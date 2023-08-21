@@ -17,20 +17,20 @@
 #container {
   display: flex;
   flex-direction: column;
-  width: 805px; /* 1610의 절반 */
-  height: 705px;
+  width: 50%; /* 1610의 절반 */
+  height: 100%;
 }
 
 #one {
   width: 805px;
-  height: 211.5px; /* 705의 30% */
+  height: 30%; /* 705의 30% 211.5px*/
 }
 
 #two {
   margin-top: 100px;
   margin-bottom: 50px;
   width: 805px;
-  height: 493.5px; /* 705의 70% */
+  height: 70%; /* 705의 70%  493.5px*/
 }
 
 #three {
