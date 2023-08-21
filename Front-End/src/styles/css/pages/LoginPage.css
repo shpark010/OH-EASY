@@ -1,0 +1,50 @@
+.loginMainDiv {
+  width: 1920px;
+  height: 1080px;
+}
+
+.loginBox {
+  margin: 229px 660px 173px 660px;
+  width: 600px;
+  height: 678px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.loginTxt {
+  margin-top: 130px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: center;
+  color: #222;
+}
+
+.loginInfoTxt {
+  margin-top: 41px;
+  margin-bottom: 36px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #222;
+}
+
+.loginInput {
+  margin: 5px 100px 5px 100px;
+  width: 400px;
+  height: 50px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.loginCheckBox {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 1px solid #ababab;
+}

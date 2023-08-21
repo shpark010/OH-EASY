@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/css/index.css" />
+    <link rel="stylesheet" href="./styles/css/pages/main.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="wrap">
+      <header id="header" class="header">
+        <div class="wrapper">
+          <div class="logo">
+           <!-- 
+            <h1>더존프로젝트 로고</h1>
+           --> 
+            <img src="logo4.png" width="100px">
+          </div>
+          <nav id="headerNav" class="nav headerNav">
+            <!-- company (S) -->
+            <div class="company">
+              <span class="companyName">(주)더존프로젝트회사명</span>
+              <select
+                name="targetYear"
+                id="targetYear"
+                class="targetYear companyYear selectBox blue"
+              >
+                <option value="2022" selected>2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+              </select>
+            </div>
+            <!-- company (E) -->
+            <!-- profile (S) -->
+            <div class="profile">
+              <span class="profileName">이재훈 사원</span>
+              <div class="profileImage">
+                <!-- 이미지 예시입니다. -->
+                <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
+              </div>
+            </div>
+            <!-- profile (E) -->
+            <!-- headerNotice (S) -->
+            <div class="headerNotice">
+              <!-- 알림이 있을 경우 active, 없을 경우에는 active 를 삭제해주세요. active 가 있을 때 빨간불 on -->
+              <div class="headerNoticeIcon active">
+                <div class="ico-bell"></div>
+              </div>
+              <!-- 알림박스는 리액트 useState 로 show/hide제어 -->
+              <div class="headerNoticeBox">
+                <div class="headerNoticeTop">
+                  <div class="title">알림</div>
+                  <div class="headerNoticeClose btn-close"></div>
+                </div>
+                <div class="headerNoticeContent">
+                  <ul class="headerNoticeList">
+                    <!-- @loop <li> (S) -->
+                    <li class="headerNoticeItem">
+                      <span>표준근로계약서 작성이 필요합니다(이재훈)</span>
+                    </li>
+                    <li class="headerNoticeItem">
+                      <span
+                        >텍스트가 길어지면 몇글자까지 나오는 것이 좋을까요 다
+                        보여주는 것이 더 좋아보임</span
+                      >
+                    </li>
+                    <li class="headerNoticeItem">
+                      <span>표준근로계약서 작성이 필요합니다(이재훈)</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <!-- headerNotice (E) -->
+          </nav>
+        </div>
+      </header>
+      <div class="contents">
+        <section class="section">페이지 예시입니다 (메인)</section>
+        <section class="section">첫번째영역</section>
+        <section class="section">두번째영역</section>
+      </div>
+      <footer id="footer" class="footer">
+        <div class="wrapper">
+          프로젝트 제작 : 이재훈, 박성환, 김의진, 조병국
+        </div>
+      </footer>
+    </div>
+    <!-- // wrap -->
+  </body>
+</html>

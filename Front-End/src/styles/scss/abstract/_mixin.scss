@@ -1,0 +1,26 @@
+@mixin centerT {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin centerF {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@mixin spaceF {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin layoutWrapper {
+  // width: 100%;
+  // max-width: $content-inner;
+  width: $content-inner;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+}

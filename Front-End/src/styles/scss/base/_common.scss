@@ -1,0 +1,40 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: "NanumSquare", sans-serif;
+  color: #222;
+}
+#wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.contents {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  background-color: #fcfcfc;
+}
+.section {
+  width: 100%;
+  max-width: $content-inner;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+.selectBox {
+  text-align: center;
+  text-align-last: center; // safari
+  font-size: 14px;
+  background: url("../../../images/icon/arw-bottom-white.png") no-repeat 66px/12px;
+  border: none;
+  border-radius: 5px;
+  &.blue {
+    background-color: var(--color-primary-blue);
+    color: #fff;
+  }
+}

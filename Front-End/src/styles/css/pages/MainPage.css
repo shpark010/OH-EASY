@@ -1,0 +1,122 @@
+.section,
+#container,
+#one,
+#two,
+#three,
+.card {
+  flex-shrink: 0;
+}
+
+.section {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+  height: 705px; /* 805 - 50 - 50 = 705px */
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  width: 805px; /* 1610의 절반 */
+  height: 705px;
+}
+
+#one {
+  width: 805px;
+  height: 211.5px; /* 705의 30% */
+}
+
+#two {
+  margin-top: 100px;
+  margin-bottom: 50px;
+  width: 805px;
+  height: 493.5px; /* 705의 70% */
+}
+
+#three {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  flex-grow: 0; /* 고정 크기를 사용할 경우 필요 없습니다. */
+  height: 605px; /* 705 - 50 - 50 = 605px */
+  width: 805px;
+}
+
+#one > p:nth-child(1) {
+  margin-top: 20px;
+  font-size: 32px; /* 조금 줄였습니다. */
+}
+
+#one > p:nth-child(2) {
+  font-size: 32px; /* 조금 줄였습니다. */
+  margin-bottom: 32px; /* 조금 줄였습니다. */
+}
+
+#three {
+  display: flex;
+  flex-wrap: wrap; /* 여러 줄로 아이템을 배치하려면 wrap을 사용 */
+  justify-content: space-between; /* 카드 간의 간격을 균등하게 설정 */
+  align-content: space-between; /* 수직 간격 균등 */
+}
+
+.card {
+  width: 48%; /* 카드의 너비를 조절하여 2개의 카드가 한 줄에 오도록 함 */
+  height: 350px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #eef7fe;
+  margin: 5px;
+  transition: transform 0.3s; /* 추가된 코드 */
+}
+.card:hover {
+  transform: scale(1.05); /* 추가된 코드 */
+}
+
+.image-container {
+  margin-top: 16px; /* 조금 줄였습니다. */
+  margin-bottom: 16px; /* 조금 줄였습니다. */
+  width: 154.96px; /* 387.4의 40% */
+  height: 154.96px;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #7092e4;
+}
+
+.text1 {
+  font-size: 20px; /* 조금 줄였습니다. */
+  margin: 6px 0; /* 조금 줄였습니다. */
+}
+
+.text2 {
+  font-size: 14px; /* 조금 줄였습니다. */
+  margin: 6px 0; /* 조금 줄였습니다. */
+}
+
+.mainPageBtn {
+  padding: 6px 36px; /* 조금 줄였습니다. */
+  margin-top: 14px; /* 조금 줄였습니다. */
+  border: none;
+  border-radius: 18px; /* 조금 줄였습니다. */
+  background-color: #fffffe;
+  color: black;
+  cursor: pointer;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mainPageBtn:hover {
+  background-color: #0056b3;
+}

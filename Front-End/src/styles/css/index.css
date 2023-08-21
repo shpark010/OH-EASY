@@ -1,0 +1,638 @@
+@charset "UTF-8";
+/* bases/reset.scss */
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css);
+html {
+  /* Anti-aliasing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  /* Typo-readability */
+  font-size: 16px;
+  letter-spacing: -0.0125em;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html,
+body,
+div,
+span,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+abbr,
+address,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+samp,
+small,
+strong,
+sub,
+sup,
+var,
+b,
+i,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+summary,
+time,
+mark,
+audio,
+video,
+button {
+  margin: 0;
+  padding: 0;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+ul,
+ol,
+li {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+img {
+  border: none;
+  vertical-align: bottom;
+  max-width: 100%;
+}
+
+i,
+em,
+address {
+  font-style: normal;
+}
+
+label {
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+legend {
+  border: 0;
+  padding: 0;
+}
+
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+
+/* input 기본 스타일 초기화 */
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* IE10 이상에서 input box 에 추가된 지우기 버튼 제거 */
+input::-ms-clear {
+  display: none;
+}
+
+/* input type number 에서 화살표 제거 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="search"] {
+  -webkit-appearance: textfield;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/* Select box 스타일 초기화 */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* IE 에서 Select box 화살표 제거 */
+select::-ms-expand {
+  display: none;
+}
+
+/* IE에서 비밀번호 보이기/숨기기 눈 없애기*/
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+::placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+/*  bases/root.scss */
+:root {
+  --color-primary-blue: #1985fa;
+  --color-secondary-blue: #92c5ff;
+  --color-primary-navy: #1e22bf;
+  --color-primary-gray: #707070;
+  --color-primary-black: #222222;
+  --color-primary-white: #ffffff;
+  --color-opacity-blue: #eef7fe;
+}
+
+.dn {
+  display: none;
+}
+
+.dn-i {
+  display: none !important;
+}
+
+.fxAlignCenter {
+  display: flex;
+  align-content: center;
+}
+
+.fxSpace {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: "NanumSquare", sans-serif;
+  color: #222;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+#wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+.contents {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  background-color: #fcfcfc;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.innerBox,
+.section {
+  width: 100%;
+  max-width: 1640px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.innerPadding {
+  padding: 0 12px;
+}
+
+/* 셀렉트 박스  */
+.selectBox {
+  height: 32px;
+  text-align: center;
+  text-align-last: center;
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 50px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
+  border: 1px solid var(--color-primary-gray);
+  color: var(--color-primary-gray);
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.selectBox.blue {
+  background-color: var(--color-primary-blue);
+  color: #fff;
+}
+.contents .selectBox {
+  border: 1px solid var(--color-primary-gray);
+}
+
+/* 버튼 */
+button {
+  border: 1px solid var(--color-primary-gray);
+  border-radius: 2px;
+  background-color: transparent;
+  cursor: pointer;
+}
+button.gray {
+  background-color: var(--color-primary-gray);
+  color: #fff;
+}
+
+.btnMore {
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
+}
+
+/* 페이지 헤더 */
+.pageHeader {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  margin-bottom: 15px;
+}
+.pageHeaderName {
+  font-size: 20px;
+}
+.pageHeader .innerBox {
+  position: relative;
+  height: 70px;
+}
+.pageHeader .innerBox:before {
+  content: "";
+  background-color: var(--color-primary-navy);
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  width: 140px;
+  height: 100%;
+}
+.pageHeader .btnWrap {
+  display: flex;
+  align-items: center;
+}
+.pageHeader .textBtnWrap {
+  display: flex;
+  align-items: center;
+  gap: 0 8px;
+}
+.pageHeader .textBtnWrap button {
+  padding: 8px 16px;
+  border: 1px solid var(--color-primary-white);
+  color: var(--color-primary-white);
+  font-size: 16px;
+}
+.pageHeader .iconBtnWrap {
+  display: flex;
+  align-items: center;
+  gap: 0 17px;
+  margin-left: 35px;
+}
+.pageHeader .iconBtnWrap button {
+  width: 30px;
+  border: none;
+}
+
+/* 서치박스 */
+.searchBar {
+  /* 서치박스 공통*/
+  /* 서치박스 각 요소설정 */
+}
+.searchBar button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+.searchBar .innerBox {
+  padding: 15px;
+  border: 1px solid var(--color-primary-gray);
+  border-radius: 2px;
+}
+.searchBar .selectWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0 25px;
+}
+.searchBarName {
+  display: inline-block;
+  font-size: 14px;
+  color: var(--color-primary-gray);
+  padding-right: 18px;
+}
+
+.ico-bell:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-bell.png") no-repeat center/cover;
+}
+.ico-bell.white:after {
+  filter: invert(1);
+}
+
+.ico-exchange:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-exchange.png") no-repeat center/cover;
+}
+.ico-exchange.white:after {
+  filter: invert(1);
+}
+
+.ico-person-add:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-person-add.png") no-repeat center/cover;
+}
+.ico-person-add.white:after {
+  filter: invert(1);
+}
+
+.ico-person-card:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-person-card.png") no-repeat
+    center/cover;
+}
+.ico-person-card.white:after {
+  filter: invert(1);
+}
+
+.ico-person-contract:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-person-contract.png") no-repeat
+    center/cover;
+}
+.ico-person-contract.white:after {
+  filter: invert(1);
+}
+
+.btn-close:after {
+  display: flex;
+  content: "\e5cd";
+  font-size: 14px;
+  font-family: Material Icons;
+}
+
+.header {
+  height: 80px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  flex-shrink: 0;
+}
+.header .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 1640px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+.headerNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.headerNav .company {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 15px;
+}
+.headerNav .companyName {
+  display: inline-block;
+  padding-right: 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.headerNav .companyYear {
+  width: 100px;
+  height: 40px;
+  padding-left: 0;
+  padding-right: 15px;
+  font-family: arial;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  background-image: url("../../images/icon/arw-bottom-white.png");
+  background-position: calc(100% - 12px) center;
+}
+.headerNav .companyYear:focus {
+  outline: 2px solid var(--color-secondary-blue);
+}
+.headerNav .profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+.headerNav .profileName {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0 15px 0 26px;
+}
+.headerNav .profileImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  outline: 1px solid #ccc;
+  background-color: #fff;
+}
+.headerNotice {
+  position: relative;
+  padding-left: 20px;
+}
+.headerNoticeBox {
+  background-color: #fff;
+}
+.headerNoticeIcon {
+  position: relative;
+  cursor: pointer;
+}
+.headerNoticeIcon.active:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 6px;
+  background-color: #ff6060;
+  border-radius: 50%;
+}
+.headerNoticeBox {
+  position: absolute;
+  top: calc(100% + 34px);
+  right: 0;
+  padding: 22px 25px;
+  width: 330px;
+  color: var(--color-primary-gray);
+  border-radius: 10px;
+  border: 1px solid #fdfdfd;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+}
+.headerNoticeTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 10px 15px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid #ccc;
+}
+.headerNoticeClose {
+  cursor: pointer;
+  color: var(--color-primary-gray);
+}
+.headerNoticeItem {
+  padding: 14px 0px 13px 15px;
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+.headerNoticeItem:nth-child(even) {
+  background-color: #fdfdfd;
+}
+.headerNoticeItem:hover {
+  background-color: #fcfcfc;
+}
+.headerNoticeItem span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 10px;
+}
+.headerNoticeItem span:after {
+  content: "";
+  display: inline-block;
+  margin-left: 5px;
+  width: 12px;
+  height: 12px;
+  background: url("../../images/icon/arw-right.png") no-repeat center/cover;
+  filter: invert(0.7);
+  flex-shrink: 0;
+}
+
+.footer {
+  height: 35px;
+  border-top: 1px solid var(--color-primary-gray);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.footer .wrapper {
+  display: flex;
+  align-items: center;
+  width: 1640px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+} /*# sourceMappingURL=index.css.map */

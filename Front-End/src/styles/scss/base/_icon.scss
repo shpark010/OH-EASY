@@ -1,0 +1,27 @@
+$icons: (bell, exchange, person-add, person-card, person-contract);
+
+@each $icon in $icons {
+  .ico-#{$icon} {
+    &:after {
+      content: "";
+      display: block;
+      width: 30px;
+      height: 30px;
+      background: url("../../../images/icon/ico-#{$icon}.png")
+        no-repeat
+        center/cover;
+    }
+    &.white:after {
+      filter: invert(1);
+    }
+  }
+}
+
+.btn-close {
+  &:after {
+    display: flex;
+    content: "\e5cd";
+    font-size: 14px;
+    font-family: Material Icons;
+  }
+}
