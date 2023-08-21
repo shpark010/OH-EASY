@@ -76,7 +76,9 @@ class SalaryData extends Component {
             </div>
           </div>
         </div>
-        <section className="section one">급여관리 페이지</section>
+        <section className="section">
+          <div>dfasdfa</div>
+        </section>
       </>
     );
   }
