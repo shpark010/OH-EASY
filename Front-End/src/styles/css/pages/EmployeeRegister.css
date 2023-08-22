@@ -1,20 +1,79 @@
 
-.emp-section{
-  width: 100%;
-  height: 100%;
+.erSection {
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-gap: 1rem;
+  width: 100%;
+  max-width: 1640px;
+  height: 85%;
+  margin: 0 auto;
+  padding: 0 15px;
+  flex-grow: 1;
+  overflow: hidden;
 }
 
-.first-grid {
+.erGrid {
   border: 1px solid black;
-  padding: 20px;
   box-sizing: border-box;
+  overflow: auto;
 }
 
-.second-grid {
+.erGridTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.erGridTable th,
+.erGridTable td {
   border: 1px solid black;
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.erGrid2 {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.erHeaderStyle {
+  background-color: #e6e6e6;
+  padding: 10px;
+  font-weight: bold;
+  text-align: right;
+  vertical-align: middle;
+  font-size: 13px;
+  width: 180px;
+}
+
+.erCellStyle {
+  padding: 7px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.erInputStyle {
+  width: 100%;
+  height: 26px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 3%;
+}
+
+.erReqInputStyle {
+  width: 100%;
+  height: 26px;
+  border: 1px solid #ccc;
+  background: #fef4f4;
+}
+
+.erSearchButton {
+  padding: 3px 10px;
+  font-size: 12px;
+}
+
+.erLightGreen {
+  background-color: rgb(232, 248, 232);
 }
