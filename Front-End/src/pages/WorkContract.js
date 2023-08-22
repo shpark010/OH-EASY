@@ -37,45 +37,46 @@ class WorkContract extends Component {
             </div>
           </div>
         </div>
-        <div className="searchBar">
-          <div className="innerBox fxSpace">
-            <div className="selectWrapper">
-              <div className="searchBarBox">
-                <span className="searchBarName">조회구분</span>
-                <select
-                  id="category"
-                  name="category"
-                  className="selectBox"
-                  defaultValue="0"
-                >
-                  <option value="0">0. 재직자+당해년도 퇴사자</option>
-                  <option value="1">1. 재직자+당해년도 퇴사자</option>
-                </select>
+        <section classname="section one">
+          <div className="searchBar">
+            <div className="innerBox fxSpace">
+              <div className="selectWrapper">
+                <div className="searchBarBox">
+                  <span className="searchBarName">조회구분</span>
+                  <select
+                    id="category"
+                    name="category"
+                    className="selectBox"
+                    defaultValue="0"
+                  >
+                    <option value="0">0. 재직자+당해년도 퇴사자</option>
+                    <option value="1">1. 재직자+당해년도 퇴사자</option>
+                  </select>
+                </div>
+                <div className="searchBarBox">
+                  <span className="searchBarName">정렬</span>
+                  <select
+                    id="order"
+                    name="order"
+                    className="selectBox"
+                    defaultValue="0"
+                  >
+                    <option value="0">0. 코드순</option>
+                    <option value="1">1. 이름순</option>
+                  </select>
+                </div>
               </div>
-              <div className="searchBarBox">
-                <span className="searchBarName">정렬</span>
-                <select
-                  id="order"
-                  name="order"
-                  className="selectBox"
-                  defaultValue="0"
-                >
-                  <option value="0">0. 코드순</option>
-                  <option value="1">1. 이름순</option>
-                </select>
+              <div className="btnWrapper">
+                <button className="gray">조회</button>
+                <button className="btnMore">
+                  <span className="hidden">펼쳐보기? 더보기?</span>
+                </button>
+                <button>PDF로 내보내기</button>
+                <button>전자서명</button>
               </div>
-            </div>
-            <div className="btnWrapper">
-              <button className="gray">조회</button>
-              <button className="btnMore">
-                <span className="hidden">펼쳐보기? 더보기?</span>
-              </button>
-              <button>PDF로 내보내기</button>
-              <button>전자서명</button>
             </div>
           </div>
-        </div>
-        <section classname="section one">표준근로계약서 페이지</section>
+        </section>
       </>
     );
   }

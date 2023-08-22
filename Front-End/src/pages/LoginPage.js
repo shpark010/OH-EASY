@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import "../styles/css/pages/LoginPage.css";
 
 class LoginPage extends Component {
@@ -43,7 +44,9 @@ class LoginPage extends Component {
               <p className="loginCheckBoxTxt">아이디저장</p>
             </div>
             <button className="btn loginBtn">로그인</button>
-            <button className="btn signupBtn">회원가입</button>
+            <Link to="/signup">
+              <button className="btn signupBtn">회원가입</button>
+            </Link>
           </div>
           <div className="accountRecoveryContainer">
             <p className="lostAccountTxt">계정을 잃어버리셨나요?</p>

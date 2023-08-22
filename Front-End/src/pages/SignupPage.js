@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import "../styles/css/pages/SignupPage.css";
 
 class SignupPage extends Component {
@@ -12,31 +13,58 @@ class SignupPage extends Component {
             <br /> 더 스마트해진 업무환경을 경험하세요
           </p>
           <div className="signupForm">
-            <input
-              type="text"
-              className="signupInput"
-              placeholder="  아이디를 입력해주세요"
-            ></input>
-            <input
-              type="password"
-              className="signupInput"
-              placeholder="  비밀번호를 입력해주세요"
-            ></input>
-            <select className="signupInput companySelectTag">
+            <div className="inputWithLabel">
+              <input type="text" className="signupInput" id="userId" required />
+              <label htmlFor="userId" className="floatingLabel">
+                아이디
+              </label>
+            </div>
+            <div className="inputWithLabel">
+              <input
+                type="password"
+                className="signupInput"
+                id="userPwd"
+                required
+              />
+              <label htmlFor="userPwd" className="floatingLabel">
+                비밀번호
+              </label>
+            </div>
+            <select className="companySelectTag">
               <option key="한국소프트웨어협회" value="한국소프트웨어협회">
                 &nbsp;&nbsp;한국소프트웨어협회
               </option>
             </select>
-            <input
-              type="text"
-              className="signupInput"
-              placeholder="  이름을 입력해주세요"
-            ></input>
-            <input
-              type="text"
-              className="signupInput"
-              placeholder="  이메일을 입력해주세요"
-            ></input>
+            <div className="inputWithLabel">
+              <input
+                type="text"
+                className="signupInput"
+                id="userName"
+                required
+              />
+              <label htmlFor="userName" className="floatingLabel">
+                이름
+              </label>
+            </div>
+            <div className="inputWithLabel">
+              <input
+                type="txt"
+                className="signupInput"
+                id="userEmail"
+                required
+              />
+              <label htmlFor="userEmail" className="floatingLabel">
+                이메일
+              </label>
+            </div>
+            <button className="signupOkBtn">
+              <p className="signupBtnTxt">회원가입</p>
+            </button>
+            <Link to="/login">
+              <button className="signupCancleBtn">
+                <p className="signupCalcleBtnTxt">취소</p>
+              </button>
+            </Link>
           </div>
         </div>
       </div>

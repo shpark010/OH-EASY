@@ -8,7 +8,7 @@ class MainPage extends Component {
   render() {
     return (
       <>
-        <section className="section">
+        <section className="section sectionMain">
           <div id="container">
             <div id="one">
               <p>이재훈 님,</p>
@@ -21,7 +21,7 @@ class MainPage extends Component {
           </div>
           <div id="three">
             <div className="card">
-              <div className="image-container">
+              <div className="image_container">
                 <img src="" alt="" />
               </div>
               <h2 className="text1">사원등록</h2>
@@ -31,7 +31,7 @@ class MainPage extends Component {
               </Link>
             </div>
             <div className="card">
-              <div className="image-container">
+              <div className="image_container">
                 <img src="" alt="" />
               </div>
               <h2 className="text1">인사등록</h2>
@@ -41,7 +41,7 @@ class MainPage extends Component {
               </Link>
             </div>
             <div className="card">
-              <div className="image-container">
+              <div className="image_container">
                 <img src="" alt="" />
               </div>
               <h2 className="text1">급여등록</h2>
@@ -51,7 +51,7 @@ class MainPage extends Component {
               </Link>
             </div>
             <div className="card">
-              <div className="image-container">
+              <div className="image_container">
                 <img src="" alt="" />
               </div>
               <h2 className="text1">근로계약서</h2>
