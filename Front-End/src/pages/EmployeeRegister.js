@@ -36,7 +36,41 @@ class EmployeeRegister extends Component {
             </div>
           </div>
         </div>
-        <section className="section one">사원등록 페이지</section>
+
+        <section className="section">
+          {/* 첫 번째 그리드 영역에 .section.one 클래스 적용 */}
+          <div className="emp-section">
+            <div className="grid">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Header 1</th>
+                      <th>Header 2</th>
+                      <th>Header 3</th>
+                      <th>Header 4</th>
+                      <th>Header 5</th>
+                      <th>Header 6</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Data 1</td>
+                      <td>Data 2</td>
+                      <td>Data 3</td>
+                      <td>Data 4</td>
+                      <td>Data 5</td>
+                      <td>Data 6</td>
+                    </tr>
+                    {/* 여기에 추가적인 행들을 넣을 수 있습니다 */}
+                  </tbody>
+                </table>
+              </div>
+            <div className="grid">second grid area</div>
+          </div>
+        </section>
+        
+
+
       </>
     );
   }
