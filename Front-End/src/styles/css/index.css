@@ -244,8 +244,8 @@ input[type="password"]::-ms-clear {
 
 html,
 body {
-  width: 1920px; /* 원래 100% 이재훈이 수정함*/
-  height: 1080px; /* 원래 100% 이재훈이 수정함*/
+  width: 100%; /* 원래 100% 이재훈이 수정함*/
+  height: 100%; /* 원래 100% 이재훈이 수정함*/
   font-family: "NanumSquare", sans-serif;
   color: #222;
 }

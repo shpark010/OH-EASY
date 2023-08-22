@@ -29,22 +29,85 @@
   color: #222;
 }
 
-.signupInput {
+.inputWithLabel {
+  position: relative;
   margin: 13.5px 100px 13.5px 100px;
+  width: 400px;
+}
+
+.signupInput {
   width: 400px;
   height: 50px;
   border-radius: 5px;
   background: #fff;
   border: 1px solid #ccc;
   font-size: 16px;
-  transition: background-color 0.3s; /* 부드러운 전환 효과를 위한 설정 */
+  transition: background-color 0.3s, padding-top 0.3s, padding-bottom 0.1s;
+  /*padding-top: 15px;  상단 패딩을 추가하여 라벨이 인풋 안에 위치하게 합니다. */
+  /*line-height: 50px;  이 속성을 통해 글씨를 세로 중앙에 배치합니다. */
+  text-align: center; /* 이 속성을 통해 글씨를 가로 중앙에 배치합니다. */
 }
-/* 사용자가 인풋태그에 포커스를 맞출 때의 스타일 */
+
+.floatingLabel {
+  position: absolute;
+  pointer-events: none;
+  left: 10px;
+  top: 10px;
+  transition: 0.1s ease all;
+  opacity: 0.5;
+}
+
+.signupInput:focus + .floatingLabel,
+.signupInput:valid + .floatingLabel {
+  /* top: -5px; */
+  /* left: 10px; */
+  font-size: 12px;
+  opacity: 1;
+}
+
 .signupInput:focus {
-  background-color: #eee; /* 원하는 회색으로 설정하세요 */
-  font-size: 18px; /* 포커스 상태에서의 텍스트 크기 */
+  background-color: #eee;
+  font-size: 18px;
+  padding-top: 0px; /* 포커스되면 패딩을 증가시켜 라벨을 위로 밀어냅니다. */
 }
 
 .companySelectTag {
+  width: 400px;
+  height: 50px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin: 13.5px 100px 13.5px 100px;
   background-color: #bfbaba;
+}
+
+.signupOkBtn {
+  margin: 100px 100px 5px 100px;
+  width: 400px;
+  height: 60px;
+  background: #2e6ec8;
+}
+.signupBtnTxt {
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #fff;
+}
+
+.signupCancleBtn {
+  margin: 5px 100px 5px 100px;
+  width: 400px;
+  height: 58px;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.signupCalcleBtnTxt {
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #707070;
 }

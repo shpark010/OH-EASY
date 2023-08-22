@@ -7,7 +7,7 @@
   flex-shrink: 0;
 }
 
-.section {
+.sectionMain {
   margin-top: 50px;
   margin-bottom: 50px;
   display: flex;
@@ -76,7 +76,7 @@
   transform: scale(1.05); /* 추가된 코드 */
 }
 
-.image-container {
+.image_container {
   margin-top: 16px; /* 조금 줄였습니다. */
   margin-bottom: 16px; /* 조금 줄였습니다. */
   width: 154.96px; /* 387.4의 40% */
@@ -86,7 +86,7 @@
   overflow: hidden;
 }
 
-.image-container img {
+.image_container img {
   position: absolute;
   top: 0;
   left: 0;

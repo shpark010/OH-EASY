@@ -71,6 +71,11 @@ input[type="checkbox"] {
   border-radius: 5px;
   font-size: 20px;
   text-align: center;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #fff;
 }
 
 .loginBtn {
