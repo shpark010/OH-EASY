@@ -8,10 +8,10 @@
 }
 
 .sectionMain {
-  margin-top: 50px;
-  margin-bottom: 50px;
+  /* margin-top: 50px; */
+  /* margin-bottom: 50px; */
   display: flex;
-  height: 705px; /* 805 - 50 - 50 = 705px */
+  height: 80%; /* 805 - 50 - 50 = 705px */
 }
 
 #container {
