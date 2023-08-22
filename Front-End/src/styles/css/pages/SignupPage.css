@@ -1,0 +1,50 @@
+.signupBox {
+  margin: 40px 660px 61px 660px;
+  width: 600px;
+  height: 979px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
+  font-family: NanumSquare;
+}
+
+.signupTxt {
+  margin-top: 45px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: left;
+  color: #222;
+  text-align: center;
+}
+
+.signupInfoTxt {
+  margin-top: 35px;
+  margin-bottom: 13.5px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #222;
+}
+
+.signupInput {
+  margin: 13.5px 100px 13.5px 100px;
+  width: 400px;
+  height: 50px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: background-color 0.3s; /* 부드러운 전환 효과를 위한 설정 */
+}
+/* 사용자가 인풋태그에 포커스를 맞출 때의 스타일 */
+.signupInput:focus {
+  background-color: #eee; /* 원하는 회색으로 설정하세요 */
+  font-size: 18px; /* 포커스 상태에서의 텍스트 크기 */
+}
+
+.companySelectTag {
+  background-color: #bfbaba;
+}

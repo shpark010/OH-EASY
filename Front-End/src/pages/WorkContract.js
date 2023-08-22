@@ -11,7 +11,7 @@ class WorkContract extends Component {
       <>
         <div className="pageHeader">
           <div className="innerBox fxSpace">
-            <h2 className="pageHeaderName">인사관리등록</h2>
+            <h2 className="pageHeaderName">표준근로계약서</h2>
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
                 <button>사원불러오기</button>
