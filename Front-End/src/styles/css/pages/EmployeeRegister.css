@@ -19,6 +19,7 @@
   box-sizing: border-box;
   overflow: auto;
   background-color: #ffffff;
+  max-height: calc(100% - 10px);
 }
 
 .erGridTable {
@@ -42,15 +43,10 @@
   font-weight: bold;
 }
 
-.erGrid2Section {
-  display: grid;
-  grid-template-rows: 6% 94%;
-  width: 100%;
-}
-
 .erGrid2Top {
   table-layout: fixed;
   width: 100%;
+  border-bottom: 2px solid black;
 }
 
 .erGrid2Top th {
@@ -70,7 +66,6 @@
 .erGrid2 {
   width: 100%;
   background-color: #ffffff;
-  border: 1px solid black;
   box-sizing: border-box;
   overflow: auto;
 }
@@ -140,5 +135,21 @@ input:disabled {
   background: url("../../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
   color: rgb(97, 97, 97);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  cursor: pointer; /* 마우스 커서를 손가락 모양으로 변경 */
+}
+
+.email-cell {
+  display: flex;
+  align-items: center;
+}
+
+.email-cell input[type="text"] {
+  flex: 9;
+}
+
+.email-cell::before {
+  content: "@";
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
 }

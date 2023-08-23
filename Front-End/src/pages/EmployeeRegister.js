@@ -15,9 +15,9 @@ class EmployeeRegister extends Component {
             <h2 className="pageHeaderName">사원등록</h2>
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                <button>버튼</button>
-                <button>사원조회하기</button>
-                <button>빠른조회</button>
+                <button>사원검색</button>
+                <button>조건검색</button>
+                <button>데이터정렬</button>
               </div>
               <div className="iconBtnWrap">
                 <button className="print">
@@ -117,12 +117,13 @@ class EmployeeRegister extends Component {
             </div>
 
             {/* 두번째 그리드 */}
-            <div className="erGrid2Section">
+            <div className="erGrid2">
 
+                {/* 제목 탭 테이블 */}
                 <table className="erGrid2Top">
                   <th className="erGrid2TopCell">기초자료</th>
-                  <th></th>
-                  <th></th>
+                  <th className="erGrid2TopCell">공제등록</th>
+                  <th className="erGrid2TopCell">부양가족</th>
                   <th></th>
                   <th></th>
                   <th></th>
@@ -132,8 +133,7 @@ class EmployeeRegister extends Component {
                   <th></th>
                 </table>
 
-
-            <div className="erGrid2">
+              {/* 탭 내용 테이블 */}
               <table>
                 <tbody>
                   <tr>
@@ -211,13 +211,17 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">이메일</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <div>
+                        <input type="text" className="erInputStyle" />
+                      </div>
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <div class="email-cell">
+                        <input type="text" className="erInputStyle" />
+                      </div>
                     </td>
                     <td className="erCellStyle">
-                    <select className="erInputStyle erSelectBox">
+                      <select className="erInputStyle erSelectBox">
                         <option value="0" selected>직접입력</option>
                         <option value="1">gmail.com</option>
                         <option value="2">naver.com</option>
@@ -271,7 +275,6 @@ class EmployeeRegister extends Component {
 
               </div>
             </div>
-          </div>
         </section>
         
       </>
