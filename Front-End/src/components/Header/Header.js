@@ -41,10 +41,20 @@ class Header extends Component {
                 <option value="2019">2019</option>
               </select>
             </div>
-            <div className="profile">
-              <span className="profileName">이재훈 사원</span>
-              <div className="profileImage">
+            <div class="profile toggleModal">
+              <span class="profileName">이재훈 사원</span>
+              <div class="profileImage">
                 <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
+              </div>
+              <div class="toggleModalBox profileBox">
+                <a href="" class="profileBoxItem">
+                  <div class="ico-person"></div>
+                  <span>마이페이지</span>
+                </a>
+                <a href="" class="profileBoxItem">
+                  <div class="ico-logout"></div>
+                  <span>로그아웃</span>
+                </a>
               </div>
             </div>
             <div className="headerNotice">
