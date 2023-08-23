@@ -1,0 +1,23 @@
+server:
+  port: 8092
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.0.37:3307/kosa?useSSL=false&serverTimezone=UTC
+    username: kosa
+    password: 1004
+    hikari:
+      poolName: HikariPool-1
+      maximumPoolSize: 10
+      minimumIdle: 2
+      idleTimeout: 10000
+      maxLifetime: 1800000
+      connectionTimeout: 30000
+
+
+mybatis:
+  mapper-locations: mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
