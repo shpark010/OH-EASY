@@ -39,8 +39,9 @@ class EmployeeRegister extends Component {
 
         <section className="section erSection">
 
-            
+            {/* 첫번째 그리드 */}
             <div className="erGrid">
+              {/* 첫번째 테이블 */}
               <table className="erGridTable">
                 <thead>
                   <tr className="erHeaderStyle">
@@ -105,123 +106,172 @@ class EmployeeRegister extends Component {
                   </tr>
                 </tbody>
               </table>
+
+              {/* 두번째 테이블 */}
+              <table className="erGridTable erGridBottom">
+                <tr>
+                  <td>재직 / 전체</td>
+                  <td>5명 / 5명</td>
+                </tr>
+              </table>
             </div>
 
-            <div className="erGrid">
-              <div className="erGrid2">
-                <table>
-                  <tbody>
-                    <tr>
-                      <th className="erHeaderStyle">입사일자</th>
-                      <td className="erCellStyle">
-                        <input type="date" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">주민번호</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">주소</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td colSpan="2" className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <button className="erSearchButton">검색</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">상세주소</th>
-                      <td colSpan="5" className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">전화번호</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">휴대폰번호</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">이메일</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">부서</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">직급</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">퇴사일자</th>
-                      <td className="erCellStyle">
-                        <input type="date" className="erInputStyle" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th className="erHeaderStyle">급여이체은행</th>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                      <td className="erCellStyle">
-                        <input type="text" className="erInputStyle" />
-                      </td>
-                    </tr>
-                  </tbody>
+            {/* 두번째 그리드 */}
+            <div className="erGrid2Section">
+
+                <table className="erGrid2Top">
+                  <th className="erGrid2TopCell">기초자료</th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
                 </table>
+
+
+            <div className="erGrid2">
+              <table>
+                <tbody>
+                  <tr>
+                    <th className="erHeaderStyle">입사일자</th>
+                    <td className="erCellStyle">
+                      <input type="date" className="erInputDateStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">주민번호</th>
+                    <td className="erCellStyle">
+                      <select className="erInputStyle erSelectBox">
+                        <option value="0" selected>내국인</option>
+                        <option value="1">외국인</option>
+                      </select>
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <select className="erInputStyle erSelectBox">
+                        <option value="0" selected>남자</option>
+                        <option value="1">여자</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">주소</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td colSpan="2" className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <button className="erSearchButton">검색</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">상세주소</th>
+                    <td colSpan="5" className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">전화번호</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">휴대폰번호</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    {/* <td className="erCellStyle">
+                      <input type="text" disabled className="erInputStyle2" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" disabled className="erInputStyle2" />
+                    </td> */}
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">이메일</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                    <select className="erInputStyle erSelectBox">
+                        <option value="0" selected>직접입력</option>
+                        <option value="1">gmail.com</option>
+                        <option value="2">naver.com</option>
+                        <option value="3">daum.net</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">부서</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">직급</th>
+                    <td className="erCellStyle">
+                      <select className="erInputStyle erSelectBox">
+                        <option value="0" selected>기본직급</option>
+                      </select>
+                    </td>
+                    <td className="erCellStyle">
+                      <select className="erInputStyle erSelectBox">
+                        <option value="0" selected>직급없음</option>
+                        <option value="1">회장</option>
+                        <option value="2">사장</option>
+                        <option value="3">부사장</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">퇴사일자</th>
+                    <td className="erCellStyle">
+                      <input type="date" className="erInputDateStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">급여이체은행</th>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                    <td className="erCellStyle">
+                      <input type="text" className="erInputStyle" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div>
+
               </div>
             </div>
-            
-
+          </div>
         </section>
         
       </>
