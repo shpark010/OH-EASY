@@ -17,9 +17,9 @@
 }
 
 @mixin layoutWrapper {
-  // width: 100%;
-  // max-width: $content-inner;
-  width: $content-inner;
+  width: 100%;
+  max-width: $content-inner;
+  min-width: $content-inner;
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;

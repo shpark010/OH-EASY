@@ -2,8 +2,15 @@ html,
 body {
   width: 100%;
   height: 100%;
+  min-height: 100vh;
   font-family: "NanumSquare", sans-serif;
   color: #222;
+  background-color: #fcfcfc;
+}
+#root {
+  // react fix
+  width: 100%;
+  height: 100%;
 }
 #wrap {
   display: flex;
@@ -12,29 +19,182 @@ body {
   height: 100%;
   max-width: 1920px;
   margin: 0 auto;
-  overflow: hidden;
 }
 .contents {
   width: 100%;
+  max-width: $content-inner;
+  min-width: $content-inner;
   height: 100%;
   flex-grow: 1;
-  background-color: #fcfcfc;
+  margin: 0 auto;
 }
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.innerBox,
 .section {
   width: 100%;
-  max-width: $content-inner;
   margin: 0 auto;
   padding: 0 15px;
 }
+.innerPadding {
+  padding: 0 12px;
+}
+
+/* 셀렉트 박스  */
 .selectBox {
+  height: 32px;
   text-align: center;
   text-align-last: center; // safari
   font-size: 14px;
-  background: url("../../../images/icon/arw-bottom-white.png") no-repeat 66px/12px;
-  border: none;
-  border-radius: 5px;
+  padding-left: 12px;
+  padding-right: 50px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/ 12px;
+  border: 1px solid var(--color-primary-gray);
+  color: var(--color-primary-gray);
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
   &.blue {
     background-color: var(--color-primary-blue);
     color: #fff;
+  }
+  .contents & {
+    border: 1px solid var(--color-primary-gray);
+  }
+}
+/* 버튼 */
+button {
+  border: 1px solid var(--color-primary-gray);
+  border-radius: 2px;
+  background-color: transparent;
+  cursor: pointer;
+  &.gray {
+    background-color: var(--color-primary-gray);
+    color: #fff;
+  }
+}
+.btnMore {
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/ 12px;
+}
+/* 페이지 헤더 */
+.pageHeader {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  margin-bottom: 15px;
+  &Name {
+    //h2
+    font-size: 20px;
+  }
+  .innerBox {
+    position: relative;
+    height: 70px;
+    // padding: 0 25px;
+    &:before,
+    &:after {
+      content: "";
+      background-color: var(--color-primary-navy);
+      position: absolute;
+      width: 140px;
+      height: 100%;
+    }
+    &:before {
+      top: 0;
+      left: 0;
+      transform: translateX(-100%);
+    }
+    &:after {
+      top: 0;
+      right: 0;
+      transform: translateX(100%);
+    }
+  }
+  .btnWrap {
+    display: flex;
+    align-items: center;
+  }
+  .textBtnWrap {
+    display: flex;
+    align-items: center;
+    gap: 0 8px;
+    button {
+      padding: 8px 16px;
+      border: 1px solid var(--color-primary-white);
+      color: var(--color-primary-white);
+      font-size: 16px;
+      // &:hover {
+      //   outline: 2px solid var(--color-primary-white);
+      // }
+    }
+  }
+
+  .iconBtnWrap {
+    display: flex;
+    align-items: center;
+    gap: 0 17px;
+    margin-left: 35px;
+    button {
+      width: 30px;
+      border: none;
+    }
+  }
+}
+
+/* 서치박스 */
+.searchBar {
+  /* 서치박스 공통*/
+  button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  .innerBox {
+    padding: 15px;
+    border: 1px solid var(--color-primary-gray);
+    border-radius: 2px;
+  }
+  .selectWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0 25px;
+    select {
+    }
+  }
+  /* 서치박스 각 요소설정 */
+  &Box {
+    //searchBarBox
+    // display: ;
+  }
+  &Name {
+    //searchBarName
+    //span
+    display: inline-block;
+    font-size: 14px;
+    color: var(--color-primary-gray);
+    padding-right: 18px;
+  }
+}
+
+.toggleModal {
+  position: relative;
+  //prt box
+  &Box {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    padding: 18px 22px;
+    background-color: #fff;
+    color: var(--color-primary-gray);
+    border-radius: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
   }
 }

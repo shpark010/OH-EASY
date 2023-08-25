@@ -1,0 +1,13 @@
+.dn {
+  display: none;
+}
+.dn-i {
+  display: none !important;
+}
+.fxAlignCenter {
+  display: flex;
+  align-content: center;
+}
+.fxSpace {
+  @include spaceF;
+}
