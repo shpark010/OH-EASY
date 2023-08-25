@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import Setting from "../images/pages/common/setting.png";
-import Calc from "../images/pages/common/calc.png";
-import Print from "../images/pages/common/print.png";
-import Delete from "../images/pages/common/delete.png";
+import IconBtnWrap from "../components/PageHeader/Button/IconBtnWrap";
+import BtnWrapper from "../components/PageHeader/Button/BtnWrapper";
 
 import "../styles/css/pages/EmployeeRegister.css";
+
 
 class EmployeeRegister extends Component {
   render() {
@@ -14,25 +13,10 @@ class EmployeeRegister extends Component {
           <div className="innerBox fxSpace">
             <h2 className="pageHeaderName">사원등록</h2>
             <div className="fxAlignCenter">
-              <div className="btnWrapper textBtnWrap">
-                <button>사원검색</button>
-                <button>조건검색</button>
-                <button>데이터정렬</button>
-              </div>
-              <div className="iconBtnWrap">
-                <button className="print">
-                  <img src={Print} alt="프린트" />
-                </button>
-                <button className="delete">
-                  <img src={Delete} alt="삭제" />
-                </button>
-                <button className="calc">
-                  <img src={Calc} alt="계산기" />
-                </button>
-                <button className="setting">
-                  <img src={Setting} alt="설정" />
-                </button>
-              </div>
+              <BtnWrapper label="사원검색" />
+              <BtnWrapper label="조건검색" />
+              <BtnWrapper label="데이터정렬" />
+              <IconBtnWrap />
             </div>
           </div>
         </div>
