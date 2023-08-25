@@ -6,12 +6,18 @@ class Header extends Component {
   // 초기 상태 설정
   state = {
     isNoticeBoxVisible: false,
+    isProfileBoxVisible: false,
   };
 
   // 알림 박스의 가시성을 전환하는 함수
   toggleNoticeBox = () => {
     this.setState((prevState) => ({
       isNoticeBoxVisible: !prevState.isNoticeBoxVisible,
+    }));
+  };
+  toggleProfileBox = () => {
+    this.setState((prevState) => ({
+      isProfileBoxVisible: !prevState.isProfileBoxVisible,
     }));
   };
 
@@ -41,23 +47,28 @@ class Header extends Component {
                 <option value="2019">2019</option>
               </select>
             </div>
-            <div class="profile toggleModal">
-              <span class="profileName">이재훈 사원</span>
-              <div class="profileImage">
+            <div
+              className="profile toggleModal"
+              onClick={this.toggleProfileBox}
+            >
+              <span className="profileName">이재훈 사원</span>
+              <div className="profileImage">
                 <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
               </div>
-              <div class="toggleModalBox profileBox">
-                <a href="" class="profileBoxItem">
-                  <div class="ico-person"></div>
-                  <span>마이페이지</span>
-                </a>
-                <a href="" class="profileBoxItem">
-                  <div class="ico-logout"></div>
-                  <span>로그아웃</span>
-                </a>
-              </div>
+              {this.state.isProfileBoxVisible && (
+                <div className="toggleModalBox profileBox">
+                  <a href="" class="profileBoxItem">
+                    <div className="ico-person"></div>
+                    <span>마이페이지</span>
+                  </a>
+                  <a href="" class="profileBoxItem">
+                    <div className="ico-logout"></div>
+                    <span>로그아웃</span>
+                  </a>
+                </div>
+              )}
             </div>
-            <div className="headerNotice">
+            <div className="toggleModal headerNotice">
               <div
                 className={`headerNoticeIcon ${
                   this.state.isNoticeBoxVisible ? "active" : ""
@@ -67,7 +78,7 @@ class Header extends Component {
                 <div className="ico-bell"></div>
               </div>
               {this.state.isNoticeBoxVisible && (
-                <div className="headerNoticeBox">
+                <div className="toggleModalBox headerNoticeBox">
                   <div className="headerNoticeTop">
                     <div className="title">알림</div>
                     <div className="headerNoticeClose btn-close"></div>

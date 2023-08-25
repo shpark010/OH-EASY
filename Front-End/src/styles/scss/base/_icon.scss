@@ -1,4 +1,12 @@
-$icons: (bell, exchange, person-add, person-card, person-contract);
+$icons: (
+  bell,
+  exchange,
+  person,
+  person-add,
+  person-card,
+  person-contract,
+  logout
+);
 
 @each $icon in $icons {
   .ico-#{$icon} {
@@ -7,7 +15,7 @@ $icons: (bell, exchange, person-add, person-card, person-contract);
       display: block;
       width: 30px;
       height: 30px;
-      background: url("../../../images/icon/ico-#{$icon}.png")
+      background: url("../../images/icon/ico-#{$icon}.png")
         no-repeat
         center/cover;
     }
