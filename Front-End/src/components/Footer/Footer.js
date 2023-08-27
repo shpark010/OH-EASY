@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const FooterContainer = styled.footer`
+  height: 35px;
   min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;

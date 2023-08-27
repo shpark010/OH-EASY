@@ -4,12 +4,15 @@ import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
 import Delete from "../images/pages/common/delete.png";
 
-import "../styles/css/pages/EmployeeRegister.css";
+import "../styles/css/pages/HRManagement.css";
 import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
 import PageHeaderName from "../components/PageHeader/PageHeaderName";
 import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton";
 import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import SearchSubmitButton from "../components/SearchBar/SearchSubmitButton";
+import CustomInput from "../components/Contents/CustomInput";
+import CustomButton from "../components/Contents/CustomButton";
+import CustomCalender from "../components/Contents/CustomCalendar";
 
 class HRManagement extends Component {
   render() {
@@ -81,7 +84,105 @@ class HRManagement extends Component {
             </div>
           </div>
         </div>
-        <section className="section one">인사등록 페이지</section>
+        <section className="section hr-section">
+          {/* <CustomInput width={300} id="dd" />
+          <CustomButton text="조회" color="black" backgroundColor="white" />
+          <CustomCalender width={100} id="hr-calender" />
+          <CustomInput width={200} id="dd" />
+          <CustomButton text="조회" color="black" backgroundColor="white" /> */}
+          <div className="hrGrid">
+            {/* 리스트 영역 */}
+            <div className="listArea">
+              <div className="namePickerBox">
+                <table className="namePickerTable hrGridTable borderTopBold">
+                  <colgroup>
+                    <col width="40px"></col>
+                    <col width="120px"></col>
+                    <col></col>
+                  </colgroup>
+                  <thead>
+                    <tr className="hrHeaderStyle">
+                      <th>✓</th>
+                      <th>Code</th>
+                      <th>사원명</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                      <td>1111</td>
+                      <td>김의진</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                      <td>2222</td>
+                      <td>의진</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                      <td>3333</td>
+                      <td>의진킴</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                      <td>4444</td>
+                      <td>진의김</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                      <td>5555</td>
+                      <td>진의킴</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="totalBox">
+                <table className="hrTotalTable borderTopBold">
+                  <tr>
+                    <th rowSpan="2">총인원</th>
+                    <td rowSpan="2">7</td>
+                    <th>재직</th>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    {/* 실제 0명이면 빈칸으로 출력? */}
+                    <th>퇴사</th>
+                    <td>0</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            {/* 컨텐츠 영역 */}
+            <div className="contentsArea">
+              <div className="hrInfoBaseWrap">
+                <ul className="pageTab">
+                  <li class="on">기초정보</li>
+                </ul>
+                <div className="hrInfoBase borderTopBold"></div>
+              </div>
+              <div className="hrInfoDetailWrap">
+                <ul className="pageTab">
+                  <li class="on">가족</li>
+                  <li>학력</li>
+                  <li>경력</li>
+                  <li>신체</li>
+                  <li>병역</li>
+                </ul>
+                <div className="hrInfoDetail borderTopBold"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </>
     );
   }

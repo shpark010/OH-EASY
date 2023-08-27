@@ -1,0 +1,15 @@
+.pageTab{ //ul
+    display: flex;
+    li{
+        padding: 8px 14px;
+        border: 1px solid var(--color-border-gray);
+        border-bottom: none;
+        color:  var(--color-primary-gray);
+        font-size: 14px;
+        &.on{
+            background-color: var(--color-primary-blue);
+            color: var(--color-primary-white);
+            border: none;
+        }
+    }
+}
