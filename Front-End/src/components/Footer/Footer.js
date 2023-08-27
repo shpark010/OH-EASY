@@ -1,13 +1,29 @@
-import React, { Component } from "react";
+import React from "react";
+import styled from "styled-components";
 
-class Footer extends Component {
+const FooterContainer = styled.footer`
+  min-height: 35px;
+  border-top: 1px solid var(--color-primary-gray);
+  font-size: 12px;
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1640px;
+  min-width: 1640px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+`;
+
+class Footer extends React.Component {
   render() {
     return (
-      <footer id="footer" className="footer">
-        <div className="wrapper">
-          프로젝트 제작 : 이재훈, 박성환, 김의진, 조병국
-        </div>
-      </footer>
+      <FooterContainer>
+        <Wrapper>프로젝트 제작 : 이재훈, 박성환, 김의진, 조병국</Wrapper>
+      </FooterContainer>
     );
   }
 }

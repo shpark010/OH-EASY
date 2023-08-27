@@ -5,6 +5,11 @@ import Print from "../images/pages/common/print.png";
 import Delete from "../images/pages/common/delete.png";
 
 import "../styles/css/pages/EmployeeRegister.css";
+import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
+import PageHeaderName from "../components/PageHeader/PageHeaderName";
+import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton";
+import SearchBarBox from "../components/SearchBar/SearchBarBox";
+import SearchSubmitButton from "../components/SearchBar/SearchSubmitButton";
 
 class HRManagement extends Component {
   render() {
@@ -12,28 +17,36 @@ class HRManagement extends Component {
       <>
         <div className="pageHeader">
           <div className="innerBox fxSpace">
-            <h2 className="pageHeaderName">인사관리등록</h2>
+            <PageHeaderName text="인사관리등록" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                <button>사원불러오기</button>
-                <button>재계산</button>
-                <button>완료</button>
-                <button>급여메일 보내기</button>
-                <button>급여명세 문자보내기</button>
+                <PageHeaderTextButton text="사원불러오기" />
+                <PageHeaderTextButton text="재계산" />
+                <PageHeaderTextButton text="완료" />
+                <PageHeaderTextButton text="급여메일 보내기" />
+                <PageHeaderTextButton text="급여명세 문자보내기" />
               </div>
               <div className="iconBtnWrap">
-                <button className="print">
-                  <img src={Print} alt="프린트" />
-                </button>
-                <button className="delete">
-                  <img src={Delete} alt="삭제" />
-                </button>
-                <button className="calc">
-                  <img src={Calc} alt="계산기" />
-                </button>
-                <button className="setting">
-                  <img src={Setting} alt="설정" />
-                </button>
+                <PageHeaderIconButton
+                  btnName="print"
+                  imageSrc={Print}
+                  altText="프린트"
+                />
+                <PageHeaderIconButton
+                  btnName="delete"
+                  imageSrc={Delete}
+                  altText="삭제"
+                />
+                <PageHeaderIconButton
+                  btnName="calc"
+                  imageSrc={Calc}
+                  altText="계산기"
+                />
+                <PageHeaderIconButton
+                  btnName="setting"
+                  imageSrc={Setting}
+                  altText="세팅"
+                />
               </div>
             </div>
           </div>
@@ -41,38 +54,30 @@ class HRManagement extends Component {
         <div className="searchBar">
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
-              <div className="searchBarBox">
-                <span className="searchBarName">조회구분</span>
-                <select
-                  id="category"
-                  name="category"
-                  className="selectBox"
-                  defaultValue="0"
-                >
-                  <option value="0">0. 재직자+당해년도 퇴사자</option>
-                  <option value="1">1. 재직자+당해년도 퇴사자</option>
-                </select>
-              </div>
-              <div className="searchBarBox">
-                <span className="searchBarName">정렬</span>
-                <select
-                  id="order"
-                  name="order"
-                  className="selectBox"
-                  defaultValue="0"
-                >
-                  <option value="0">0. 코드순</option>
-                  <option value="1">1. 이름순</option>
-                </select>
-              </div>
+              <SearchBarBox
+                label="조회구분"
+                id="hr-category"
+                options={[
+                  { value: "0", label: "0. 재직자+당해년도 퇴사자" },
+                  { value: "1", label: "1. 재직자+당해년도 퇴사자" },
+                  { value: "1", label: "2. 작년퇴사자+당해년도 퇴사자" },
+                ]}
+                defaultValue="0"
+              />
+
+              <SearchBarBox
+                label="정렬"
+                id="hr-order"
+                options={[
+                  { value: "0", label: "0. 코드순" },
+                  { value: "1", label: "1. 이름순" },
+                  { value: "1", label: "2. 성적순" },
+                ]}
+                defaultValue="0"
+              />
             </div>
             <div className="btnWrapper">
-              <button className="gray">조회</button>
-              <button className="btnMore">
-                <span className="hidden">펼쳐보기? 더보기?</span>
-              </button>
-              <button>PDF로 내보내기</button>
-              <button>전자서명</button>
+              <SearchSubmitButton text="조회" />
             </div>
           </div>
         </div>

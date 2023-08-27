@@ -166,20 +166,20 @@ input::-ms-clear {
 }
 
 /* input type number 에서 화살표 제거 */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
 
-input[type=search] {
+input[type="search"] {
   -webkit-appearance: textfield;
   box-sizing: content-box;
 }
 
-input[type=search]::-webkit-search-cancel-button,
-input[type=search]::-webkit-search-decoration {
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
@@ -196,8 +196,8 @@ select::-ms-expand {
 }
 
 /* IE에서 비밀번호 보이기/숨기기 눈 없애기*/
-input[type=password]::-ms-reveal,
-input[type=password]::-ms-clear {
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
   display: none;
 }
 
@@ -301,11 +301,12 @@ body {
   height: 32px;
   text-align: center;
   -moz-text-align-last: center;
-       text-align-last: center;
+  text-align-last: center;
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
-  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
   border: 1px solid var(--color-primary-gray);
   color: var(--color-primary-gray);
   border-radius: 2px;
@@ -333,7 +334,8 @@ button.gray {
 }
 
 .btnMore {
-  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
 }
 
 /* 페이지 헤더 */
@@ -349,7 +351,8 @@ button.gray {
   position: relative;
   height: 70px;
 }
-.pageHeader .innerBox:before, .pageHeader .innerBox:after {
+.pageHeader .innerBox:before,
+.pageHeader .innerBox:after {
   content: "";
   background-color: var(--color-primary-navy);
   position: absolute;
@@ -418,7 +421,7 @@ button.gray {
   padding-right: 18px;
 }
 
-.toggleModal {
+/* .toggleModal {
   position: relative;
 }
 .toggleModalBox {
@@ -431,7 +434,7 @@ button.gray {
   border-radius: 10px;
   border: 1px solid #eee;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
-}
+} */
 
 .ico-bell:after {
   content: "";
@@ -482,7 +485,8 @@ button.gray {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-card.png") no-repeat center/cover;
+  background: url("../../images/icon/ico-person-card.png") no-repeat
+    center/cover;
 }
 .ico-person-card.white:after {
   filter: invert(1);
@@ -493,7 +497,8 @@ button.gray {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-contract.png") no-repeat center/cover;
+  background: url("../../images/icon/ico-person-contract.png") no-repeat
+    center/cover;
 }
 .ico-person-contract.white:after {
   filter: invert(1);
@@ -539,7 +544,7 @@ button.gray {
   align-items: center;
   justify-content: center;
 }
-.headerNav .company {
+/* .headerNav .company {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -550,7 +555,7 @@ button.gray {
   padding-right: 15px;
   font-size: 16px;
   font-weight: 600;
-}
+} */
 .headerNav .companyYear {
   width: 100px;
   height: 40px;
@@ -566,7 +571,7 @@ button.gray {
 .headerNav .companyYear:focus {
   outline: 2px solid var(--color-secondary-blue);
 }
-.headerNav .profile {
+/* .headerNav .profile {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,11 +608,11 @@ button.gray {
 .headerNav .profileBoxItem + .profileBoxItem {
   margin-top: 10px;
 }
-.headerNav .profileBox [class^=ico-]:after {
+.headerNav .profileBox [class^="ico-"]:after {
   width: 24px;
   height: 24px;
   margin-right: 5px;
-}
+} */
 .headerNotice {
   padding-left: 20px;
 }
@@ -673,7 +678,7 @@ button.gray {
   flex-shrink: 0;
 }
 
-.footer {
+/* .footer {
   min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
@@ -687,4 +692,5 @@ button.gray {
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
-}/*# sourceMappingURL=index.css.map */
+} */
+/*# sourceMappingURL=index.css.map */
