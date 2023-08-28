@@ -25,7 +25,7 @@ class HRManagement extends Component {
               <div className="btnWrapper textBtnWrap">
                 <PageHeaderTextButton text="사원불러오기" />
                 <PageHeaderTextButton text="재계산" />
-                <PageHeaderTextButton text="완료" />
+                <PageHeaderTextButton text="완료" onCLi />
                 <PageHeaderTextButton text="급여메일 보내기" />
                 <PageHeaderTextButton text="급여명세 문자보내기" />
               </div>
@@ -63,7 +63,8 @@ class HRManagement extends Component {
                 options={[
                   { value: "0", label: "0. 재직자+당해년도 퇴사자" },
                   { value: "1", label: "1. 재직자+당해년도 퇴사자" },
-                  { value: "1", label: "2. 작년퇴사자+당해년도 퇴사자" },
+                  { value: "2", label: "2. 작년퇴사자+당해년도 퇴사자" },
+                  { value: "3", label: "4. 박성환" },
                 ]}
                 defaultValue="0"
               />
@@ -75,6 +76,7 @@ class HRManagement extends Component {
                   { value: "0", label: "0. 코드순" },
                   { value: "1", label: "1. 이름순" },
                   { value: "1", label: "2. 성적순" },
+                  { value: "1", label: "3. 박성환" },
                 ]}
                 defaultValue="0"
               />
@@ -168,7 +170,7 @@ class HRManagement extends Component {
                 <ul className="pageTab">
                   <li class="on">기초정보</li>
                 </ul>
-                <div className="hrInfoBase borderTopBold borderbuttonBold">
+                <div className="hrInfoBase borderTopBold borderbottomBold">
                   <div className="hrInfoBaseProfileImg">
                     <img
                       src="https://picsum.photos/180/180"
@@ -209,11 +211,7 @@ class HRManagement extends Component {
                     />
                     <CustomInput className="hrInfoBaseInput" width="300" />
                     <CustomInput className="hrInfoBaseInput" width="300" />
-                    <CustomCalender
-                      className="hrInfoBaseInput"
-                      width="300"
-                      defaultValue="2012-12-22"
-                    />
+                    <CustomCalender className="hrInfoBaseInput" width="300" />
                   </div>
                   <div className="hrInfoBaseProfileTitle">
                     <p className="hrInfoBaseProfileOnePtag">한자성명</p>
