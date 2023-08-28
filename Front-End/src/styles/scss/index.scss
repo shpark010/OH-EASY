@@ -1,3 +1,5 @@
+
+@charset "utf-8";
 @import "./abstract/variable";
 @import "./abstract/mixin";
 
@@ -10,3 +12,5 @@
 
 @import "./layouts/header";
 @import "./layouts/footer";
+@import "./layouts/table";
+@import "./layouts/pageTab";

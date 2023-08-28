@@ -11,3 +11,7 @@
 .fxSpace {
   @include spaceF;
 }
+
+.borderTopBold{
+  border-top: 3px solid var(--color-primary-black);
+}

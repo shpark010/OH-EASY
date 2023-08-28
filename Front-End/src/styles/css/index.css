@@ -166,20 +166,20 @@ input::-ms-clear {
 }
 
 /* input type number 에서 화살표 제거 */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
 
-input[type="search"] {
+input[type=search] {
   -webkit-appearance: textfield;
   box-sizing: content-box;
 }
 
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
@@ -196,8 +196,8 @@ select::-ms-expand {
 }
 
 /* IE에서 비밀번호 보이기/숨기기 눈 없애기*/
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
   display: none;
 }
 
@@ -220,6 +220,8 @@ input[type="password"]::-ms-clear {
   --color-primary-black: #222222;
   --color-primary-white: #ffffff;
   --color-opacity-blue: #eef7fe;
+  --color-opacity-gray: #e6e6e6;
+  --color-border-gray: #ccc;
 }
 
 .dn {
@@ -241,11 +243,14 @@ input[type="password"]::-ms-clear {
   justify-content: space-between;
 }
 
+.borderTopBold {
+  border-top: 3px solid var(--color-primary-black);
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
-  min-height: 100vh;
   font-family: "NanumSquare", sans-serif;
   color: #222;
   background-color: #fcfcfc;
@@ -270,6 +275,7 @@ body {
   max-width: 1640px;
   min-width: 1640px;
   height: 100%;
+  max-height: calc(100vh - 115px);
   flex-grow: 1;
   margin: 0 auto;
 }
@@ -299,14 +305,10 @@ body {
 /* 셀렉트 박스  */
 .selectBox {
   height: 32px;
-  text-align: center;
-  -moz-text-align-last: center;
-  text-align-last: center;
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
-  background: url("../../images/icon/arw-bottom.png") no-repeat
-    calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
   border: 1px solid var(--color-primary-gray);
   color: var(--color-primary-gray);
   border-radius: 2px;
@@ -334,8 +336,7 @@ button.gray {
 }
 
 .btnMore {
-  background: url("../../images/icon/arw-bottom.png") no-repeat
-    calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
 }
 
 /* 페이지 헤더 */
@@ -351,8 +352,7 @@ button.gray {
   position: relative;
   height: 70px;
 }
-.pageHeader .innerBox:before,
-.pageHeader .innerBox:after {
+.pageHeader .innerBox:before, .pageHeader .innerBox:after {
   content: "";
   background-color: var(--color-primary-navy);
   position: absolute;
@@ -421,7 +421,17 @@ button.gray {
   padding-right: 18px;
 }
 
-/* .toggleModal {
+/* 체크박스 */
+input[type=checkbox] {
+  -webkit-appearance: checkbox;
+     -moz-appearance: checkbox;
+          appearance: checkbox;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary-blue);
+}
+
+.toggleModal {
   position: relative;
 }
 .toggleModalBox {
@@ -432,9 +442,8 @@ button.gray {
   background-color: #fff;
   color: var(--color-primary-gray);
   border-radius: 10px;
-  border: 1px solid #eee;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
-} */
+}
 
 .ico-bell:after {
   content: "";
@@ -485,8 +494,7 @@ button.gray {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-card.png") no-repeat
-    center/cover;
+  background: url("../../images/icon/ico-person-card.png") no-repeat center/cover;
 }
 .ico-person-card.white:after {
   filter: invert(1);
@@ -497,8 +505,7 @@ button.gray {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-contract.png") no-repeat
-    center/cover;
+  background: url("../../images/icon/ico-person-contract.png") no-repeat center/cover;
 }
 .ico-person-contract.white:after {
   filter: invert(1);
@@ -544,7 +551,7 @@ button.gray {
   align-items: center;
   justify-content: center;
 }
-/* .headerNav .company {
+.headerNav .company {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -555,13 +562,16 @@ button.gray {
   padding-right: 15px;
   font-size: 16px;
   font-weight: 600;
-} */
+}
 .headerNav .companyYear {
   width: 100px;
   height: 40px;
   padding-left: 0;
   padding-right: 15px;
   font-family: arial;
+  text-align: center;
+  -moz-text-align-last: center;
+       text-align-last: center;
   font-weight: 600;
   border: none;
   border-radius: 20px;
@@ -571,7 +581,7 @@ button.gray {
 .headerNav .companyYear:focus {
   outline: 2px solid var(--color-secondary-blue);
 }
-/* .headerNav .profile {
+.headerNav .profile {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,11 +618,11 @@ button.gray {
 .headerNav .profileBoxItem + .profileBoxItem {
   margin-top: 10px;
 }
-.headerNav .profileBox [class^="ico-"]:after {
+.headerNav .profileBox [class^=ico-]:after {
   width: 24px;
   height: 24px;
   margin-right: 5px;
-} */
+}
 .headerNotice {
   padding-left: 20px;
 }
@@ -678,7 +688,8 @@ button.gray {
   flex-shrink: 0;
 }
 
-/* .footer {
+.footer {
+  height: 35px;
   min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
@@ -692,5 +703,61 @@ button.gray {
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
-} */
-/*# sourceMappingURL=index.css.map */
+}
+
+/* 서브페이지 테이블 설정 (subpage setting) */
+.listArea {
+  overflow: hidden;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.namePickerBox {
+  width: 100%;
+  height: 100%;
+  background-color: #F9F9F9;
+  border: 1px solid var(--color-border-gray);
+  border-top: none;
+}
+
+table {
+  /* 사원선택 테이블 설정 */
+}
+table.namePickerTable th, table.namePickerTable td, table.hrTotalTable th, table.hrTotalTable td {
+  border-bottom: 1px solid var(--color-border-gray);
+}
+table.namePickerTable th, table.hrTotalTable th {
+  font-size: 13px;
+  font-weight: 800;
+  background-color: #ededed;
+  padding: 10px;
+}
+table.namePickerTable th + th, table.hrTotalTable th + th {
+  border-left: 1px solid var(--color-border-gray);
+}
+table.namePickerTable td, table.hrTotalTable td {
+  padding: 5px 10px;
+  background-color: #fff;
+}
+table.namePickerTable td + td, table.hrTotalTable td + td {
+  border-left: 1px solid var(--color-border-gray);
+}
+
+.pageTab {
+  display: flex;
+}
+.pageTab li {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border-gray);
+  border-bottom: none;
+  color: var(--color-primary-gray);
+  font-size: 14px;
+}
+.pageTab li.on {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  border: none;
+}/*# sourceMappingURL=index.css.map */
