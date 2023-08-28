@@ -68,7 +68,7 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar({ width, id }) {
+function CustomCalendar({ width, id, className }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -99,6 +99,7 @@ function CustomCalendar({ width, id }) {
     <InputWrapper ref={ref} width={`${width}px`}>
       <Input
         id={id}
+        className={className}
         readOnly
         value={formatDate(date)}
         onClick={() => setIsOpen(!isOpen)}
