@@ -1,9 +1,14 @@
 import React, { Component } from "react";
-import IconBtnWrap from "../components/PageHeader/Button/IconBtnWrap";
-import BtnWrapper from "../components/PageHeader/Button/BtnWrapper";
+import Setting from "../images/pages/common/setting.png";
+import Calc from "../images/pages/common/calc.png";
+import Print from "../images/pages/common/print.png";
+import Delete from "../images/pages/common/delete.png";
 
 import "../styles/css/pages/EmployeeRegister.css";
-
+import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
+import PageHeaderName from "../components/PageHeader/PageHeaderName";
+import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton";
+import CustomCalendar from "../components/Contents/CustomCalendar";
 
 class EmployeeRegister extends Component {
   render() {
@@ -11,12 +16,35 @@ class EmployeeRegister extends Component {
       <>
         <div className="pageHeader">
           <div className="innerBox fxSpace">
-            <h2 className="pageHeaderName">사원등록</h2>
+            <PageHeaderName text="사원등록" />
             <div className="fxAlignCenter">
-              <BtnWrapper label="사원검색" />
-              <BtnWrapper label="조건검색" />
-              <BtnWrapper label="데이터정렬" />
-              <IconBtnWrap />
+              <div className="btnWrapper textBtnWrap">
+                <PageHeaderTextButton text="사원검색" />
+                <PageHeaderTextButton text="조건검색" />
+                <PageHeaderTextButton text="데이터정렬" />
+              </div>
+              <div className="iconBtnWrap">
+                <PageHeaderIconButton
+                  btnName="print"
+                  imageSrc={Print}
+                  altText="프린트"
+                />
+                <PageHeaderIconButton
+                  btnName="delete"
+                  imageSrc={Delete}
+                  altText="삭제"
+                />
+                <PageHeaderIconButton
+                  btnName="calc"
+                  imageSrc={Calc}
+                  altText="계산기"
+                />
+                <PageHeaderIconButton
+                  btnName="setting"
+                  imageSrc={Setting}
+                  altText="세팅"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -123,7 +151,7 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">입사일자</th>
                     <td className="erCellStyle">
-                      <input type="date" className="erInputDateStyle" />
+                      <CustomCalendar width="130" id="erDate1" />
                     </td>
                   </tr>
                   <tr>
@@ -238,7 +266,7 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">퇴사일자</th>
                     <td className="erCellStyle">
-                      <input type="date" className="erInputDateStyle" />
+                      <CustomCalendar width="120" id="erDate2" />
                     </td>
                   </tr>
                   <tr>
