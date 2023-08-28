@@ -3,7 +3,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styled from "styled-components";
 import moment from "moment";
-import { FaRegCalendarAlt } from 'react-icons/fa';
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 const InputWrapper = styled.div`
   position: relative;
@@ -18,7 +18,8 @@ const Input = styled.input`
   height: 32px;
   padding: 0 5px;
   text-align: center;
-  padding-right: 20px;
+  //padding-right: 20px;
+  margin-left: 10px;
 
   &:focus {
     outline: 1px solid var(--color-primary-black);
@@ -67,7 +68,7 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar({ width, id }) {
+function CustomCalendar({ width, id, className }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -98,6 +99,7 @@ function CustomCalendar({ width, id }) {
     <InputWrapper ref={ref} width={`${width}px`}>
       <Input
         id={id}
+        className={className}
         readOnly
         value={formatDate(date)}
         onClick={() => setIsOpen(!isOpen)}
