@@ -23,3 +23,37 @@
 .hrTotalTable {
   text-align: center;
 }
+
+.hrInfoBase {
+  display: flex;
+}
+.hrInfoBaseProfileImg {
+  position: relative;
+  padding: 10px 20px 5px 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.hrInfoBaseProfileTitle {
+  padding-left: 95px;
+  background-color: var(--color-opacity-gray);
+}
+
+.hrInfoBaseProfileImgBtn {
+  margin: 10px 5px;
+  font-weight: 600;
+  font-family: "NanumSquare", sans-serif;
+}
+
+.hrInfoBaseProfileOnePtag {
+  text-align: right;
+  padding: 10px 10px;
+  font-weight: 900;
+}
+
+.hrInfoBaseInput {
+  display: block;
+  margin: 7px 20px 7px 10px;
+  font-weight: 500;
+}

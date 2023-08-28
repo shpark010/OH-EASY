@@ -168,7 +168,77 @@ class HRManagement extends Component {
                 <ul className="pageTab">
                   <li class="on">기초정보</li>
                 </ul>
-                <div className="hrInfoBase borderTopBold"></div>
+                <div className="hrInfoBase borderTopBold borderbuttonBold">
+                  <div className="hrInfoBaseProfileImg">
+                    <img
+                      src="https://picsum.photos/180/180"
+                      alt="이미지 샘플"
+                      width="180px"
+                      height="180px"
+                    />
+                    <div className="hrInfoBaseProfileImgBtnBox">
+                      <CustomButton
+                        text="등록"
+                        color="black"
+                        backgroundColor="white"
+                        className="hrInfoBaseProfileImgBtn"
+                      />
+                      <CustomButton
+                        text="삭제"
+                        color="black"
+                        backgroundColor="white"
+                        className="hrInfoBaseProfileImgBtn"
+                      />
+                    </div>
+                  </div>
+                  <div className="hrInfoBaseProfileTitle">
+                    <p className="hrInfoBaseProfileOnePtag">영문성명</p>
+                    <p className="hrInfoBaseProfileOnePtag">주민등록번호</p>
+                    <p className="hrInfoBaseProfileOnePtag">생년월일</p>
+                    <p className="hrInfoBaseProfileOnePtag">부서</p>
+                    <p className="hrInfoBaseProfileOnePtag">직무</p>
+                    <p className="hrInfoBaseProfileOnePtag">입사년월일</p>
+                  </div>
+                  <div className="hrInfoBaseProfiletwo">
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomCalender
+                      className="hrInfoBaseInput"
+                      width="300"
+                      defaultValue="입력없음"
+                    />
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomCalender
+                      className="hrInfoBaseInput"
+                      width="300"
+                      defaultValue="2012-12-22"
+                    />
+                  </div>
+                  <div className="hrInfoBaseProfileTitle">
+                    <p className="hrInfoBaseProfileOnePtag">한자성명</p>
+                    <p className="hrInfoBaseProfileOnePtag">성별</p>
+                    <p className="hrInfoBaseProfileOnePtag">결혼여부</p>
+                    <p className="hrInfoBaseProfileOnePtag">직급</p>
+                    <p className="hrInfoBaseProfileOnePtag">근로계약서</p>
+                    <p className="hrInfoBaseProfileOnePtag">퇴사년연월일</p>
+                  </div>
+                  <div className="hrInfoBaseProfiletwo">
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <div className="genderSelect">
+                      <label>
+                        <input type="radio" name="gender" value="male" />남
+                      </label>
+                      <label>
+                        <input type="radio" name="gender" value="female" />여
+                      </label>
+                    </div>
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomCalender className="hrInfoBaseInput" width="300" />
+                  </div>
+                </div>
               </div>
               <div className="hrInfoDetailWrap">
                 <ul className="pageTab">
@@ -178,17 +248,7 @@ class HRManagement extends Component {
                   <li>신체</li>
                   <li>병역</li>
                 </ul>
-                <div className="hrInfoDetail borderTopBold">
-                  <CustomButton
-                    text="조회"
-                    color="black"
-                    backgroundColor="black"
-                  />
-                  <CustomCalender width="100" id="erDate1" />
-                  <CustomCalender width="200" id="erDate2" />
-                  <CustomCalender width="300" id="erDate3" />
-                  <CustomInput width="100" id="dd" />
-                </div>
+                <div className="hrInfoDetail borderTopBold"></div>
               </div>
             </div>
           </div>
