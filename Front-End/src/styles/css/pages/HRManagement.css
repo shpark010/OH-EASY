@@ -1,0 +1,25 @@
+.hr-section {
+  height: 80%;
+  padding-top: 15px;
+}
+.hrGrid {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-gap: 1rem;
+  /* border: 1px solid var(--color-primary-black); */
+  background-color: var(--color-primary-white);
+}
+
+.listArea,
+.contentsArea {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 15px;
+}
+
+.hrGridTable,
+.hrTotalTable {
+  text-align: center;
+}

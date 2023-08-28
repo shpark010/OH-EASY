@@ -1,23 +1,26 @@
-@import "https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css";
+@charset "UTF-8";
+/* bases/reset.scss */
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css);
 html {
+  /* Anti-aliasing */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  /* Typo-readability */
   font-size: 16px;
   letter-spacing: -0.0125em;
 }
+
 * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 *:before,
 *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 html,
 body,
 div,
@@ -91,6 +94,7 @@ button {
   margin: 0;
   padding: 0;
 }
+
 article,
 aside,
 details,
@@ -104,82 +108,110 @@ nav,
 section {
   display: block;
 }
+
 ul,
 ol,
 li {
   list-style: none;
 }
+
 a {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
 }
+
 img {
   border: none;
   vertical-align: bottom;
   max-width: 100%;
 }
+
 i,
 em,
 address {
   font-style: normal;
 }
+
 label {
   cursor: pointer;
 }
+
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
 legend {
   border: 0;
   padding: 0;
 }
+
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid #c0c0c0;
   margin: 0 2px;
   padding: 0.35em 0.625em 0.75em;
 }
+
+/* input 기본 스타일 초기화 */
 input {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
+
+/* IE10 이상에서 input box 에 추가된 지우기 버튼 제거 */
 input::-ms-clear {
   display: none;
 }
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+
+/* input type number 에서 화살표 제거 */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
-input[type="search"] {
+
+input[type=search] {
   -webkit-appearance: textfield;
-  -moz-box-sizing: content-box;
-  -webkit-box-sizing: content-box;
   box-sizing: content-box;
 }
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
+
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
+
+/* Select box 스타일 초기화 */
 select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
+
+/* IE 에서 Select box 화살표 제거 */
 select::-ms-expand {
   display: none;
 }
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
+
+/* IE에서 비밀번호 보이기/숨기기 눈 없애기*/
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
   display: none;
 }
+
+::-moz-placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
 ::placeholder {
   color: #999;
   font-size: 14px;
 }
+
+/*  bases/root.scss */
 :root {
   --color-primary-blue: #1985fa;
   --color-secondary-blue: #92c5ff;
@@ -188,22 +220,33 @@ input[type="password"]::-ms-clear {
   --color-primary-black: #222222;
   --color-primary-white: #ffffff;
   --color-opacity-blue: #eef7fe;
+  --color-opacity-gray: #e6e6e6;
+  --color-border-gray: #ccc;
 }
+
 .dn {
   display: none;
 }
+
 .dn-i {
   display: none !important;
 }
+
 .fxAlignCenter {
   display: flex;
   align-content: center;
 }
+
 .fxSpace {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+.borderTopBold {
+  border-top: 3px solid var(--color-primary-black);
+}
+
 html,
 body {
   width: 100%;
@@ -212,10 +255,12 @@ body {
   color: #222;
   background-color: #fcfcfc;
 }
+
 #root {
   width: 100%;
   height: 100%;
 }
+
 #wrap {
   display: flex;
   flex-direction: column;
@@ -224,14 +269,17 @@ body {
   max-width: 1920px;
   margin: 0 auto;
 }
+
 .contents {
   width: 100%;
   max-width: 1640px;
   min-width: 1640px;
   height: 100%;
+  max-height: calc(100vh - 115px);
   flex-grow: 1;
   margin: 0 auto;
 }
+
 .hidden {
   position: absolute;
   width: 1px;
@@ -242,24 +290,25 @@ body {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
 .innerBox,
 .section {
   width: 100%;
   margin: 0 auto;
   padding: 0 15px;
 }
+
 .innerPadding {
   padding: 0 12px;
 }
+
+/* 셀렉트 박스  */
 .selectBox {
   height: 32px;
-  text-align: center;
-  text-align-last: center;
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
-  background: url("../../images/icon/arw-bottom.png") no-repeat
-    calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
   border: 1px solid var(--color-primary-gray);
   color: var(--color-primary-gray);
   border-radius: 2px;
@@ -273,20 +322,24 @@ body {
 .contents .selectBox {
   border: 1px solid var(--color-primary-gray);
 }
+
+/* 버튼 */
 button {
   border: 1px solid var(--color-primary-gray);
   border-radius: 2px;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
   cursor: pointer;
 }
 button.gray {
   background-color: var(--color-primary-gray);
   color: #fff;
 }
+
 .btnMore {
-  background: url("../../images/icon/arw-bottom.png") no-repeat
-    calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
 }
+
+/* 페이지 헤더 */
 .pageHeader {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-white);
@@ -299,8 +352,7 @@ button.gray {
   position: relative;
   height: 70px;
 }
-.pageHeader .innerBox:before,
-.pageHeader .innerBox:after {
+.pageHeader .innerBox:before, .pageHeader .innerBox:after {
   content: "";
   background-color: var(--color-primary-navy);
   position: absolute;
@@ -345,7 +397,12 @@ button.gray {
   width: 30px;
   border: none;
 }
-*/
+
+/* 서치박스 */
+.searchBar {
+  /* 서치박스 공통*/
+  /* 서치박스 각 요소설정 */
+}
 .searchBar button {
   padding: 6px 12px;
   font-size: 14px;
@@ -366,6 +423,17 @@ button.gray {
   color: var(--color-primary-gray);
   padding-right: 18px;
 }
+
+/* 체크박스 */
+input[type=checkbox] {
+  -webkit-appearance: checkbox;
+     -moz-appearance: checkbox;
+          appearance: checkbox;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary-blue);
+}
+
 .toggleModal {
   position: relative;
 }
@@ -377,9 +445,9 @@ button.gray {
   background-color: #fff;
   color: var(--color-primary-gray);
   border-radius: 10px;
-  border: 1px solid #eee;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
 }
+
 .ico-bell:after {
   content: "";
   display: block;
@@ -390,6 +458,7 @@ button.gray {
 .ico-bell.white:after {
   filter: invert(1);
 }
+
 .ico-exchange:after {
   content: "";
   display: block;
@@ -400,6 +469,7 @@ button.gray {
 .ico-exchange.white:after {
   filter: invert(1);
 }
+
 .ico-person:after {
   content: "";
   display: block;
@@ -410,6 +480,7 @@ button.gray {
 .ico-person.white:after {
   filter: invert(1);
 }
+
 .ico-person-add:after {
   content: "";
   display: block;
@@ -420,28 +491,29 @@ button.gray {
 .ico-person-add.white:after {
   filter: invert(1);
 }
+
 .ico-person-card:after {
   content: "";
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-card.png") no-repeat
-    center/cover;
+  background: url("../../images/icon/ico-person-card.png") no-repeat center/cover;
 }
 .ico-person-card.white:after {
   filter: invert(1);
 }
+
 .ico-person-contract:after {
   content: "";
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-contract.png") no-repeat
-    center/cover;
+  background: url("../../images/icon/ico-person-contract.png") no-repeat center/cover;
 }
 .ico-person-contract.white:after {
   filter: invert(1);
 }
+
 .ico-logout:after {
   content: "";
   display: block;
@@ -452,17 +524,19 @@ button.gray {
 .ico-logout.white:after {
   filter: invert(1);
 }
+
 .btn-close:after {
   display: flex;
-  content: "";
+  content: "\e5cd";
   font-size: 14px;
   font-family: Material Icons;
 }
+
 .header {
   height: 80px;
+  min-height: 80px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 10;
-  flex-shrink: 0;
 }
 .header .wrapper {
   display: flex;
@@ -498,6 +572,9 @@ button.gray {
   padding-left: 0;
   padding-right: 15px;
   font-family: arial;
+  text-align: center;
+  -moz-text-align-last: center;
+       text-align-last: center;
   font-weight: 600;
   border: none;
   border-radius: 20px;
@@ -544,7 +621,7 @@ button.gray {
 .headerNav .profileBoxItem + .profileBoxItem {
   margin-top: 10px;
 }
-.headerNav .profileBox [class^="ico-"]:after {
+.headerNav .profileBox [class^=ico-]:after {
   width: 24px;
   height: 24px;
   margin-right: 5px;
@@ -613,11 +690,12 @@ button.gray {
   filter: invert(0.7);
   flex-shrink: 0;
 }
+
 .footer {
   height: 35px;
+  min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
-  flex-shrink: 0;
 }
 .footer .wrapper {
   display: flex;
@@ -628,4 +706,61 @@ button.gray {
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
-} /*# sourceMappingURL=index.css.map */
+}
+
+/* 서브페이지 테이블 설정 (subpage setting) */
+.listArea {
+  overflow: hidden;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.namePickerBox {
+  width: 100%;
+  height: 100%;
+  background-color: #F9F9F9;
+  border: 1px solid var(--color-border-gray);
+  border-top: none;
+}
+
+table {
+  /* 사원선택 테이블 설정 */
+}
+table.namePickerTable th, table.namePickerTable td, table.hrTotalTable th, table.hrTotalTable td {
+  border-bottom: 1px solid var(--color-border-gray);
+}
+table.namePickerTable th, table.hrTotalTable th {
+  font-size: 13px;
+  font-weight: 800;
+  background-color: #ededed;
+  padding: 10px;
+}
+table.namePickerTable th + th, table.hrTotalTable th + th {
+  border-left: 1px solid var(--color-border-gray);
+}
+table.namePickerTable td, table.hrTotalTable td {
+  padding: 5px 10px;
+  background-color: #fff;
+}
+table.namePickerTable td + td, table.hrTotalTable td + td {
+  border-left: 1px solid var(--color-border-gray);
+}
+
+.pageTab {
+  display: flex;
+}
+.pageTab li {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border-gray);
+  border-bottom: none;
+  color: var(--color-primary-gray);
+  font-size: 14px;
+}
+.pageTab li.on {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  border: none;
+}/*# sourceMappingURL=index.css.map */

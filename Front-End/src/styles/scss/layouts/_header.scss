@@ -1,11 +1,11 @@
 .header {
   // position: fixed;
   // top: 0;
-  // width: 100%;
   height: $header-height;
+  min-height: $header-height;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 10;
-  flex-shrink: 0;
+  // flex-shrink: 0;
   .wrapper {
     @include spaceF;
     @include layoutWrapper;
@@ -27,12 +27,16 @@
         // this is select #targetYear(companyYear)
         width: 100px;
         height: 40px;
+        padding-left: 0;
         padding-right: 15px;
         font-family: arial;
+        text-align: center;
+        text-align-last: center; // safari
         font-weight: 600;
+        border: none;
         border-radius: 20px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
+        background-image: url("../../images/icon/arw-bottom-white.png");
+        background-position: calc(100% - 12px) center;
         &:focus {
           outline: 2px solid var(--color-secondary-blue);
         }
@@ -62,17 +66,29 @@
         outline: 1px solid #ccc;
         background-color: #fff;
       }
+      &Box {
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 1;
+        &Item {
+          display: flex;
+          align-items: center;
+          + .profileBoxItem {
+            margin-top: 10px;
+          }
+        }
+        [class^="ico-"]:after {
+          width: 24px;
+          height: 24px;
+          margin-right: 5px;
+        }
+      }
     }
   }
   // headerNotice
   &Notice {
-    position: relative;
-    //prt box
     padding-left: 20px;
     //headerNoticeIcon(ico-bell)
-    &Box {
-      background-color: #fff;
-    }
     &Icon {
       position: relative;
       cursor: pointer;
@@ -80,7 +96,6 @@
         &:after {
           content: "";
           display: block;
-
           position: absolute;
           top: 0;
           right: 0;
@@ -93,15 +108,8 @@
     }
     //headerNoticeBox
     &Box {
-      position: absolute;
-      top: calc(100% + 34px);
-      right: 0;
-      padding: 22px 25px;
       width: 330px;
-      color: #707070;
-      border-radius: 10px;
-      border: 1px solid #fdfdfd;
-      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+      padding: 22px 25px;
     }
     //headerNoticeTop
     &Top {
@@ -114,7 +122,7 @@
     //headerNoticeClose
     &Close {
       cursor: pointer;
-      color: #707070;
+      color: var(--color-primary-gray);
     }
     //headerNoticeItem (li)
     &Item {
@@ -138,7 +146,7 @@
           margin-left: 5px;
           width: 12px;
           height: 12px;
-          background: url("../../../images/icon/arw-right.png") no-repeat
+          background: url("../../images/icon/arw-right.png") no-repeat
             center/cover;
           filter: invert(0.7);
           flex-shrink: 0;

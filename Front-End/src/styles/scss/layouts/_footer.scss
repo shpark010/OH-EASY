@@ -1,8 +1,9 @@
 .footer {
   height: 35px;
-  border-top: 1px solid #707070;
+  min-height: 35px;
+  border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
-  flex-shrink: 0;
+  // flex-shrink: 0;
   .wrapper {
     display: flex;
     align-items: center;
