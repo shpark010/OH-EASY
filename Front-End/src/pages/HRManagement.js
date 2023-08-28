@@ -178,7 +178,17 @@ class HRManagement extends Component {
                   <li>신체</li>
                   <li>병역</li>
                 </ul>
-                <div className="hrInfoDetail borderTopBold"></div>
+                <div className="hrInfoDetail borderTopBold">
+                  <CustomButton
+                    text="조회"
+                    color="black"
+                    backgroundColor="black"
+                  />
+                  <CustomCalender width="100" id="erDate1" />
+                  <CustomCalender width="200" id="erDate2" />
+                  <CustomCalender width="300" id="erDate3" />
+                  <CustomInput width="100" id="dd" />
+                </div>
               </div>
             </div>
           </div>

@@ -13,7 +13,7 @@ const Button = styled.button`
 //color 안주면 기본 화이트
 const CustomButton = ({ text, color, backgroundColor }) => {
   return (
-    <Button color={color} background-color={backgroundColor}>
+    <Button color={color} backgroundColor={backgroundColor}>
       {text}
     </Button>
   );
