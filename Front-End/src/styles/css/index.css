@@ -166,20 +166,20 @@ input::-ms-clear {
 }
 
 /* input type number 에서 화살표 제거 */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
 
-input[type=search] {
+input[type="search"] {
   -webkit-appearance: textfield;
   box-sizing: content-box;
 }
 
-input[type=search]::-webkit-search-cancel-button,
-input[type=search]::-webkit-search-decoration {
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
@@ -196,8 +196,8 @@ select::-ms-expand {
 }
 
 /* IE에서 비밀번호 보이기/숨기기 눈 없애기*/
-input[type=password]::-ms-reveal,
-input[type=password]::-ms-clear {
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
   display: none;
 }
 
@@ -245,6 +245,9 @@ input[type=password]::-ms-clear {
 
 .borderTopBold {
   border-top: 3px solid var(--color-primary-black);
+}
+.borderbuttonBold {
+  border-bottom: 1px solid var(--color-border-gray);
 }
 
 html,
@@ -308,7 +311,8 @@ body {
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
-  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
   border: 1px solid var(--color-primary-gray);
   color: var(--color-primary-gray);
   border-radius: 2px;
@@ -336,7 +340,8 @@ button.gray {
 }
 
 .btnMore {
-  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 12px) center/12px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat
+    calc(100% - 12px) center/12px;
 }
 
 /* 페이지 헤더 */
@@ -352,7 +357,8 @@ button.gray {
   position: relative;
   height: 70px;
 }
-.pageHeader .innerBox:before, .pageHeader .innerBox:after {
+.pageHeader .innerBox:before,
+.pageHeader .innerBox:after {
   content: "";
   background-color: var(--color-primary-navy);
   position: absolute;
@@ -422,10 +428,10 @@ button.gray {
 }
 
 /* 체크박스 */
-input[type=checkbox] {
+input[type="checkbox"] {
   -webkit-appearance: checkbox;
-     -moz-appearance: checkbox;
-          appearance: checkbox;
+  -moz-appearance: checkbox;
+  appearance: checkbox;
   width: 14px;
   height: 14px;
   accent-color: var(--color-primary-blue);
@@ -494,7 +500,8 @@ input[type=checkbox] {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-card.png") no-repeat center/cover;
+  background: url("../../images/icon/ico-person-card.png") no-repeat
+    center/cover;
 }
 .ico-person-card.white:after {
   filter: invert(1);
@@ -505,7 +512,8 @@ input[type=checkbox] {
   display: block;
   width: 30px;
   height: 30px;
-  background: url("../../images/icon/ico-person-contract.png") no-repeat center/cover;
+  background: url("../../images/icon/ico-person-contract.png") no-repeat
+    center/cover;
 }
 .ico-person-contract.white:after {
   filter: invert(1);
@@ -571,7 +579,7 @@ input[type=checkbox] {
   font-family: arial;
   text-align: center;
   -moz-text-align-last: center;
-       text-align-last: center;
+  text-align-last: center;
   font-weight: 600;
   border: none;
   border-radius: 20px;
@@ -618,7 +626,7 @@ input[type=checkbox] {
 .headerNav .profileBoxItem + .profileBoxItem {
   margin-top: 10px;
 }
-.headerNav .profileBox [class^=ico-]:after {
+.headerNav .profileBox [class^="ico-"]:after {
   width: 24px;
   height: 24px;
   margin-right: 5px;
@@ -718,7 +726,7 @@ table {
 .namePickerBox {
   width: 100%;
   height: 100%;
-  background-color: #F9F9F9;
+  background-color: #f9f9f9;
   border: 1px solid var(--color-border-gray);
   border-top: none;
 }
@@ -726,23 +734,30 @@ table {
 table {
   /* 사원선택 테이블 설정 */
 }
-table.namePickerTable th, table.namePickerTable td, table.hrTotalTable th, table.hrTotalTable td {
+table.namePickerTable th,
+table.namePickerTable td,
+table.hrTotalTable th,
+table.hrTotalTable td {
   border-bottom: 1px solid var(--color-border-gray);
 }
-table.namePickerTable th, table.hrTotalTable th {
+table.namePickerTable th,
+table.hrTotalTable th {
   font-size: 13px;
   font-weight: 800;
   background-color: #ededed;
   padding: 10px;
 }
-table.namePickerTable th + th, table.hrTotalTable th + th {
+table.namePickerTable th + th,
+table.hrTotalTable th + th {
   border-left: 1px solid var(--color-border-gray);
 }
-table.namePickerTable td, table.hrTotalTable td {
+table.namePickerTable td,
+table.hrTotalTable td {
   padding: 5px 10px;
   background-color: #fff;
 }
-table.namePickerTable td + td, table.hrTotalTable td + td {
+table.namePickerTable td + td,
+table.hrTotalTable td + td {
   border-left: 1px solid var(--color-border-gray);
 }
 
@@ -760,4 +775,4 @@ table.namePickerTable td + td, table.hrTotalTable td + td {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-white);
   border: none;
-}/*# sourceMappingURL=index.css.map */
+} /*# sourceMappingURL=index.css.map */

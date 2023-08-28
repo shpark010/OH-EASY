@@ -3,6 +3,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styled from "styled-components";
 import moment from "moment";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 const InputWrapper = styled.div`
   position: relative;
@@ -17,6 +18,8 @@ const Input = styled.input`
   height: 32px;
   padding: 0 5px;
   text-align: center;
+  //padding-right: 20px;
+  margin-left: 10px;
 
   &:focus {
     outline: 1px solid var(--color-primary-black);
@@ -66,7 +69,7 @@ const StyledCalendar = styled(Calendar)`
 `;
 
 function CustomCalendar({ width, id }) {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -89,7 +92,7 @@ function CustomCalendar({ width, id }) {
   };
 
   const formatDate = (date) => {
-    return moment(date).format("YYYY-MM-DD");
+    return date ? moment(date).format("YYYY-MM-DD") : "";
   };
 
   return (
@@ -100,16 +103,30 @@ function CustomCalendar({ width, id }) {
         value={formatDate(date)}
         onClick={() => setIsOpen(!isOpen)}
       />
+      <IconWrapper onClick={() => setIsOpen(!isOpen)}>
+        <FaRegCalendarAlt size={17} />
+      </IconWrapper>
       {isOpen && (
         <StyledCalendar
           locale="ko"
           formatDay={(locale, date) => moment(date).format("DD")}
           onChange={handleDateChange}
-          value={date}
+          value={date || new Date()}
         />
       )}
     </InputWrapper>
   );
 }
+
+const IconWrapper = styled.div`
+  position: absolute;
+  top: -1px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 5px;
+  cursor: pointer;
+`;
 
 export default CustomCalendar;
