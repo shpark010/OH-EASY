@@ -9,6 +9,9 @@ import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton"
 import PageHeaderName from "../components/PageHeader/PageHeaderName";
 import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton";
 import CustomCalendar from "../components/Contents/CustomCalendar";
+import CustomInput from "../components/Contents/CustomInput";
+import SearchBarBox from "../components/SearchBar/SearchBarBox";
+import CustomButton from "../components/Contents/CustomButton";
 
 class EmployeeRegister extends Component {
   render() {
@@ -151,141 +154,148 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">입사일자</th>
                     <td className="erCellStyle">
-                      <CustomCalendar width="130" id="erDate1" />
+                      <CustomCalendar width="170" id="erDate1" />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">주민번호</th>
                     <td className="erCellStyle">
-                      <select className="erInputStyle erSelectBox">
-                        <option value="0" selected>내국인</option>
-                        <option value="1">외국인</option>
-                      </select>
+                    <SearchBarBox
+                        options={[
+                          { value: "0", label: "내국인" },
+                          { value: "1", label: "외국인" },
+                        ]}
+                        />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <select className="erInputStyle erSelectBox">
-                        <option value="0" selected>남자</option>
-                        <option value="1">여자</option>
-                      </select>
+                    <SearchBarBox
+                        options={[
+                          { value: "0", label: "남자" },
+                          { value: "1", label: "여자" },
+                        ]}
+                      />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">주소</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
-                    <td colSpan="2" className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                    <td className="erCellStyle" colSpan="2">
+                      <CustomInput width={360}/>
                     </td>
                     <td className="erCellStyle">
-                      <button className="erSearchButton">검색</button>
+                    <CustomButton text="검색" color="black" />
                     </td>
                   </tr>
                   <tr>
-                    <th className="erHeaderStyle">상세주소</th>
-                    <td colSpan="5" className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                  <th className="erHeaderStyle">상세주소</th>
+                    <td className="erCellStyle" colSpan="5">
+                      <CustomInput width={915} />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">전화번호</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">휴대폰번호</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
-                    {/* <td className="erCellStyle">
-                      <input type="text" disabled className="erInputStyle2" />
+
+                    <td className="erCellStyle">
+                      <input type="text" disabled className="erInputDisabledStyle" />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" disabled className="erInputStyle2" />
-                    </td> */}
+                      <input type="text" disabled className="erInputDisabledStyle" />
+                    </td>
+
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">이메일</th>
                     <td className="erCellStyle">
                       <div>
-                        <input type="text" className="erInputStyle" />
+                        <CustomInput />
                       </div>
                     </td>
                     <td className="erCellStyle">
                       <div class="email-cell">
-                        <input type="text" className="erInputStyle" />
+                        <div className="at-sign">@</div>
+                        <CustomInput className="input-cell" width="10" />
                       </div>
                     </td>
+
                     <td className="erCellStyle">
-                      <select className="erInputStyle erSelectBox">
-                        <option value="0" selected>직접입력</option>
-                        <option value="1">gmail.com</option>
-                        <option value="2">naver.com</option>
-                        <option value="3">daum.net</option>
-                      </select>
+                      <SearchBarBox
+                        options={[
+                          { value: "0", label: "직접입력" },
+                          { value: "1", label: "gmail.com" },
+                          { value: "2", label: "naver.com" },
+                          { value: "3", label: "daum.net" },
+                        ]}
+                      />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">부서</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">직급</th>
                     <td className="erCellStyle">
-                      <select className="erInputStyle erSelectBox">
-                        <option value="0" selected>기본직급</option>
-                      </select>
+                      <SearchBarBox options={[{values:"0", label:"기본직급"}]} />
                     </td>
-                    <td className="erCellStyle">
-                      <select className="erInputStyle erSelectBox">
-                        <option value="0" selected>직급없음</option>
-                        <option value="1">회장</option>
-                        <option value="2">사장</option>
-                        <option value="3">부사장</option>
-                      </select>
+                    <td>
+                      <SearchBarBox
+                        options={[
+                          { value: "0", label: "직급없음" },
+                          { value: "1", label: "회장" },
+                          { value: "2", label: "사장" },
+                          { value: "3", label: "부사장" },
+                        ]}
+                      />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">퇴사일자</th>
                     <td className="erCellStyle">
-                      <CustomCalendar width="120" id="erDate2" />
+                      <CustomCalendar width="170" id="erDate2" />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">급여이체은행</th>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                     <td className="erCellStyle">
-                      <input type="text" className="erInputStyle" />
+                      <CustomInput />
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div>
-
-              </div>
             </div>
         </section>
         
