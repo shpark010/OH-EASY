@@ -13,8 +13,42 @@ import SearchSubmitButton from "../components/SearchBar/SearchSubmitButton";
 import CustomInput from "../components/Contents/CustomInput";
 import CustomButton from "../components/Contents/CustomButton";
 import CustomCalender from "../components/Contents/CustomCalendar";
+import CustomRadio from "../components/Contents/CustomRadio";
+
+import HrFamily from "../components/HRManagement/HrFamily";
+import HrEdu from "../components/HRManagement/HrEdu";
+import HrCareer from "../components/HRManagement/HrCareer";
+import HrBody from "../components/HRManagement/HrBody";
+
+const Alert = (e) => {
+  alert(e.target.value);
+  console.log(e);
+};
 
 class HRManagement extends Component {
+  state = {
+    activeTab: "family",
+  };
+
+  handleTabClick = (tabName) => {
+    this.setState({ activeTab: tabName });
+  };
+
+  renderContent() {
+    switch (this.state.activeTab) {
+      case "family":
+        return <HrFamily />;
+      case "edu":
+        return <HrEdu />;
+      case "career":
+        return <HrCareer />;
+      case "body":
+        return <HrBody />;
+      default:
+        return null;
+    }
+  }
+
   render() {
     return (
       <>
@@ -63,7 +97,8 @@ class HRManagement extends Component {
                 options={[
                   { value: "0", label: "0. 재직자+당해년도 퇴사자" },
                   { value: "1", label: "1. 재직자+당해년도 퇴사자" },
-                  { value: "1", label: "2. 작년퇴사자+당해년도 퇴사자" },
+                  { value: "2", label: "2. 작년퇴사자+당해년도 퇴사자" },
+                  { value: "3", label: "4. 박성환" },
                 ]}
                 defaultValue="0"
               />
@@ -75,6 +110,7 @@ class HRManagement extends Component {
                   { value: "0", label: "0. 코드순" },
                   { value: "1", label: "1. 이름순" },
                   { value: "1", label: "2. 성적순" },
+                  { value: "1", label: "3. 박성환" },
                 ]}
                 defaultValue="0"
               />
@@ -168,7 +204,7 @@ class HRManagement extends Component {
                 <ul className="pageTab">
                   <li class="on">기초정보</li>
                 </ul>
-                <div className="hrInfoBase borderTopBold borderbuttonBold">
+                <div className="hrInfoBase borderTopBold borderbottomBold">
                   <div className="hrInfoBaseProfileImg">
                     <img
                       src="https://picsum.photos/180/180"
@@ -209,11 +245,7 @@ class HRManagement extends Component {
                     />
                     <CustomInput className="hrInfoBaseInput" width="300" />
                     <CustomInput className="hrInfoBaseInput" width="300" />
-                    <CustomCalender
-                      className="hrInfoBaseInput"
-                      width="300"
-                      defaultValue="2012-12-22"
-                    />
+                    <CustomCalender className="hrInfoBaseInput" width="300" />
                   </div>
                   <div className="hrInfoBaseProfileTitle">
                     <p className="hrInfoBaseProfileOnePtag">한자성명</p>
@@ -225,30 +257,72 @@ class HRManagement extends Component {
                   </div>
                   <div className="hrInfoBaseProfiletwo">
                     <CustomInput className="hrInfoBaseInput" width="300" />
-                    <div className="genderSelect">
-                      <label>
-                        <input type="radio" name="gender" value="male" />남
-                      </label>
-                      <label>
-                        <input type="radio" name="gender" value="female" />여
-                      </label>
-                    </div>
+                    <CustomRadio
+                      classNameBox="hrInfoBaseBox"
+                      classNameRadio="classNameRadio"
+                      name="gender"
+                      options={[
+                        ["남", "male"],
+                        ["여", "female"],
+                      ]}
+                      onClick={Alert}
+                    />
+                    <CustomRadio
+                      classNameBox="hrInfoBaseBox"
+                      classNameRadio="classNameRadio"
+                      name="married"
+                      options={[
+                        ["미혼", "0"],
+                        ["기혼", "1"],
+                      ]}
+                      onClick={Alert}
+                    />
                     <CustomInput className="hrInfoBaseInput" width="300" />
-                    <CustomInput className="hrInfoBaseInput" width="300" />
-                    <CustomInput className="hrInfoBaseInput" width="300" />
+                    <CustomRadio
+                      classNameBox="hrInfoBaseBox"
+                      classNameRadio="classNameRadio"
+                      name="married"
+                      options={[
+                        ["작성", "0"],
+                        ["미작성", "1"],
+                      ]}
+                      onClick={Alert}
+                    />
                     <CustomCalender className="hrInfoBaseInput" width="300" />
                   </div>
                 </div>
               </div>
               <div className="hrInfoDetailWrap">
                 <ul className="pageTab">
-                  <li class="on">가족</li>
-                  <li>학력</li>
-                  <li>경력</li>
-                  <li>신체</li>
+                  <li
+                    className={this.state.activeTab === "family" ? "on" : ""}
+                    onClick={() => this.handleTabClick("family")}
+                  >
+                    가족
+                  </li>
+                  <li
+                    className={this.state.activeTab === "edu" ? "on" : ""}
+                    onClick={() => this.handleTabClick("edu")}
+                  >
+                    학력
+                  </li>
+                  <li
+                    className={this.state.activeTab === "career" ? "on" : ""}
+                    onClick={() => this.handleTabClick("career")}
+                  >
+                    경력
+                  </li>
+                  <li
+                    className={this.state.activeTab === "body" ? "on" : ""}
+                    onClick={() => this.handleTabClick("body")}
+                  >
+                    신체
+                  </li>
                   <li>병역</li>
                 </ul>
-                <div className="hrInfoDetail borderTopBold"></div>
+                <div className="hrInfoDetail borderTopBold">
+                  {this.renderContent()}
+                </div>
               </div>
             </div>
           </div>

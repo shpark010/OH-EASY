@@ -246,7 +246,7 @@ input[type="password"]::-ms-clear {
 .borderTopBold {
   border-top: 3px solid var(--color-primary-black);
 }
-.borderbuttonBold {
+.borderbottomBold {
   border-bottom: 1px solid var(--color-border-gray);
 }
 
