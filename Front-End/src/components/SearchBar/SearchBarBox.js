@@ -1,10 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 
-function SearchBarBox({ label, id, className, options, defaultValue }) {
+function SearchBarBox({
+  label,
+  id,
+  className,
+  options,
+  defaultValue,
+  onChange,
+}) {
+  const [selectedValue, setSelectedValue] = useState(defaultValue);
+
+  const handleValueChange = (event) => {
+    const newValue = event.target.value;
+    setSelectedValue(newValue);
+    if (onChange) {
+      onChange(newValue);
+    }
+  };
+
   return (
     <div className={`searchBarBox ${className}`}>
-      <span className="searchBarName">{label}</span>
-      <select id={id} className="selectBox" defaultValue={defaultValue}>
+      {label && <span className="searchBarName">{label}</span>}
+      <select
+        id={id}
+        className="selectBox"
+        defaultValue={defaultValue}
+        onChange={handleValueChange}
+        value={selectedValue}
+      >
         {options.map((option, index) => (
           <option key={index} value={option.value}>
             {option.label}
