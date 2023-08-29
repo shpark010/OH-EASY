@@ -137,8 +137,8 @@ class EmployeeRegister extends Component {
                 {/* 제목 탭 테이블 */}
                 <table className="erGrid2Top">
                   <th className="erGrid2TopCell">기초자료</th>
-                  <th className="erGrid2TopCell">공제등록</th>
-                  <th className="erGrid2TopCell">부양가족</th>
+                  <th></th>
+                  <th></th>
                   <th></th>
                   <th></th>
                   <th></th>
@@ -161,10 +161,12 @@ class EmployeeRegister extends Component {
                     <th className="erHeaderStyle">주민번호</th>
                     <td className="erCellStyle">
                     <SearchBarBox
+                        className="erSelectBox"
                         options={[
                           { value: "0", label: "내국인" },
                           { value: "1", label: "외국인" },
                         ]}
+                        defaultValue="0"
                         />
                     </td>
                     <td className="erCellStyle">
@@ -172,10 +174,12 @@ class EmployeeRegister extends Component {
                     </td>
                     <td className="erCellStyle">
                     <SearchBarBox
+                        className="erSelectBox"
                         options={[
                           { value: "0", label: "남자" },
                           { value: "1", label: "여자" },
                         ]}
+                        defaultValue="0"
                       />
                     </td>
                   </tr>
@@ -185,7 +189,7 @@ class EmployeeRegister extends Component {
                       <CustomInput />
                     </td>
                     <td className="erCellStyle" colSpan="2">
-                      <CustomInput width={360}/>
+                      <CustomInput width={375}/>
                     </td>
                     <td className="erCellStyle">
                     <CustomButton text="검색" color="black" />
@@ -245,12 +249,14 @@ class EmployeeRegister extends Component {
 
                     <td className="erCellStyle">
                       <SearchBarBox
+                        className="erSelectBox"
                         options={[
                           { value: "0", label: "직접입력" },
                           { value: "1", label: "gmail.com" },
                           { value: "2", label: "naver.com" },
                           { value: "3", label: "daum.net" },
                         ]}
+                        defaultValue="0"
                       />
                     </td>
                   </tr>
@@ -263,16 +269,22 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">직급</th>
                     <td className="erCellStyle">
-                      <SearchBarBox options={[{values:"0", label:"기본직급"}]} />
+                      <SearchBarBox 
+                      className="erSelectBox"
+                      options={[{values:"0", label:"기본직급"}]} 
+                      defaultValue="0" 
+                      />
                     </td>
-                    <td>
+                    <td className="erCellStyle">
                       <SearchBarBox
+                        className="erSelectBox"
                         options={[
                           { value: "0", label: "직급없음" },
                           { value: "1", label: "회장" },
                           { value: "2", label: "사장" },
                           { value: "3", label: "부사장" },
                         ]}
+                        defaultValue="0"
                       />
                     </td>
                   </tr>

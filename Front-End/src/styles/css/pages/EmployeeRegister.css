@@ -31,7 +31,7 @@
   border: 1px solid black;
   padding: 8px;
   text-align: center;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .erGridBottom {
@@ -51,7 +51,7 @@
 .erGrid2Top th {
   padding: 8px;
   text-align: center;
-  font-size: 13px;
+  font-size: 16px;
   table-layout: fixed;
   width: 10%;
 }
@@ -76,12 +76,12 @@
   text-align: right;
   vertical-align: middle;
   font-size: 16px;
-  width: 250px;
+  width: 200px;
 }
 
 .erCellStyle {
   padding: 7px;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .erInputDisabledStyle {
@@ -113,9 +113,10 @@ input:disabled {
 }
 
 .input-cell {
-  flex: 9;}
+  flex: 9;
+}
 
   
-/* .erSelectBox {
-  width: 200px;
-} */
+.erSelectBox select {
+  width: 173px;
+}
