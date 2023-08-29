@@ -57,3 +57,56 @@
   margin: 7px 20px 7px 10px;
   font-weight: 500;
 }
+
+.hrInfoDetailTable th {
+  height: 34px;
+  background-color: var(--color-opacity-gray);
+  border: 1px solid var(--color-border-gray);
+}
+.hrInfoDetailTable td {
+  height: 34px;
+  text-align: center;
+  background-color: var(--color-opacity-white);
+  border: 1px solid var(--color-border-gray);
+}
+.hrInfoBaseBox {
+  text-align: left;
+  padding: 5px;
+  height: 34px;
+  font-weight: 900;
+}
+
+.hrBody {
+  display: flex;
+}
+
+.hrBodyTitle {
+  background-color: var(--color-opacity-gray);
+  width: 13%;
+}
+.hrBodyTitle p {
+  text-align: right;
+  padding: 10px 10px;
+  font-weight: 900;
+  margin-top: 3px;
+}
+
+.hrBodyInput {
+  display: block;
+  margin: 7px 20px 7px 10px;
+  font-weight: 500;
+}
+
+.hrBodyText {
+  display: flex;
+  align-items: center; /* 내부 요소를 중앙 정렬합니다 */
+}
+.hrBodyText p {
+  display: flex;
+  align-items: center; /* 내부 요소를 중앙 정렬합니다 */
+  font-weight: 900;
+}
+
+.hrBloodType {
+  padding: 5px 0 5px 10px;
+}
