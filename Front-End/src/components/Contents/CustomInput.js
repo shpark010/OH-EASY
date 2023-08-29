@@ -14,7 +14,7 @@ const Input = styled.input`
   }
 `;
 
-//사이즈를 주면 그사이즏대로 안주면 100px
+//사이즈를 주면 그사이즈대로 안주면 100px
 function CustomInput({ width, id, className }) {
   return (
     <Input type="text" id={id} className={className} width={`${width}px`} />
