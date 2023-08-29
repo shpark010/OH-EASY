@@ -18,9 +18,7 @@ const Input = styled.input`
   height: 32px;
   padding: 0 5px;
   text-align: center;
-  //padding-right: 20px;
-  margin-left: 10px;
-
+  
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }

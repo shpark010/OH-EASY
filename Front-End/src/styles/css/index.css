@@ -375,7 +375,6 @@ button.gray {
   right: 0;
   transform: translateX(100%);
 }
-/*
 .pageHeader .btnWrap {
   display: flex;
   align-items: center;
@@ -391,8 +390,6 @@ button.gray {
   color: var(--color-primary-white);
   font-size: 16px;
 }
-*/
-/*
 .pageHeader .iconBtnWrap {
   display: flex;
   align-items: center;
