@@ -1,8 +1,8 @@
 import React from "react";
 
-function SearchBarBox({ label, id, options, defaultValue }) {
+function SearchBarBox({ label, id, className, options, defaultValue }) {
   return (
-    <div className="searchBarBox">
+    <div className={`searchBarBox ${className}`}>
       <span className="searchBarName">{label}</span>
       <select id={id} className="selectBox" defaultValue={defaultValue}>
         {options.map((option, index) => (
