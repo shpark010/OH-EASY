@@ -308,6 +308,8 @@ body {
 /* 셀렉트 박스  */
 .selectBox {
   height: 32px;
+  font-family: "NanumSquare", sans-serif;
+  font-weight: 700;
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
@@ -333,6 +335,7 @@ button {
   border-radius: 2px;
   background-color: transparent;
   cursor: pointer;
+  font-family: "NanumSquare", sans-serif;
 }
 button.gray {
   background-color: var(--color-primary-gray);
