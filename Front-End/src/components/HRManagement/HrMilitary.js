@@ -23,11 +23,7 @@ const HrMilitary = () => {
           defaultValue="AB"
           width="200"
         />
-        <CustomCalender
-          className="hrInfoBaseInput"
-          width="200"
-          defaultValue="입력없음"
-        />
+        <CustomCalender className="hrInfoBaseInput" width="200" />
         <CustomSelect
           className={"hrDetailSelect"}
           options={[
@@ -60,11 +56,7 @@ const HrMilitary = () => {
           defaultValue="AB"
           width="200"
         />
-        <CustomCalender
-          className="hrInfoBaseInput"
-          width="200"
-          defaultValue="입력없음"
-        />
+        <CustomCalender className="hrInfoBaseInput" width="200" />
         <CustomInput className="hrDetailInput" width="200" />
       </div>
       <div className="hrDetailTitle">

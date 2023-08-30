@@ -15,6 +15,8 @@ import CustomButton from "../components/Contents/CustomButton";
 import CustomCalender from "../components/Contents/CustomCalendar";
 import CustomRadio from "../components/Contents/CustomRadio";
 
+import { handlePageHeaderSearchSubmit } from "../components/Services/PageHeaderSearchService";
+
 import HrFamily from "../components/HRManagement/HrFamily";
 import HrEdu from "../components/HRManagement/HrEdu";
 import HrCareer from "../components/HRManagement/HrCareer";
@@ -63,7 +65,7 @@ class HRManagement extends Component {
             <PageHeaderName text="인사관리등록" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                <PageHeaderTextButton text="사원불러오기" />
+                <PageHeaderTextButton text="사원불러오기" onClick={Alert} />
               </div>
               <div className="iconBtnWrap">
                 <PageHeaderIconButton
@@ -102,23 +104,26 @@ class HRManagement extends Component {
                   { value: "2", label: "2. 작년퇴사자+당해년도 퇴사자" },
                   { value: "3", label: "4. 박성환" },
                 ]}
-                defaultValue="0"
+                defaultValue="1"
               />
-
               <SearchBarBox
                 label="정렬"
                 id="hr-order"
                 options={[
                   { value: "0", label: "0. 코드순" },
                   { value: "1", label: "1. 이름순" },
-                  { value: "1", label: "2. 성적순" },
-                  { value: "1", label: "3. 박성환" },
+                  { value: "1", label: "1. 입사순" },
                 ]}
                 defaultValue="0"
               />
             </div>
             <div className="btnWrapper">
-              <SearchSubmitButton text="조회" />
+              <SearchSubmitButton
+                text="조회"
+                onClick={() =>
+                  handlePageHeaderSearchSubmit("url", "hr-category", "hr-order")
+                }
+              />
             </div>
           </div>
         </div>
@@ -204,7 +209,7 @@ class HRManagement extends Component {
             <div className="contentsArea">
               <div className="hrInfoBaseWrap">
                 <ul className="pageTab">
-                  <li class="on">기초정보</li>
+                  <li className="on">기초정보</li>
                 </ul>
                 <div className="hrInfoBase borderTopBold borderbottomBold">
                   <div className="hrInfoBaseProfileImg">
@@ -240,11 +245,7 @@ class HRManagement extends Component {
                   <div className="hrInfoBaseProfiletwo">
                     <CustomInput className="hrInfoBaseInput" width="300" />
                     <CustomInput className="hrInfoBaseInput" width="300" />
-                    <CustomCalender
-                      className="hrInfoBaseInput"
-                      width="300"
-                      defaultValue="입력없음"
-                    />
+                    <CustomCalender className="hrInfoBaseInput" width="300" />
                     <CustomInput className="hrInfoBaseInput" width="300" />
                     <CustomInput className="hrInfoBaseInput" width="300" />
                     <CustomCalender className="hrInfoBaseInput" width="300" />
