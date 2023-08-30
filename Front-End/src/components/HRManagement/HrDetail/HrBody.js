@@ -1,7 +1,7 @@
 import React from "react";
-import CustomInput from "../Contents/CustomInput";
-import CustomRadio from "../Contents/CustomRadio";
-import CustomSelect from "../Contents/CustomSelect";
+import CustomInput from "../../Contents/CustomInput";
+import CustomRadio from "../../Contents/CustomRadio";
+import CustomSelect from "../../Contents/CustomSelect";
 
 const HrBody = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
-import CustomInput from "../Contents/CustomInput";
-import CustomSelect from "../Contents/CustomSelect";
-import CustomCalender from "../Contents/CustomCalendar";
+import CustomInput from "../../Contents/CustomInput";
+import CustomSelect from "../../Contents/CustomSelect";
+import CustomCalender from "../../Contents/CustomCalendar";
 
 const HrMilitary = () => {
   return (
