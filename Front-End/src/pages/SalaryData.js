@@ -5,37 +5,72 @@ import Print from "../images/pages/common/print.png";
 import Delete from "../images/pages/common/delete.png";
 
 import "../styles/css/pages/SalaryData.css";
+import PageHeaderName from "../components/PageHeader/PageHeaderName";
+import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton";
+import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
+import SearchBarBox from "../components/SearchBar/SearchBarBox";
+import CustomCalendar from "../components/Contents/CustomCalendar";
+
+const handleSearchBarChange = (selectedValue) => {
+  console.log("선택된 값:", selectedValue);
+};
 
 class SalaryData extends Component {
+  constructor(props) {
+    super();
+    this.state = {
+      selectedSalary: "", //급여구분
+      revertibleDate: "", //귀속년도
+    };
+  }
+  handleSelectChange = (event) => {
+    this.setState({ selectedValue: event.target.value }); // 선택된 값을 상태에 업데이트
+  };
+
+  handleDateChange = (event) => {
+    this.setState({ revertibleDate: event.target.value }); // 선택된 값을 상태에 업데이트
+  };
+
+  handleButtonClick = () => {
+    console.log(this.state.selectedValue); // 선택된 값을 콘솔에 출력
+  };
   render() {
     return (
       <>
         <div className="pageHeader">
           <div className="innerBox fxSpace">
-            <h2 className="pageHeaderName">인사관리등록</h2>
+            <PageHeaderName text="급여자료입력" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                <button>급여대장</button>
-                <button>지급일자</button>
-                <button>수당/공제등록</button>
-                <button>재계산</button>
-                <button>완료</button>
-                <button>급여메일보내기</button>
-                <button>급여명세 문자보내기</button>
+                <PageHeaderTextButton text="급여대장" />
+                <PageHeaderTextButton text="지급일자" />
+                <PageHeaderTextButton text="수당/공제등록" />
+                <PageHeaderTextButton text="재계산" />
+                <PageHeaderTextButton text="완료" />
+                <PageHeaderTextButton text="급여메일보내기" />
+                <PageHeaderTextButton text="급여명세 문자보내기" />
               </div>
               <div className="iconBtnWrap">
-                <button className="print">
-                  <img src={Print} alt="프린트" />
-                </button>
-                <button className="delete">
-                  <img src={Delete} alt="삭제" />
-                </button>
-                <button className="calc">
-                  <img src={Calc} alt="계산기" />
-                </button>
-                <button className="setting">
-                  <img src={Setting} alt="설정" />
-                </button>
+                <PageHeaderIconButton
+                  btnName="print"
+                  imageSrc={Print}
+                  altText="프린트"
+                />
+                <PageHeaderIconButton
+                  btnName="delete"
+                  imageSrc={Delete}
+                  altText="삭제"
+                />
+                <PageHeaderIconButton
+                  btnName="calc"
+                  imageSrc={Calc}
+                  altText="계산기"
+                />
+                <PageHeaderIconButton
+                  btnName="setting"
+                  imageSrc={Setting}
+                  altText="세팅"
+                />
               </div>
             </div>
           </div>
@@ -44,41 +79,46 @@ class SalaryData extends Component {
           <div className="searchBar">
             <div className="innerBox fxSpace">
               <div className="selectWrapper">
-                <div className="searchBarBox">
+                {/* <div className="searchBarBox">
                   <span className="searchBarName">귀속연월</span>
-                  <input type="date" />
+                  <CustomCalendar className="" width="150" />
+                </div> */}
+                <div className="searchBarName">
+                  <div className="searchBarNameCalender">
+                    <span>귀속년월</span>
+                    <CustomCalendar width="150" />
+                  </div>
                 </div>
-                <div className="searchBarBox">
-                  <span className="searchBarName">구분</span>
-                  <select
-                    id="order"
-                    name="order"
-                    className="selectBox"
-                    defaultValue="0"
-                  >
-                    <option value="0">0. 급여</option>
-                    <option value="1">1. 급여 + 상여</option>
-                    <option value="2">2. 상여</option>
-                    <option value="3">3. 추급</option>
-                    <option value="4">4. 추상</option>
-                  </select>
+                <SearchBarBox
+                  label="구분"
+                  id="sd-salary-category"
+                  options={[
+                    { value: "0", label: "0. 급여" },
+                    { value: "1", label: "1. 급여 + 상여" },
+                    { value: "2", label: "2. 상여" },
+                    { value: "3", label: "3. 추급" },
+                    { value: "4", label: "4. 추상" },
+                  ]}
+                  defaultValue="0"
+                  onChange={handleSearchBarChange}
+                />
+                <div className="searchBarName">
+                  <div className="searchBarNameCalender">
+                    <span>지급일</span>
+                    <CustomCalendar width="150" />
+                  </div>
                 </div>
-                <div className="searchBarBox">
-                  <span className="searchBarName">지급일</span>
-                  <input type="date" />
-                </div>
-                <div className="searchBarBox">
-                  <span className="searchBarName">정렬</span>
-                  <select
-                    id="order"
-                    name="order"
-                    className="selectBox"
-                    defaultValue="0"
-                  >
-                    <option value="0">0. 코드순</option>
-                    <option value="1">1. 이름순</option>
-                  </select>
-                </div>
+                <SearchBarBox
+                  label="정렬"
+                  id="sd-order-category"
+                  options={[
+                    { value: "0", label: "0. 코드순" },
+                    { value: "1", label: "1. 이름순" },
+                    { value: "2", label: "2. 직급순" },
+                    { value: "3", label: "3. 입사일순" },
+                  ]}
+                  defaultValue="0"
+                />
               </div>
               <div className="btnWrapper">
                 <button className="gray">조회</button>
@@ -210,21 +250,20 @@ class SalaryData extends Component {
             <div className="sd-item sd-item4">
               <div className="sd-searchCondition">
                 <span className="searchBarName">조회구분</span>
-                <select
-                  name="sd-searchCondition"
-                  id="sd-searchCondition"
-                  className="selectBox"
-                  defaultValue={2}
-                >
-                  <option value="0">0. 전체사원_당월</option>
-                  <option value="1">1. 현재사원_당월</option>
-                  <option value="2">2. 전체사원_현재</option>
-                  <option value="3">3. 현재사원_현재</option>
-                  <option value="4">4. 전체사원_연간</option>
-                  <option value="5">5. 현재사원_연간</option>
-                </select>
+                <SearchBarBox
+                  id="hr-category"
+                  options={[
+                    { value: "0", label: "0. 전체사원_당월" },
+                    { value: "1", label: "1. 현재사원_당월" },
+                    { value: "2", label: "2. 전체사원_현재" },
+                    { value: "3", label: "3. 현재사원_현재" },
+                    { value: "3", label: "4. 전체사원_연간" },
+                    { value: "3", label: "5. 현재사원_연간" },
+                  ]}
+                  defaultValue="0"
+                />
               </div>
-              <div className="sd-tableArea-top">
+              <div className="sd-tableArea">
                 <table className="sd-search-allowance-top">
                   <thead>
                     <tr>
@@ -311,12 +350,7 @@ class SalaryData extends Component {
                 </tr>
               </table>
             </div>
-            <div
-              className="sd-item sd-item6"
-              style={{
-                border: "1px solid black",
-              }}
-            >
+            <div className="sd-item sd-item6">
               <div className="sd-empInfo">
                 <div className="sd-empInfo-top">
                   <h4>
