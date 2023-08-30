@@ -16,24 +16,6 @@ const handleSearchBarChange = (selectedValue) => {
 };
 
 class SalaryData extends Component {
-  constructor(props) {
-    super();
-    this.state = {
-      selectedSalary: "", //급여구분
-      revertibleDate: "", //귀속년도
-    };
-  }
-  handleSelectChange = (event) => {
-    this.setState({ selectedValue: event.target.value }); // 선택된 값을 상태에 업데이트
-  };
-
-  handleDateChange = (event) => {
-    this.setState({ revertibleDate: event.target.value }); // 선택된 값을 상태에 업데이트
-  };
-
-  handleButtonClick = () => {
-    console.log(this.state.selectedValue); // 선택된 값을 콘솔에 출력
-  };
   render() {
     return (
       <>
@@ -155,13 +137,15 @@ class SalaryData extends Component {
                 </tbody>
               </table>
               <table className="sd-empList-calTable">
-                <tr>
-                  <td></td>
-                  <td colSpan={2}>인 원 ( 퇴 직 )</td>
-                  <td>7(0)</td>
-                  <td></td>
-                  <td></td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td></td>
+                    <td colSpan={2}>인 원 ( 퇴 직 )</td>
+                    <td>7(0)</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div className="sd-item sd-item2">
@@ -183,22 +167,24 @@ class SalaryData extends Component {
                 </tbody>
               </table>
               <table className="sd-allowance-top-calTable">
-                <tr>
-                  <td>과세</td>
-                  <td>999,999,999</td>
-                </tr>
-                <tr>
-                  <td>비과세</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>감면 소득</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>지급액 계</td>
-                  <td>999,999,999</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td>과세</td>
+                    <td>999,999,999</td>
+                  </tr>
+                  <tr>
+                    <td>비과세</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>감면 소득</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>지급액 계</td>
+                    <td>999,999,999</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div className="sd-item sd-item3">
@@ -237,14 +223,16 @@ class SalaryData extends Component {
                 </tbody>
               </table>
               <table className="sd-allowance-bottom-calTable">
-                <tr>
-                  <td>공제액 계</td>
-                  <td>456,641,770</td>
-                </tr>
-                <tr>
-                  <td>차인지급액</td>
-                  <td>534,358,229</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td>공제액 계</td>
+                    <td>456,641,770</td>
+                  </tr>
+                  <tr>
+                    <td>차인지급액</td>
+                    <td>534,358,229</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div className="sd-item sd-item4">
@@ -281,22 +269,24 @@ class SalaryData extends Component {
                   </tbody>
                 </table>
                 <table className="sd-search-allowance-top-calTable">
-                  <tr>
-                    <td>과세</td>
-                    <td>1,000,000,149</td>
-                  </tr>
-                  <tr>
-                    <td>비과세</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>감면 소득</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>지급액 계</td>
-                    <td>1,000,000,149</td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <td>과세</td>
+                      <td>1,000,000,149</td>
+                    </tr>
+                    <tr>
+                      <td>비과세</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>감면 소득</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>지급액 계</td>
+                      <td>1,000,000,149</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -340,14 +330,16 @@ class SalaryData extends Component {
                 </tbody>
               </table>
               <table className="sd-search-allowance-bottom-calTable">
-                <tr>
-                  <td>공제액 계</td>
-                  <td>456,641,770</td>
-                </tr>
-                <tr>
-                  <td>차인지급액</td>
-                  <td>534,358,229</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td>공제액 계</td>
+                    <td>456,641,770</td>
+                  </tr>
+                  <tr>
+                    <td>차인지급액</td>
+                    <td>534,358,229</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div className="sd-item sd-item6">
