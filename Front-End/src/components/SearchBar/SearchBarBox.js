@@ -24,7 +24,6 @@ function SearchBarBox({
       <select
         id={id}
         className="selectBox"
-        defaultValue={defaultValue}
         onChange={handleValueChange}
         value={selectedValue}
       >

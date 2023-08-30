@@ -20,13 +20,7 @@ const CustomButton = ({
   onClick,
 }) => {
   return (
-    <Button
-      color={color}
-      backgroundColor={backgroundColor}
-      id={id}
-      className={className}
-      onClick={onClick}
-    >
+    <Button color={color} id={id} className={className} onClick={onClick}>
       {text}
     </Button>
   );

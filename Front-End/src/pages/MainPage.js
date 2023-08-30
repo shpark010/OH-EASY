@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import "../styles/css/pages/MainPage.css";
 import office from "../images/pages/main/office.png";
+import arwright from "../images/icon/arw-right.png";
 
 class MainPage extends Component {
   render() {
@@ -15,7 +16,7 @@ class MainPage extends Component {
               <p>오늘도 기분 좋은 하루 보내세요!</p>
               <span>
                 마이페이지
-                <img src="/src/images/icon/arrow-right.png" alt=""></img>
+                <img src={arwright} alt="" width="16px"></img>
               </span>
             </div>
             <div id="two">

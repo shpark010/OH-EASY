@@ -38,6 +38,10 @@
   padding-top: 35px;
   font-size: 16px;
 }
+#one > span > img {
+  font-size: 16px;
+  padding-bottom: 3px;
+}
 #two {
   padding-top: 60px;
 }

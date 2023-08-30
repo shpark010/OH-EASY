@@ -1,7 +1,11 @@
 import React from "react";
 
-const SearchSubmitButton = ({ text }) => {
-  return <button className="gray">{text}</button>;
+const SearchSubmitButton = ({ text, onClick }) => {
+  return (
+    <button className="gray" onClick={onClick}>
+      {text}
+    </button>
+  );
 };
 
 export default SearchSubmitButton;
