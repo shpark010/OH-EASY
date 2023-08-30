@@ -19,6 +19,8 @@ import HrFamily from "../components/HRManagement/HrFamily";
 import HrEdu from "../components/HRManagement/HrEdu";
 import HrCareer from "../components/HRManagement/HrCareer";
 import HrBody from "../components/HRManagement/HrBody";
+import HrMilitary from "../components/HRManagement/HrMilitary";
+import HrLicense from "../components/HRManagement/HrLicense";
 
 const Alert = (e) => {
   alert(e.target.value);
@@ -44,6 +46,10 @@ class HRManagement extends Component {
         return <HrCareer />;
       case "body":
         return <HrBody />;
+      case "military":
+        return <HrMilitary />;
+      case "license":
+        return <HrLicense />;
       default:
         return null;
     }
@@ -58,10 +64,6 @@ class HRManagement extends Component {
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
                 <PageHeaderTextButton text="사원불러오기" />
-                <PageHeaderTextButton text="재계산" />
-                <PageHeaderTextButton text="완료" />
-                <PageHeaderTextButton text="급여메일 보내기" />
-                <PageHeaderTextButton text="급여명세 문자보내기" />
               </div>
               <div className="iconBtnWrap">
                 <PageHeaderIconButton
@@ -318,7 +320,18 @@ class HRManagement extends Component {
                   >
                     신체
                   </li>
-                  <li>병역</li>
+                  <li
+                    className={this.state.activeTab === "military" ? "on" : ""}
+                    onClick={() => this.handleTabClick("military")}
+                  >
+                    병역
+                  </li>
+                  <li
+                    className={this.state.activeTab === "license" ? "on" : ""}
+                    onClick={() => this.handleTabClick("license")}
+                  >
+                    병역
+                  </li>
                 </ul>
                 <div className="hrInfoDetail borderTopBold">
                   {this.renderContent()}
