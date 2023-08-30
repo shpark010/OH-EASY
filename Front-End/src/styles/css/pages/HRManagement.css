@@ -76,37 +76,38 @@
   font-weight: 900;
 }
 
-.hrBody {
+.hrDetail {
   display: flex;
 }
 
-.hrBodyTitle {
+.hrDetailTitle {
   background-color: var(--color-opacity-gray);
-  width: 13%;
+  width: 15%;
+  padding-left: 55px;
 }
-.hrBodyTitle p {
-  text-align: right;
+.hrDetailTitle p {
   padding: 10px 10px;
+  text-align: right;
   font-weight: 900;
-  margin-top: 3px;
 }
 
-.hrBodyInput {
+.hrDetailInput {
   display: block;
   margin: 7px 20px 7px 10px;
   font-weight: 500;
 }
 
-.hrBodyText {
+.hrDetailText {
+  margin: 7px 20px 7px 10px;
+  height: 32px;
   display: flex;
-  align-items: center; /* 내부 요소를 중앙 정렬합니다 */
 }
-.hrBodyText p {
+.hrDetailText p {
   display: flex;
-  align-items: center; /* 내부 요소를 중앙 정렬합니다 */
+  align-items: center;
   font-weight: 900;
 }
 
-.hrBloodType {
-  padding: 5px 0 5px 10px;
+.hrDetailSelect {
+  margin: 7px 20px 7px 10px;
 }

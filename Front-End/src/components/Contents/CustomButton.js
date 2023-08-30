@@ -11,13 +11,21 @@ const Button = styled.button`
   color: ${(props) => props.color || "var(--color-primary-white)"};
 `;
 //color 안주면 기본 화이트
-const CustomButton = ({ text, color, backgroundColor, id, className }) => {
+const CustomButton = ({
+  text,
+  color,
+  backgroundColor,
+  id,
+  className,
+  onClick,
+}) => {
   return (
     <Button
       color={color}
       backgroundColor={backgroundColor}
       id={id}
       className={className}
+      onClick={onClick}
     >
       {text}
     </Button>

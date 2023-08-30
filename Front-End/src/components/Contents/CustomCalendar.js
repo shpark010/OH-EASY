@@ -18,7 +18,9 @@ const Input = styled.input`
   height: 32px;
   padding: 0 5px;
   text-align: center;
-  
+  font-family: "NanumSquare", sans-serif;
+  font-weight: 700;
+
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
@@ -35,6 +37,7 @@ const StyledCalendar = styled(Calendar)`
   background-color: white;
   z-index: 100;
   font-size: 16px;
+  font-family: "NanumSquare", sans-serif;
 
   .react-calendar__navigation__label > span {
     color: var(--color-primary-black);
@@ -66,7 +69,7 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar({ width, id, className }) {
+function CustomCalendar({ width, id, className, onChange }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -101,6 +104,7 @@ function CustomCalendar({ width, id, className }) {
         readOnly
         value={formatDate(date)}
         onClick={() => setIsOpen(!isOpen)}
+        onChange={onChange}
       />
       <IconWrapper onClick={() => setIsOpen(!isOpen)}>
         <FaRegCalendarAlt size={17} />
