@@ -80,7 +80,9 @@
 }
 
 .erCellStyle {
-  padding: 7px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 7px;
   font-size: 13px;
 }
 

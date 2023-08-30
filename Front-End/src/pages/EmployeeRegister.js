@@ -124,10 +124,12 @@ class EmployeeRegister extends Component {
 
               {/* 두번째 테이블 */}
               <table className="erGridTable erGridBottom">
+                <tbody>
                 <tr>
                   <td>재직 / 전체</td>
                   <td>5명 / 5명</td>
                 </tr>
+                </tbody>
               </table>
             </div>
 
@@ -225,6 +227,7 @@ class EmployeeRegister extends Component {
                       <CustomInput />
                     </td>
 
+                    {/* disabled */}
                     <td className="erCellStyle">
                       <input type="text" disabled className="erInputDisabledStyle" />
                     </td>
@@ -241,7 +244,7 @@ class EmployeeRegister extends Component {
                       </div>
                     </td>
                     <td className="erCellStyle">
-                      <div class="email-cell">
+                      <div className="email-cell">
                         <div className="at-sign">@</div>
                         <CustomInput className="input-cell" width="10" />
                       </div>
