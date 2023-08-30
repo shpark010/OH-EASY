@@ -3,8 +3,12 @@ import styled from "styled-components";
 
 const PageHeaderTextButtonStyle = styled.button``;
 
-const PageHeaderTextButton = ({ text }) => {
-  return <PageHeaderTextButtonStyle>{text}</PageHeaderTextButtonStyle>;
+const PageHeaderTextButton = ({ text, onClick }) => {
+  return (
+    <PageHeaderTextButtonStyle onClick={onClick}>
+      {text}
+    </PageHeaderTextButtonStyle>
+  );
 };
 
 export default PageHeaderTextButton;
