@@ -44,26 +44,10 @@
 
 .erGrid2Top {
   table-layout: fixed;
-  width: 100%;
   border-bottom: 2px solid black;
 }
 
-.erGrid2Top th {
-  padding: 8px;
-  text-align: center;
-  font-size: 16px;
-  table-layout: fixed;
-  width: 10%;
-}
-
-.erGrid2TopCell {
-  background-color: var(--color-primary-blue);
-  color: white;
-  border: 1px solid black;
-}
-
 .erGrid2 {
-  width: 100%;
   background-color: #ffffff;
   box-sizing: border-box;
   overflow: auto;
@@ -94,38 +78,28 @@ input:disabled {
   background: #ffffff;
 }
 
-.erSearchButton {
-  padding: 3px 10px;
-  font-size: 12px;
-}
-
 .erLightGreen {
   background-color: rgb(232, 248, 232);
 }
 
+.erSelectBox select {
+  width: 180px;
+}
+
+/* email */
 .email-cell {
   display: flex;
   align-items: center;
 }
 
 .at-sign {
-  flex: 1;
   text-align: left;
   font-size: 13px;
+  padding-right: 8px;
 }
 
 .input-cell {
-  flex: 9;
-}
-
-  
-.erSelectBox select {
-  width: 173px;
-}
-
-.erGrid2TopCell:hover {
-  background-color: rgb(0, 0, 0);
-  cursor: pointer;
+  width: 160px;
 }
 
 /* 모달 스타일 */

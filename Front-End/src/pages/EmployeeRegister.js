@@ -13,6 +13,9 @@ import CustomCalendar from "../components/Contents/CustomCalendar";
 import CustomInput from "../components/Contents/CustomInput";
 import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import CustomButton from "../components/Contents/CustomButton";
+import CustomNumberInput from "../components/Contents/CustomNumberInput";
+import CustomResidentNumberInput from "../components/Contents/CustomResidentNumberInput";
+import CustomEmailInput from "../components/Contents/CustomEmailInput";
 import DaumPostcode from 'react-daum-postcode';
 
 class EmployeeRegister extends Component {
@@ -20,24 +23,30 @@ class EmployeeRegister extends Component {
     constructor(props) {
       super(props);
       this.state = {
+        selectedEmailDomain: "",
         employeeData: [],
         openPostcode: false,
       };
     }
 
-    componentDidMount() {
-      this.fetchEmployeeData();
-    }
+    // componentDidMount() {
+    //   this.fetchEmployeeData();
+    // }
   
-    fetchEmployeeData = () => {
-      axios.get("/api/getEmployeeData")
-        .then(response => {
-          this.setState({ employeeData: response.data });
-        })
-        .catch(error => {
-          console.error("Error fetching employee data:", error);
-        });
-    }
+    // fetchEmployeeData = () => {
+    //   axios.get("/api/getEmployeeData")
+    //     .then(response => {
+    //       this.setState({ employeeData: response.data });
+    //     })
+    //     .catch(error => {
+    //       console.error("Error fetching employee data:", error);
+    //     });
+    // }
+
+    // handleEmailDomainSelect = (event) => {
+    //   const selectedDomain = event.target.value;
+    //   this.setState({ selectedEmailDomain: selectedDomain });
+    // }
 
     handleAddressButtonClick = () => {
       this.setState({ openPostcode: true });
@@ -56,7 +65,7 @@ class EmployeeRegister extends Component {
     }
     
   render() {
-    const { employeeData, openPostcode } = this.state;
+    const { employeeData, openPostcode, selectedEmailDomain } = this.state;
     
     return (
       <>
@@ -196,26 +205,17 @@ class EmployeeRegister extends Component {
             <div className="erGrid2">
 
                 {/* 제목 탭 테이블 */}
-                <table className="erGrid2Top">
-                  <th className="erGrid2TopCell">기초자료</th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                </table>
-
+                <ul className="pageTab">
+                  <li className="on">기초자료</li>
+                </ul>
+                
               {/* 탭 내용 테이블 */}
               <table>
-                <tbody>
+                <tbody className="tbody borderTopBold">
                   <tr>
                     <th className="erHeaderStyle">입사일자</th>
                     <td className="erCellStyle">
-                      <CustomCalendar width="170" id="erDate1" />
+                      <CustomCalendar width={180} id="erDate1" />
                     </td>
                   </tr>
                   <tr>
@@ -231,7 +231,7 @@ class EmployeeRegister extends Component {
                         />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomResidentNumberInput width={180} />
                     </td>
                     <td className="erCellStyle">
                     <SearchBarBox
@@ -247,10 +247,10 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">주소</th>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomInput width={180} />
                     </td>
                     <td className="erCellStyle" colSpan="2">
-                      <CustomInput width={375}/>
+                      <CustomInput width={365}/>
                     </td>
                     <td className="erCellStyle">
                     <CustomButton text="검색" color="black" onClick={this.handleAddressButtonClick} />
@@ -259,55 +259,64 @@ class EmployeeRegister extends Component {
                   <tr>
                   <th className="erHeaderStyle">상세주소</th>
                     <td className="erCellStyle" colSpan="5">
-                      <CustomInput width={915} />
+                      <CustomInput width={850} />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">전화번호</th>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={3} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={4} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={4} />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">휴대폰번호</th>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={3} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={4} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomNumberInput width={180} maxLength={4} />
                     </td>
 
                     {/* disabled */}
-                    <td className="erCellStyle">
+                    <td width={295}>
                       <input type="text" disabled className="erInputDisabledStyle" />
                     </td>
-                    <td className="erCellStyle">
+                    {/* <td className="">
                       <input type="text" disabled className="erInputDisabledStyle" />
-                    </td>
+                    </td> */}
 
                   </tr>
+
                   <tr>
                     <th className="erHeaderStyle">이메일</th>
                     <td className="erCellStyle">
                       <div>
-                        <CustomInput />
+                        <CustomEmailInput width={180} />
                       </div>
                     </td>
+
                     <td className="erCellStyle">
+                    <div className="email-cell">
+                    <div className="at-sign">@</div>
+                      <CustomInput className="input-cell" />
+                      </div>
+                    </td>
+
+                    {/* <td className="erCellStyle">
                       <div className="email-cell">
                         <div className="at-sign">@</div>
                         <CustomInput className="input-cell" width="10" />
                       </div>
-                    </td>
+                    </td> */}
 
                     <td className="erCellStyle">
                       <SearchBarBox
@@ -322,10 +331,11 @@ class EmployeeRegister extends Component {
                       />
                     </td>
                   </tr>
+
                   <tr>
                     <th className="erHeaderStyle">부서</th>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomInput width={180} />
                     </td>
                   </tr>
                   <tr>
@@ -353,19 +363,19 @@ class EmployeeRegister extends Component {
                   <tr>
                     <th className="erHeaderStyle">퇴사일자</th>
                     <td className="erCellStyle">
-                      <CustomCalendar width="170" id="erDate2" />
+                      <CustomCalendar width={180} id="erDate2" />
                     </td>
                   </tr>
                   <tr>
                     <th className="erHeaderStyle">급여이체은행</th>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomInput width={180} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomInput width={180} />
                     </td>
                     <td className="erCellStyle">
-                      <CustomInput />
+                      <CustomInput width={180} />
                     </td>
                   </tr>
                 </tbody>
@@ -385,7 +395,6 @@ class EmployeeRegister extends Component {
               )}
 
         </section>
-        
       </>
     );
   }
