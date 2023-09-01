@@ -1,13 +1,13 @@
 .sd-section {
-  height: 85%;
+  height: 800px;
 }
 
 .sd-container {
-  height: 100%;
+  /* height: 100%; */
   padding-top: 1%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 45%;
+  grid-auto-rows: 380px;
   grid-gap: 1rem;
   grid-template-areas:
     "a b d f"
@@ -17,6 +17,10 @@
 .searchBarNameCalender {
   display: flex;
   align-items: center;
+}
+
+.searchBarNameCalender span {
+  margin-right: 20px;
 }
 
 .sd-item {
@@ -132,6 +136,16 @@
   border: 1px solid black;
   background: #a9d0f5;
   min-width: 18px;
+}
+
+.sd-item2 tr th:first-child,
+.sd-item2 tr td:first-child {
+  width: 40%;
+}
+
+.sd-item3 tr th:first-child,
+.sd-item3 tr td:first-child {
+  width: 50%;
 }
 
 .sd-item4 .sd-searchCondition {

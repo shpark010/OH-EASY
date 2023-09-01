@@ -10,13 +10,34 @@ import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton"
 import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
 import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import CustomCalendar from "../components/Contents/CustomCalendar";
-
-const handleSearchBarChange = (selectedValue) => {
-  console.log("선택된 값:", selectedValue);
-};
+import CustomPriceInput from "../components/Contents/CustomPriceInput";
 
 class SalaryData extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      editing: false,
+      price: "",
+    };
+  }
+
+  handlePriceChange = (value) => {
+    // 사용자가 입력한 값을 상태에 업데이트
+    this.setState({
+      price: value,
+    });
+  };
+
+  handleDoubleClick = () => {
+    this.setState({ editing: true });
+  };
+
+  handleInputBlur = () => {
+    this.setState({ editing: false });
+  };
+
   render() {
+    const { editing, price } = this.state;
     return (
       <>
         <div className="pageHeader">
@@ -82,7 +103,6 @@ class SalaryData extends Component {
                     { value: "4", label: "4. 추상" },
                   ]}
                   defaultValue="0"
-                  onChange={handleSearchBarChange}
                 />
                 <div className="searchBarName">
                   <div className="searchBarNameCalender">
@@ -104,9 +124,6 @@ class SalaryData extends Component {
               </div>
               <div className="btnWrapper">
                 <button className="gray">조회</button>
-                <button className="btnMore">
-                  <span className="hidden">펼쳐보기? 더보기?</span>
-                </button>
               </div>
             </div>
           </div>
@@ -159,9 +176,28 @@ class SalaryData extends Component {
                 <tbody>
                   <tr>
                     <td>기본급</td>
-                    <td>
-                      999,999,999
+                    <td onDoubleClick={this.handleDoubleClick}>
+                      {/* 999,999,999 */}
                       {/* <input type="text" /> */}
+                      {editing ? (
+                        // <input
+                        //   type="text"
+                        //   value={text}
+                        //   onChange={this.handleInputChange}
+                        //   onBlur={this.handleInputBlur}
+                        //   autoFocus
+                        // />
+                        <CustomPriceInput
+                          id="price-input"
+                          value={price}
+                          width={100}
+                          onChange={this.handlePriceChange}
+                          onBlur={this.handleInputBlur}
+                        />
+                      ) : (
+                        // <p onDoubleClick={this.handleDoubleClick}>{price}</p>
+                        <span>{Number(price).toLocaleString()}</span>
+                      )}
                     </td>
                   </tr>
                 </tbody>
@@ -264,7 +300,7 @@ class SalaryData extends Component {
                     <tr>
                       <td>기본급</td>
                       <td>과세</td>
-                      <td>1,000,000.149</td>
+                      <td>1,000,000,149</td>
                     </tr>
                   </tbody>
                 </table>
