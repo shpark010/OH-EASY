@@ -1,4 +1,154 @@
+.erSection {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-gap: 1rem;
+  width: 100%;
+  max-width: 1640px;
+  height: 85%;
+  margin: 0 auto;
+  padding: 0 15px;
+  flex-grow: 1;
+  overflow: hidden;
+}
 
-.section.one{
+.erGrid {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border: 1px solid black;
+  box-sizing: border-box;
+  overflow: auto;
+  background-color: #ffffff;
+  max-height: calc(100% - 10px);
+}
 
+.erGridTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.erGridTable th,
+.erGridTable td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.erGridBottom {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: auto;
+  background-color: lightblue;
+  font-weight: bold;
+}
+
+.erGrid2Top {
+  table-layout: fixed;
+  width: 100%;
+  border-bottom: 2px solid black;
+}
+
+.erGrid2Top th {
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+  table-layout: fixed;
+  width: 10%;
+}
+
+.erGrid2TopCell {
+  background-color: var(--color-primary-blue);
+  color: white;
+  border: 1px solid black;
+}
+
+.erGrid2 {
+  width: 100%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.erHeaderStyle {
+  background-color: #e6e6e6;
+  padding: 10px;
+  font-weight: 900;
+  text-align: right;
+  vertical-align: middle;
+  font-size: 16px;
+  width: 200px;
+}
+
+.erCellStyle {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 7px;
+  font-size: 13px;
+}
+
+.erInputDisabledStyle {
+  border: 1px solid #ffffff;
+}
+
+input:disabled {
+  background: #ffffff;
+}
+
+.erSearchButton {
+  padding: 3px 10px;
+  font-size: 12px;
+}
+
+.erLightGreen {
+  background-color: rgb(232, 248, 232);
+}
+
+.email-cell {
+  display: flex;
+  align-items: center;
+}
+
+.at-sign {
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
+}
+
+.input-cell {
+  flex: 9;
+}
+
+  
+.erSelectBox select {
+  width: 173px;
+}
+
+.erGrid2TopCell:hover {
+  background-color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+/* 모달 스타일 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  width: 30%;
+  height: 55%;
+  max-height: 100%;
+  overflow-y: auto;
 }

@@ -1,0 +1,203 @@
+.sd-section {
+  height: 800px;
+}
+
+.sd-container {
+  /* height: 100%; */
+  padding-top: 1%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 380px;
+  grid-gap: 1rem;
+  grid-template-areas:
+    "a b d f"
+    "a c e f";
+}
+
+.searchBarNameCalender {
+  display: flex;
+  align-items: center;
+}
+
+.searchBarNameCalender span {
+  margin-right: 20px;
+}
+
+.sd-item {
+  width: 390px;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sd-item1 {
+  grid-area: a;
+  border-top: 2px solid black;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+  position: relative;
+}
+
+.sd-item2 {
+  grid-area: b;
+  border-top: 2px solid black;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+  position: relative;
+}
+
+.sd-item3 {
+  grid-area: c;
+  border-top: 2px solid black;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+  position: relative;
+}
+
+.sd-item4 {
+  grid-area: d;
+  position: relative;
+}
+
+.sd-tableArea {
+  height: 80%;
+  border-top: 2px solid black;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.sd-item5 {
+  grid-area: e;
+  border-top: 2px solid black;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+  position: relative;
+}
+
+.sd-item6 {
+  grid-area: f;
+  background-color: #f2f2f2;
+  height: 100%;
+}
+
+.sd-item1 .sd-empList,
+.sd-item2 .sd-allowance-top,
+.sd-item3 .sd-allowance-bottom,
+.sd-item4 .sd-search-allowance-top,
+.sd-item5 .sd-search-allowance-bottom {
+  width: 100%;
+  text-align: center;
+}
+
+.sd-item1 .sd-empList th,
+.sd-item1 .sd-empList td,
+.sd-item2 .sd-allowance-top th,
+.sd-item2 .sd-allowance-top td,
+.sd-item3 .sd-allowance-bottom th,
+.sd-item3 .sd-allowance-bottom td,
+.sd-item4 .sd-search-allowance-top th,
+.sd-item4 .sd-search-allowance-top td,
+.sd-item5 .sd-search-allowance-bottom th,
+.sd-item5 .sd-search-allowance-bottom td {
+  border: 0.125px solid #bdbdbd;
+  height: 30px;
+}
+
+.sd-item1 .sd-empList th,
+.sd-item2 .sd-allowance-top th,
+.sd-item3 .sd-allowance-bottom th,
+.sd-item4 .sd-search-allowance-top th,
+.sd-item5 .sd-search-allowance-bottom th {
+  background: #f2f2f2;
+  font-weight: 900;
+}
+
+.sd-item1 .sd-empList-calTable,
+.sd-item2 .sd-allowance-top-calTable,
+.sd-item3 .sd-allowance-bottom-calTable,
+.sd-item4 .sd-search-allowance-top-calTable,
+.sd-item5 .sd-search-allowance-bottom-calTable {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  font-weight: 900;
+}
+
+.sd-item1 .sd-empList-calTable td,
+.sd-item2 .sd-allowance-top-calTable td,
+.sd-item3 .sd-allowance-bottom-calTable td,
+.sd-item4 .sd-search-allowance-top-calTable td,
+.sd-item5 .sd-search-allowance-bottom-calTable td {
+  border: 1px solid black;
+  background: #a9d0f5;
+  min-width: 18px;
+}
+
+.sd-item2 tr th:first-child,
+.sd-item2 tr td:first-child {
+  width: 40%;
+}
+
+.sd-item3 tr th:first-child,
+.sd-item3 tr td:first-child {
+  width: 50%;
+}
+
+.sd-item4 .sd-searchCondition {
+  border: 3px solid #d8d8d8;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.sd-item4 .sd-searchCondition span {
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sd-empInfo {
+  height: 100%;
+}
+
+.sd-empInfo-top {
+  margin: 5px;
+  padding: 10px;
+  background-color: #fff;
+  font-size: 1.5rem;
+  border: 2px solid #bdbdbd;
+}
+
+.sd-empInfo-top span {
+  position: relative;
+  top: 3px;
+}
+
+.sd-empInfo-detail {
+  background-color: #fff;
+  margin: 5px;
+  padding: 10px;
+  border: 2px solid #bdbdbd;
+  height: 90%;
+  overflow-y: scroll;
+}
+
+.sd-empInfo-detail label {
+  font-weight: 900;
+  padding-left: 10px;
+}
+
+.sd-empInfo-detail p {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #fafafa;
+  border: 2px solid #dfdfdf;
+  font-weight: 600;
+}

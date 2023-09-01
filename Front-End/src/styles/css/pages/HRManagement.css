@@ -1,0 +1,113 @@
+.hr-section {
+  height: 80%;
+  padding-top: 15px;
+}
+.hrGrid {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-gap: 1rem;
+  /* border: 1px solid var(--color-primary-black); */
+  background-color: var(--color-primary-white);
+}
+
+.listArea,
+.contentsArea {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 15px;
+}
+
+.hrGridTable,
+.hrTotalTable {
+  text-align: center;
+}
+
+.hrInfoBase {
+  display: flex;
+}
+.hrInfoBaseProfileImg {
+  position: relative;
+  padding: 10px 20px 5px 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.hrInfoBaseProfileTitle {
+  padding-left: 95px;
+  background-color: var(--color-opacity-gray);
+}
+
+.hrInfoBaseProfileImgBtn {
+  margin: 10px 5px;
+  font-weight: 600;
+  font-family: "NanumSquare", sans-serif;
+}
+
+.hrInfoBaseProfileOnePtag {
+  text-align: right;
+  padding: 10px 10px;
+  font-weight: 900;
+}
+
+.hrInfoBaseInput {
+  display: block;
+  margin: 7px 20px 7px 10px;
+  font-weight: 500;
+}
+
+.hrInfoDetailTable th {
+  height: 34px;
+  background-color: var(--color-opacity-gray);
+  border: 1px solid var(--color-border-gray);
+}
+.hrInfoDetailTable td {
+  height: 34px;
+  text-align: center;
+  background-color: var(--color-opacity-white);
+  border: 1px solid var(--color-border-gray);
+}
+.hrInfoBaseBox {
+  text-align: left;
+  padding: 5px;
+  height: 34px;
+  font-weight: 900;
+}
+
+.hrDetail {
+  display: flex;
+}
+
+.hrDetailTitle {
+  background-color: var(--color-opacity-gray);
+  width: 15%;
+  padding-left: 55px;
+}
+.hrDetailTitle p {
+  padding: 10px 10px;
+  text-align: right;
+  font-weight: 900;
+}
+
+.hrDetailInput {
+  display: block;
+  margin: 7px 20px 7px 10px;
+  font-weight: 500;
+}
+
+.hrDetailText {
+  margin: 7px 20px 7px 10px;
+  height: 32px;
+  display: flex;
+}
+.hrDetailText p {
+  display: flex;
+  align-items: center;
+  font-weight: 900;
+}
+
+.hrDetailSelect {
+  margin: 7px 20px 7px 10px;
+}

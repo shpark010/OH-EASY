@@ -1,0 +1,113 @@
+.signupBox {
+  margin: 40px 660px 61px 660px;
+  width: 600px;
+  height: 979px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
+  font-family: NanumSquare;
+}
+
+.signupTxt {
+  margin-top: 45px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: left;
+  color: #222;
+  text-align: center;
+}
+
+.signupInfoTxt {
+  margin-top: 35px;
+  margin-bottom: 13.5px;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #222;
+}
+
+.inputWithLabel {
+  position: relative;
+  margin: 13.5px 100px 13.5px 100px;
+  width: 400px;
+}
+
+.signupInput {
+  width: 400px;
+  height: 50px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: background-color 0.3s, padding-top 0.3s, padding-bottom 0.1s;
+  /*padding-top: 15px;  상단 패딩을 추가하여 라벨이 인풋 안에 위치하게 합니다. */
+  /*line-height: 50px;  이 속성을 통해 글씨를 세로 중앙에 배치합니다. */
+  text-align: center; /* 이 속성을 통해 글씨를 가로 중앙에 배치합니다. */
+}
+
+.floatingLabel {
+  position: absolute;
+  pointer-events: none;
+  left: 10px;
+  top: 10px;
+  transition: 0.1s ease all;
+  opacity: 0.5;
+}
+
+.signupInput:focus + .floatingLabel,
+.signupInput:valid + .floatingLabel {
+  /* top: -5px; */
+  /* left: 10px; */
+  font-size: 12px;
+  opacity: 1;
+}
+
+.signupInput:focus {
+  background-color: #eee;
+  font-size: 18px;
+  padding-top: 0px; /* 포커스되면 패딩을 증가시켜 라벨을 위로 밀어냅니다. */
+}
+
+.companySelectTag {
+  width: 400px;
+  height: 50px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin: 13.5px 100px 13.5px 100px;
+  background-color: #bfbaba;
+}
+
+.signupOkBtn {
+  margin: 100px 100px 5px 100px;
+  width: 400px;
+  height: 60px;
+  background: #2e6ec8;
+}
+.signupBtnTxt {
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #fff;
+}
+
+.signupCancleBtn {
+  margin: 5px 100px 5px 100px;
+  width: 400px;
+  height: 58px;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.signupCalcleBtnTxt {
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #707070;
+}

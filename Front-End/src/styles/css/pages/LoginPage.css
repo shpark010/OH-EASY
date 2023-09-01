@@ -1,8 +1,3 @@
-.loginMainDiv {
-  width: 1920px;
-  height: 1080px;
-}
-
 .loginBox {
   margin: 229px 660px 173px 660px;
   width: 600px;
@@ -14,23 +9,25 @@
   text-align: center;
 }
 
-.loginTxt {
-  margin-top: 130px;
+.loginTxt,
+.loginInfoTxt,
+.loginCheckBoxTxt,
+.lostAccountTxt,
+.recoveryOption {
   font-family: NanumSquare;
   font-weight: bold;
+  color: #707070;
+}
+
+.loginTxt {
+  margin-top: 130px;
   font-size: 24px;
-  text-align: center;
-  color: #222;
 }
 
 .loginInfoTxt {
   margin-top: 41px;
   margin-bottom: 36px;
-  font-family: NanumSquare;
-  font-weight: bold;
   font-size: 16px;
-  text-align: center;
-  color: #222;
 }
 
 .loginInput {
@@ -40,11 +37,79 @@
   border-radius: 5px;
   background: #fff;
   border: 1px solid #ccc;
+  font-size: 16px; /* 기본 텍스트 크기 설정 */
+  transition: background-color 0.3s; /* 부드러운 전환 효과를 위한 설정 */
+}
+
+/* 사용자가 인풋태그에 포커스를 맞출 때의 스타일 */
+.loginInput:focus {
+  background-color: #eee; /* 원하는 회색으로 설정하세요 */
+  font-size: 18px; /* 포커스 상태에서의 텍스트 크기 */
+}
+
+/* input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+  -moz-appearance: checkbox;
+  appearance: checkbox;
+} */
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .loginCheckBox {
+  margin-left: 409px;
   width: 12px;
   height: 12px;
-  background: #fff;
   border: 1px solid #ababab;
+}
+
+.btn {
+  width: 400px;
+  border-radius: 5px;
+  font-size: 20px;
+  text-align: center;
+  font-family: NanumSquare;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  color: #fff;
+}
+
+.loginBtn {
+  margin-top: 40px;
+  height: 60px;
+  background: #2e6ec8;
+  color: #fff;
+}
+
+.signupBtn {
+  margin-top: 10px;
+  height: 58px;
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #707070;
+}
+
+.accountRecoveryContainer {
+  margin: 20px 100px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recoveryOptions {
+  display: flex;
+  align-items: center;
+}
+
+.recoveryOption {
+  margin: 0 15px;
+  font-size: 14px;
+}
+
+.separator {
+  color: #707070;
 }

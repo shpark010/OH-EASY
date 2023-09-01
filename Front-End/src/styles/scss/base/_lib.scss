@@ -1,0 +1,17 @@
+.dn {
+  display: none;
+}
+.dn-i {
+  display: none !important;
+}
+.fxAlignCenter {
+  display: flex;
+  align-content: center;
+}
+.fxSpace {
+  @include spaceF;
+}
+
+.borderTopBold{
+  border-top: 3px solid var(--color-primary-black);
+}

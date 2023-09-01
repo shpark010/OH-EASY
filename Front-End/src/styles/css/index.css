@@ -13,15 +13,11 @@ html {
 }
 
 * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
 *:before,
 *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -179,8 +175,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="search"] {
   -webkit-appearance: textfield;
-  -moz-box-sizing: content-box;
-  -webkit-box-sizing: content-box;
   box-sizing: content-box;
 }
 
@@ -207,6 +201,11 @@ input[type="password"]::-ms-clear {
   display: none;
 }
 
+::-moz-placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
 ::placeholder {
   color: #999;
   font-size: 14px;
@@ -221,6 +220,8 @@ input[type="password"]::-ms-clear {
   --color-primary-black: #222222;
   --color-primary-white: #ffffff;
   --color-opacity-blue: #eef7fe;
+  --color-opacity-gray: #e6e6e6;
+  --color-border-gray: #ccc;
 }
 
 .dn {
@@ -242,12 +243,20 @@ input[type="password"]::-ms-clear {
   justify-content: space-between;
 }
 
+.borderTopBold {
+  border-top: 3px solid var(--color-primary-black);
+}
+.borderbuttonBold {
+  border-bottom: 1px solid var(--color-border-gray);
+}
+
 html,
 body {
-  width: 1920px; /* 원래 100% 이재훈이 수정함*/
-  height: 1080px; /* 원래 100% 이재훈이 수정함*/
+  width: 100%;
+  height: 100%;
   font-family: "NanumSquare", sans-serif;
   color: #222;
+  background-color: #fcfcfc;
 }
 
 #root {
@@ -266,9 +275,12 @@ body {
 
 .contents {
   width: 100%;
+  max-width: 1640px;
+  min-width: 1640px;
   height: 100%;
+  max-height: calc(100vh - 115px);
   flex-grow: 1;
-  background-color: #fcfcfc;
+  margin: 0 auto;
 }
 
 .hidden {
@@ -285,7 +297,6 @@ body {
 .innerBox,
 .section {
   width: 100%;
-  max-width: 1640px;
   margin: 0 auto;
   padding: 0 15px;
 }
@@ -297,8 +308,8 @@ body {
 /* 셀렉트 박스  */
 .selectBox {
   height: 32px;
-  text-align: center;
-  text-align-last: center;
+  font-family: "NanumSquare", sans-serif;
+  font-weight: 700;
   font-size: 14px;
   padding-left: 12px;
   padding-right: 50px;
@@ -324,6 +335,7 @@ button {
   border-radius: 2px;
   background-color: transparent;
   cursor: pointer;
+  font-family: "NanumSquare", sans-serif;
 }
 button.gray {
   background-color: var(--color-primary-gray);
@@ -348,15 +360,23 @@ button.gray {
   position: relative;
   height: 70px;
 }
-.pageHeader .innerBox:before {
+.pageHeader .innerBox:before,
+.pageHeader .innerBox:after {
   content: "";
   background-color: var(--color-primary-navy);
   position: absolute;
+  width: 140px;
+  height: 100%;
+}
+.pageHeader .innerBox:before {
   top: 0;
   left: 0;
   transform: translateX(-100%);
-  width: 140px;
-  height: 100%;
+}
+.pageHeader .innerBox:after {
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
 }
 .pageHeader .btnWrap {
   display: flex;
@@ -410,6 +430,30 @@ button.gray {
   padding-right: 18px;
 }
 
+/* 체크박스 */
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+  -moz-appearance: checkbox;
+  appearance: checkbox;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary-blue);
+}
+
+.toggleModal {
+  position: relative;
+}
+.toggleModalBox {
+  position: absolute;
+  top: calc(100% + 15px);
+  right: 0;
+  padding: 18px 22px;
+  background-color: #fff;
+  color: var(--color-primary-gray);
+  border-radius: 10px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+}
+
 .ico-bell:after {
   content: "";
   display: block;
@@ -429,6 +473,17 @@ button.gray {
   background: url("../../images/icon/ico-exchange.png") no-repeat center/cover;
 }
 .ico-exchange.white:after {
+  filter: invert(1);
+}
+
+.ico-person:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-person.png") no-repeat center/cover;
+}
+.ico-person.white:after {
   filter: invert(1);
 }
 
@@ -467,6 +522,17 @@ button.gray {
   filter: invert(1);
 }
 
+.ico-logout:after {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: url("../../images/icon/ico-logout.png") no-repeat center/cover;
+}
+.ico-logout.white:after {
+  filter: invert(1);
+}
+
 .btn-close:after {
   display: flex;
   content: "\e5cd";
@@ -476,15 +542,17 @@ button.gray {
 
 .header {
   height: 80px;
+  min-height: 80px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 10;
-  flex-shrink: 0;
 }
 .header .wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 1640px;
+  width: 100%;
+  max-width: 1640px;
+  min-width: 1640px;
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
@@ -512,6 +580,9 @@ button.gray {
   padding-left: 0;
   padding-right: 15px;
   font-family: arial;
+  text-align: center;
+  -moz-text-align-last: center;
+  text-align-last: center;
   font-weight: 600;
   border: none;
   border-radius: 20px;
@@ -546,12 +617,25 @@ button.gray {
   outline: 1px solid #ccc;
   background-color: #fff;
 }
-.headerNotice {
-  position: relative;
-  padding-left: 20px;
+.headerNav .profileBox {
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1;
 }
-.headerNoticeBox {
-  background-color: #fff;
+.headerNav .profileBoxItem {
+  display: flex;
+  align-items: center;
+}
+.headerNav .profileBoxItem + .profileBoxItem {
+  margin-top: 10px;
+}
+.headerNav .profileBox [class^="ico-"]:after {
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+}
+.headerNotice {
+  padding-left: 20px;
 }
 .headerNoticeIcon {
   position: relative;
@@ -569,15 +653,8 @@ button.gray {
   border-radius: 50%;
 }
 .headerNoticeBox {
-  position: absolute;
-  top: calc(100% + 34px);
-  right: 0;
-  padding: 22px 25px;
   width: 330px;
-  color: var(--color-primary-gray);
-  border-radius: 10px;
-  border: 1px solid #fdfdfd;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+  padding: 22px 25px;
 }
 .headerNoticeTop {
   display: flex;
@@ -624,15 +701,81 @@ button.gray {
 
 .footer {
   height: 35px;
+  min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
-  flex-shrink: 0;
 }
 .footer .wrapper {
   display: flex;
   align-items: center;
-  width: 1640px;
+  width: 100%;
+  max-width: 1640px;
+  min-width: 1640px;
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
+}
+
+/* 서브페이지 테이블 설정 (subpage setting) */
+.listArea {
+  overflow: hidden;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.namePickerBox {
+  width: 100%;
+  height: 100%;
+  background-color: #f9f9f9;
+  border: 1px solid var(--color-border-gray);
+  border-top: none;
+}
+
+table {
+  /* 사원선택 테이블 설정 */
+}
+table.namePickerTable th,
+table.namePickerTable td,
+table.hrTotalTable th,
+table.hrTotalTable td {
+  border-bottom: 1px solid var(--color-border-gray);
+}
+table.namePickerTable th,
+table.hrTotalTable th {
+  font-size: 13px;
+  font-weight: 800;
+  background-color: #ededed;
+  padding: 10px;
+}
+table.namePickerTable th + th,
+table.hrTotalTable th + th {
+  border-left: 1px solid var(--color-border-gray);
+}
+table.namePickerTable td,
+table.hrTotalTable td {
+  padding: 5px 10px;
+  background-color: #fff;
+}
+table.namePickerTable td + td,
+table.hrTotalTable td + td {
+  border-left: 1px solid var(--color-border-gray);
+}
+
+.pageTab {
+  display: flex;
+}
+.pageTab li {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border-gray);
+  border-bottom: none;
+  color: var(--color-primary-gray);
+  font-size: 14px;
+}
+.pageTab li.on {
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  border: none;
 } /*# sourceMappingURL=index.css.map */
