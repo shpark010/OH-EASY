@@ -250,10 +250,10 @@ class EmployeeRegister extends Component {
                       <CustomInput width={180} />
                     </td>
                     <td className="erCellStyle" colSpan="2">
-                      <CustomInput width={365}/>
+                      <CustomInput width={370}/>
                     </td>
                     <td className="erCellStyle">
-                    <CustomButton text="검색" color="black" onClick={this.handleAddressButtonClick} />
+                      <CustomButton text="검색" color="black" onClick={this.handleAddressButtonClick} />
                     </td>
                   </tr>
                   <tr>
