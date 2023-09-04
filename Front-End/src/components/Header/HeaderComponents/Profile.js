@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import { setCookie, getCookie, removeCookie } from "../../../containers/Cookie";
+import axios from "axios";
 
 const ProfileWrapper = styled.div`
   /* profile */
@@ -64,6 +66,26 @@ const IconWrapper = styled.div`
   margin-right: 5px;
 `;
 
+const logout = async (event) => {
+  event.preventDefault();
+  const logoutId = getCookie("loginInfo").split("/")[0];
+  console.log(logoutId);
+  const token = getCookie("loginInfo").split("/")[1];
+  removeCookie("loginInfo");
+  try {
+    const response = await axios.post("/api1/auth/logout", {
+      logoutId,
+      token,
+    });
+    if (response.data) {
+      console.log("삭제");
+      window.location.reload();
+    }
+  } catch (error) {
+    console.error("오류 : ", error);
+  }
+};
+
 class Profile extends Component {
   state = {
     isProfileBoxVisible: false,
@@ -74,6 +96,7 @@ class Profile extends Component {
       isProfileBoxVisible: !prevState.isProfileBoxVisible,
     }));
   };
+
   render() {
     const { isProfileBoxVisible } = this.state;
 
@@ -89,7 +112,7 @@ class Profile extends Component {
               <IconWrapper className="ico-person"></IconWrapper>
               <span>마이페이지</span>
             </ProfileBoxItem>
-            <ProfileBoxItem href="">
+            <ProfileBoxItem onClick={logout}>
               <IconWrapper className="ico-logout"></IconWrapper>
               <span>로그아웃</span>
             </ProfileBoxItem>
