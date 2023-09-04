@@ -38,7 +38,9 @@ const StyledCalendar = styled(Calendar)`
   z-index: 100;
   font-size: 16px;
   font-family: "NanumSquare", sans-serif;
-
+  .react-calendar__navigation__label {
+    padding: 0;
+  }
   .react-calendar__navigation__label > span {
     color: var(--color-primary-black);
     font-size: 15px;

@@ -745,7 +745,7 @@ table.hrTotalTable td {
 }
 table.namePickerTable th,
 table.hrTotalTable th {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   background-color: #ededed;
   padding: 10px;
@@ -756,8 +756,9 @@ table.hrTotalTable th + th {
 }
 table.namePickerTable td,
 table.hrTotalTable td {
-  padding: 5px 10px;
+  /* padding: 5px 10px; */
   background-color: #fff;
+  height: 40px;
 }
 table.namePickerTable td + td,
 table.hrTotalTable td + td {
