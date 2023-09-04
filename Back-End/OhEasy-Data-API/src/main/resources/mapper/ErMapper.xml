@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.er.dao.ErDao">
+
+    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+        INSERT INTO hr_emp_mst (CD_EMP, NM_EMP, FG_FOREIGN, NO_RESIDENT, DT_HIRE
+        <if test="noPositionUnique != null">
+            , NO_POSITION_UNIQUE
+        </if>
+        <if test="noDepartment != null">
+            , NO_DEPARTMENT
+        </if>
+        )
+        VALUES (#{cdEmp}, #{nmEmp}, #{fgForeign}, #{noResident}, #{dtHire}
+        <if test="noPositionUnique != null">
+            , #{noPositionUnique}
+        </if>
+        <if test="noDepartment != null">
+            , #{noDepartment}
+        </if>
+        )
+    </insert>
+
+    <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+        select * from hr_emp_mst
+    </select>
+
+    <select id="getCdEmp" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+        SELECT * FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
+    </select>
+
+    <delete id="deleteEmp">
+        delete from hr_emp_mst where CD_EMP=#{cdEmp}
+    </delete>
+
+
+</mapper>
