@@ -5,7 +5,7 @@ import CustomCalender from "../../Contents/CustomCalendar";
 
 const HrMilitary = () => {
   return (
-    <div className="hrDetail">
+    <div className="hrDetail borderTopBold">
       <div className="hrDetailTitle">
         <p>제대구분</p>
         <p>복무시작일</p>
