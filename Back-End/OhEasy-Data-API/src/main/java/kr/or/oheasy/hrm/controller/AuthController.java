@@ -1,4 +1,4 @@
-package kr.or.oheasy.controller;
+package kr.or.oheasy.hrm.controller;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.or.oheasy.service.AuthService;
+import kr.or.oheasy.hrm.service.AuthService;
 import kr.or.oheasy.utils.JwtUtil;
 import kr.or.oheasy.vo.LoginVO;
 

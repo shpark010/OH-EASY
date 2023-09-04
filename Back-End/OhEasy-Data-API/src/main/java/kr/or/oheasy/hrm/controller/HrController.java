@@ -1,4 +1,4 @@
-package kr.or.oheasy.controller;
+package kr.or.oheasy.hrm.controller;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.or.oheasy.service.HrService;
+import kr.or.oheasy.hrm.service.HrService;
 import kr.or.oheasy.vo.HrEmpMstVO;
 
 @RestController

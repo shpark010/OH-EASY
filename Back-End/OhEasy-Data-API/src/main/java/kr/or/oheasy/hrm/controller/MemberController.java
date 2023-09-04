@@ -1,4 +1,4 @@
-package kr.or.oheasy.controller;
+package kr.or.oheasy.hrm.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
