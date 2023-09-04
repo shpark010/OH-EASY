@@ -1,4 +1,4 @@
-package kr.or.oheasy.dao;
+package kr.or.oheasy.hrm.dao;
 
 import kr.or.oheasy.vo.LoginVO;
 
