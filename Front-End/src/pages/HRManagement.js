@@ -41,14 +41,14 @@ function HRManagement() {
         code: emp.cdEmp,
         employee: emp.nmEmp,
       })),
-    [empList]
+    [empList],
   );
   const columns = React.useMemo(
     () => [
       {
         Header: "✓",
         accessor: "checkbox",
-        width: "20%",
+        width: "40%",
         id: "checkbox",
         //Cell: ({ cell: { value } }) => <input type="checkbox" />,
         Cell: ({ cell: { value } }) => {
@@ -74,6 +74,7 @@ function HRManagement() {
       {
         Header: "Code",
         accessor: "code",
+        width: "35%",
         id: "code",
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value);
@@ -118,7 +119,7 @@ function HRManagement() {
         },
       },
     ],
-    []
+    [],
   );
 
   const renderContent = () => {
@@ -153,7 +154,7 @@ function HRManagement() {
                 columns={columns}
                 data={data}
                 showInsertRow={true}
-                checkboxWidth={"20%"}
+                checkboxWidth={"40%"}
               />
               {/* <Table
                   headers={["✓", "Code", "사원"]}

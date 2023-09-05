@@ -19,7 +19,7 @@ function Table(props) {
     console.log("블러 이벤트");
     e.currentTarget.style.border = "none";
     const tdNodes = Array.from(
-      e.currentTarget.parentNode.parentNode.childNodes
+      e.currentTarget.parentNode.parentNode.childNodes,
     );
     console.log(tdNodes);
     tdNodes.forEach((td) => {
@@ -43,6 +43,14 @@ function Table(props) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
 
+  // width px , % 구분 하는 함수
+  const getWidthStyle = (widthValue) => {
+    if (typeof widthValue === "number") return `${widthValue}px`;
+    if (typeof widthValue === "string" && widthValue.includes("%"))
+      return widthValue;
+    return undefined;
+  };
+
   return (
     <table
       {...getTableProps()}
@@ -61,7 +69,10 @@ function Table(props) {
         <tr>
           {props.columns.map((column) =>
             column.id !== "checkbox" ? (
-              <td key={column.id}>
+              <td
+                key={column.id}
+                style={{ width: getWidthStyle(column.width) }}
+              >
                 <Input
                   value={inputValues[column.id] || ""}
                   onChange={(e) => handleChange(column.id, e.target.value)}
@@ -72,7 +83,7 @@ function Table(props) {
               <td key="check" width={props.checkboxWidth}>
                 <input type="checkbox" />
               </td>
-            )
+            ),
           )}
         </tr>
       )}
@@ -84,8 +95,9 @@ function Table(props) {
               {row.cells.map((cell) => (
                 <StyledTd
                   {...cell.getCellProps()}
-                  width={cell.column.width}
+                  width={getWidthStyle(cell.column.width)}
                   onDoubleClick={() => {
+                    console.log(cell.column.width);
                     if (props.page === "sd") {
                       toggleEditing();
                     }

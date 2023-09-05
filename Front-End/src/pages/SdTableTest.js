@@ -127,7 +127,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    []
+    [],
   );
 
   //급여항목 , 급액 item2
@@ -164,7 +164,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    [editing, price]
+    [editing, price],
   );
   //item3
   const dummyItem3 = [
@@ -220,7 +220,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    []
+    [],
   );
 
   //item4
@@ -263,7 +263,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    []
+    [],
   );
   //item5
   const dummyItem5 = [
@@ -319,7 +319,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    []
+    [],
   );
 
   return (
