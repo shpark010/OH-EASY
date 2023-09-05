@@ -13,18 +13,29 @@ public class ErService {
 
     @Autowired
     private SqlSession sqlSession;
-    
-    public int postEmp(HrEmpMstVO hrEmpMstVO){
+
+    public int postEmp(HrEmpMstVO hrEmpMstVO) {
         ErDao dao = sqlSession.getMapper(ErDao.class);
         return dao.postEmp(hrEmpMstVO);
     }
 
-    public List<HrEmpMstVO> getAllEmpList(){
-    	ErDao dao = sqlSession.getMapper(ErDao.class);
+    public int patchEmp(HrEmpMstVO hrEmpMstVO) {
+        ErDao dao = sqlSession.getMapper(ErDao.class);
+        return dao.patchEmp(hrEmpMstVO);
+    }
+
+    public boolean isCdEmpValid(String cdEmp) {
+        ErDao dao = sqlSession.getMapper(ErDao.class);
+        int count = dao.checkCdEmpExistence(cdEmp);
+        return count > 0;
+    }
+
+    public List<HrEmpMstVO> getAllEmpList() {
+        ErDao dao = sqlSession.getMapper(ErDao.class);
         return dao.getAllEmpList();
     }
 
-    public HrEmpMstVO getCdEmp(String cdEmp){
+    public HrEmpMstVO getCdEmp(String cdEmp) {
         ErDao dao = sqlSession.getMapper(ErDao.class);
         return dao.getCdEmp(cdEmp);
     }
@@ -33,5 +44,5 @@ public class ErService {
         ErDao dao = sqlSession.getMapper(ErDao.class);
         return dao.deleteEmp(cdEmp);
     }
-    
+
 }

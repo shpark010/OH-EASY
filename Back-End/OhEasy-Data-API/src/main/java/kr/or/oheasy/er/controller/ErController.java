@@ -27,6 +27,27 @@ public class ErController {
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/{cdEmp}")
+    public ResponseEntity<Integer> patchEmp(@PathVariable("cdEmp") String cdEmp,
+                                            @RequestBody HrEmpMstVO hrEmpMstVO) {
+        try {
+            if (erService.isCdEmpValid(cdEmp)) {
+                int result = erService.patchEmp(hrEmpMstVO);
+                if (result > 0) {
+                    return new ResponseEntity<>(result, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return new ResponseEntity<>(0, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -49,9 +70,19 @@ public class ErController {
     }
 
     @DeleteMapping("/{cdEmp}")
-    public ResponseEntity<String> deleteEmp(@PathVariable("cdEmp") String cdEmp) {
-        erService.deleteEmp(cdEmp);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Integer> deleteEmp(@PathVariable("cdEmp") String cdEmp) {
+        try {
+            int result = erService.deleteEmp(cdEmp);
+
+            if (result > 0) {
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
