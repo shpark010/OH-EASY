@@ -10,6 +10,7 @@ import EmployeeRegister from "../pages/EmployeeRegister";
 import HRManagement from "../pages/HRManagement";
 import WorkContract from "../pages/WorkContract";
 import SalaryData from "../pages/SalaryData";
+import TableTest from "../pages/SdTableTest";
 
 function AppContent() {
   return (
@@ -26,6 +27,7 @@ function AppContent() {
           <Route path="/hrm" element={<HRManagement />} />
           <Route path="/wc" element={<WorkContract />} />
           <Route path="/sd" element={<SalaryData />} />
+          <Route path="/test" element={<TableTest />} />
         </Route>
       </Routes>
     </Layout>
