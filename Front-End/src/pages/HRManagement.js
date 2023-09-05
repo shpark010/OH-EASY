@@ -27,7 +27,7 @@ function HRManagement() {
 
   const handleFetchEmpData = async () => {
     try {
-      const url = "/hr/getAllEmpList";
+      const url = "/api2/hr/getAllEmpList";
       const data = await handlePageHeaderSearchSubmit(url);
       setEmpList(data);
     } catch (error) {
@@ -50,7 +50,26 @@ function HRManagement() {
         accessor: "checkbox",
         width: "20%",
         id: "checkbox",
-        Cell: ({ cell: { value } }) => <input type="checkbox" />,
+        //Cell: ({ cell: { value } }) => <input type="checkbox" />,
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            const newValue = !inputValue;
+            console.log("현재 체크박스 value : ", inputValue);
+            setInputValue(newValue);
+            console.log("변경 체크박스 value : ", newValue);
+          };
+
+          return (
+            <input
+              type="checkbox"
+              checked={inputValue} // checked 속성 사용
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
       },
       {
         Header: "Code",
@@ -69,7 +88,7 @@ function HRManagement() {
           return (
             <Input
               value={inputValue}
-              onClick={handleInputClick}
+              //onClick={handleInputClick}
               onChange={handleInputChange}
             />
           );
