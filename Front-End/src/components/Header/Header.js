@@ -10,11 +10,7 @@ import styled from "styled-components";
 class Header extends Component {
   render() {
     return (
-      <header
-        id="header"
-        className="header"
-        style={{ position: "fixed", top: "0", backgroundColor: "white" }}
-      >
+      <header id="header" className="header">
         <div className="wrapper">
           <Logo />
           <nav id="headerNav" className="nav headerNav">
