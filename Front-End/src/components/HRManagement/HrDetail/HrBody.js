@@ -5,7 +5,7 @@ import CustomSelect from "../../Contents/CustomSelect";
 
 const HrBody = () => {
   return (
-    <div className="hrDetail">
+    <div className="hrDetail borderTopBold">
       <div className="hrDetailTitle">
         <p>신장</p>
         <p>가슴둘레</p>

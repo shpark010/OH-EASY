@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setCookie, getCookie, removeCookie } from "../containers/Cookie";
 import "../styles/css/pages/LoginPage.css";
 
 function LoginPage() {
@@ -10,11 +11,12 @@ function LoginPage() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    //const token = localStorage.getItem("token");
+    const token = getCookie("loginInfo");
     if (token) {
       navigate("/main", { replace: true });
     }
-  }, [navigate]);
+  }, []);
 
   const handleCheckboxChange = (event) => {
     setIsChecked(event.target.checked);
@@ -29,15 +31,20 @@ function LoginPage() {
   const login = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post("/auth/login", {
+      const response = await axios.post("/api1/auth/login", {
         userId,
         userPwd,
       });
       if (response.status === 200) {
         console.log(response.data);
-        const token = response.data;
-        localStorage.setItem("token", token);
+        const loginId = response.data.split("/")[0];
+        const token = response.data.split("/")[1];
+        console.log("로그인 아이디 : " + loginId);
+        console.log("발급 토큰 : " + token);
+        //localStorage.setItem("token", token);
+        setCookie("loginInfo", response.data, { path: "/", maxAge: 28800 });
         console.log("로그인 성공!");
+        console.log("저장된 쿠키값 가져오기 : " + getCookie("loginInfo"));
         navigate("/main");
       } else if (response.status === 401) {
         console.log("아이디 or 비밀번호 틀림");
