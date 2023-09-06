@@ -37,12 +37,11 @@ function LoginPage() {
       });
       if (response.status === 200) {
         console.log(response.data);
-        const loginId = response.data.split("/")[0];
-        const token = response.data.split("/")[1];
-        console.log("로그인 아이디 : " + loginId);
-        console.log("발급 토큰 : " + token);
         //localStorage.setItem("token", token);
-        setCookie("loginInfo", response.data, { path: "/", maxAge: 28800 });
+        setCookie("loginInfo", response.data, {
+          path: "/",
+          maxAge: 28800,
+        });
         console.log("로그인 성공!");
         console.log("저장된 쿠키값 가져오기 : " + getCookie("loginInfo"));
         navigate("/main");
