@@ -13,13 +13,17 @@ import CustomCalendar from "../components/Contents/CustomCalendar";
 import CustomPriceInput from "../components/Contents/CustomPriceInput";
 import Table from "../components/TablesLib/Table";
 import Input from "../components/Contents/Input";
+import CustomModal from "../components/Contents/CustomModal";
+import { handlePageHeaderSearchSubmit } from "../components/Services/PageHeaderSearchService";
 
 const TableTest = (props) => {
   const [editing, setEditing] = useState(false);
-  const [price, setPrice] = useState("");
+  const [pay, setPay] = useState("");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [empList, setEmpList] = useState([]);
 
   const handlePriceChange = (value) => {
-    setPrice(value);
+    setPay(value);
   };
 
   const handleDoubleClick = () => {
@@ -30,6 +34,33 @@ const TableTest = (props) => {
   const handleInputBlur = () => {
     setEditing(false);
   };
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const handleFetchEmpData = async () => {
+    try {
+      const url = "/api2/sd/getEmpList";
+      const data = await handlePageHeaderSearchSubmit(url);
+      setEmpList(data);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+  const data = React.useMemo(
+    () =>
+      empList.map((emp) => ({
+        checkbox: false,
+        code: emp.cdEmp,
+        employee: emp.nmEmp,
+      })),
+    [empList],
+  );
 
   // item1
   const dummyItem1 = [
@@ -134,7 +165,7 @@ const TableTest = (props) => {
   const dummyItem2 = [
     {
       nm_tax: "기본급",
-      amt_allowance: price,
+      amt_allowance: pay,
     },
   ];
   const columnsItem2 = React.useMemo(
@@ -153,18 +184,18 @@ const TableTest = (props) => {
           return editing ? (
             <CustomPriceInput
               id="price-input"
-              value={price}
+              value={pay}
               width={100}
               onChange={handlePriceChange}
               onBlur={handleInputBlur}
             />
           ) : (
-            <span>{Number(price).toLocaleString()}</span>
+            <span>{Number(pay).toLocaleString()}</span>
           );
         },
       },
     ],
-    [editing, price],
+    [editing, pay],
   );
   //item3
   const dummyItem3 = [
@@ -331,7 +362,22 @@ const TableTest = (props) => {
             <div className="btnWrapper textBtnWrap">
               <PageHeaderTextButton text="급여대장" />
               <PageHeaderTextButton text="지급일자" />
-              <PageHeaderTextButton text="수당/공제등록" />
+              <PageHeaderTextButton text="수당/공제등록" onClick={openModal} />
+              <CustomModal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+                contentStyle={{
+                  width: "600px",
+                  height: "400px",
+                  backgroundColor: "white",
+                  border: "1px solid gray",
+                }}
+              >
+                <h2>커스텀 모달 제목</h2>
+                <p>커스텀 모달 내용</p>
+                <button onClick={closeModal}>닫기</button>
+              </CustomModal>
               <PageHeaderTextButton text="재계산" />
               <PageHeaderTextButton text="완료" />
               <PageHeaderTextButton text="급여메일보내기" />
@@ -432,8 +478,8 @@ const TableTest = (props) => {
               columns={columnsItem2}
               editing={editing}
               setEditing={setEditing}
-              price={price}
-              setPrice={setPrice}
+              pay={pay}
+              setPay={setPay}
               page={"sd"}
             />
             <table className="sd-allowance-top-calTable">
