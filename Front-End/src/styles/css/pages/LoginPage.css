@@ -1,5 +1,14 @@
+.loginMainDiv {
+  /* 설정 */
+  position: relative;
+  margin-top: 500px;
+}
+
 .loginBox {
-  margin: 229px 660px 173px 660px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 600px;
   height: 678px;
   border-radius: 10px;
