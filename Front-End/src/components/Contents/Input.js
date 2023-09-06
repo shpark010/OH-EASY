@@ -19,7 +19,7 @@ const InputTag = styled.input`
 
 const defaultTdOnClick = (e) => {
   console.log("클릭 이벤트");
-  e.currentTarget.style.border = "3px solid var(--color-primary-black)";
+  e.currentTarget.style.border = "1px solid var(--color-primary-black)";
   e.currentTarget.style.backgroundColor = "var(--color-opacity-blue)";
   const tdNodes = Array.from(e.currentTarget.parentNode.parentNode.childNodes);
   tdNodes.forEach((td) => {
@@ -43,7 +43,7 @@ const defaultTdOnBlur = (e) => {
 };
 const defaultTdOnFocus = (e) => {
   console.log("포커스 이벤트");
-  e.currentTarget.style.border = "3px solid var(--color-primary-black)";
+  e.currentTarget.style.border = "1px solid var(--color-primary-black)";
   e.currentTarget.style.backgroundColor = "var(--color-opacity-blue)";
   const tdNodes = Array.from(e.currentTarget.parentNode.parentNode.childNodes);
   tdNodes.forEach((td) => {
