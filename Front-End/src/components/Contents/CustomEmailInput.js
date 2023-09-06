@@ -19,7 +19,7 @@ function CustomEmailInput({ width, id, className, maxLength, onChange }) {
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
-        const sanitizedValue = inputValue.replace(/[^a-zA-Z0-9@._-]/g, ""); // 영문자, 숫자, @, ., _만 허용
+        const sanitizedValue = inputValue.replace(/[^a-zA-Z0-9]/g, "");
         const limitedValue = sanitizedValue.slice(0, maxLength);
         setValue(limitedValue);
         onChange && onChange(limitedValue);
