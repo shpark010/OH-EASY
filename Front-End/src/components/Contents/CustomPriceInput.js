@@ -6,8 +6,7 @@ const PriceInput = styled.input`
   border-radius: 2px;
   border: 1px solid var(--color-primary-gray);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-  height: 32px;
-  padding: 0 5px;
+  height: 38px;
   text-align: center;
   font-size: 16px;
 
