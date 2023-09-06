@@ -18,12 +18,70 @@ const InputTag = styled.input`
 `;
 
 const defaultTdOnClick = (e) => {
-  e.currentTarget.style.border = "3px solid var(--color-primary-black)";
+  console.log("클릭 이벤트");
+  e.currentTarget.style.border = "1px solid var(--color-primary-black)";
   e.currentTarget.style.backgroundColor = "var(--color-opacity-blue)";
+  const tdNodes = Array.from(e.currentTarget.parentNode.parentNode.childNodes);
+  tdNodes.forEach((td) => {
+    td.style.backgroundColor = "var(--color-opacity-blue)";
+    Array.from(td.childNodes).forEach((child) => {
+      child.style.backgroundColor = "var(--color-opacity-blue)";
+    });
+  });
 };
 const defaultTdOnBlur = (e) => {
+  console.log("블러 이벤트");
   e.currentTarget.style.border = "none";
-  e.currentTarget.style.backgroundColor = "var(--color-opacity-white)";
+  const tdNodes = Array.from(e.currentTarget.parentNode.parentNode.childNodes);
+  console.log(tdNodes);
+  tdNodes.forEach((td) => {
+    td.style.backgroundColor = "var(--color-primary-white)";
+    Array.from(td.childNodes).forEach((child) => {
+      child.style.backgroundColor = "var(--color-primary-white)";
+    });
+  });
+};
+const defaultTdOnFocus = (e) => {
+  console.log("포커스 이벤트");
+  e.currentTarget.style.border = "1px solid var(--color-primary-black)";
+  e.currentTarget.style.backgroundColor = "var(--color-opacity-blue)";
+  const tdNodes = Array.from(e.currentTarget.parentNode.parentNode.childNodes);
+  tdNodes.forEach((td) => {
+    td.style.backgroundColor = "var(--color-opacity-blue)";
+    Array.from(td.childNodes).forEach((child) => {
+      child.style.backgroundColor = "var(--color-opacity-blue)";
+    });
+  });
+};
+
+// 커스텀 프라이스 인풋꺼
+const handleChange = (e) => {
+  //const { onChange } = this.props;
+  const inputValue = e.target.value.replace(/[^0-9]/g, ""); // 숫자 외의 문자 제거
+  //onChange(inputValue);
+};
+
+// 커스텀 프라이스 인풋꺼
+const formatPrice = (value) => {
+  // 숫자를 3자리 단위로 쉼표 추가해서 형식화
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+// 커스텀 프라이스 인풋꺼
+const handleKeyUp = (e) => {
+  if (e.key === "Enter") {
+    //   e.target.blur(); // Remove focus from the input field on Enter key
+    this.props.onBlur();
+  }
+};
+
+const handleInputChange = (e) => {
+  this.props.setPrice(e.target.value);
+};
+
+const toggleEditing = () => {
+  this.setEditing(!this.props.editing);
+  console.log(this.props.editing);
 };
 
 // * 클릭이벤트 기본 defaultTdOnClick
@@ -40,14 +98,35 @@ const defaultTdOnBlur = (e) => {
 // <Input onfocus={따로 정의한 함수 }
 
 function Input(props) {
-  return (
-    <InputTag
-      {...props}
-      spellCheck="false"
-      onClick={props.onClick || defaultTdOnClick}
-      onBlur={props.onBlur || defaultTdOnBlur}
-    />
-  );
+  const formattedValue = formatPrice(props.value.toString()); // toString()으로 value가 숫자인 경우 문자열로 변환
+
+  if (props.inputType === "price") {
+    return (
+      <InputTag
+        {...props}
+        //spellCheck="false"
+        type="text"
+        id={props.id}
+        className={props.className}
+        value={formattedValue}
+        onChange={handleChange}
+        onBlur={null || props.onBlur}
+        onKeyUp={handleKeyUp}
+        onDoubleClick={toggleEditing}
+        onFocus={props.onFocus || defaultTdOnFocus}
+      />
+    );
+  } else {
+    return (
+      <InputTag
+        {...props}
+        spellCheck="false"
+        onClick={props.onClick || defaultTdOnClick}
+        onBlur={props.onBlur || defaultTdOnBlur}
+        onFocus={props.onFocus || defaultTdOnFocus}
+      />
+    );
+  }
 }
 
 export default Input;

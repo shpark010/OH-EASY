@@ -27,7 +27,7 @@ function HRManagement() {
 
   const handleFetchEmpData = async () => {
     try {
-      const url = "/hr/getAllEmpList";
+      const url = "/api2/hr/getAllEmpList";
       const data = await handlePageHeaderSearchSubmit(url);
       setEmpList(data);
     } catch (error) {
@@ -41,20 +41,40 @@ function HRManagement() {
         code: emp.cdEmp,
         employee: emp.nmEmp,
       })),
-    [empList]
+    [empList],
   );
   const columns = React.useMemo(
     () => [
       {
         Header: "✓",
         accessor: "checkbox",
-        width: "20%",
+        width: "40%",
         id: "checkbox",
-        Cell: ({ cell: { value } }) => <input type="checkbox" />,
+        //Cell: ({ cell: { value } }) => <input type="checkbox" />,
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            const newValue = !inputValue;
+            console.log("현재 체크박스 value : ", inputValue);
+            setInputValue(newValue);
+            console.log("변경 체크박스 value : ", newValue);
+          };
+
+          return (
+            <input
+              type="checkbox"
+              checked={inputValue} // checked 속성 사용
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
       },
       {
         Header: "Code",
         accessor: "code",
+        width: "35%",
         id: "code",
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value);
@@ -69,7 +89,7 @@ function HRManagement() {
           return (
             <Input
               value={inputValue}
-              onClick={handleInputClick}
+              //onClick={handleInputClick}
               onChange={handleInputChange}
             />
           );
@@ -99,7 +119,7 @@ function HRManagement() {
         },
       },
     ],
-    []
+    [],
   );
 
   const renderContent = () => {
@@ -134,7 +154,7 @@ function HRManagement() {
                 columns={columns}
                 data={data}
                 showInsertRow={true}
-                checkboxWidth={"20%"}
+                checkboxWidth={"40%"}
               />
               {/* <Table
                   headers={["✓", "Code", "사원"]}

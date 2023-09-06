@@ -1,5 +1,15 @@
+.signupMainDiv {
+  /* 설정 */
+  position: relative;
+  margin-top: 500px;
+}
+
 .signupBox {
-  margin: 40px 660px 61px 660px;
+  /* margin: 40px 660px 61px 660px; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 600px;
   height: 979px;
   border-radius: 10px;
@@ -10,7 +20,7 @@
 }
 
 .signupTxt {
-  margin-top: 45px;
+  margin-top: 150px;
   font-family: NanumSquare;
   font-weight: bold;
   font-size: 24px;
@@ -80,6 +90,7 @@
   font-size: 16px;
   margin: 13.5px 100px 13.5px 100px;
   background-color: #bfbaba;
+  font-family: NanumSquare;
 }
 
 .signupOkBtn {
