@@ -1,8 +1,8 @@
 import React from "react";
 
-const PageHeaderButton = ({ btnName, imageSrc, altText }) => {
+const PageHeaderButton = ({ btnName, imageSrc, altText, onClick }) => {
   return (
-    <button className={btnName}>
+    <button className={btnName} onClick={onClick}>
       <img src={imageSrc} alt={altText} />
     </button>
   );
