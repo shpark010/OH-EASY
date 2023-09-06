@@ -4,7 +4,7 @@
   grid-gap: 1rem;
   width: 100%;
   max-width: 1640px;
-  height: 85%;
+  height: 88%;
   margin: 0 auto;
   padding: 0 15px;
   flex-grow: 1;
@@ -13,44 +13,40 @@
 
 .erGrid {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  border: 1px solid black;
+  grid-template-rows: auto 1fr;
+  border-left: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
   box-sizing: border-box;
   overflow: auto;
   background-color: #ffffff;
-  max-height: calc(100% - 10px);
+  position: relative;
 }
 
-.erGridTable {
+.erGridBottomTable {
   border-collapse: collapse;
+  background-color: #a9d0f5;
+  font-weight: bold;
+  position: absolute;
+  bottom: 0;
+  table-layout: fixed;
   width: 100%;
 }
 
-.erGridTable th,
-.erGridTable td {
-  border: 1px solid black;
+.erGridBottomTable th,
+.erGridBottomTable td {
+  border: 1px solid #e6e6e6;
   padding: 8px;
   text-align: center;
   font-size: 16px;
-}
-
-.erGridBottom {
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: auto;
-  background-color: lightblue;
-  font-weight: bold;
-}
-
-.erGrid2Top {
-  table-layout: fixed;
-  border-bottom: 2px solid black;
+  width: 50%;
 }
 
 .erGrid2 {
   background-color: #ffffff;
   box-sizing: border-box;
   overflow: auto;
+  width: 100%;
 }
 
 .erHeaderStyle {
@@ -72,6 +68,7 @@
 
 .erInputDisabledStyle {
   border: 1px solid #ffffff;
+  width: 100%;
 }
 
 input:disabled {
@@ -99,7 +96,7 @@ input:disabled {
 }
 
 .input-cell {
-  width: 160px;
+  width: 159px;
 }
 
 /* 모달 스타일 */
@@ -118,7 +115,7 @@ input:disabled {
 
 .modalContent {
   background-color: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   width: 30%;
