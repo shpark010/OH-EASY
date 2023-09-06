@@ -1,5 +1,6 @@
 package kr.or.oheasy.controller;
 
+import java.net.URLEncoder;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class AuthController {
 			// Redis에 데이터(아이디, 토큰) 저장
 			redisService.setData(loginVO.getUserId(), token);
 
-			String idToken = loginVO.getUserId() + "/" + token;
+			String idToken = loginVO.getUserId() + "." + token;
 			System.out.println(idToken);
 
 			return new ResponseEntity<>(idToken, HttpStatus.OK);

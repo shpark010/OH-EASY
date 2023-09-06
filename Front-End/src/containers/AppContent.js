@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/Layout/Layout";
 import PrivateRoute from "../containers/PrivateRoute";
 import MainPage from "../pages/MainPage";
@@ -29,6 +29,8 @@ function AppContent() {
           <Route path="/sd" element={<SalaryData />} />
           <Route path="/test" element={<TableTest />} />
         </Route>
+        {/* Catch-all 라우트 */}
+        <Route path="*" element={<Navigate to="/main" />} />
       </Routes>
     </Layout>
   );

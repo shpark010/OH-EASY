@@ -14,59 +14,78 @@ import HrBody from "../components/HRManagement/HrDetail/HrBody";
 import HrMilitary from "../components/HRManagement/HrDetail/HrMilitary";
 import HrLicense from "../components/HRManagement/HrDetail/HrLicense";
 import { handlePageHeaderSearchSubmit } from "../components/Services/PageHeaderSearchService";
-
+import ApiRequest from "../components/Services/ApiRequest";
 import "../styles/css/pages/HRManagement.css";
 
 function HRManagement() {
-  const [activeTab, setActiveTab] = useState("family");
-  const [empList, setEmpList] = useState([]);
+  const [empList, setEmpList] = useState([]); //첫번째 테이블의 사원정보들 관리
+  const [activeTab, setActiveTab] = useState("family"); // 가족,학력,경력,신체,병역,자격 탭 상태 관리
+  const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
+  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 클릭된 EmpCode를 저장하는 상태
 
+  // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
+  const handleRowClick = (empCode) => {
+    setSelectedEmpCode(empCode);
+    console.log(selectedEmpCode);
+  };
+  // 탭 클릭시 클릭한 탭으로 setActiveTab 변경
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };
-
-  const handleFetchEmpData = async () => {
-    try {
-      const url = "/api2/hr/getAllEmpList";
-      const data = await handlePageHeaderSearchSubmit(url);
-      setEmpList(data);
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
+  //헤더 체크박스를 클릭할 때 호출되어, 모든 체크박스를 체크하거나 체크를 해제
+  const handleHeaderCheckboxClick = () => {
+    if (checkedRows.length !== empList.length) {
+      setCheckedRows(empList.map((emp) => emp.cdEmp));
+    } else {
+      setCheckedRows([]);
     }
   };
+  // 각 행의 체크박스를 클릭할 때 해당 행의 체크박스 상태를 업데이트
+  const handleRowCheckboxClick = (empCode) => {
+    if (checkedRows.includes(empCode)) {
+      setCheckedRows((prevCheckedRows) =>
+        prevCheckedRows.filter((code) => code !== empCode),
+      );
+    } else {
+      setCheckedRows((prevCheckedRows) => [...prevCheckedRows, empCode]);
+    }
+  };
+
+  // 첫번째 테이블에 보내야할 data 파라미터
   const data = React.useMemo(
     () =>
       empList.map((emp) => ({
         checkbox: false,
         code: emp.cdEmp,
         employee: emp.nmEmp,
+        onRowClick: () => handleRowClick(emp.cdEmp), // 여기 추가
       })),
     [empList],
   );
+  // 첫번째 테이블에 보내야할 colums 파라미터
   const columns = React.useMemo(
     () => [
       {
-        Header: "✓",
+        Header: (
+          // 이 체크박스는 체크된 행의 수가 전체 empList와 동일한 경우에만 체크되도록 설정 모든 행이 체크되어 있으면 이 체크박스도 체크
+          <input
+            type="checkbox"
+            checked={checkedRows.length === empList.length}
+            onChange={handleHeaderCheckboxClick}
+          />
+        ),
         accessor: "checkbox",
-        width: "40%",
+        width: "10%",
         id: "checkbox",
-        //Cell: ({ cell: { value } }) => <input type="checkbox" />,
-        Cell: ({ cell: { value } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
-
-          const handleInputChange = (e) => {
-            const newValue = !inputValue;
-            console.log("현재 체크박스 value : ", inputValue);
-            setInputValue(newValue);
-            console.log("변경 체크박스 value : ", newValue);
-          };
-
+        Cell: ({ cell: { value }, row: { original } }) => {
+          // 현재 행의 체크박스 상태를 결정 checkedRows 배열에 현재 행의 코드가 포함되어 있으면 체크박스는 체크된 상태로 표시
+          const isChecked = checkedRows.includes(original.code);
           return (
             <input
               type="checkbox"
-              checked={inputValue} // checked 속성 사용
-              value={inputValue}
-              onChange={handleInputChange}
+              // 행의 체크박스가 클릭될 때의 동작을 handleRowCheckboxClick 함수에 위임, 해당 행의 코드를 인자로 전달
+              checked={isChecked}
+              onChange={() => handleRowCheckboxClick(original.code)}
             />
           );
         },
@@ -78,14 +97,12 @@ function HRManagement() {
         id: "code",
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value);
-
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
           const handleInputClick = (e) => {
             console.log(e.target);
           };
-
           return (
             <Input
               value={inputValue}
@@ -108,7 +125,6 @@ function HRManagement() {
           const defaultTdOnBlur = (e) => {
             //alert("ddd");
           };
-
           return (
             <Input
               value={inputValue}
@@ -119,9 +135,8 @@ function HRManagement() {
         },
       },
     ],
-    [],
+    [checkedRows, empList],
   );
-
   const renderContent = () => {
     switch (activeTab) {
       case "family":
@@ -140,10 +155,13 @@ function HRManagement() {
         return null;
     }
   };
-
   return (
     <>
-      <HrPageHeader onFetchEmpData={handleFetchEmpData} />
+      <HrPageHeader
+        checkedRows={checkedRows}
+        setCheckedRows={setCheckedRows}
+        setEmpList={setEmpList}
+      />
       <HrSearchBar />
       <section className="section hr-section">
         <div className="hrGrid">
@@ -154,30 +172,8 @@ function HRManagement() {
                 columns={columns}
                 data={data}
                 showInsertRow={true}
-                checkboxWidth={"40%"}
+                checkboxWidth={"10%"}
               />
-              {/* <Table
-                  headers={["✓", "Code", "사원"]}
-                  colWidths={["10%", "40%", "50%"]}
-                  cells={[
-                    <input
-                      type="checkbox"
-                      onMouseEnter={() => alert("안녕")}
-                    />,
-                    null,
-                    null,
-                  ]}
-                  data={this.state.empList.map((emp) => [
-                    false,
-                    emp.cdEmp,
-                    emp.nmEmp,
-                  ])}
-                  eventHandlers={{
-                    onClick: () => {
-                      console.log("테이블 항목을 클릭하였습니다.");
-                    },
-                  }}
-                /> */}
             </div>
             <div className="totalBox">
               <table className="hrTotalTable borderTopBold">
@@ -322,7 +318,6 @@ function HRManagement() {
                   자격
                 </li>
               </ul>
-
               <div className="hrInfoDetail">{renderContent()}</div>
             </div>
           </div>
