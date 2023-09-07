@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import { useState } from 'react';
 import Delete from '../images/pages/common/delete.png';
 import '../styles/css/pages/WorkContract.css';
 import PageHeaderIconButton from '../components/PageHeader/PageHeaderIconButton';
@@ -9,12 +9,149 @@ import CustomInput from '../components/Contents/CustomInput';
 import CustomButton from '../components/Contents/CustomButton';
 import SearchBarBox from '../components/SearchBar/SearchBarBox';
 import Table from '../components/TablesLib/Table';
+import Input from '../components/Contents/Input';
 
-class WorkContract extends Component {
+const WorkContract = () => {
 
+  const [employeeData, setEmployeeData] = useState([]);
+  const [openPostcode, setOpenPostcode] = useState(false);
+  const [empList, setEmpList] = useState([]);
+  const [zonecode, setZonecode] = useState("");
+  const [address, setAddress] = useState("");
 
+  const handleAddressButtonClick = () => {
+    setOpenPostcode(true);
+  };
+
+  const handleAddressSelect = (addr) => {
+    console.log(`
+        우편번호: ${addr.zonecode}
+        주소: ${addr.address}
+    `);
+    // // 주소와 우편번호 값을 가져온 데이터로 설정
+    // const address = data.address;
+    // const zipcode = data.zipcode;
   
-  render() {
+    // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
+    // setEmpList((prevEmpList) => [
+    //   ...prevEmpList,
+    //   {
+    //     // 이전 데이터 유지하고 주소와 우편번호 추가
+    //     address: address, // 주소 상태 값 사용
+    //     zipcode: zipcode, // 우편번호 상태 값 사용
+    //   },
+    // ]);
+    setZonecode(data.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
+    setAddress(data.address); // 선택된 주소로 주소 상태 업데이트
+    setOpenPostcode(false); // 모달 닫기
+  }
+  const data = React.useMemo(
+    () =>
+      empList.map((emp) => ({
+        checkbox: false,
+        code: emp.cdEmp,
+        employee: emp.nmEmp,
+        foreign: emp.fgForeign,
+        resident: emp.noResident,
+      })),
+    [empList]
+  );
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "✓",
+        accessor: "checkbox",
+        id: "checkbox",
+        Cell: ({ cell: { value } }) => <input type="checkbox" />,
+      },
+      {
+        Header: "Code",
+        accessor: "code",
+        id: "code",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+          const handleInputClick = (e) => {
+            console.log(e.target);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      {
+        Header: "사원명",
+        accessor: "employee",
+        id: "employee",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      {
+        Header: "내/외",
+        accessor: "foreign",
+        id: "foreign",
+        width: "12%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      {
+        Header: "주민번호",
+        accessor: "resident",
+        id: "resident",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
+  
+  
 
     
     return (
@@ -64,112 +201,35 @@ class WorkContract extends Component {
         </div>
         <section className="section">
           <div className="wc-grid-container">
-            <div className=" wc-grid-cell-item ">
-              
+            <div className=" wc-grid-cell-item1 ">
+            
+              <Table
+                columns={columns}
+                data={data}
+                showInsertRow={true}
+                checkboxWidth={"10%"}
+              />
             
             
-
-               <table className="wc-table">
-                <tr>
-                  <th className="wc-th">V</th>
-                  <th className="wc-th">사원코드</th>
-                  <th className="wc-th">성명</th>
-                  <th className="wc-th">주민번호</th>
-                  <th className="wc-th">서명여부</th>
-                  <th className="wc-th-bigo"> &nbsp;&nbsp;&nbsp; </th>
-                </tr>
-              </table>
-              <div className="wc-table-scroll">
-                <table className="wc-table">
-                  <tr>
-                    <td className="wc-td">1</td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">O</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">2</td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">X</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                  <tr>
-                    <td className="wc-td">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td className="wc-td">202212</td>
-                    <td className="wc-td">조병국</td>
-                    <td className="wc-td">940704-1******</td>
-                    <td className="wc-td">1</td>
-                  </tr>
-                </table>
-              </div> 
 
               <table className="wc-bottom-table">
                 <tr>
-                  <th> 조회 된 사원 </th>
+                  <th>조회된 사원</th>
                   <th>{}명</th>
                 </tr>
               </table>
             </div>
 
-            <div className="wc-grid-cell-item">
+            <div className="wc-grid-cell-item2">
               <h1 className="wc-right-head">근로계약서</h1>
               <table className="wc-right-first-table">
                 <tr>
                   <td className="wc-right-first-table-left-td"> 근로계약기간 : </td>
                   <td className="wc-right-first-table-right-td-first">
-                    <CustomCalendar width="170" id="startDate" />
+                    <CustomCalendar width="179" id="startDate" />
                   </td>
                   <td className="wc-right-first-table-right-td">
-                    <CustomCalendar width="170" id="endDate" />
+                    <CustomCalendar width="179" id="endDate" />
                   </td>
                 </tr>
                 <tr>
@@ -182,17 +242,17 @@ class WorkContract extends Component {
                   </td>
                   <td className="wc-right-first-table-right-td-first">
                     <CustomButton
-                      className={'wc-right-cell-search-button'}
+                      className="wc-right-cell-search-button"
                       text="검색"
                       color="black"
-                      onClick={this.handleAddressButtonClick}
+                      onClick={"handleAddressButtonClick"}
                     />
                   </td>
                 </tr>
                 <tr>
                   <th className="wc-right-first-table-left-td">상세주소 : </th>
                   <td className="wc-right-first-table-right-td-first" colSpan="5">
-                    <CustomInput width={600} />
+                    <CustomInput width={605} />
                   </td>
                 </tr>
                 <tr>
@@ -380,6 +440,4 @@ class WorkContract extends Component {
       </>
     );
   }
-}
-
 export default WorkContract;
