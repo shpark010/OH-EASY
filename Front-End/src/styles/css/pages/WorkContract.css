@@ -155,7 +155,7 @@
   } 
   /*주소조회 버튼 */
   
-  .wcCreSelButton1{
+  .wcTab1{
     border :1px solid white;
     border-radius: 2px;
     padding: 10px;
@@ -167,29 +167,21 @@
     font-weight: bold;
     
   } 
-  .wcCreSelButton1:hover {
-    border-bottom-color: rgb(51, 118, 233);
-    border-bottom-width: 2px;
-    cursor: pointer;
-  } 
+
   
 
-  .wcCreSelButton2{
+  .wcTab2{
     border :1px solid white;
     border-radius: 2px;
     padding: 10px;
     font-size: 17px;
     font-weight: bold;
   }
-  .wcCreSelButton2:hover {
-    border-bottom-color: rgb(51, 118, 233);
-    border-bottom-width: 2px;
-    cursor: pointer;
-  } 
   
-  .wcButtonClikced {
-    border-bottom-color: rgb(51, 118, 233);
-    border-bottom-width: 2px;
+  
+  .on {
+    background-color: #1985fa;
+    color: #ffffff;
     
   }
   /* 작성,조회중 button이 클릭 됐을때 Click했을때만 class에 add 될 것.*/
