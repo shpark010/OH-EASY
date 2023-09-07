@@ -64,7 +64,6 @@ function CustomModalInput({ width, id, className, children }) {
           }}
         >
           {children}
-          <button onClick={closeModal}>닫기</button>
         </Modal>
       </div>
     </InputWrapper>
