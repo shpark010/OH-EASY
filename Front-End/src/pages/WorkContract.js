@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import Setting from '../images/pages/common/setting.png';
-import Calc from '../images/pages/common/calc.png';
-import Print from '../images/pages/common/print.png';
+
 import Delete from '../images/pages/common/delete.png';
 import '../styles/css/pages/WorkContract.css';
 import PageHeaderIconButton from '../components/PageHeader/PageHeaderIconButton';
@@ -10,9 +8,15 @@ import CustomCalendar from '../components/Contents/CustomCalendar';
 import CustomInput from '../components/Contents/CustomInput';
 import CustomButton from '../components/Contents/CustomButton';
 import SearchBarBox from '../components/SearchBar/SearchBarBox';
+import Table from '../components/TablesLib/Table';
 
 class WorkContract extends Component {
+
+
+  
   render() {
+
+    
     return (
       <>
         <div className="pageHeader">
@@ -28,21 +32,24 @@ class WorkContract extends Component {
             </div>
           </div>
         </div>
-        <div>
-          <button>계약서 작성</button>
-          <button>계약서 조회</button>
-        </div>
+
+    
+         <div>
+          <button className='wcCreSelButton1'> 계약서 작성</button>  
+          <button className='wcCreSelButton2'> 계약서 조회</button>
+        </div> 
+        <div ></div> 
+        {/* 기본으로 작성 page 보여주고 조회 Tab 누르면 조회 Component보여줄 것.  */}
+
+
         <div className="searchBar">
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
               <div className="searchBarBox">
-                <span className="searchBarName">조회구분</span>
-                <select id="category" name="category" className="selectBox" defaultValue="0">
-                  <option value="1"> 작성년월 </option>
-                  <option value="2"> 사원이름 </option>
-                </select>
+                <span className="searchBarName">작성일자</span>
               </div>
-              <div className="searchBarBox">
+              <CustomCalendar width="130" id="selectCreDate" />
+              <div className="searchBrBox">
                 <span className="searchBarName">정렬</span>
                 <select id="order" name="order" className="selectBox" defaultValue="0">
                   <option value="1"> 사원코드순</option>
@@ -58,7 +65,11 @@ class WorkContract extends Component {
         <section className="section">
           <div className="wc-grid-container">
             <div className=" wc-grid-cell-item ">
-              <table className="wc-table">
+              
+            
+            
+
+               <table className="wc-table">
                 <tr>
                   <th className="wc-th">V</th>
                   <th className="wc-th">사원코드</th>
@@ -139,7 +150,7 @@ class WorkContract extends Component {
                     <td className="wc-td">1</td>
                   </tr>
                 </table>
-              </div>
+              </div> 
 
               <table className="wc-bottom-table">
                 <tr>
