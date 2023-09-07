@@ -15,13 +15,14 @@ const Input = styled.input`
 `;
 
 //사이즈를 주면 그사이즈대로 안주면 100px
-function CustomInput({ width, id, className, onChange }) {
+function CustomInput({ width, id, className, value, onChange }) {
   return (
     <Input
       type="text"
       id={id}
       className={className}
       width={`${width}px`}
+      value={value}
       onChange={onChange}
     />
   );

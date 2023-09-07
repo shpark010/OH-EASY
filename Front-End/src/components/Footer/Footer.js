@@ -15,8 +15,8 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 1640px;
-  min-width: 1640px;
+  max-width: 1920px;
+  min-width: 1920px;
   height: 100%;
   margin: 0 auto;
   padding: 0 15px;
