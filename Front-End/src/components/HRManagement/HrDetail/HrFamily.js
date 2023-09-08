@@ -1,7 +1,10 @@
 import React from "react";
 import Table from "../../Tables/Table";
 
-const HrFamily = () => {
+const HrFamily = (empCode) => {
+  console.log("가족탭********************");
+  console.log(empCode);
+
   return (
     <Table
       headers={[
