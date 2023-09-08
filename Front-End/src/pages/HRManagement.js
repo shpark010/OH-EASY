@@ -13,7 +13,6 @@ import HrCareer from "../components/HRManagement/HrDetail/HrCareer";
 import HrBody from "../components/HRManagement/HrDetail/HrBody";
 import HrMilitary from "../components/HRManagement/HrDetail/HrMilitary";
 import HrLicense from "../components/HRManagement/HrDetail/HrLicense";
-import { handlePageHeaderSearchSubmit } from "../components/Services/PageHeaderSearchService";
 import ApiRequest from "../components/Services/ApiRequest";
 import "../styles/css/pages/HRManagement.css";
 
@@ -21,7 +20,12 @@ function HRManagement() {
   const [empList, setEmpList] = useState([]); //첫번째 테이블의 사원정보들 관리
   const [activeTab, setActiveTab] = useState("family"); // 가족,학력,경력,신체,병역,자격 탭 상태 관리
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
-  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 클릭된 EmpCode를 저장하는 상태
+  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 EmpCode를 저장하는 상태
+  const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 EmpCode를 저장하는 상태
+
+  const handleSetEmpCode = (code) => {
+    setclickEmpCode(code);
+  };
 
   // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
   const handleRowClick = (empCode) => {
@@ -95,19 +99,23 @@ function HRManagement() {
         accessor: "code",
         width: "35%",
         id: "code",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
           const handleInputClick = (e) => {
-            console.log(e.target);
+            console.log("code클릭이벤발생");
+            //console.log(original.code);
+            setclickEmpCode(original.code);
+            console.log(clickEmpCode);
           };
           return (
             <Input
               value={inputValue}
-              //onClick={handleInputClick}
+              onClick={handleInputClick}
               onChange={handleInputChange}
+              isDoubleClick={false}
             />
           );
         },
@@ -116,20 +124,42 @@ function HRManagement() {
         Header: "사원",
         accessor: "employee",
         id: "employee",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-          const defaultTdOnBlur = (e) => {
-            //alert("ddd");
+          const handleInputClick = (e) => {
+            console.log("hr : 클릭이벤");
+            console.log(original.code);
+            setclickEmpCode(original.code);
           };
+          const defaultTdOnBlur = (e) => {
+            console.log("hr: td 블러이벤");
+          };
+          const handleEnterPress = (e) => {
+            console.log("Enter 키가 눌렸습니다.");
+            setclickEmpCode(original.code);
+            console.log(clickEmpCode);
+            // 여기에서 DB 접근 등의 원하는 작업 수행
+          };
+
+          const handleTabPress = (e) => {
+            console.log("Tab 키가 눌렸습니다.");
+            // 여기에서 DB 접근 등의 원하는 작업 수행
+          };
+
           return (
             <Input
               value={inputValue}
+              onClick={handleInputClick}
               onChange={handleInputChange}
-              //onBlur={defaultTdOnBlur}
+              onBlur={defaultTdOnBlur}
+              onEnterPress={handleEnterPress}
+              onTabPress={handleTabPress}
+              isDoubleClick={true}
+              className={"doubleLine"}
             />
           );
         },
@@ -140,7 +170,7 @@ function HRManagement() {
   const renderContent = () => {
     switch (activeTab) {
       case "family":
-        return <HrFamily />;
+        return <HrFamily empCode={clickEmpCode} />;
       case "edu":
         return <HrEdu />;
       case "career":

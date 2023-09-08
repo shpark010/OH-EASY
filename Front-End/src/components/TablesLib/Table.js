@@ -8,6 +8,13 @@ const StyledTd = styled.td`
   padding: 0;
 `;
 
+const StyledTr = styled.tr`
+  box-sizing: border-box;
+  &:hover {
+    background-color: var(--color-secondary-blue);
+  }
+`;
+
 function Table(props) {
   const [inputValues, setInputValues] = useState({});
 
@@ -15,29 +22,8 @@ function Table(props) {
     setInputValues((prev) => ({ ...prev, [columnId]: value }));
   };
 
-  const defaultTdOnBlur = (e) => {
-    console.log("블러 이벤트");
-    e.currentTarget.style.border = "none";
-    const tdNodes = Array.from(
-      e.currentTarget.parentNode.parentNode.childNodes,
-    );
-    console.log(tdNodes);
-    tdNodes.forEach((td) => {
-      td.style.backgroundColor = "var(--color-primary-white)";
-      Array.from(td.childNodes).forEach((child) => {
-        child.style.backgroundColor = "var(--color-primary-white)";
-      });
-    });
-  };
-
   const handleInputChange = (e) => {
     props.setPrice(e.target.value);
-  };
-
-  const toggleEditing = () => {
-    console.log("더블클릭 이벤트 발생~~ 테이블꺼");
-    props.setEditing(!props.editing);
-    console.log(props.editing);
   };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -58,15 +44,18 @@ function Table(props) {
     >
       <thead>
         {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()} className="hrHeaderStyle">
+          <StyledTr
+            {...headerGroup.getHeaderGroupProps()}
+            className="hrHeaderStyle"
+          >
             {headerGroup.headers.map((column) => (
               <th {...column.getHeaderProps()}>{column.render("Header")}</th>
             ))}
-          </tr>
+          </StyledTr>
         ))}
       </thead>
       {props.showInsertRow && (
-        <tr>
+        <StyledTr>
           {props.columns.map((column) =>
             column.id !== "checkbox" ? (
               <td
@@ -76,7 +65,8 @@ function Table(props) {
                 <Input
                   value={inputValues[column.id] || ""}
                   onChange={(e) => handleChange(column.id, e.target.value)}
-                  onBlur={(e) => defaultTdOnBlur(e)}
+                  isDoubleClick={true}
+                  className={"doubleLine"}
                 />
               </td>
             ) : (
@@ -85,28 +75,22 @@ function Table(props) {
               </td>
             ),
           )}
-        </tr>
+        </StyledTr>
       )}
       <tbody {...getTableBodyProps()}>
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()} className="hrRowStyle">
+            <StyledTr {...row.getRowProps()} className="hrRowStyle">
               {row.cells.map((cell) => (
                 <StyledTd
                   {...cell.getCellProps()}
                   width={getWidthStyle(cell.column.width)}
-                  onDoubleClick={() => {
-                    console.log(cell.column.width);
-                    if (props.page === "sd") {
-                      toggleEditing();
-                    }
-                  }}
                 >
                   {cell.render("Cell")}
                 </StyledTd>
               ))}
-            </tr>
+            </StyledTr>
           );
         })}
       </tbody>
