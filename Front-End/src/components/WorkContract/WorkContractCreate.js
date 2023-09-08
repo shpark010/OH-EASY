@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ useState } from 'react';
 // import '../styles/css/pages/WorkContract.css';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
@@ -6,11 +6,173 @@ import CustomInput from '../../components/Contents/CustomInput';
 import CustomButton from '../../components/Contents/CustomButton';
 import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
+import Input from '../Contents/Input';
+import DaumPostcode from 'react-daum-postcode';
 
 
 
 
-const WorkContractCreate = ({data, columns}) => {
+
+const WorkContractCreate = () => {
+
+  const [employeeData, setEmployeeData] = useState([]);
+  const [openPostcode, setOpenPostcode] = useState(false);
+  const [empList, setEmpList] = useState([]);
+  const [zonecode, setZonecode] = useState("");
+  const [address, setAddress] = useState("");
+
+  const addrButtonClick= () => {
+    setOpenPostcode(true);
+  };
+
+  const closeModal = () => {
+    setOpenPostcode(false);
+  }
+
+  const handleAddressSelect = (addr) => {
+    console.log(`
+        우편번호: ${addr.zonecode}
+        주소: ${addr.address}
+    `);
+    // // 주소와 우편번호 값을 가져온 데이터로 설정
+    // const address = data.address;
+    // const zipcode = data.zipcode;
+  
+    // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
+    // setEmpList((prevEmpList) => [
+    //   ...prevEmpList,
+    //   {
+    //     // 이전 데이터 유지하고 주소와 우편번호 추가
+    //     address: address, // 주소 상태 값 사용
+    //     zipcode: zipcode, // 우편번호 상태 값 사용
+    //   },
+    // ]);
+    setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
+    setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
+    setOpenPostcode(false); // 모달 닫기
+  }
+  const data = React.useMemo(
+    () =>
+      empList.map((emp) => ({
+        checkbox: false,
+        code: emp.cdEmp,
+        employee: emp.nmEmp,
+        foreign: emp.fgForeign,
+        resident: emp.noResident,
+      })),
+    [empList]
+  );
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "✓",
+        accessor: "checkbox",
+        id: "checkbox",
+        Cell: ({ cell: { value } }) =>{ 
+          
+        return(
+          <>
+        
+        <input type="checkbox" />
+
+        </>
+        );
+      
+      },
+      },
+      {
+        Header: "Code",
+        accessor: "code",
+        id: "code",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+          const [modalApper,setModalApper] = useState("off")
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+          const handleInputClick = (e) => {
+            console.log(e.target);
+          };
+
+          /*Code input에서 mouse 올라오면 state 변경하는 함수 */
+          const mouseOverModalOn = ()=>{
+            setModalApper("on");
+          };
+
+          /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
+          const mouseOutModalOff = ()=>{
+            setModalApper("off");
+          };
+
+          /*Code input에 code 도우미 render 함수*/ 
+          const modalApperFunc = () =>{
+            if(modalApper === "on"){
+              return null;
+            }
+            else return null;
+
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick }
+              onChange={handleInputChange}
+              onMouseOver={mouseOverModalOn}
+              onMouseOut= {mouseOutModalOff}
+              modalRender = {modalApperFunc}
+            
+            />
+
+          );
+
+        },
+      },
+      {
+        Header: "사원명",
+        accessor: "employee",
+        id: "employee",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      
+      {
+        Header: "주민번호",
+        accessor: "resident",
+        id: "resident",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
 
 
     return (
@@ -63,7 +225,7 @@ const WorkContractCreate = ({data, columns}) => {
                 <tr>
                   <td className="wc-right-first-table-left-td"> 근로계약기간 : </td>
                   <td className="wc-right-first-table-right-td-first">
-                    <CustomCalendar width="179" id="startDate" />
+                    <CustomCalendar width="179" id="startDate" /> 
                   </td>
                   <td className="wc-right-first-table-right-td">
                     <CustomCalendar width="179" id="endDate" />
@@ -80,9 +242,9 @@ const WorkContractCreate = ({data, columns}) => {
                   <td className="wc-right-first-table-right-td-first">
                     <CustomButton
                       className="wc-right-cell-search-button"
-                      text="검색"
+                      text="주소검색"
                       color="black"
-                      onClick={"handleAddressButtonClick"}
+                      onClick={addrButtonClick}
                     />
                   </td>
                 </tr>
@@ -273,6 +435,23 @@ const WorkContractCreate = ({data, columns}) => {
               </table>
             </div>
           </div>
+
+         {/* 모달 창 */}
+         {openPostcode && (
+          <div className="wcModal1" onClick={closeModal}>
+            <div className="wcModal2" onClick={(e) => e.stopPropagation()}>
+              <DaumPostcode 
+                style={{ height: "100%" }}
+                onComplete={handleAddressSelect}  
+                autoClose={false} 
+              />
+            </div>
+          </div>
+        )}
+
+
+
+
         </section>
       </>
     );
