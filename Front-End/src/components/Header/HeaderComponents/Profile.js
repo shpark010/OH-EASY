@@ -68,9 +68,10 @@ const IconWrapper = styled.div`
 
 const logout = async (event) => {
   event.preventDefault();
-  const logoutId = getCookie("loginInfo").split("/")[0];
-  console.log(logoutId);
-  const token = getCookie("loginInfo").split("/")[1];
+  const cookieData = getCookie("loginInfo").split(".");
+  const logoutId = cookieData[0];
+  const token = cookieData.slice(1).join(".");
+  console.log("분리한 토큰값 : " + token);
   removeCookie("loginInfo");
   try {
     const response = await axios.post("/api1/auth/logout", {

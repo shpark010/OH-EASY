@@ -719,7 +719,7 @@ input[type="checkbox"] {
 
 /* 서브페이지 테이블 설정 (subpage setting) */
 .listArea {
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 table {
@@ -758,7 +758,7 @@ table.hrTotalTable th + th {
 table.namePickerTable td,
 table.hrTotalTable td {
   /* padding: 5px 10px; */
-  background-color: #fff;
+  /* background-color: #fff; */
   height: 40px;
 }
 table.namePickerTable td + td,
