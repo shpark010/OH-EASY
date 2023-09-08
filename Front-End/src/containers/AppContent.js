@@ -22,6 +22,7 @@ function AppContent() {
 
         {/* 로그인이 필요한 라우트들을 PrivateRoute 안에 묶기 */}
         <Route path="/" element={<PrivateRoute />}>
+          <Route index element={<Navigate to="/main" />} /> {/* 추가된 부분 */}
           <Route path="/main" element={<MainPage />} />
           <Route path="/er" element={<EmployeeRegister />} />
           <Route path="/hrm" element={<HRManagement />} />
