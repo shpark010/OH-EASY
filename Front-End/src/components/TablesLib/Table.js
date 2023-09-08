@@ -14,6 +14,10 @@ const StyledTr = styled.tr`
     background-color: var(--color-secondary-blue);
   }
 `;
+const StyledScrollableTbody = styled.div`
+  max-height: 600px;
+  overflow-y: auto; // 세로 방향 스크롤 활성화
+`;
 
 function Table(props) {
   const [inputValues, setInputValues] = useState({});
@@ -38,63 +42,65 @@ function Table(props) {
   };
 
   return (
-    <table
-      {...getTableProps()}
-      className="namePickerTable hrGridTable borderTopBold"
-    >
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <StyledTr
-            {...headerGroup.getHeaderGroupProps()}
-            className="hrHeaderStyle"
-          >
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-          </StyledTr>
-        ))}
-      </thead>
-      {props.showInsertRow && (
-        <StyledTr>
-          {props.columns.map((column) =>
-            column.id !== "checkbox" ? (
-              <td
-                key={column.id}
-                style={{ width: getWidthStyle(column.width) }}
-              >
-                <Input
-                  value={inputValues[column.id] || ""}
-                  onChange={(e) => handleChange(column.id, e.target.value)}
-                  isDoubleClick={true}
-                  className={"doubleLine"}
-                />
-              </td>
-            ) : (
-              <td key="check" width={props.checkboxWidth}>
-                <input type="checkbox" />
-              </td>
-            ),
-          )}
-        </StyledTr>
-      )}
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <StyledTr {...row.getRowProps()} className="hrRowStyle">
-              {row.cells.map((cell) => (
-                <StyledTd
-                  {...cell.getCellProps()}
-                  width={getWidthStyle(cell.column.width)}
-                >
-                  {cell.render("Cell")}
-                </StyledTd>
+    <div className="">
+      <table
+        {...getTableProps()}
+        className="namePickerTable hrGridTable borderTopBold"
+      >
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <StyledTr
+              {...headerGroup.getHeaderGroupProps()}
+              className="hrHeaderStyle"
+            >
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
               ))}
             </StyledTr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+        {props.showInsertRow && (
+          <StyledTr>
+            {props.columns.map((column) =>
+              column.id !== "checkbox" ? (
+                <td
+                  key={column.id}
+                  style={{ width: getWidthStyle(column.width) }}
+                >
+                  <Input
+                    value={inputValues[column.id] || ""}
+                    onChange={(e) => handleChange(column.id, e.target.value)}
+                    isDoubleClick={true}
+                    className={"doubleLine"}
+                  />
+                </td>
+              ) : (
+                <td key="check" width={props.checkboxWidth}>
+                  <input type="checkbox" />
+                </td>
+              ),
+            )}
+          </StyledTr>
+        )}
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <StyledTr {...row.getRowProps()} className="hrRowStyle">
+                {row.cells.map((cell) => (
+                  <StyledTd
+                    {...cell.getCellProps()}
+                    width={getWidthStyle(cell.column.width)}
+                  >
+                    {cell.render("Cell")}
+                  </StyledTd>
+                ))}
+              </StyledTr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

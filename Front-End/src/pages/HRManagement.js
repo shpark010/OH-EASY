@@ -13,15 +13,28 @@ import HrCareer from "../components/HRManagement/HrDetail/HrCareer";
 import HrBody from "../components/HRManagement/HrDetail/HrBody";
 import HrMilitary from "../components/HRManagement/HrDetail/HrMilitary";
 import HrLicense from "../components/HRManagement/HrDetail/HrLicense";
-import ApiRequest from "../components/Services/ApiRequest";
+import useApiRequest from "../components/Services/ApiRequest";
 import "../styles/css/pages/HRManagement.css";
 
 function HRManagement() {
+  const apiRequest = useApiRequest();
   const [empList, setEmpList] = useState([]); //첫번째 테이블의 사원정보들 관리
   const [activeTab, setActiveTab] = useState("family"); // 가족,학력,경력,신체,병역,자격 탭 상태 관리
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 EmpCode를 저장하는 상태
   const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 EmpCode를 저장하는 상태
+
+  const handleGetEmpBasicData = async (code) => {
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/hr/getOneEmpBasicData?code=${code}`,
+      });
+      //setEmpList(responseData);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
 
   const handleSetEmpCode = (code) => {
     setclickEmpCode(code);
@@ -108,7 +121,7 @@ function HRManagement() {
             console.log("code클릭이벤발생");
             //console.log(original.code);
             setclickEmpCode(original.code);
-            console.log(clickEmpCode);
+            handleGetEmpBasicData(original.code);
           };
           return (
             <Input
@@ -134,6 +147,7 @@ function HRManagement() {
             console.log("hr : 클릭이벤");
             console.log(original.code);
             setclickEmpCode(original.code);
+            handleGetEmpBasicData(original.code);
           };
           const defaultTdOnBlur = (e) => {
             console.log("hr: td 블러이벤");
@@ -143,11 +157,13 @@ function HRManagement() {
             setclickEmpCode(original.code);
             console.log(clickEmpCode);
             // 여기에서 DB 접근 등의 원하는 작업 수행
+            handleGetEmpBasicData(original.code);
           };
 
           const handleTabPress = (e) => {
             console.log("Tab 키가 눌렸습니다.");
             // 여기에서 DB 접근 등의 원하는 작업 수행
+            handleGetEmpBasicData(original.code);
           };
 
           return (

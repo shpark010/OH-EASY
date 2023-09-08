@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.sd.dao.SdDao">
+
+	<select id="getEmpList" resultType="kr.or.oheasy.vo.SdEmpMstVO">
+		SELECT
+			e.CD_EMP,
+			e.NM_EMP,
+			s.NM_POSITION
+		FROM
+			HR_EMP_MST e
+		JOIN
+			POSITION_SDTL s
+		ON
+			e.NO_POSITION_UNIQUE = s.NO_POSITION_UNIQUE
+	</select>
+
+</mapper>
+
+
+
+

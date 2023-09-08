@@ -14,13 +14,42 @@ import CustomPriceInput from "../components/Contents/CustomPriceInput";
 import Table from "../components/TablesLib/Table";
 import Input from "../components/Contents/Input";
 import CustomModal from "../components/Contents/CustomModal";
-import { handlePageHeaderSearchSubmit } from "../components/Services/PageHeaderSearchService";
+import useApiRequest from "../components/Services/ApiRequest";
 
 const TableTest = (props) => {
   const [editing, setEditing] = useState(false);
   const [pay, setPay] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [empList, setEmpList] = useState([]);
+  const [belongingDate, setBelongingDate] = useState("");
+  const handleBelongingDateChange = (newDate) => {
+    setBelongingDate(newDate);
+    console.log("귀속년월 : " + belongingDate);
+  };
+  // const [selectedDate, setSelectedDate] = useState(null); // 선택한 날짜를 상위 컴포넌트의 state로 관리
+  // const handleDateChange = (newDate) => {
+  //   setSelectedDate(newDate); // 선택한 날짜를 state에 저장
+  // };
+  const [payDay, setPayDay] = useState();
+  const handlePayDateChange = (newDate) => {
+    setPayDay(newDate);
+    console.log("지급일 : " + payDay);
+  };
+  const [searchOrder, setSearchOrder] = useState("0");
+  // 선택된 값이 변경될 때 호출될 콜백 함수
+  const handleSearchTypeChange = (newValue) => {
+    setSearchOrder(newValue);
+    console.log("정렬기준 : " + searchOrder);
+  };
+  const [nationalPension, setNationalPension] = useState(); //국민연금
+  const [healthInsurance, setHealthInsurance] = useState(); //건강보험
+  const [employmentInsurance, setEmploymentInsurance] = useState(); //고용보험
+  const [longtermNursingInsurance, setLongtermNursingInsurance] = useState(); //장기요양보험
+  const [incomeTax, setIncomeTax] = useState(); //소득세
+  const [localIncomeTax, setLocalIncomeTax] = useState(); //지방소득세
+
+  //api 요청 함수
+  const apiRequest = useApiRequest();
 
   const handlePriceChange = (value) => {
     setPay(value);
@@ -43,52 +72,48 @@ const TableTest = (props) => {
     setModalIsOpen(false);
   };
 
+  //조회 버튼 클릭시 사원리스트 불러오기(select)
   const handleFetchEmpData = async () => {
     try {
-      const url = "/api2/sd/getEmpList";
-      const data = await handlePageHeaderSearchSubmit(url);
-      setEmpList(data);
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/getEmpList",
+        data: {
+          belongingDate: belongingDate,
+          payDay: payDay,
+          searchOrder: searchOrder,
+        },
+      });
+      setEmpList(responseData);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
   };
-  const data = React.useMemo(
+
+  //기본급 입력 후 이벤트(insert)
+  const handleInsertData = async () => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/setEmpPay",
+      });
+      setEmpList(responseData);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  const EmpData = React.useMemo(
     () =>
       empList.map((emp) => ({
         checkbox: false,
         code: emp.cdEmp,
         employee: emp.nmEmp,
+        position: emp.nmPosition,
       })),
     [empList],
   );
 
-  // item1
-  const dummyItem1 = [
-    {
-      checkbox: false,
-      code: 1000,
-      employee: "이재훈",
-      nm_position: "조장",
-    },
-    {
-      checkbox: false,
-      code: 1001,
-      employee: "박성환",
-      nm_position: "부조장",
-    },
-    {
-      checkbox: false,
-      code: 1002,
-      employee: "김의진",
-      nm_position: "조원",
-    },
-    {
-      checkbox: false,
-      code: 1004,
-      employee: "조병국",
-      nm_position: "조원",
-    },
-  ];
   const columnsItem1 = React.useMemo(
     () => [
       {
@@ -146,8 +171,8 @@ const TableTest = (props) => {
       },
       {
         Header: "직급",
-        accessor: "nm_position",
-        id: "nm_position",
+        accessor: "position",
+        id: "position",
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value);
 
@@ -189,9 +214,9 @@ const TableTest = (props) => {
               onChange={handlePriceChange}
               onBlur={handleInputBlur}
             />
-          ) : (
+          ) : pay !== null && pay.trim() !== "" ? (
             <span>{Number(pay).toLocaleString()}</span>
-          );
+          ) : null;
         },
       },
     ],
@@ -419,7 +444,11 @@ const TableTest = (props) => {
               <div className="searchBarName">
                 <div className="searchBarNameCalender">
                   <span>귀속년월</span>
-                  <CustomCalendar width="150" />
+                  <CustomCalendar
+                    width="150"
+                    type="month"
+                    onChange={handleBelongingDateChange}
+                  />
                 </div>
               </div>
               <SearchBarBox
@@ -432,12 +461,15 @@ const TableTest = (props) => {
                   { value: "3", label: "3. 추급" },
                   { value: "4", label: "4. 추상" },
                 ]}
-                defaultValue="0"
               />
               <div className="searchBarName">
                 <div className="searchBarNameCalender">
                   <span>지급일</span>
-                  <CustomCalendar width="150" />
+                  <CustomCalendar
+                    width="150"
+                    show="top"
+                    onChange={handlePayDateChange}
+                  />
                 </div>
               </div>
               <SearchBarBox
@@ -449,23 +481,26 @@ const TableTest = (props) => {
                   { value: "2", label: "2. 직급순" },
                   { value: "3", label: "3. 입사일순" },
                 ]}
-                defaultValue="0"
+                defaultValue={searchOrder}
+                onChange={handleSearchTypeChange}
               />
             </div>
             <div className="btnWrapper">
-              <button className="gray">조회</button>
+              <button className="gray" onClick={handleFetchEmpData}>
+                조회
+              </button>
             </div>
           </div>
         </div>
         <div className="sd-container">
           <div className="sd-item sd-item1">
-            <Table data={dummyItem1} columns={columnsItem1} />
+            <Table data={EmpData} columns={columnsItem1} />
             <table className="sd-empList-calTable">
               <tbody>
                 <tr>
                   <td></td>
                   <td colSpan={2}>인 원 ( 퇴 직 )</td>
-                  <td>7(0)</td>
+                  <td>{empList.length}</td>
                   <td></td>
                   <td></td>
                 </tr>
@@ -528,8 +563,8 @@ const TableTest = (props) => {
                   { value: "1", label: "1. 현재사원_당월" },
                   { value: "2", label: "2. 전체사원_현재" },
                   { value: "3", label: "3. 현재사원_현재" },
-                  { value: "3", label: "4. 전체사원_연간" },
-                  { value: "3", label: "5. 현재사원_연간" },
+                  { value: "4", label: "4. 전체사원_연간" },
+                  { value: "5", label: "5. 현재사원_연간" },
                 ]}
                 defaultValue="0"
               />

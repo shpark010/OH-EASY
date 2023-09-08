@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React,{ useState } from 'react';
 // import '../styles/css/pages/WorkContract.css';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
@@ -6,13 +6,108 @@ import CustomInput from '../../components/Contents/CustomInput';
 import CustomButton from '../../components/Contents/CustomButton';
 import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
+import Input from '../Contents/Input';
 
 
 
 
-const WorkContractSelect = ({data, columns}) => {
 
- 
+const WorkContractSelect = () => {
+
+  const [employeeData, setEmployeeData] = useState([]);
+  const [empList, setEmpList] = useState([]);
+  const [zonecode, setZonecode] = useState("");
+  const [address, setAddress] = useState("");
+
+  
+
+
+  const data = React.useMemo(
+    () =>
+      empList.map((emp) => ({
+        checkbox: false,
+        code: emp.cdEmp,
+        employee: emp.nmEmp,
+        foreign: emp.fgForeign,
+        resident: emp.noResident,
+      })),
+    [empList]
+  );
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "✓",
+        accessor: "checkbox",
+        id: "checkbox",
+        Cell: ({ cell: { value } }) => <input type="checkbox" />,
+      },
+      {
+        Header: "Code",
+        accessor: "code",
+        id: "code",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+          const handleInputClick = (e) => {
+            console.log(e.target);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      {
+        Header: "사원명",
+        accessor: "employee",
+        id: "employee",
+        width: "20%",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      
+      {
+        Header: "주민번호",
+        accessor: "resident",
+        id: "resident",
+        Cell: ({ cell: { value } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
   
 
     
@@ -85,9 +180,9 @@ const WorkContractSelect = ({data, columns}) => {
                   <td className="wc-right-first-table-right-td-first">
                     <CustomButton
                       className="wc-right-cell-search-button"
-                      text="검색"
+                      text="주소검색"
                       color="black"
-                      onClick={"handleAddressButtonClick"}
+                      
                     />
                   </td>
                 </tr>
