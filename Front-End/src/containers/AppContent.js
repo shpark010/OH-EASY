@@ -11,6 +11,7 @@ import HRManagement from "../pages/HRManagement";
 import WorkContract from "../pages/WorkContract";
 import SalaryData from "../pages/SalaryData";
 import TableTest from "../pages/SdTableTest";
+import Test from "../pages/Test";
 
 function AppContent() {
   return (
