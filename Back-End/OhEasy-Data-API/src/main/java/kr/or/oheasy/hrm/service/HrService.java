@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import kr.or.oheasy.hrm.dao.HrDao;
 import kr.or.oheasy.vo.HrEmpMstVO;
+import kr.or.oheasy.vo.HrFamilyDtlVO;
 
 @Service
 public class HrService {
@@ -19,6 +20,13 @@ public class HrService {
     	HrDao dao = sqlSession.getMapper(HrDao.class);
     	
     	return dao.getAllEmpList();
+    }
+    
+    
+    public List<HrFamilyDtlVO> getFamilyDataList(String cdEmp){
+    	HrDao dao = sqlSession.getMapper(HrDao.class);
+    	
+    	return dao.getFamilyDataList(cdEmp);
     }
     
 }

@@ -3,8 +3,18 @@
 
 <mapper namespace="kr.or.oheasy.hrm.dao.HrDao">
 
+<!-- 전사원의 정보 -->
 <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-	select * from hr_emp_mst
+	select cd_emp,nm_emp from hr_emp_mst
+</select>
+<!-- 한 사원의 기초정보	
+<select id="getOneEmpBasicData" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+	select * from hr_emp_mst where cd_emp=#{cdEmp}
+</select>
+ -->
+<!-- 한 사원의 가족정보 -->
+<select id="getFamilyDataList" resultType="kr.or.oheasy.vo.HrFamilyDtlVO">
+	select * from hr_family_dtl where cd_emp=#{cdEmp}
 </select>
 
 </mapper>
