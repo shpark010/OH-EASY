@@ -1,6 +1,8 @@
 package kr.or.oheasy.hrm.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +55,32 @@ public class HrController {
 		List<HrFamilyDtlVO> result = hrService.getFamilyDataList(cdEmp);
 		System.out.println(result);
 		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("insertFamilyData")
+	public ResponseEntity<?> insertFamilyData(@RequestParam Map<String, String> params){
+		String cdEmp = params.remove("cdEmp");
+		Entry<String, String> entry = params.entrySet().iterator().next();
+		String column = entry.getKey();
+		String value = entry.getValue();
+		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
+		
+		int result = hrService.insertFamilyData(cdEmp, column, value);
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("updateFamilyData")
+	public ResponseEntity<?> updateFamilyData(@RequestParam Map<String, String> params){
+	    String seqFamily = params.remove("seqFamily");
+	    Entry<String, String> entry = params.entrySet().iterator().next();
+	    String column = entry.getKey();
+	    String value = entry.getValue();
+	    System.out.println("seqFamily : " + seqFamily + ", column : " + column + ", value : " + value);
+	    
+	    int result = hrService.updateFamilyData(seqFamily, column, value);
+	    
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
