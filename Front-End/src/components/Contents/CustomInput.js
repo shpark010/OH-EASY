@@ -15,7 +15,7 @@ const Input = styled.input`
 `;
 
 //사이즈를 주면 그사이즈대로 안주면 100px
-function CustomInput({ width, id, className, value, onChange }) {
+function CustomInput({ width, id, className, value, onChange, style }) {
   return (
     <Input
       type="text"
@@ -24,6 +24,7 @@ function CustomInput({ width, id, className, value, onChange }) {
       width={`${width}px`}
       value={value}
       onChange={onChange}
+      style={style}
     />
   );
 }

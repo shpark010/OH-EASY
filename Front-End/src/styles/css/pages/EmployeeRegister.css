@@ -4,7 +4,7 @@
   grid-gap: 1rem;
   width: 100%;
   max-width: 1640px;
-  height: 88%;
+  height: 84%;
   margin: 0 auto;
   padding: 0 15px;
   flex-grow: 1;
@@ -13,7 +13,7 @@
 
 .erGrid {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr auto;
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -27,9 +27,6 @@
   border-collapse: collapse;
   background-color: #a9d0f5;
   font-weight: bold;
-  position: absolute;
-  bottom: 0;
-  table-layout: fixed;
   width: 100%;
 }
 
@@ -40,6 +37,12 @@
   text-align: center;
   font-size: 16px;
   width: 50%;
+}
+
+.erlistArea {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .erGrid2 {
