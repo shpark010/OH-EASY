@@ -27,18 +27,25 @@ function CustomRadio({
   classNameRadio,
   name,
   options,
-  onClick,
+  onChange,
+  value,
 }) {
+  const handleRadioChange = (e) => {
+    if (onChange) {
+      onChange(e);
+    }
+  };
   return (
     <Div id={id} className={classNameBox}>
-      {options.map(([labelText, value]) => (
-        <Label key={value}>
+      {options.map(([labelText, optionValue]) => (
+        <Label key={optionValue}>
           <Input
             className={classNameRadio}
             type="radio"
             name={name}
-            value={value}
-            onClick={onClick}
+            value={optionValue}
+            onChange={handleRadioChange}
+            checked={String(value) === optionValue}
           />
           <Span>{labelText}</Span>
         </Label>

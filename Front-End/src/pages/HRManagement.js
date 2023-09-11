@@ -23,16 +23,21 @@ function HRManagement() {
   const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
 
+  const [oneEmpData, setOneEmpData] = useState([]);
+
   const handleGetEmpBasicData = async (cdEmp) => {
-    try {
-      const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/hr/getOneEmpBasicData?cdEmp=${cdEmp}`,
-      });
-      //setEmpList(responseData);
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
+    // try {
+    //   const responseData = await apiRequest({
+    //     method: "GET",
+    //     url: `/api2/hr/getOneEmpBasicData?cdEmp=${cdEmp}`,
+    //   });
+    //   setOneEmpData(responseData);
+    //   console.log("******************************");
+    //   console.log(responseData);
+    //   console.log("******************************");
+    // } catch (error) {
+    //   console.error("Failed to fetch emp data:", error);
+    // }
   };
 
   const handleSetEmpCode = (code) => {
@@ -124,7 +129,7 @@ function HRManagement() {
             console.log("code클릭이벤발생");
             //console.log(original.code);
             setclickEmpCode(original.code);
-            handleGetEmpBasicData(original.code);
+            //handleGetEmpBasicData(original.code);
           };
           return (
             <Input
@@ -150,7 +155,7 @@ function HRManagement() {
             console.log("hr : 클릭이벤");
             console.log(original.code);
             setclickEmpCode(original.code);
-            handleGetEmpBasicData(original.code);
+            //handleGetEmpBasicData(original.code);
           };
           const defaultTdOnBlur = (e) => {
             console.log("hr: td 블러이벤");
@@ -160,13 +165,13 @@ function HRManagement() {
             setclickEmpCode(original.code);
             console.log(clickEmpCode);
             // 여기에서 DB 접근 등의 원하는 작업 수행
-            handleGetEmpBasicData(original.code);
+            //handleGetEmpBasicData(original.code);
           };
 
           const handleTabPress = (e) => {
             console.log("Tab 키가 눌렸습니다.");
             // 여기에서 DB 접근 등의 원하는 작업 수행
-            handleGetEmpBasicData(original.code);
+            //handleGetEmpBasicData(original.code);
           };
 
           return (

@@ -81,6 +81,7 @@ const HrFamily = ({ cdEmp }) => {
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
+    handleSendEmpCodeGetFamilyData(cdEmp);
   };
 
   // 테이블에 보내야할 데이터
@@ -555,6 +556,7 @@ const HrFamily = ({ cdEmp }) => {
       insertRow={true}
       showInsertRow={showInsertRow}
       setShowInsertRow={setShowInsertRow}
+      scrollHeight={"500"}
     />
   );
 };
