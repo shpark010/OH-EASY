@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.oheasy.hrm.dao.HrDao;
 import kr.or.oheasy.utils.Camel;
@@ -24,6 +25,18 @@ public class HrService {
     	
     	return dao.getAllEmpList();
     }
+    public HrEmpMstVO getOneEmpBasicData(String cdEmp){
+    	HrDao dao = sqlSession.getMapper(HrDao.class);
+    	
+    	return dao.getOneEmpBasicData(cdEmp);
+    }
+    public int updateEmpBasicData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value) {
+        HrDao dao = sqlSession.getMapper(HrDao.class);
+        column = Camel.camelToSnake(column);
+        return dao.updateEmpBasicData(cdEmp, column, value);
+    }
+    
+    
     
     
     public List<HrFamilyDtlVO> getFamilyDataList(String cdEmp){

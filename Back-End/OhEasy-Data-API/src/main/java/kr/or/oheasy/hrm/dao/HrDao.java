@@ -11,6 +11,10 @@ public interface HrDao {
 	
 	public List<HrEmpMstVO> getAllEmpList();
 	
+	public HrEmpMstVO getOneEmpBasicData(String cdEmp);
+	
+	public int updateEmpBasicData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);
+	
 	public List<HrFamilyDtlVO> getFamilyDataList(String cdEmp);
 	
 	public int insertFamilyData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);

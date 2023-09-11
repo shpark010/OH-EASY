@@ -40,12 +40,26 @@ public class HrController {
 		
 		return new ResponseEntity<>(1,HttpStatus.OK);
 	}
+	
 	@GetMapping("/getOneEmpBasicData")
 	public ResponseEntity<?> getOneEmpBasicData(@RequestParam String cdEmp){
 		
-		System.out.println(cdEmp);
+		HrEmpMstVO result =hrService.getOneEmpBasicData(cdEmp);
+		System.out.println(result);
 		
-		return new ResponseEntity<>(1,HttpStatus.OK);
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@GetMapping("/updateBasicEmpdata")
+	public ResponseEntity<?> updateEmpBasicData(@RequestParam Map<String, String> params){
+		String cdEmp = params.remove("cdEmp");
+		Entry<String, String> entry = params.entrySet().iterator().next();
+		String column = entry.getKey();
+		String value = entry.getValue();
+		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
+		int result = hrService.updateEmpBasicData(cdEmp, column, value);
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
 	@GetMapping("/getFamilyDataList")
@@ -65,6 +79,7 @@ public class HrController {
 		String column = entry.getKey();
 		String value = entry.getValue();
 		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
+		System.out.println("인서트 가족 정보 *************************");
 		
 		int result = hrService.insertFamilyData(cdEmp, column, value);
 		
