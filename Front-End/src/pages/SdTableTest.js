@@ -15,9 +15,10 @@ import Table from "../components/TablesLib/Table";
 import Input from "../components/Contents/Input";
 import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
+import { useEffect } from "react";
 
 const TableTest = (props) => {
-  const [editing, setEditing] = useState(false);
+  // const [editing, setEditing] = useState(false);
   const [pay, setPay] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [empList, setEmpList] = useState([]);
@@ -26,27 +27,58 @@ const TableTest = (props) => {
     setBelongingDate(newDate);
     console.log("귀속년월 : " + belongingDate);
   };
-  // const [selectedDate, setSelectedDate] = useState(null); // 선택한 날짜를 상위 컴포넌트의 state로 관리
-  // const handleDateChange = (newDate) => {
-  //   setSelectedDate(newDate); // 선택한 날짜를 state에 저장
-  // };
   const [payDay, setPayDay] = useState();
   const handlePayDateChange = (newDate) => {
     setPayDay(newDate);
     console.log("지급일 : " + payDay);
   };
-  const [searchOrder, setSearchOrder] = useState("0");
+  const [searchOrder, setSearchOrder] = useState("cdEmp");
   // 선택된 값이 변경될 때 호출될 콜백 함수
   const handleSearchTypeChange = (newValue) => {
     setSearchOrder(newValue);
     console.log("정렬기준 : " + searchOrder);
   };
+  const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
+  const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
+  const handleInsert = (value) => {
+    //더블 클릭시 사원이 선택 되어야 정보 수정 가능할 수 있게 로직 작성
+    if (
+      clickEmpCode !== null &&
+      clickEmpCode !== undefined &&
+      clickEmpCode.trim() !== ""
+    ) {
+    }
+  };
+  const [taxAmount, setTaxAmount] = useState({
+    nationalPension: "", //국민연금
+    healthInsurance: "", //건강보험
+    employmentInsurance: "", //고용보험
+    longtermNursingInsurance: "", //장기요양보험
+    incomeTax: "", //소득세
+    localIncomeTax: "", //지방소득세
+  }); //단일 세금 금액
+  const [totalTaxAmount, setTotalTaxAmount] = useState(); //총 세금 금액
   const [nationalPension, setNationalPension] = useState(); //국민연금
   const [healthInsurance, setHealthInsurance] = useState(); //건강보험
   const [employmentInsurance, setEmploymentInsurance] = useState(); //고용보험
   const [longtermNursingInsurance, setLongtermNursingInsurance] = useState(); //장기요양보험
   const [incomeTax, setIncomeTax] = useState(); //소득세
   const [localIncomeTax, setLocalIncomeTax] = useState(); //지방소득세
+  const [empDetailInfo, setEmpDetailInfo] = useState({
+    hireDate: "", //입사일
+    gender: "", //성별
+    address: "", //주소
+    detailAddress: "", //상세주소
+    phone: "", //휴대폰번호
+    email: "", //이메일
+    leavingDate: "", //퇴사일
+    department: "", //부서
+    domesticForeign: "", //내외국인
+    family: "", //가족수
+    military: "", //병역
+    obstacle: "", //장애
+    certificate: "", //자격증
+  }); //사원 상세 정보
 
   //api 요청 함수
   const apiRequest = useApiRequest();
@@ -55,14 +87,14 @@ const TableTest = (props) => {
     setPay(value);
   };
 
-  const handleDoubleClick = () => {
-    setEditing(true);
-    console.log("더블클릭이벤트 발생");
-  };
+  // const handleDoubleClick = () => {
+  //   setEditing(true);
+  //   console.log("더블클릭이벤트 발생");
+  // };
 
-  const handleInputBlur = () => {
-    setEditing(false);
-  };
+  // const handleInputBlur = () => {
+  //   setEditing(false);
+  // };
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -74,6 +106,11 @@ const TableTest = (props) => {
 
   //조회 버튼 클릭시 사원리스트 불러오기(select)
   const handleFetchEmpData = async () => {
+    // data 객체의 속성들이 undefined, null 또는 공백인지 확인
+    if (!belongingDate || !payDay || !searchOrder) {
+      alert("조회 조건 사항을 모두 선택해 주세요");
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "POST",
@@ -85,6 +122,25 @@ const TableTest = (props) => {
         },
       });
       setEmpList(responseData);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //사원 클릭시 사원정보 불러오기
+  const handleGetEmpDetailData = async (code) => {
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/sd/getOneEmpDetailData?code=${code}`,
+      });
+      console.log(responseData);
+      // 빈 문자열 또는 null 값을 빈 문자열로 변환하여 empDetailInfo에 설정
+      const cleanedData = {};
+      for (const key in responseData) {
+        cleanedData[key] = responseData[key] || "";
+      }
+      setEmpDetailInfo(cleanedData);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -146,40 +202,79 @@ const TableTest = (props) => {
         Header: "Code",
         accessor: "code",
         id: "code",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-          return <Input value={inputValue} onChange={handleInputChange} />;
+
+          const handleInputClick = (e) => {
+            console.log("hr : 클릭이벤");
+            console.log(original.code);
+            setclickEmpCode(original.code);
+            handleGetEmpDetailData(original.code);
+          };
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick}
+              onChange={handleInputChange}
+            />
+          );
         },
       },
       {
         Header: "사원",
         accessor: "employee",
         id: "employee",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
 
-          return <Input value={inputValue} onChange={handleInputChange} />;
+          const handleInputClick = (e) => {
+            console.log("hr : 클릭이벤");
+            console.log(original.code);
+            setclickEmpCode(original.code);
+            handleGetEmpDetailData(original.code);
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick}
+              onChange={handleInputChange}
+            />
+          );
         },
       },
       {
         Header: "직급",
         accessor: "position",
         id: "position",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-          return <Input value={inputValue} onChange={handleInputChange} />;
+
+          const handleInputClick = (e) => {
+            console.log("hr : 클릭이벤");
+            console.log(original.code);
+            setclickEmpCode(original.code);
+            handleGetEmpDetailData(original.code);
+          };
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick}
+              onChange={handleInputChange}
+            />
+          );
         },
       },
     ],
@@ -206,21 +301,29 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return editing ? (
-            <CustomPriceInput
+          const [inputValue, setInputValue] = React.useState(value || "");
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+          const handlePay = (newPay) => {
+            setPay();
+          };
+          return (
+            <Input
+              isDoubleClick={true}
               id="price-input"
-              value={pay}
+              value={inputValue}
               width={100}
-              onChange={handlePriceChange}
-              onBlur={handleInputBlur}
+              onChange={handleInputChange}
+              // onBlur={handleInputBlur}
+              className={"doubleLine"}
+              type="price"
             />
-          ) : pay !== null && pay.trim() !== "" ? (
-            <span>{Number(pay).toLocaleString()}</span>
-          ) : null;
+          );
         },
       },
     ],
-    [editing, pay],
+    [pay],
   );
   //item3
   const dummyItem3 = [
@@ -262,17 +365,7 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return editing ? (
-            <CustomPriceInput
-              id="price-input"
-              value={value}
-              width={100}
-              onChange={handlePriceChange}
-              onBlur={handleInputBlur}
-            />
-          ) : (
-            <span>{Number(value).toLocaleString()}</span>
-          );
+          return <Input />;
         },
       },
     ],
@@ -305,17 +398,7 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return editing ? (
-            <CustomPriceInput
-              id="price-input"
-              value={value}
-              width={100}
-              onChange={handlePriceChange}
-              onBlur={handleInputBlur}
-            />
-          ) : (
-            <span>{Number(value).toLocaleString()}</span>
-          );
+          return <Input />;
         },
       },
     ],
@@ -361,17 +444,7 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return editing ? (
-            <CustomPriceInput
-              id="price-input"
-              value={value}
-              width={100}
-              onChange={handlePriceChange}
-              onBlur={handleInputBlur}
-            />
-          ) : (
-            <span>{Number(value).toLocaleString()}</span>
-          );
+          return <Input />;
         },
       },
     ],
@@ -437,10 +510,6 @@ const TableTest = (props) => {
         <div className="searchBar">
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
-              {/* <div className="searchBarBox">
-                  <span className="searchBarName">귀속연월</span>
-                  <CustomCalendar className="" width="150" />
-                </div> */}
               <div className="searchBarName">
                 <div className="searchBarNameCalender">
                   <span>귀속년월</span>
@@ -476,7 +545,7 @@ const TableTest = (props) => {
                 label="정렬"
                 id="sd-order-category"
                 options={[
-                  { value: "0", label: "0. 코드순" },
+                  { value: "cdEmp", label: "0. 코드순" },
                   { value: "1", label: "1. 이름순" },
                   { value: "2", label: "2. 직급순" },
                   { value: "3", label: "3. 입사일순" },
@@ -494,7 +563,13 @@ const TableTest = (props) => {
         </div>
         <div className="sd-container">
           <div className="sd-item sd-item1">
-            <Table data={EmpData} columns={columnsItem1} />
+            <Table
+              data={EmpData}
+              columns={columnsItem1}
+              showInsertRow={showInsertRow}
+              setShowInsertRow={setShowInsertRow}
+              insertRow={true}
+            />
             <table className="sd-empList-calTable">
               <tbody>
                 <tr>
@@ -511,8 +586,8 @@ const TableTest = (props) => {
             <Table
               data={dummyItem2}
               columns={columnsItem2}
-              editing={editing}
-              setEditing={setEditing}
+              // editing={editing}
+              // setEditing={setEditing}
               pay={pay}
               setPay={setPay}
               page={"sd"}
@@ -607,6 +682,46 @@ const TableTest = (props) => {
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div className="sd-item sd-item6">
+            <div className="sd-empInfo">
+              <div className="sd-empInfo-top">
+                <h4>
+                  <span>
+                    <box-icon name="user"></box-icon>
+                  </span>
+                  사원정보
+                </h4>
+              </div>
+              <div className="sd-empInfo-detail">
+                <label htmlFor="">입사일</label>
+                <p>{empDetailInfo.hireDate}</p>
+                <label htmlFor="">성별</label>
+                <p>{empDetailInfo.gender}</p>
+                <label htmlFor="">주소</label>
+                <p>{empDetailInfo.address}</p>
+                <label htmlFor="">상세주소</label>
+                <p>{empDetailInfo.detailAddress}</p>
+                <label htmlFor="">핸드폰</label>
+                <p>{empDetailInfo.phone}</p>
+                <label htmlFor="">이메일</label>
+                <p>{empDetailInfo.email}</p>
+                <label htmlFor="">퇴사일</label>
+                <p>{empDetailInfo.leavingDate}</p>
+                <label htmlFor="">부서</label>
+                <p>{empDetailInfo.department}</p>
+                <label htmlFor="">내외국인</label>
+                <p>{empDetailInfo.domesticForeign}</p>
+                <label htmlFor="">가족수</label>
+                <p>{empDetailInfo.family}</p>
+                <label htmlFor="">병역</label>
+                <p>{empDetailInfo.military}</p>
+                <label htmlFor="">장애구분</label>
+                <p>{empDetailInfo.obstacle}</p>
+                <label htmlFor="">자격증</label>
+                <p>{empDetailInfo.certificate}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
