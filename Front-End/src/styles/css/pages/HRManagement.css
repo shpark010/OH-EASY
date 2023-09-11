@@ -24,15 +24,20 @@
   text-align: center;
 }
 
+.hrTotalTable tr {
+  width: 50%;
+}
 .hrInfoBase {
   display: flex;
 }
 .hrInfoBaseProfileImg {
-  position: relative;
-  padding: 10px 20px 5px 10px;
+  width: 210px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
+  padding-top: 10px;
 }
 
 .hrInfoBaseProfileTitle {
@@ -41,12 +46,32 @@
 }
 
 .hrInfoBaseProfileImgBtn {
-  margin: 10px 5px;
+  /* margin: 10px 5px; */
+  margin: 8px 5px 0;
   font-weight: 600;
   font-family: "NanumSquare", sans-serif;
 }
 
-.hrInfoBaseProfileOnePtag {
+.hrInfoBase .table,
+.hrInfoBase .table tr {
+  display: flex;
+}
+.hrInfoBase .table tbody {
+  width: 50%;
+}
+.hrInfoBase .table th {
+  width: 200px;
+  text-align: right;
+  border: none;
+  flex-shrink: 0;
+}
+.hrInfoBase .table td {
+  width: 100%;
+  padding: 3px 10px;
+  border: none;
+}
+
+/* .hrInfoBaseProfileOnePtag {
   text-align: right;
   padding: 10px 10px;
   font-weight: 900;
@@ -56,7 +81,7 @@
   display: block;
   margin: 7px 20px 7px 10px;
   font-weight: 500;
-}
+} */
 
 .hrInfoDetailTable th {
   height: 34px;
@@ -69,12 +94,12 @@
   background-color: var(--color-opacity-white);
   border: 1px solid var(--color-border-gray);
 }
-.hrInfoBaseBox {
+/* .hrInfoBaseBox {
   text-align: left;
   padding: 5px;
   height: 34px;
   font-weight: 900;
-}
+} */
 
 .hrDetail {
   display: flex;
@@ -109,5 +134,5 @@
 }
 
 .hrDetailSelect {
-  margin: 7px 20px 7px 10px;
+  margin: 7px 10px;
 }

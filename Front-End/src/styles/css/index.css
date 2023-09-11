@@ -330,6 +330,11 @@ body {
   border: 1px solid var(--color-primary-gray);
 }
 
+table .selectBox {
+  padding-right: 28px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 8px)
+    center/8px;
+}
 /* 버튼 */
 button {
   border: 1px solid var(--color-primary-gray);
@@ -738,12 +743,15 @@ table {
 table {
   /* 사원선택 테이블 설정 */
 }
+.table th,
+.table td,
 table.namePickerTable th,
 table.namePickerTable td,
 table.hrTotalTable th,
 table.hrTotalTable td {
   border-bottom: 1px solid var(--color-border-gray);
 }
+.table th,
 table.namePickerTable th,
 table.hrTotalTable th {
   font-size: 15px;
@@ -751,16 +759,19 @@ table.hrTotalTable th {
   background-color: #ededed;
   padding: 10px;
 }
+.table th + th,
 table.namePickerTable th + th,
 table.hrTotalTable th + th {
   border-left: 1px solid var(--color-border-gray);
 }
+.table td,
 table.namePickerTable td,
 table.hrTotalTable td {
   /* padding: 5px 10px; */
   /* background-color: #fff; */
   height: 40px;
 }
+.table td + td,
 table.namePickerTable td + td,
 table.hrTotalTable td + td {
   border-left: 1px solid var(--color-border-gray);
@@ -771,10 +782,18 @@ table.hrTotalTable td + td {
 }
 .pageTab li {
   padding: 8px 14px;
-  border: 1px solid var(--color-border-gray);
+  border-top: 1px solid var(--color-border-gray);
+  border-right: 1px solid var(--color-border-gray);
   border-bottom: none;
   color: var(--color-primary-gray);
   font-size: 14px;
+}
+.pageTab li:first-child {
+  border-left: 1px solid var(--color-border-gray);
+  border-top-left-radius: 2px;
+}
+.pageTab li:last-child {
+  border-top-right-radius: 2px;
 }
 .pageTab li.on {
   background-color: var(--color-primary-blue);
