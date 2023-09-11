@@ -14,7 +14,7 @@ const InputTag = styled.input`
   color: var(--color-primary-gray);
   cursor: pointer;
 
-  .doubleLine {
+  &.doubleLine {
     border: none;
     color: var(--color-primary-gray);
     font-weight: 600;
@@ -27,30 +27,21 @@ const InputTag = styled.input`
   }
 
   &[readOnly] {
-    //cursor: not-allowed;
+    /* cursor: not-allowed; */
   }
 `;
 
-function formatPrice(value) {
-  // 세 자리마다 쉼표 추가
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function unformatPrice(value) {
-  // 쉼표 제거
-  return value.replace(/,/g, "");
-}
-
 function Input({
-  type,
   onEnterPress,
   onTabPress,
   isDoubleClick,
+  onChange,
+  type,
   ...otherProps
 }) {
   const [readOnlyState, setReadOnlyState] = useState(true);
-
   let singleClickTimer;
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && onEnterPress) {
       onEnterPress(e);
@@ -62,7 +53,6 @@ function Input({
   };
 
   const handleBlur = (e) => {
-    console.log("input : 블러이벤트");
     setReadOnlyState(true);
     if (otherProps.onBlur) {
       otherProps.onBlur(e);
@@ -73,35 +63,39 @@ function Input({
     if (otherProps.onFocus) {
       otherProps.onFocus(e);
     }
-    console.log("input : 포커스이벤트");
   };
 
   const handleClick = (e) => {
-    clearTimeout(singleClickTimer); // 더블 클릭 시 타이머를 초기화
+    clearTimeout(singleClickTimer);
 
     singleClickTimer = setTimeout(() => {
       if (otherProps.onClick) {
         otherProps.onClick(e);
       }
-      console.log("input : 한번클릭이벤트");
-    }, 200); // 200ms 후에 단일 클릭 핸들러를 실행
+    }, 200);
   };
 
   const handleDoubleClick = (e) => {
     e.preventDefault();
-    clearTimeout(singleClickTimer); // 단일 클릭의 타이머를 제거하여 단일 클릭 핸들러를 실행하지 않습니다.
+    clearTimeout(singleClickTimer);
 
     if (isDoubleClick) {
       setReadOnlyState(false);
 
-      // 입력 필드의 커서 위치를 끝으로 이동
       const inputElement = e.target;
       const endOfInput = inputElement.value.length;
-
       inputElement.selectionStart = endOfInput;
       inputElement.selectionEnd = endOfInput;
     }
-    console.log("input : 더블클릭이벤트");
+  };
+
+  const handleInputChange = (e) => {
+    let newValue = e.target.value;
+
+    if (onChange) {
+      e.target.value = newValue;
+      onChange(e);
+    }
   };
 
   return (
@@ -114,7 +108,9 @@ function Input({
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       onDoubleClick={handleDoubleClick}
+      onChange={handleInputChange}
     />
   );
 }
+
 export default React.memo(Input);

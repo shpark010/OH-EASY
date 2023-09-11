@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTable } from "react-table";
 import styled from "styled-components";
-import Input from "../Contents/Input";
+import add from "../../images/icon/ico-person-add.png";
 
 const StyledTd = styled.td`
   width: ${(props) => props.width || "auto"};
@@ -14,26 +14,54 @@ const StyledTr = styled.tr`
     background-color: var(--color-secondary-blue);
   }
 `;
-const StyledScrollableTbody = styled.div`
-  max-height: 600px;
-  overflow-y: auto; // 세로 방향 스크롤 활성화
+
+const StyledTh = styled.th`
+  width: ${(props) => props.width || "auto"};
+  padding: 0;
+`;
+const StyledInsertTh = styled.th`
+  width: ${(props) => props.width || "auto"};
+  padding: 0;
+  background-color: var(--color-opacity-blue) !important;
+
+  &:hover {
+    /* background-color: none; */
+  }
+`;
+
+const StyledBtn = styled.button`
+  border: none;
+  background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  /* border: 2px solid var(--color-primary-gray); */
+  padding: 6px 10px;
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    &:before {
+      display: flex;
+      content: "\\e145";
+      margin-right: 3px;
+      font-size: 14px;
+      font-family: Material Icons;
+    }
+  }
 `;
 
 function Table(props) {
   const [inputValues, setInputValues] = useState({});
+  //const [showInsertRow, setShowInsertRow] = useState(false);
 
   const handleChange = (columnId, value) => {
     setInputValues((prev) => ({ ...prev, [columnId]: value }));
   };
 
-  const handleInputChange = (e) => {
-    props.setPrice(e.target.value);
-  };
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
 
-  // width px , % 구분 하는 함수
   const getWidthStyle = (widthValue) => {
     if (typeof widthValue === "number") return `${widthValue}px`;
     if (typeof widthValue === "string" && widthValue.includes("%"))
@@ -54,35 +82,53 @@ function Table(props) {
               className="hrHeaderStyle"
             >
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+                <StyledTh {...column.getHeaderProps()} width={column.width}>
+                  {column.render("Header")}
+                </StyledTh>
               ))}
             </StyledTr>
           ))}
-        </thead>
-        {props.showInsertRow && (
           <StyledTr>
-            {props.columns.map((column) =>
-              column.id !== "checkbox" ? (
-                <td
-                  key={column.id}
-                  style={{ width: getWidthStyle(column.width) }}
-                >
-                  <Input
-                    value={inputValues[column.id] || ""}
-                    onChange={(e) => handleChange(column.id, e.target.value)}
-                    isDoubleClick={true}
-                    className={"doubleLine"}
-                  />
-                </td>
-              ) : (
-                <td key="check" width={props.checkboxWidth}>
-                  <input type="checkbox" />
-                </td>
-              ),
-            )}
+            <StyledInsertTh
+              colSpan={props.columns.length}
+              onClick={() => props.setShowInsertRow((prevState) => !prevState)}
+            >
+              <StyledBtn>
+                <span>추가하기</span>
+              </StyledBtn>
+            </StyledInsertTh>
           </StyledTr>
-        )}
+        </thead>
+
         <tbody {...getTableBodyProps()}>
+          {props.showInsertRow && (
+            <StyledTr>
+              {props.columns.map((column) => {
+                // 기본 Input 컴포넌트 렌더링 로직.
+                if (column.id !== "checkbox") {
+                  // Cell 로직 재사용
+                  const CellContent = column.Cell;
+                  return (
+                    <StyledTd
+                      key={column.id}
+                      style={{ width: getWidthStyle(column.width) }}
+                    >
+                      <CellContent
+                        cell={{ value: null }}
+                        row={{ original: null }}
+                      />
+                    </StyledTd>
+                  );
+                } else {
+                  return (
+                    <StyledTd key="check" width={props.checkboxWidth}>
+                      <input type="checkbox" />
+                    </StyledTd>
+                  );
+                }
+              })}
+            </StyledTr>
+          )}
           {rows.map((row) => {
             prepareRow(row);
             return (

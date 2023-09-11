@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useLoading } from "../../containers/LoadingContext";
 
 const useApiRequest = () => {
+  const { setLoading } = useLoading();
   // React Router의 navigate 함수를 사용하여 페이지 이동을 수행
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ const useApiRequest = () => {
 
   // API 요청을 수행하는 함수
   const apiRequest = async (props) => {
+    setLoading(true);
     const { method, url, data } = props;
 
     // "loginInfo"라는 이름의 쿠키 값
@@ -57,6 +60,7 @@ const useApiRequest = () => {
         headers,
         data: JSON.stringify(data),
       });
+      setLoading(false);
       return response.data;
     } catch (error) {
       // API 요청 중 오류가 발생한 경우 콘솔에 오류를 기록하고, 사용자를 로그인 페이지로 리디렉션
