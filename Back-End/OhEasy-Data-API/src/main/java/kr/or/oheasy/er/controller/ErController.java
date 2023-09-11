@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/er")
+@RequestMapping("/api2/er")
 public class ErController {
 
     @Autowired
@@ -32,8 +32,8 @@ public class ErController {
         }
     }
 
-    @PatchMapping("/{cdEmp}")
-    public ResponseEntity<Integer> patchEmp(@PathVariable("cdEmp") String cdEmp,
+    @PatchMapping("/patchEmpData")
+    public ResponseEntity<Integer> patchEmp(@RequestParam("cdEmp") String cdEmp,
                                             @RequestBody HrEmpMstVO hrEmpMstVO) {
         try {
             if (erService.isCdEmpValid(cdEmp)) {
@@ -55,11 +55,17 @@ public class ErController {
     @GetMapping("/getAllEmpList")
     public ResponseEntity<?> getAllEmpList() {
         List<HrEmpMstVO> result = erService.getAllEmpList();
+
+        System.out.println("getAllEmpList 메서드진입");
+        System.out.println(result);
+
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/{cdEmp}")
-    public ResponseEntity<?> getCdEmp(@PathVariable("cdEmp") String cdEmp) {
+    @GetMapping("/getEmpData")
+    public ResponseEntity<?> getCdEmp(@RequestParam("cdEmp") String cdEmp) {
+        System.out.println("사원코드 한명 가져오기 ***********************************");
+        System.out.println(cdEmp);
         HrEmpMstVO result = erService.getCdEmp(cdEmp);
 
         if (result == null) {
@@ -69,11 +75,13 @@ public class ErController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{cdEmp}")
-    public ResponseEntity<Integer> deleteEmp(@PathVariable("cdEmp") String cdEmp) {
+
+    @DeleteMapping("/deleteEmpData")
+    public ResponseEntity<Integer> deleteEmp(@RequestParam("cdEmp") String cdEmp) {
         try {
             int result = erService.deleteEmp(cdEmp);
-
+            System.out.println("사원코드 deleteEmpData ******************************");
+            System.out.println(cdEmp);
             if (result > 0) {
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } else {
