@@ -92,6 +92,29 @@ function Input({
   const handleInputChange = (e) => {
     let newValue = e.target.value;
 
+    if (type === "price") {
+      // 쉼표(,) 제거 후 숫자만 남김
+      newValue = newValue.replace(/,/g, "");
+      // 숫자만 허용
+      newValue = newValue.replace(/[^0-9]/g, "");
+      // 3자리마다 쉼표 추가
+      newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      // newValue = Number(newValue).toLocaleString("ko-KR");
+    } else if (type === "resident") {
+      // 숫자만 허용
+      newValue = newValue.replace(/[^0-9]/g, "");
+
+      // 6자리 이상 입력 후 '-' 추가
+      if (newValue.length > 6) {
+        newValue = newValue.substring(0, 6) + "-" + newValue.substring(6);
+      }
+
+      // 13자리 이상 입력 방지
+      if (newValue.length > 13) {
+        newValue = newValue.substring(0, 13);
+      }
+    }
+
     if (onChange) {
       e.target.value = newValue;
       onChange(e);
