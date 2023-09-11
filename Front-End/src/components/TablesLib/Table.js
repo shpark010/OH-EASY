@@ -88,16 +88,20 @@ function Table(props) {
               ))}
             </StyledTr>
           ))}
-          <StyledTr>
-            <StyledInsertTh
-              colSpan={props.columns.length}
-              onClick={() => props.setShowInsertRow((prevState) => !prevState)}
-            >
-              <StyledBtn>
-                <span>추가하기</span>
-              </StyledBtn>
-            </StyledInsertTh>
-          </StyledTr>
+          {props.insertRow && (
+            <StyledTr>
+              <StyledInsertTh
+                colSpan={props.columns.length}
+                onClick={() =>
+                  props.setShowInsertRow((prevState) => !prevState)
+                }
+              >
+                <StyledBtn>
+                  <span>추가하기</span>
+                </StyledBtn>
+              </StyledInsertTh>
+            </StyledTr>
+          )}
         </thead>
 
         <tbody {...getTableBodyProps()}>

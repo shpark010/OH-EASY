@@ -216,8 +216,9 @@ function HRManagement() {
               <Table
                 columns={columns}
                 data={data}
-                showInsertRow={showInsertRow}
-                setShowInsertRow={setShowInsertRow}
+                //insertRow={false}
+                //showInsertRow={showInsertRow}
+                //setShowInsertRow={setShowInsertRow}
               />
             </div>
             <div className="totalBox">

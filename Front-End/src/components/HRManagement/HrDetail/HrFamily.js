@@ -552,6 +552,7 @@ const HrFamily = ({ cdEmp }) => {
     <Table
       data={data}
       columns={columns}
+      insertRow={true}
       showInsertRow={showInsertRow}
       setShowInsertRow={setShowInsertRow}
     />
