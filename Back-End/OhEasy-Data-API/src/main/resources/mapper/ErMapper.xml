@@ -3,7 +3,7 @@
 
 <mapper namespace="kr.or.oheasy.er.dao.ErDao">
 
-    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+<!--    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
         INSERT INTO hr_emp_mst (CD_EMP, NM_EMP, FG_FOREIGN, NO_RESIDENT, DT_HIRE
         <if test="noPositionUnique != null">
             , NO_POSITION_UNIQUE
@@ -20,6 +20,10 @@
             , #{noDepartment}
         </if>
         )
+    </insert>-->
+
+    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+        INSERT INTO hr_emp_mst (CD_EMP) VALUES (#{cdEmp})
     </insert>
 
     <update id="patchEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
