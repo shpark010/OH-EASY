@@ -8,16 +8,16 @@ import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
 import DaumPostcode from 'react-daum-postcode';
+import SearchSubmitButton from '../SearchBar/SearchSubmitButton';
 
 
 
 
 
-const WorkContractCreate = () => {
+const WorkContractCreate = ({empList}) => {
 
   const [employeeData, setEmployeeData] = useState([]);
   const [openPostcode, setOpenPostcode] = useState(false);
-  const [empList, setEmpList] = useState([]);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
 
@@ -57,7 +57,6 @@ const WorkContractCreate = () => {
         checkbox: false,
         code: emp.cdEmp,
         employee: emp.nmEmp,
-        foreign: emp.fgForeign,
         resident: emp.noResident,
       })),
     [empList]
@@ -173,6 +172,14 @@ const WorkContractCreate = () => {
     ],
     []
   );
+  
+  const onBlur = () => {
+    
+
+    
+  }
+
+
 
 
     return (
@@ -180,18 +187,16 @@ const WorkContractCreate = () => {
         <div className="searchBar">
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
-              <div className="searchBarBox">
-                <span className="searchBarName">작성일자</span>
-              </div>
-              <CustomCalendar width="130" id="selectCreDateStart" />
-             
-             
-              <span className="searchBarName">정렬</span>
               
-              <div className="searchBrBox">
+              <div className="searchBarName">작성년도</div>
+              <CustomCalendar width={130}/>
+              
+             
                 
 
                 <SearchBarBox
+                  label="정렬"
+                  id="wc-order"
                       options={[
                         { value: '1', label: '사원코드 순' },
                         { value: '2', label: '사원이름 순' },
@@ -201,10 +206,10 @@ const WorkContractCreate = () => {
                       
                     />
 
-              </div>
+             
             </div>
             <div className="btnWrapper">
-              <button className="gray">조회</button>
+            <SearchSubmitButton text="조회" />
             </div>
           </div>
         </div>
@@ -225,7 +230,7 @@ const WorkContractCreate = () => {
               <table className="wc-bottom-table">
                 <tr>
                   <th>조회된 사원</th>
-                  <th>{}명</th>
+                  <th>{data.length}명</th>
                 </tr>
               </table>
             </div>
@@ -261,15 +266,15 @@ const WorkContractCreate = () => {
                 </tr>
                 <tr>
                   <th className="wc-right-first-table-left-td">상세주소  </th>
-                  <td className="wcRightFirstTableRightTdFirst1" colSpan="5">
-                    <CustomInput width={605} />
+                  <td className="wcRightFirstTableRightTdFirst1" colSpan="2">
+                    <CustomInput width={605} onBlur = {onBlur} />
                   </td>
                 </tr>
                 <tr>
                   <td className="wc-right-first-table-left-td">업무의 내용 </td>
 
-                  <td className="wcRightFirstTableRightTdFirst1">
-                    <CustomInput></CustomInput>
+                  <td className="wcRightFirstTableRightTdFirst1" colSpan="2">
+                    <CustomInput width="605"/>
                   </td>
                 </tr>
                 <tr>
@@ -340,7 +345,8 @@ const WorkContractCreate = () => {
                     />
                   </td>
                   <td className="wc-right-first-table-right-td">
-                    <CustomInput></CustomInput>
+                    <CustomInput width={100} /> 
+                    <b>원</b>
                   </td>
                 </tr>
                 <tr>
@@ -357,7 +363,8 @@ const WorkContractCreate = () => {
                     />
                   </td>
                   <td className="wc-right-first-table-right-td">
-                    <CustomInput></CustomInput>
+                    <CustomInput width={40}/>
+                    <b>일</b>
                   </td>
                 </tr>
                 <tr>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.wc.dao.WcDao">
+
+<!-- 전사원의 정보 -->
+<select id="getAllEmpList" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+	SELECT cd_emp,nm_emp,no_resident FROM hr_emp_mst
+	WHERE fg_workcontract = #{tabState}
+</select>
+
+  
+
+
+
+</mapper>
+
+
+
+

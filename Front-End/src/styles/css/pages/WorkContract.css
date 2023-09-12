@@ -115,10 +115,21 @@
     padding-left: 8px;
   }
 
+  .wc-right-first-table-right-td b{
+    padding-left: 4px;
+    font-size: 14px;
+  }
+
+  
+
 
   .wcRightFirstTableRightTdFirst1 {
     width: 200px;
     padding-left: 5px;
+    
+  }
+  .wcRightFirstTableRightTdFirst1 Input[readonly]{
+    background-color: #a9d0f5;
   }
   /*오른쪽 첫번째 td태그*/
 
@@ -237,3 +248,6 @@
     overflow-y: auto;
   }
   
+  .customInput[readonly]{
+    background-color: gray;
+  }
