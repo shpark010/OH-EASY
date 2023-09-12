@@ -10,12 +10,11 @@ import PageHeaderTextButton from "../components/PageHeader/PageHeaderTextButton"
 import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton";
 import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import CustomCalendar from "../components/Contents/CustomCalendar";
-import CustomPriceInput from "../components/Contents/CustomPriceInput";
 import Table from "../components/TablesLib/Table";
 import Input from "../components/Contents/Input";
 import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
-import { useEffect } from "react";
+import { click } from "@testing-library/user-event/dist/click";
 
 const TableTest = (props) => {
   // const [editing, setEditing] = useState(false);
@@ -38,17 +37,9 @@ const TableTest = (props) => {
     setSearchOrder(newValue);
     console.log("정렬기준 : " + searchOrder);
   };
-  const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-  const handleInsert = (value) => {
-    //더블 클릭시 사원이 선택 되어야 정보 수정 가능할 수 있게 로직 작성
-    if (
-      clickEmpCode !== null &&
-      clickEmpCode !== undefined &&
-      clickEmpCode.trim() !== ""
-    ) {
-    }
-  };
+  const [clickEmpCode, setClickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
+  console.log("랜더링 : " + clickEmpCode);
   const [taxAmount, setTaxAmount] = useState({
     nationalPension: "", //국민연금
     healthInsurance: "", //건강보험
@@ -57,13 +48,7 @@ const TableTest = (props) => {
     incomeTax: "", //소득세
     localIncomeTax: "", //지방소득세
   }); //단일 세금 금액
-  const [totalTaxAmount, setTotalTaxAmount] = useState(); //총 세금 금액
-  const [nationalPension, setNationalPension] = useState(); //국민연금
-  const [healthInsurance, setHealthInsurance] = useState(); //건강보험
-  const [employmentInsurance, setEmploymentInsurance] = useState(); //고용보험
-  const [longtermNursingInsurance, setLongtermNursingInsurance] = useState(); //장기요양보험
-  const [incomeTax, setIncomeTax] = useState(); //소득세
-  const [localIncomeTax, setLocalIncomeTax] = useState(); //지방소득세
+
   const [empDetailInfo, setEmpDetailInfo] = useState({
     hireDate: "", //입사일
     gender: "", //성별
@@ -86,15 +71,6 @@ const TableTest = (props) => {
   const handlePriceChange = (value) => {
     setPay(value);
   };
-
-  // const handleDoubleClick = () => {
-  //   setEditing(true);
-  //   console.log("더블클릭이벤트 발생");
-  // };
-
-  // const handleInputBlur = () => {
-  //   setEditing(false);
-  // };
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -147,13 +123,17 @@ const TableTest = (props) => {
   };
 
   //기본급 입력 후 이벤트(insert)
-  const handleInsertData = async () => {
+  const handleInsertData = async (pay) => {
     try {
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/sd/setEmpPay",
+        data: {
+          code: clickEmpCode,
+          pay: pay,
+        },
       });
-      setEmpList(responseData);
+      setTaxAmount(responseData);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -210,11 +190,10 @@ const TableTest = (props) => {
           };
 
           const handleInputClick = (e) => {
-            console.log("hr : 클릭이벤");
-            console.log(original.code);
-            setclickEmpCode(original.code);
+            setClickEmpCode(original.code);
             handleGetEmpDetailData(original.code);
           };
+
           return (
             <Input
               value={inputValue}
@@ -238,8 +217,9 @@ const TableTest = (props) => {
           const handleInputClick = (e) => {
             console.log("hr : 클릭이벤");
             console.log(original.code);
-            setclickEmpCode(original.code);
             handleGetEmpDetailData(original.code);
+            setClickEmpCode(original.code);
+            console.log(clickEmpCode);
           };
 
           return (
@@ -256,7 +236,7 @@ const TableTest = (props) => {
         accessor: "position",
         id: "position",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
+          const [inputValue, setInputValue] = useState(value);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
@@ -265,7 +245,7 @@ const TableTest = (props) => {
           const handleInputClick = (e) => {
             console.log("hr : 클릭이벤");
             console.log(original.code);
-            setclickEmpCode(original.code);
+            setClickEmpCode(original.code);
             handleGetEmpDetailData(original.code);
           };
           return (
@@ -305,8 +285,10 @@ const TableTest = (props) => {
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-          const handlePay = (newPay) => {
-            setPay();
+          const insertPayAmount = (e) => {
+            const insertPay = e.target.value;
+            handleInsertData(insertPay);
+            console.log("insert : " + clickEmpCode);
           };
           return (
             <Input
@@ -315,7 +297,8 @@ const TableTest = (props) => {
               value={inputValue}
               width={100}
               onChange={handleInputChange}
-              // onBlur={handleInputBlur}
+              onBlur={insertPayAmount}
+              onEnterPress={insertPayAmount}
               className={"doubleLine"}
               type="price"
             />
