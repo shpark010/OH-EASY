@@ -20,7 +20,7 @@ function HRManagement() {
 
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
-  const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
+  const [clickEmpCode, setclickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
 
   const [oneEmpData, setOneEmpData] = useState([]);
@@ -246,7 +246,7 @@ function HRManagement() {
           {/* 컨텐츠 영역 */}
           <div className="contentsArea">
             <HrBasic cdEmp={clickEmpCode} />
-            <div className="hrInfoDetailWrap">
+            <div className="hrInfoDetailWrap borderbuttonBoldBlack">
               <ul className="pageTab">
                 {tabs.map((tab) => (
                   <li

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import CustomButton from "../../Contents/CustomButton";
 import CustomInput from "../../Contents/CustomInput";
+import Input from "../../Contents/Input";
 import CustomCalender from "../../Contents/CustomCalendar";
 import CustomRadio from "../../Contents/CustomRadio";
 import useApiRequest from "../../Services/ApiRequest";
@@ -34,7 +35,10 @@ const HrBasic = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [empBasicData, setEmpBasicData] = useState({ ...defaultEmpBasicData });
 
-  const handleInputChange = async (e) => {
+  const handleInputBlur = async (e) => {
+    if (cdEmp === undefined) {
+      return;
+    }
     const { name, value } = e.target;
     console.log(name);
     console.log(value);
@@ -52,19 +56,31 @@ const HrBasic = ({ cdEmp }) => {
     }));
   };
 
-  const handleUpdateEmpBasicData = async (cdEmp, columnName, inputValue) => {
+  const handleDateChange = async (value, name) => {
+    if (cdEmp === undefined) {
+      return;
+    }
+    value = value.replace(/-/g, "");
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/updateBasicEmpdata?cdEmp=${cdEmp}&${columnName}=${inputValue}`,
-      });
-      setEmpBasicData({
-        ...defaultEmpBasicData,
-        ...responseData,
+        url: `/api2/hr/updateBasicEmpdata?cdEmp=${cdEmp}&${name}=${value}`,
       });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
+    setEmpBasicData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEmpBasicData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const extractBirthDate = (noResident) => {
@@ -73,7 +89,19 @@ const HrBasic = ({ cdEmp }) => {
     const year = noResident.slice(0, 2);
     const month = noResident.slice(2, 4);
     const day = noResident.slice(4, 6);
-    const century = noResident[7] < "3" ? "19" : "20"; // 1,2는 1900년대, 3,4는 2000년대를 의미
+
+    const genderIndicator = noResident[7];
+    let century;
+
+    if (genderIndicator === "1" || genderIndicator === "2") {
+      century = "19";
+    } else if (genderIndicator === "3" || genderIndicator === "4") {
+      century = "20";
+    } else {
+      // 성별 구분자가 올바르지 않은 경우 기본값을 설정하거나 에러를 던질 수 있습니다.
+      century = ""; // 기본값으로 설정
+      // throw new Error("Invalid resident number");  // 에러를 던지는 방법
+    }
 
     return `${century}${year}-${month}-${day}`;
   };
@@ -136,9 +164,12 @@ const HrBasic = ({ cdEmp }) => {
               <td>
                 <CustomInput
                   value={empBasicData.nmEngEmp}
-                  onChange={handleInputChange}
                   width={322}
-                  className="hrInfoBaseInput"
+                  name={"nmEngEmp"}
+                  onBlur={handleInputBlur}
+                  onChange={handleInputChange}
+                  // backgroundColor={"gray"}
+                  // readOnly={true}
                 />
               </td>
             </tr>
@@ -146,18 +177,21 @@ const HrBasic = ({ cdEmp }) => {
               <th>주민등록번호</th>
               <td>
                 <CustomInput
-                  value={empBasicData.noResident}
-                  onChange={handleInputChange}
+                  type="resident"
                   width={322}
-                  className="hrInfoBaseInput"
+                  name={"noResident"}
+                  value={empBasicData.noResident}
+                  onblur={handleInputBlur}
+                  onChange={handleInputChange}
                 />
               </td>
             </tr>
             <tr>
               <th>생년월일</th>
               <td>
-                <CustomCalender
+                <CustomInput
                   className="hrInfoBaseInput"
+                  width={322}
                   value={extractBirthDate(empBasicData.noResident)}
                 />
               </td>
@@ -167,19 +201,26 @@ const HrBasic = ({ cdEmp }) => {
               <td>
                 <CustomInput
                   width={322}
-                  onChange={handleInputChange}
-                  className="hrInfoBaseInput"
+                  name={"noDepartment"}
                   value={empBasicData.noDepartment}
+                  onblur={handleInputBlur}
+                  onChange={handleInputChange}
                 />
               </td>
             </tr>
             <tr>
-              <th>직무</th>
+              <th>재직구분</th>
               <td>
-                <CustomInput
-                  width={322}
-                  className="hrInfoBaseInput"
-                  onChange={handleInputChange}
+                <CustomRadio
+                  name="fgEmp"
+                  classNameBox="hrInfoBaseBox"
+                  classNameRadio="classNameRadio"
+                  options={[
+                    ["재직", "0"],
+                    ["퇴사", "1"],
+                  ]}
+                  value={empBasicData.fgEmp}
+                  onChange={handleInputBlur}
                 />
               </td>
             </tr>
@@ -189,6 +230,8 @@ const HrBasic = ({ cdEmp }) => {
                 <CustomCalender
                   className="hrInfoBaseInput"
                   value={empBasicData.dtHire}
+                  name="dtHire"
+                  onChange={(e) => handleDateChange(e, "dtHire")}
                 />
               </td>
             </tr>
@@ -200,7 +243,7 @@ const HrBasic = ({ cdEmp }) => {
                 <CustomInput
                   value={empBasicData.nmHanjaEmp}
                   width={322}
-                  className="hrInfoBaseInput"
+                  onblur={handleInputBlur}
                   onChange={handleInputChange}
                 />
               </td>
@@ -217,7 +260,7 @@ const HrBasic = ({ cdEmp }) => {
                     ["여", "1"],
                   ]}
                   value={empBasicData.fgGender}
-                  onChange={handleInputChange}
+                  onChange={handleInputBlur}
                 />
               </td>
             </tr>
@@ -233,7 +276,7 @@ const HrBasic = ({ cdEmp }) => {
                     ["기혼", "1"],
                   ]}
                   value={empBasicData.fgMarriage}
-                  onChange={handleInputChange} // 추가된 부분
+                  onChange={handleInputBlur}
                 />
               </td>
             </tr>
@@ -242,8 +285,9 @@ const HrBasic = ({ cdEmp }) => {
               <td>
                 <CustomInput
                   width={322}
-                  className="hrInfoBaseInput"
-                  onChange={handleInputChange}
+                  name={"noPositionUnique"}
+                  value={empBasicData.noPositionUnique}
+                  onblur={handleInputChange}
                 />
               </td>
             </tr>
@@ -259,14 +303,19 @@ const HrBasic = ({ cdEmp }) => {
                     ["미작성", "0"],
                   ]}
                   value={empBasicData.fgWorkcontract}
-                  onChange={handleInputChange} // 추가된 부분
+                  onChange={handleInputBlur}
                 />
               </td>
             </tr>
             <tr>
               <th>퇴사년연월일</th>
               <td>
-                <CustomCalender className="hrInfoBaseInput" />
+                <CustomCalender
+                  className="hrInfoBaseInput"
+                  name="dtResign"
+                  value={empBasicData.dtResign}
+                  onChange={(e) => handleDateChange(e, "dtResign")}
+                />
               </td>
             </tr>
           </tbody>
