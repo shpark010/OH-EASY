@@ -25,17 +25,7 @@ const HrFamily = ({ cdEmp }) => {
     if (cdEmp === undefined) {
       return;
     }
-    const handleSendEmpCodeGetFamilyData = async (cdEmp) => {
-      try {
-        const responseData = await apiRequest({
-          method: "GET",
-          url: `/api2/hr/getFamilyDataList?cdEmp=${cdEmp}`,
-        });
-        setfamilyList(Array.isArray(responseData) ? responseData : []); // 배열 확인
-      } catch (error) {
-        console.error("api 요청 실패:", error);
-      }
-    };
+
     setShowInsertRow(false);
     handleSendEmpCodeGetFamilyData(cdEmp); // 함수 호출시 인자로 empCode 전달
     setfamilyEmpCode(cdEmp);
@@ -67,6 +57,7 @@ const HrFamily = ({ cdEmp }) => {
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
+    //handleSendEmpCodeGetFamilyData(cdEmp);
   };
   const handleSendEmpCodeInsertFamilyData = async (
     cdEmp,
@@ -123,6 +114,7 @@ const HrFamily = ({ cdEmp }) => {
                 "fgYearEndTax",
                 e.target.value,
               );
+              console.log("수정요청");
               handleSendEmpCodeGetFamilyData(cdEmp);
               setInputValue(e.target.value);
             } else {
@@ -132,18 +124,19 @@ const HrFamily = ({ cdEmp }) => {
                 "fgYearEndTax",
                 e.target.value,
               );
+              console.log("수정요청");
               setInputValue(e.target.value);
             }
           };
-
           return (
             <CustomSelect
               className={"hrDetailSelect"}
               options={[
-                { value: 0, label: "본인" },
-                { value: 1, label: "배우자" },
-                { value: 2, label: "자녀" },
+                { value: "0", label: "본인" },
+                { value: "1", label: "배우자" },
+                { value: "2", label: "자녀" },
               ]}
+              placeholder="선택"
               value={inputValue}
               onChange={handleInputChange}
             />
@@ -228,6 +221,7 @@ const HrFamily = ({ cdEmp }) => {
               value={inputValue}
               onChange={handleInputChange}
               isDoubleClick={true}
+              type="resident"
               className={"doubleLine"}
               onBlur={handleInputOnBlur}
             />
@@ -260,6 +254,7 @@ const HrFamily = ({ cdEmp }) => {
                 { value: 2, label: "자녀" },
               ]}
               value={inputValue}
+              placeholder="선택"
               onChange={handleInputChange}
             />
           );
@@ -292,6 +287,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: 4, label: "3년제" },
                 { value: 5, label: "4년제" },
               ]}
+              value={inputValue}
+              placeholder="선택"
               onChange={handleInputChange}
             />
           );
@@ -322,6 +319,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "1", label: "중퇴" },
                 { value: "2", label: "휴학" },
               ]}
+              placeholder="선택"
+              value={inputValue}
               onChange={handleInputChange}
             />
           );
@@ -351,6 +350,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "0", label: "여" },
                 { value: "1", label: "부" },
               ]}
+              placeholder="선택"
+              value={inputValue}
               onChange={handleInputChange}
             />
           );
@@ -379,6 +380,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "0", label: "양" },
                 { value: "1", label: "음" },
               ]}
+              placeholder="선택"
+              value={inputValue}
               onChange={handleInputChange}
             />
           );
@@ -420,7 +423,7 @@ const HrFamily = ({ cdEmp }) => {
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
-              handleInputOnBlur={handleInputOnBlur}
+              onBlur={handleInputOnBlur}
             />
           );
         },

@@ -71,10 +71,18 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar({ width, id, className, onChange, type, name }) {
+function CustomCalendar({ width, id, className, onChange, type, name, value }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
+
+  // if (
+  //   value &&
+  //   typeof value === "string" &&
+  //   !moment(value, "YYYYMMDD").isValid()
+  // ) {
+  //   console.error("Invalid value prop passed to CustomCalendar:", value);
+  // }
 
   useEffect(() => {
     function handleOutsideClick(event) {
@@ -89,42 +97,39 @@ function CustomCalendar({ width, id, className, onChange, type, name }) {
     };
   }, []);
 
+  function convertDBDateToMoment(dateStr) {
+    if (!dateStr || !moment(dateStr, "YYYYMMDD").isValid()) {
+      //console.error("Invalid date conversion:", dateStr);
+      return "";
+    }
+    return moment(dateStr, "YYYYMMDD").format("YYYY-MM-DD");
+  }
+
   const handleDateChange = (newDate) => {
     setDate(formatDate(newDate));
     setIsOpen(false);
     onChange(formatDate(newDate));
-    console.log("새로 선택한 날짜 : " + formatDate(newDate));
 
-    // 일반 달력에서 날짜를 선택한 경우, onChange 콜백 호출
-    if (type !== "month" && onChange) {
-    }
+    console.log("새로 선택한 날짜 : " + formatDate(newDate));
   };
 
   const handleMonthChange = (newDate) => {
-    // 이 함수는 월 선택 달력에서 월을 선택했을 때 호출됩니다.
-    // 선택한 월을 date 상태에 반영합니다.
-    console.log("선택한 월 : " + newDate);
-
-    // 월 선택 달력에서 선택한 월을 추출합니다.
     const selectedMonth = moment(newDate).format("YYYY-MM");
-
-    console.log("저장될 월 : " + selectedMonth); // 선택된 월 출력
+    console.log("선택한 월 : " + newDate);
+    console.log("저장될 월 : " + selectedMonth);
 
     setDate(newDate);
     onChange(selectedMonth);
-
-    // 월 선택 달력에서 월을 선택한 경우, onChange 콜백 호출
-    if (type === "month" && onChange) {
-    }
-
-    setIsOpen(false); // 월 선택 후, 달력을 닫습니다.
+    setIsOpen(false);
   };
 
   const formatDate = (date) => {
-    return date
+    const formattedDate =
+      typeof date === "string" ? convertDBDateToMoment(date) : date;
+    return formattedDate
       ? type === "month"
-        ? moment(date).format("YYYY-MM")
-        : moment(date).format("YYYY-MM-DD")
+        ? moment(formattedDate).format("YYYY-MM")
+        : moment(formattedDate).format("YYYY-MM-DD")
       : "";
   };
 
@@ -133,7 +138,7 @@ function CustomCalendar({ width, id, className, onChange, type, name }) {
       <Input
         id={id}
         className={className}
-        value={formatDate(date)}
+        value={formatDate(value)}
         onClick={() => setIsOpen(!isOpen)}
         onChange={onChange}
         name={name}
@@ -146,7 +151,7 @@ function CustomCalendar({ width, id, className, onChange, type, name }) {
           locale="ko"
           formatDay={(locale, date) => moment(date).format("DD")}
           onChange={type === "month" ? handleMonthChange : handleDateChange}
-          value={date || new Date()}
+          value={formatDate(value) || new Date()}
           view={type === "month" ? "year" : "month"}
           onClickMonth={type === "month" ? handleMonthChange : undefined}
         />

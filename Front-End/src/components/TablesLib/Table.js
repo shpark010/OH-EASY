@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTable } from "react-table";
 import styled from "styled-components";
 import add from "../../images/icon/ico-person-add.png";
@@ -10,6 +10,11 @@ const StyledTd = styled.td`
 
 const StyledTr = styled.tr`
   box-sizing: border-box;
+  position: ${(props) => (props.isHeader ? "sticky" : "static")};
+  top: ${(props) =>
+    props.stickyTop ? props.stickyTop : "0"}px; // 동적 top 값 추가
+  z-index: 1;
+  background-color: white;
   &:hover {
     background-color: var(--color-secondary-blue);
   }
@@ -51,9 +56,26 @@ const StyledBtn = styled.button`
   }
 `;
 
+const StyledInsertFooter = styled.tfoot`
+  tr {
+    box-sizing: border-box;
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    z-index: 2;
+  }
+`;
+const TableContainer = styled.div`
+  height: 400px;
+  overflow-y: auto;
+  position: relative;
+  border-top: 2.5px solid var(--color-primary-black);
+`;
+
 function Table(props) {
   const [inputValues, setInputValues] = useState({});
   //const [showInsertRow, setShowInsertRow] = useState(false);
+  const tableContainerRef = useRef(null);
 
   const handleChange = (columnId, value) => {
     setInputValues((prev) => ({ ...prev, [columnId]: value }));
@@ -70,16 +92,14 @@ function Table(props) {
   };
 
   return (
-    <div className="">
-      <table
-        {...getTableProps()}
-        className="namePickerTable hrGridTable borderTopBold"
-      >
+    <TableContainer ref={tableContainerRef}>
+      <table {...getTableProps()} className="namePickerTable hrGridTable">
         <thead>
           {headerGroups.map((headerGroup) => (
             <StyledTr
               {...headerGroup.getHeaderGroupProps()}
               className="hrHeaderStyle"
+              isHeader // prop 추가하여 헤더임을 명시
             >
               {headerGroup.headers.map((column) => (
                 <StyledTh {...column.getHeaderProps()} width={column.width}>
@@ -88,48 +108,27 @@ function Table(props) {
               ))}
             </StyledTr>
           ))}
-          {props.insertRow && (
-            <StyledTr>
-              <StyledInsertTh
-                colSpan={props.columns.length}
-                onClick={() =>
-                  props.setShowInsertRow((prevState) => !prevState)
-                }
-              >
-                <StyledBtn>
-                  <span>추가하기</span>
-                </StyledBtn>
-              </StyledInsertTh>
-            </StyledTr>
-          )}
+          <StyledTr>
+            <StyledTh style={{ width: "15px", padding: "0" }} />
+          </StyledTr>
         </thead>
 
         <tbody {...getTableBodyProps()}>
           {props.showInsertRow && (
             <StyledTr>
               {props.columns.map((column) => {
-                // 기본 Input 컴포넌트 렌더링 로직.
-                if (column.id !== "checkbox") {
-                  // Cell 로직 재사용
-                  const CellContent = column.Cell;
-                  return (
-                    <StyledTd
-                      key={column.id}
-                      style={{ width: getWidthStyle(column.width) }}
-                    >
-                      <CellContent
-                        cell={{ value: null }}
-                        row={{ original: null }}
-                      />
-                    </StyledTd>
-                  );
-                } else {
-                  return (
-                    <StyledTd key="check" width={props.checkboxWidth}>
-                      <input type="checkbox" />
-                    </StyledTd>
-                  );
-                }
+                const CellContent = column.Cell;
+                return (
+                  <StyledTd
+                    key={column.id}
+                    style={{ width: getWidthStyle(column.width) }}
+                  >
+                    <CellContent
+                      cell={{ value: null }}
+                      row={{ original: null }}
+                    />
+                  </StyledTd>
+                );
               })}
             </StyledTr>
           )}
@@ -149,8 +148,29 @@ function Table(props) {
             );
           })}
         </tbody>
+
+        {/* 푸터 추가 */}
+        {props.insertRow && (
+          <StyledInsertFooter>
+            <StyledTr isHeader>
+              <StyledInsertTh
+                colSpan={props.columns.length}
+                onClick={() => {
+                  if (tableContainerRef.current) {
+                    tableContainerRef.current.scrollTop = 0; // 스크롤을 맨 위로 설정
+                  }
+                  props.setShowInsertRow((prevState) => !prevState);
+                }}
+              >
+                <StyledBtn>
+                  <span>추가하기</span>
+                </StyledBtn>
+              </StyledInsertTh>
+            </StyledTr>
+          </StyledInsertFooter>
+        )}
       </table>
-    </div>
+    </TableContainer>
   );
 }
 
