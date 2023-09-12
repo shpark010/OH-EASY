@@ -8,25 +8,34 @@ import CustomCalendar from '../components/Contents/CustomCalendar';
 import Input from '../components/Contents/Input';
 import WorkContractCreate from '../components/WorkContract/WorkContractCreate';
 import WorkContractSelect from '../components/WorkContract/WorkContractSelect';
+import useApiRequest from '../components/Services/ApiRequest';
+import PageHeaderName from '../components/PageHeader/PageHeaderName';
 
 const WorkContract = () => {
 
+  const apiRequest = useApiRequest();
+  const [tabState,setTab] = useState("0");
+  const [empList,setEmpList] = useState([]); //작성Tab state
+  const [wcEmpList,setWcEmpList] = useState([]); //조회Tab state
 
-  const [tabState,setTab] = useState("wcCreate");
 
   const tabClick = (tabState) =>{
     setTab(tabState)
+    console.log({tabState})
   };
 
   const tabComponent = () =>{
-    console.log(tabState)
 
     switch(tabState){
-      case "wcCreate" :
-        return (<WorkContractCreate />);
+      case "0" :
+        
+        return (<WorkContractCreate empList={empList} />);
+        // 계약서 작성 Tab Click
       
-      case "wcSelect" :
-        return <WorkContractSelect />;
+      case "1" :
+        
+        return <WorkContractSelect wcEmpList={wcEmpList}  />;
+        // 계약서 조회 Tab Click
 
       default : 
       return null;
@@ -35,11 +44,32 @@ const WorkContract = () => {
     
   };
 
-//   const tab = [
-//     { id: "wcCreate", label: "계약서 작성", component: WorkContractCreate },
-//     { id: "wcSelect", label: "계약서 조회", component: WorkContractSelect },
 
-// ]
+const getEmpList = async () => { 
+
+
+  
+  try {
+    const responseData = await apiRequest({
+      method: "GET",
+      url: `/api2/wc/getEmpList?tabState=${tabState}`,
+    });
+    if(tabState==="0"){
+      setEmpList(responseData);
+      
+    }
+    else if(tabState==="1"){
+      setWcEmpList(responseData);
+      
+    }
+    
+  } catch (error) {
+    console.error("Failed to fetch emp data:", error);
+  }
+
+
+};
+
 
     
     return (
@@ -48,10 +78,11 @@ const WorkContract = () => {
 
         <div className="pageHeader">
           <div className="innerBox fxSpace">
-            <h2 className="pageHeaderName">표준근로계약서</h2>
+          <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-              <PageHeaderTextButton text="사원 불러오기" onClick={" "} />
+              <PageHeaderTextButton text="사원 불러오기" 
+              onClick={getEmpList} />
                 <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
               </div>
               <div className="iconBtnWrap">
@@ -64,25 +95,16 @@ const WorkContract = () => {
     
          <div className='borderbuttonBold'>
           <button 
-          className={`wcTab1 ${tabState === "wcCreate" ? "on" : ""}`}
-          onClick={ () => tabClick("wcCreate")}> 계약서 작성</button>  
+          className={`wcTab1 ${tabState === "0" ? "on" : ""}`}
+          onClick={ () => tabClick("0")}> 계약서 작성
+          </button>  
 
           <button 
-          className={`wcTab2 ${tabState === "wcSelect" ? "on" : ""}`} 
-          onClick={ ()=>tabClick("wcSelect")} > 계약서 조회</button>
+          className={`wcTab2 ${tabState === "1" ? "on" : ""}`} 
+          onClick={ ()=>tabClick("1")} > 계약서 조회
+          </button>
         </div> 
         
-        {/* <ul className="pageTab">
-                {tab.map((tab) => (
-                  <li
-                    key={tab.id}
-                    className={tabState === tab.id ? "on" : ""}
-                    onClick={() => tabComponent(tab.id)}
-                  >
-                    {tab.label}
-                  </li>
-                ))}
-              </ul> */}
         
          <div>{tabComponent()}</div> 
         
