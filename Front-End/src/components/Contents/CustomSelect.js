@@ -20,7 +20,10 @@ function CustomSelect({
   defaultValue,
   width,
   onChange,
+  placeholder, // 추가한 props
 }) {
+  const showPlaceholder = value === ""; // value가 ""이면 true, 아니면 false
+
   return (
     <SelectContainer className={`searchBarBox ${className}`}>
       <StyledSelect
@@ -31,6 +34,11 @@ function CustomSelect({
         onChange={onChange}
         width={width}
       >
+        {placeholder && (
+          <option value="" disabled hidden={!showPlaceholder}>
+            {placeholder}
+          </option>
+        )}
         {options.map((option, index) => (
           <option key={index} value={option.value}>
             {option.label}
