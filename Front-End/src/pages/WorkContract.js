@@ -12,15 +12,16 @@ import WorkContractSelect from '../components/WorkContract/WorkContractSelect';
 const WorkContract = () => {
 
 
-  const [tab,setTab] = useState("wcCreate");
+  const [tabState,setTab] = useState("wcCreate");
 
   const tabClick = (tabState) =>{
     setTab(tabState)
   };
 
   const tabComponent = () =>{
+    console.log(tabState)
 
-    switch(tab){
+    switch(tabState){
       case "wcCreate" :
         return (<WorkContractCreate />);
       
@@ -33,6 +34,12 @@ const WorkContract = () => {
     }
     
   };
+
+//   const tab = [
+//     { id: "wcCreate", label: "계약서 작성", component: WorkContractCreate },
+//     { id: "wcSelect", label: "계약서 조회", component: WorkContractSelect },
+
+// ]
 
     
     return (
@@ -57,18 +64,27 @@ const WorkContract = () => {
     
          <div className='borderbuttonBold'>
           <button 
-          className={`wcTab1 ${tab === "wcCreate" ? "on" : ""}`}
+          className={`wcTab1 ${tabState === "wcCreate" ? "on" : ""}`}
           onClick={ () => tabClick("wcCreate")}> 계약서 작성</button>  
 
           <button 
-          className={`wcTab2 ${tab === "wcSelect" ? "on" : ""}`} 
+          className={`wcTab2 ${tabState === "wcSelect" ? "on" : ""}`} 
           onClick={ ()=>tabClick("wcSelect")} > 계약서 조회</button>
         </div> 
         
-      
-
-
-        <div>{tabComponent()}</div>
+        {/* <ul className="pageTab">
+                {tab.map((tab) => (
+                  <li
+                    key={tab.id}
+                    className={tabState === tab.id ? "on" : ""}
+                    onClick={() => tabComponent(tab.id)}
+                  >
+                    {tab.label}
+                  </li>
+                ))}
+              </ul> */}
+        
+         <div>{tabComponent()}</div> 
         
       </>
     );
