@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
+//급여자료입력 - 사원 리스트
 @Getter
 @Setter
 @NoArgsConstructor
