@@ -7,21 +7,50 @@ import CustomButton from '../../components/Contents/CustomButton';
 import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
+import DaumPostcode from 'react-daum-postcode';
 
 
 
 
 
-const WorkContractSelect = () => {
+const WorkContractCreate = () => {
 
   const [employeeData, setEmployeeData] = useState([]);
+  const [openPostcode, setOpenPostcode] = useState(false);
   const [empList, setEmpList] = useState([]);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
 
+  const addrButtonClick= () => {
+    setOpenPostcode(true);
+  };
+
+  const closeModal = () => {
+    setOpenPostcode(false);
+  }
+
+  const handleAddressSelect = (addr) => {
+    console.log(`
+        우편번호: ${addr.zonecode}
+        주소: ${addr.address}
+    `);
+    // // 주소와 우편번호 값을 가져온 데이터로 설정
+    // const address = data.address;
+    // const zipcode = data.zipcode;
   
-
-
+    // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
+    // setEmpList((prevEmpList) => [
+    //   ...prevEmpList,
+    //   {
+    //     // 이전 데이터 유지하고 주소와 우편번호 추가
+    //     address: address, // 주소 상태 값 사용
+    //     zipcode: zipcode, // 우편번호 상태 값 사용
+    //   },
+    // ]);
+    setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
+    setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
+    setOpenPostcode(false); // 모달 닫기
+  }
   const data = React.useMemo(
     () =>
       empList.map((emp) => ({
@@ -39,7 +68,17 @@ const WorkContractSelect = () => {
         Header: "✓",
         accessor: "checkbox",
         id: "checkbox",
-        Cell: ({ cell: { value } }) => <input type="checkbox" />,
+        Cell: ({ cell: { value } }) =>{ 
+          
+        return(
+          <>
+        
+        <input type="checkbox" />
+
+        </>
+        );
+      
+      },
       },
       {
         Header: "Code",
@@ -48,6 +87,7 @@ const WorkContractSelect = () => {
         width: "20%",
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value);
+          const [modalApper,setModalApper] = useState("off")
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
@@ -56,13 +96,38 @@ const WorkContractSelect = () => {
             console.log(e.target);
           };
 
+          /*Code input에서 mouse 올라오면 state 변경하는 함수 */
+          const mouseOverModalOn = ()=>{
+            setModalApper("on");
+          };
+
+          /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
+          const mouseOutModalOff = ()=>{
+            setModalApper("off");
+          };
+
+          /*Code input에 code 도우미 render 함수*/ 
+          const modalApperFunc = () =>{
+            if(modalApper === "on"){
+              return null;
+            }
+            else return null;
+
+          };
+
           return (
             <Input
               value={inputValue}
-              onClick={handleInputClick}
+              onClick={handleInputClick }
               onChange={handleInputChange}
+              onMouseOver={mouseOverModalOn}
+              onMouseOut= {mouseOutModalOff}
+              modalRender = {modalApperFunc}
+            
             />
+
           );
+
         },
       },
       {
@@ -108,9 +173,8 @@ const WorkContractSelect = () => {
     ],
     []
   );
-  
 
-    
+
     return (
       <>
         <div className="searchBar">
@@ -120,14 +184,25 @@ const WorkContractSelect = () => {
                 <span className="searchBarName">작성일자</span>
               </div>
               <CustomCalendar width="130" id="selectCreDateStart" />
-              <b>~</b>
+              <b>~
+              </b>
               <CustomCalendar width="130" id="selectCreDateEnd" />
+             
+              <span className="searchBarName">정렬</span>
+              
               <div className="searchBrBox">
-                <span className="searchBarName">정렬</span>
-                <select id="order" name="order" className="selectBox" defaultValue="0">
-                  <option value="1"> 사원코드순</option>
-                  <option value="2"> 사원이름순</option>
-                </select>
+                
+
+                <SearchBarBox
+                      options={[
+                        { value: '1', label: '사원코드 순' },
+                        { value: '2', label: '사원이름 순' },
+                       
+                      ]}
+                      defaultValue="1"
+                      
+                    />
+
               </div>
             </div>
             <div className="btnWrapper">
@@ -161,47 +236,47 @@ const WorkContractSelect = () => {
               <h1 className="wc-right-head">근로계약서</h1>
               <table className="wc-right-first-table">
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 근로계약기간 : </td>
-                  <td className="wc-right-first-table-right-td-first">
-                    <CustomCalendar width="179" id="startDate" />
+                  <td className="wc-right-first-table-left-td"> 근로계약기간  </td>
+                  <td className="wcRightFirstTableRightTdFirst1">
+                    <CustomCalendar width="179" id="startDate" /> 
                   </td>
                   <td className="wc-right-first-table-right-td">
                     <CustomCalendar width="179" id="endDate" />
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">근무장소 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">근무장소  </td>
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomInput />
                   </td>
                   <td className="wc-right-first-table-right-td wc-right-cell-td-size">
                     <CustomInput width={400} />
                   </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomButton
                       className="wc-right-cell-search-button"
                       text="주소검색"
                       color="black"
-                      
+                      onClick={addrButtonClick}
                     />
                   </td>
                 </tr>
                 <tr>
-                  <th className="wc-right-first-table-left-td">상세주소 : </th>
-                  <td className="wc-right-first-table-right-td-first" colSpan="5">
+                  <th className="wc-right-first-table-left-td">상세주소  </th>
+                  <td className="wcRightFirstTableRightTdFirst1" colSpan="5">
                     <CustomInput width={605} />
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">업무의 내용 :</td>
+                  <td className="wc-right-first-table-left-td">업무의 내용 </td>
 
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomInput></CustomInput>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">소정근로시간 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">소정근로시간 </td>
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomInput></CustomInput>
                   </td>
                   <td className="wc-right-first-table-right-td">
@@ -209,8 +284,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">휴게시간 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">휴게시간 </td>
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomInput></CustomInput>
                   </td>
                   <td className="wc-right-first-table-right-td">
@@ -218,8 +293,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">근무일 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">근무일  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: '1주에 1일' },
@@ -236,8 +311,8 @@ const WorkContractSelect = () => {
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">주휴일 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">주휴일 </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: '매주 월요일' },
@@ -254,8 +329,8 @@ const WorkContractSelect = () => {
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">임금유형 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">임금유형 </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 월급 ' },
@@ -263,6 +338,7 @@ const WorkContractSelect = () => {
                         { value: '3', label: ' 시급 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox2"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td">
@@ -270,8 +346,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">임금지급일 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">임금지급일 </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 매월 ' },
@@ -279,6 +355,7 @@ const WorkContractSelect = () => {
                         { value: '3', label: ' 매일 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox2"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td">
@@ -286,8 +363,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">지급방법 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">지급방법  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 예금통장에 입금 ' },
@@ -299,73 +376,78 @@ const WorkContractSelect = () => {
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 고용보험 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td"> 고용보험  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox3"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 산재보험 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td"> 산재보험  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox3"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 국민연금 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td"> 국민연금  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox3"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 건강보험 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td"> 건강보험  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
                       defaultValue="1"
+                      className="searchBarBox3"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 서명여부 : </td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td"> 서명여부  </td>
+                  <td className="wcRightFirstTableRightTdFirst2">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
                       defaultValue="2"
+                      className="searchBarBox3"
                     />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">작성일자 :</td>
-                  <td className="wc-right-first-table-right-td-first">
+                  <td className="wc-right-first-table-left-td">작성일자 </td>
+                  <td className="wcRightFirstTableRightTdFirst1">
                     <CustomCalendar className={'wcCreatedDateCalander'} width="170" id="createDate" />
                   </td>
                   <td className="wc-right-first-table-right-td"></td>
@@ -373,8 +455,25 @@ const WorkContractSelect = () => {
               </table>
             </div>
           </div>
+
+         {/* 모달 창 */}
+         {openPostcode && (
+          <div className="wcModal1" onClick={closeModal}>
+            <div className="wcModal2" onClick={(e) => e.stopPropagation()}>
+              <DaumPostcode 
+                style={{ height: "100%" }}
+                onComplete={handleAddressSelect}  
+                autoClose={false} 
+              />
+            </div>
+          </div>
+        )}
+
+
+
+
         </section>
       </>
     );
   }
-export default WorkContractSelect;
+export default WorkContractCreate;
