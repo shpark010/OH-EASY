@@ -11,6 +11,7 @@ function CustomModal({
 }) {
   const defaultOverlayStyle = {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: "10",
   };
 
   const defaultContentStyle = {
@@ -18,6 +19,7 @@ function CustomModal({
     width: "600px",
     height: "400px",
     margin: "auto",
+    zIndex: "20",
   };
   return (
     <Modal

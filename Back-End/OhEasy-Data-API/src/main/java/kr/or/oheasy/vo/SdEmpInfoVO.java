@@ -1,9 +1,11 @@
 package kr.or.oheasy.vo;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 //급여자료입력 - 사원 상세 정보
 @Data
+@NoArgsConstructor
 public class SdEmpInfoVO {
 	private String hireDate;			//입사일
 	private String gender;				//성별
@@ -18,4 +20,5 @@ public class SdEmpInfoVO {
 	private String military;			//병역구분
 	private String obstacle;			//장애구분
 	private String certificate;			//자격증수
+	
 }

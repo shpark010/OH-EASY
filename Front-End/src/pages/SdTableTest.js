@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Setting from "../images/pages/common/setting.png";
 import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
@@ -14,20 +14,22 @@ import Table from "../components/TablesLib/Table";
 import Input from "../components/Contents/Input";
 import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
-import { click } from "@testing-library/user-event/dist/click";
 
 const TableTest = (props) => {
   // const [editing, setEditing] = useState(false);
   const [pay, setPay] = useState("");
+  const [beforePay, setBeforePay] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [empList, setEmpList] = useState([]);
   const [belongingDate, setBelongingDate] = useState("");
   const handleBelongingDateChange = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
     setBelongingDate(newDate);
     console.log("귀속년월 : " + belongingDate);
   };
   const [payDay, setPayDay] = useState();
   const handlePayDateChange = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
     setPayDay(newDate);
     console.log("지급일 : " + payDay);
   };
@@ -38,8 +40,13 @@ const TableTest = (props) => {
     console.log("정렬기준 : " + searchOrder);
   };
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-  const [clickEmpCode, setClickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
-  console.log("랜더링 : " + clickEmpCode);
+  const [clickEmpCode, setClickEmpCode] = useState("aaa"); // 현재 클릭한 cdEmp 저장하는 상태
+
+  useEffect(() => {
+    if (clickEmpCode !== undefined) {
+      console.log("insert : " + clickEmpCode);
+    }
+  }, [clickEmpCode]);
   const [taxAmount, setTaxAmount] = useState({
     nationalPension: "", //국민연금
     healthInsurance: "", //건강보험
@@ -103,34 +110,43 @@ const TableTest = (props) => {
     }
   };
 
-  //사원 클릭시 사원정보 불러오기
+  //사원 클릭시 사원정보&급여 정보 불러오기
   const handleGetEmpDetailData = async (code) => {
     try {
       const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/sd/getOneEmpDetailData?code=${code}`,
+        method: "POST",
+        url: "/api2/sd/getOneEmpDetailData",
+        data: {
+          code: code,
+          belongingDate: belongingDate,
+          payDay: payDay,
+        },
       });
-      console.log(responseData);
-      // 빈 문자열 또는 null 값을 빈 문자열로 변환하여 empDetailInfo에 설정
-      const cleanedData = {};
-      for (const key in responseData) {
-        cleanedData[key] = responseData[key] || "";
-      }
-      setEmpDetailInfo(cleanedData);
+      console.log("사원 클릭시 : ");
+      console.log(responseData.searchInfo);
+      console.log("사원 클릭시 : ");
+      console.log(responseData.deducation);
+      setPay(responseData.pay);
+      setBeforePay(responseData.pay);
+      setEmpDetailInfo(responseData.searchInfo);
+      setTaxAmount(responseData.deducation);
+      setClickEmpCode(code);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
   };
 
   //기본급 입력 후 이벤트(insert)
-  const handleInsertData = async (pay) => {
+  const handleInsertData = async (code, pay) => {
     try {
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/sd/setEmpPay",
         data: {
-          code: clickEmpCode,
+          code: code,
           pay: pay,
+          belongingDate: belongingDate,
+          payDay: payDay,
         },
       });
       setTaxAmount(responseData);
@@ -190,8 +206,10 @@ const TableTest = (props) => {
           };
 
           const handleInputClick = (e) => {
-            setClickEmpCode(original.code);
-            handleGetEmpDetailData(original.code);
+            const clickedCode = original.code;
+            console.log("클릭코드 : " + clickedCode);
+            setClickEmpCode(clickedCode);
+            handleGetEmpDetailData(clickedCode);
           };
 
           return (
@@ -215,11 +233,9 @@ const TableTest = (props) => {
           };
 
           const handleInputClick = (e) => {
-            console.log("hr : 클릭이벤");
-            console.log(original.code);
-            handleGetEmpDetailData(original.code);
-            setClickEmpCode(original.code);
-            console.log(clickEmpCode);
+            const clickedCode = original.code;
+            setClickEmpCode(clickedCode);
+            handleGetEmpDetailData(clickedCode);
           };
 
           return (
@@ -243,10 +259,9 @@ const TableTest = (props) => {
           };
 
           const handleInputClick = (e) => {
-            console.log("hr : 클릭이벤");
-            console.log(original.code);
-            setClickEmpCode(original.code);
-            handleGetEmpDetailData(original.code);
+            const clickedCode = original.code;
+            setClickEmpCode(clickedCode);
+            handleGetEmpDetailData(clickedCode);
           };
           return (
             <Input
@@ -258,7 +273,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    [],
+    [belongingDate, payDay],
   );
 
   //급여항목 , 급액 item2
@@ -283,12 +298,18 @@ const TableTest = (props) => {
         Cell: ({ cell: { value } }) => {
           const [inputValue, setInputValue] = React.useState(value || "");
           const handleInputChange = (e) => {
+            console.log(clickEmpCode);
             setInputValue(e.target.value);
+            console.log(inputValue);
           };
           const insertPayAmount = (e) => {
-            const insertPay = e.target.value;
-            handleInsertData(insertPay);
-            console.log("insert : " + clickEmpCode);
+            console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
+            console.log("가져온 급여 : " + beforePay);
+            if (inputValue !== Number(beforePay).toLocaleString()) {
+              const insertPay = e.target.value;
+              const clickedCode = clickEmpCode;
+              handleInsertData(clickedCode, insertPay);
+            }
           };
           return (
             <Input
@@ -306,33 +327,33 @@ const TableTest = (props) => {
         },
       },
     ],
-    [pay],
+    [pay, clickEmpCode],
   );
   //item3
   const dummyItem3 = [
     {
       nm_tax: "국민연금",
-      amt_allowance: 0,
+      amt_allowance: taxAmount.nationalPension,
     },
     {
       nm_tax: "건강보험",
-      amt_allowance: 1000,
+      amt_allowance: taxAmount.healthInsurance,
     },
     {
       nm_tax: "고용보험",
-      amt_allowance: 2000,
+      amt_allowance: taxAmount.employmentInsurance,
     },
     {
       nm_tax: "장기요양보험료",
-      amt_allowance: 3121212,
+      amt_allowance: taxAmount.longtermNursingInsurance,
     },
     {
       nm_tax: "소득세",
-      amt_allowance: 3333333,
+      amt_allowance: taxAmount.incomeTax,
     },
     {
       nm_tax: "지방소득세",
-      amt_allowance: 122222,
+      amt_allowance: taxAmount.localIncomeTax,
     },
   ];
   const columnsItem3 = React.useMemo(
@@ -348,11 +369,27 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return <Input />;
+          const [inputValue, setInputValue] = React.useState(value);
+          const handleInputChange = (e) => {
+            console.log(clickEmpCode);
+            console.log("newValue");
+            console.log(e.target.value);
+            setInputValue(e.target.value);
+          };
+          return (
+            <Input
+              id="price-input"
+              value={inputValue}
+              width={100}
+              onChange={handleInputChange}
+              className={"doubleLine"}
+              type="price"
+            />
+          );
         },
       },
     ],
-    [],
+    [taxAmount],
   );
 
   //item4
@@ -499,6 +536,7 @@ const TableTest = (props) => {
                   <CustomCalendar
                     width="150"
                     type="month"
+                    value={belongingDate}
                     onChange={handleBelongingDateChange}
                   />
                 </div>
@@ -520,6 +558,7 @@ const TableTest = (props) => {
                   <CustomCalendar
                     width="150"
                     show="top"
+                    value={payDay}
                     onChange={handlePayDateChange}
                   />
                 </div>
@@ -551,7 +590,7 @@ const TableTest = (props) => {
               columns={columnsItem1}
               showInsertRow={showInsertRow}
               setShowInsertRow={setShowInsertRow}
-              insertRow={true}
+              scrollHeight="500"
             />
             <table className="sd-empList-calTable">
               <tbody>
@@ -571,8 +610,8 @@ const TableTest = (props) => {
               columns={columnsItem2}
               // editing={editing}
               // setEditing={setEditing}
-              pay={pay}
-              setPay={setPay}
+              // pay={pay}
+              // setPay={setPay}
               page={"sd"}
             />
             <table className="sd-allowance-top-calTable">
