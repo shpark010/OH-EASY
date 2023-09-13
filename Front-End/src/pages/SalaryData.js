@@ -303,9 +303,14 @@ const SalaryData = (props) => {
             console.log(inputValue);
           };
           const insertPayAmount = (e) => {
-            console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
+            // console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
+            // console.log("가져온 급여 : " + beforePay);
+            console.log("입력 급여 : " + inputValue);
             console.log("가져온 급여 : " + beforePay);
-            if (inputValue !== Number(beforePay).toLocaleString()) {
+            if (
+              inputValue !== Number(beforePay).toLocaleString() &&
+              inputValue != beforePay
+            ) {
               const insertPay = e.target.value;
               const clickedCode = clickEmpCode;
               handleInsertData(clickedCode, insertPay);
