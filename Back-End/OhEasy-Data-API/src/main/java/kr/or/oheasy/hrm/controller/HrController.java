@@ -33,6 +33,17 @@ public class HrController {
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
+	@GetMapping("getConditionalEmpList")
+	public ResponseEntity<?> getAllEmpList(@RequestParam("category") int category,@RequestParam("sort") int sort){
+		
+		System.out.println("category : " + category);
+		System.out.println("sort : " + sort);
+		
+		List<HrEmpMstVO> result = hrService.getConditionalEmpList(category, sort); 
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
 	@PostMapping("/HrEmpDataDelete")
 	public ResponseEntity<?> empDataDelete(@RequestBody String cdEmp){
 		
@@ -57,6 +68,7 @@ public class HrController {
 		String column = entry.getKey();
 		String value = entry.getValue();
 		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
+		
 		int result = hrService.updateEmpBasicData(cdEmp, column, value);
 		
 		return new ResponseEntity<>(result,HttpStatus.OK);
