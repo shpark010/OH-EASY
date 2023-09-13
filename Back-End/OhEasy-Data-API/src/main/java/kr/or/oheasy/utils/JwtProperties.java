@@ -4,7 +4,7 @@ import java.util.Base64;
 
 public interface JwtProperties {
 	String SECRET = "서버에기록된비밀번호"; // 서버만 알고 있는 비밀값
-	int EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 10; // 10일 (1/1000초)
+	int EXPIRATION_TIME = 1000 * 60 * 60 * 8; // 8시간 (1/1000초)
 	String TOKEN_PREFIX = "Bearer ";
 	String HEADER_STRING = "Authorization";
 	
