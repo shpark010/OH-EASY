@@ -110,7 +110,7 @@ const TableTest = (props) => {
     }
   };
 
-  //사원 클릭시 사원정보&급여 정보 불러오기
+  //사원 클릭시 사원정보와 급여 정보 불러오기
   const handleGetEmpDetailData = async (code) => {
     try {
       const responseData = await apiRequest({
