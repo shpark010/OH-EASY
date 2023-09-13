@@ -6,13 +6,11 @@
 	<!-- 조건 조회(사원 리스트) -->
 	<select id="getEmpList" resultType="kr.or.oheasy.vo.SdEmpMstVO">
 		SELECT
-		e.CD_EMP,
-		e.NM_EMP,
-		s.NM_POSITION
-		FROM
-		HR_EMP_MST e
-		JOIN
-		POSITION_SDTL s
+			e.CD_EMP,
+			e.NM_EMP,
+			s.NM_POSITION
+		FROM HR_EMP_MST e
+		JOIN POSITION_SDTL s
 		ON
 		e.NO_POSITION_UNIQUE = s.NO_POSITION_UNIQUE
 	</select>
@@ -21,35 +19,91 @@
 	<select id="getEmpDetailData" parameterType="String"
 		resultType="kr.or.oheasy.vo.SdEmpInfoVO">
 		SELECT
-		e.DT_HIRE AS hireDate,
-		e.FG_GENDER AS gender,
-		e.NM_ADDRESS AS address,
-		e.DC_ADDRESS AS detailAddress,
-		e.NO_MOBILE_PHONE AS phone,
-		e.NM_EMAIL AS email,
-		e.DT_RESIGN AS leavingDate,
-		e.FG_FOREIGN AS domesticForeign,
-		d.NM_DEPARTMENT AS department,
-		m.FG_MILITARY_SERVICE AS military,
-		IFNULL(l.LICENSE_COUNT, 0) AS certificate,
-		IFNULL(f.FAMILY_COUNT, 0) AS family,
-		bd.FG_OBSTACLE AS obstacle
+			e.DT_HIRE AS hireDate,
+			e.FG_GENDER AS gender,
+			e.NM_ADDRESS AS address,
+			e.DC_ADDRESS AS detailAddress,
+			e.NO_MOBILE_PHONE AS phone,
+			e.NM_EMAIL AS email,
+			e.DT_RESIGN AS
+			leavingDate,
+			e.FG_FOREIGN AS domesticForeign,
+			d.NM_DEPARTMENT AS
+			department,
+			m.FG_MILITARY_SERVICE AS military,
+			IFNULL(l.LICENSE_COUNT,
+			0) AS certificate,
+			IFNULL(f.FAMILY_COUNT, 0) AS family,
+			bd.FG_OBSTACLE
+			AS obstacle
 		FROM HR_EMP_MST e
-		LEFT JOIN DEPARTMENT_DTL d ON e.NO_DEPARTMENT = d.NO_DEPARTMENT
-		LEFT JOIN MILITARY_INFO_DTL m ON e.CD_EMP = m.CD_EMP
+		LEFT JOIN DEPARTMENT_DTL d ON
+			e.NO_DEPARTMENT = d.NO_DEPARTMENT
+		LEFT JOIN MILITARY_INFO_DTL m ON
+			e.CD_EMP = m.CD_EMP
 		LEFT JOIN (
-		SELECT CD_EMP, COUNT(*) AS LICENSE_COUNT
-		FROM LICENSE_DTL
-		GROUP BY CD_EMP
-		) l ON e.CD_EMP = l.CD_EMP
+				SELECT CD_EMP, COUNT(*) AS LICENSE_COUNT
+				FROM LICENSE_DTL
+				GROUP BY CD_EMP
+					) l ON e.CD_EMP = l.CD_EMP
 		LEFT JOIN (
-		SELECT CD_EMP, COUNT(*) AS FAMILY_COUNT
-		FROM HR_FAMILY_DTL
-		GROUP BY CD_EMP
-		) f ON e.CD_EMP = f.CD_EMP
-		LEFT JOIN BODY_DATA_DTL bd ON e.CD_EMP = bd.CD_EMP
+				SELECT CD_EMP, COUNT(*) AS FAMILY_COUNT
+				FROM HR_FAMILY_DTL
+				GROUP BY
+				CD_EMP
+					) f ON e.CD_EMP = f.CD_EMP
+		LEFT JOIN BODY_DATA_DTL bd ON e.CD_EMP
+			= bd.CD_EMP
 		WHERE e.CD_EMP = #{cd_Emp}
 	</select>
+	
+	<!-- 급여 자료 조회 -->
+	<select id="getEmpTax" parameterType="Map" resultType="kr.or.oheasy.vo.SdDeducationVO">
+		SELECT 
+			s.CD_EMP AS cdEmp,
+			t.NM_TAX_RATE as cdTaxRate,
+			s.AMT_ALLOWANCE as amtAllowance,
+			s.FG_TAX as fgTax,
+			s.YY_ALLOWANCE as yyAllowance,
+			s.MM_BELONG as mmBelong,
+			s.DT_ALLOWANCE as dtAllowance
+		FROM salary_deduction_info s
+		INNER JOIN
+			tax_rate t
+		ON s.CD_TAX_RATE = t.CD_TAX_RATE
+		WHERE CD_EMP=#{cdEmp}
+			AND YY_ALLOWANCE=#{yyAllowance}
+			AND MM_BELONG=#{mmBelong}
+			AND DT_ALLOWANCE=#{dtAllowance}
+	</select>
+
+	<!-- 신규 급여 입력 -->
+	<insert id="setEmpPay" parameterType="List">
+	    INSERT INTO SALARY_DEDUCTION_INFO (CD_EMP, CD_TAX_RATE,
+	    AMT_ALLOWANCE, FG_TAX, YY_ALLOWANCE, MM_BELONG, DT_ALLOWANCE)
+	    VALUES
+	    <foreach collection="list" item="item" index="index" separator=",">
+	        (#{item.cdEmp},
+	        #{item.cdTaxRate},
+	        <choose>
+	            <when test="item.cdTaxRate == 506">
+	                #{item.amtAllowance} * (
+	                SELECT RATE_TAX FROM TAX_RATE WHERE CD_TAX_RATE = 505
+	                )
+	            </when>
+	            <otherwise>
+	                #{item.amtAllowance} 
+	            </otherwise>
+	        </choose>
+	        * (
+	            SELECT RATE_TAX FROM TAX_RATE WHERE CD_TAX_RATE = #{item.cdTaxRate}
+	        ),
+	        #{item.fgTax},
+	        #{item.yyAllowance},
+	        #{item.mmBelong},
+	        #{item.dtAllowance})
+	    </foreach>
+	</insert>
 </mapper>
 
 
