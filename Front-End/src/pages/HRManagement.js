@@ -21,28 +21,10 @@ function HRManagement() {
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
   const [clickEmpCode, setclickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
-  const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-
-  const [oneEmpData, setOneEmpData] = useState([]);
-
-  const handleGetEmpBasicData = async (cdEmp) => {
-    // try {
-    //   const responseData = await apiRequest({
-    //     method: "GET",
-    //     url: `/api2/hr/getOneEmpBasicData?cdEmp=${cdEmp}`,
-    //   });
-    //   setOneEmpData(responseData);
-    //   console.log("******************************");
-    //   console.log(responseData);
-    //   console.log("******************************");
-    // } catch (error) {
-    //   console.error("Failed to fetch emp data:", error);
-    // }
-  };
-
-  const handleSetEmpCode = (code) => {
-    setclickEmpCode(code);
-  };
+  const [conditions, setConditions] = useState({
+    category: 0,
+    sort: 3,
+  }); // 검색 조건을 저장하는 상태
 
   // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
   const handleRowClick = useCallback((empCode) => {
@@ -212,7 +194,11 @@ function HRManagement() {
         setCheckedRows={setCheckedRows}
         setEmpList={setEmpList}
       />
-      <HrSearchBar />
+      <HrSearchBar
+        conditions={conditions}
+        setConditions={setConditions}
+        setEmpList={setEmpList}
+      />
       <section className="section hr-section">
         <div className="hrGrid">
           {/* 리스트 영역 */}

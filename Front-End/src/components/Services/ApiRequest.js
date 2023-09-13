@@ -42,7 +42,10 @@ const useApiRequest = () => {
     }
 
     // loginInfo 쿠키에서 토큰 정보를 추출
-    const token = loginInfo.split(".")[1];
+    const tokenParts = loginInfo.split(".");
+    const token = `${tokenParts[1]}.${tokenParts[2]}.${tokenParts[3]}`;
+    console.log("토큰 추출~~~~~~~~");
+    console.log(token);
     const headers = {
       "Content-Type": "application/json",
     };
@@ -51,7 +54,8 @@ const useApiRequest = () => {
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
-
+    console.log("헤더 ********************");
+    console.log(headers);
     // 실제로 API를 호출하는 부분
     try {
       const response = await axios({
@@ -63,8 +67,12 @@ const useApiRequest = () => {
       setLoading(false);
       return response.data;
     } catch (error) {
-      // API 요청 중 오류가 발생한 경우 콘솔에 오류를 기록하고, 사용자를 로그인 페이지로 리디렉션
-      console.error("API request failed:", error);
+      // API 요청 중 오류가 발생
+      console.error("API 요청 실패 :", error);
+      // "loginInfo" 쿠키 삭제
+      document.cookie =
+        "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      setLoading(false);
       navigate("/login");
       return null;
     }

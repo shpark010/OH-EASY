@@ -163,7 +163,7 @@ const HrBasic = ({ cdEmp }) => {
               <th>영문성명</th>
               <td>
                 <CustomInput
-                  value={empBasicData.nmEngEmp}
+                  value={empBasicData.nmEngEmp || ""}
                   width={322}
                   name={"nmEngEmp"}
                   onBlur={handleInputBlur}
@@ -180,7 +180,7 @@ const HrBasic = ({ cdEmp }) => {
                   type="resident"
                   width={322}
                   name={"noResident"}
-                  value={empBasicData.noResident}
+                  value={empBasicData.noResident || ""}
                   onblur={handleInputBlur}
                   onChange={handleInputChange}
                 />
@@ -202,7 +202,7 @@ const HrBasic = ({ cdEmp }) => {
                 <CustomInput
                   width={322}
                   name={"noDepartment"}
-                  value={empBasicData.noDepartment}
+                  value={empBasicData.noDepartment || ""}
                   onblur={handleInputBlur}
                   onChange={handleInputChange}
                 />
@@ -241,7 +241,7 @@ const HrBasic = ({ cdEmp }) => {
               <th>한자성명</th>
               <td>
                 <CustomInput
-                  value={empBasicData.nmHanjaEmp}
+                  value={empBasicData.nmHanjaEmp || ""}
                   width={322}
                   onblur={handleInputBlur}
                   onChange={handleInputChange}
@@ -286,7 +286,7 @@ const HrBasic = ({ cdEmp }) => {
                 <CustomInput
                   width={322}
                   name={"noPositionUnique"}
-                  value={empBasicData.noPositionUnique}
+                  value={empBasicData.noPositionUnique || ""}
                   onblur={handleInputChange}
                 />
               </td>
