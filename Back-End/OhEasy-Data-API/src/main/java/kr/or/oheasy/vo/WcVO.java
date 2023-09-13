@@ -6,13 +6,11 @@ import lombok.Data;
 public class WcVO {
 	
     private String cdEmp; //코드
-    private String name; //이름
-    private String noRes; //주민번호
     private String dtStartCont; //근로계약 시작날짜
     private String dtEndCont; //근로계약 종료날짜
     private String noPost; // 우편번호
-    private String addr; // 주소
-    private String addrDtl; // 상세주소
+    private String addrWork; // 근무장소
+    private String addrWorkDtl; // 상세주소
     private String cntnJob; // 업무내용
     private String tmStartRegularWork; //소정근로 시작시간
     private String tmEndRegularWork; // 소정근로 끝 시간
