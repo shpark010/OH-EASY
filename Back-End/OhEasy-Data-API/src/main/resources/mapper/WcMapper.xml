@@ -10,7 +10,16 @@
 </select>
 
   
+<update id="updateEmp0to1" >
+update hr_emp_mst
+set fg_workcontract = 1
+</update>
 
+
+<select id = "getWcData" parameterType="String" resultType="kr.or.oheasy.vo.WcVO">
+	SELECT * FROM hr_contract_infO WHERE cd_emp = #{code}
+
+</select>
 
 
 </mapper>

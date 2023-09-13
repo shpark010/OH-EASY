@@ -4,8 +4,6 @@ import Delete from '../images/pages/common/delete.png';
 import '../styles/css/pages/WorkContract.css';
 import PageHeaderIconButton from '../components/PageHeader/PageHeaderIconButton';
 import PageHeaderTextButton from '../components/PageHeader/PageHeaderTextButton';
-import CustomCalendar from '../components/Contents/CustomCalendar';
-import Input from '../components/Contents/Input';
 import WorkContractCreate from '../components/WorkContract/WorkContractCreate';
 import WorkContractSelect from '../components/WorkContract/WorkContractSelect';
 import useApiRequest from '../components/Services/ApiRequest';
@@ -15,28 +13,28 @@ const WorkContract = () => {
 
   const apiRequest = useApiRequest();
   const [tabState,setTab] = useState("0");
-  const [empList,setEmpList] = useState([]); //작성Tab state
-  const [wcEmpList,setWcEmpList] = useState([]); //조회Tab state
+  const [creEmpList,setEmpList] = useState([]); //작성 Component에 넘겨줄 prop
+  const [sleEmpList,setSleEmpList] = useState([]); // 조회 Component
+  
 
 
   const tabClick = (tabState) =>{
     setTab(tabState)
     console.log({tabState})
+  
   };
 
   const tabComponent = () =>{
 
     switch(tabState){
       case "0" :
-        
-        return (<WorkContractCreate empList={empList} />);
-        // 계약서 작성 Tab Click
-      
-      case "1" :
-        
-        return <WorkContractSelect wcEmpList={wcEmpList}  />;
-        // 계약서 조회 Tab Click
 
+        return (<WorkContractCreate empList={creEmpList} />);
+
+        // 계약서 작성 Tab Click
+      case "1" :
+        return <WorkContractSelect sleEmpList={sleEmpList}  />;
+        // 계약서 조회 Tab Click
       default : 
       return null;
 
@@ -46,28 +44,24 @@ const WorkContract = () => {
 
 
 const getEmpList = async () => { 
-
-
-  
   try {
     const responseData = await apiRequest({
       method: "GET",
       url: `/api2/wc/getEmpList?tabState=${tabState}`,
     });
+    
     if(tabState==="0"){
       setEmpList(responseData);
       
     }
     else if(tabState==="1"){
-      setWcEmpList(responseData);
+      setSleEmpList(responseData);
       
     }
     
   } catch (error) {
     console.error("Failed to fetch emp data:", error);
   }
-
-
 };
 
 
@@ -85,9 +79,6 @@ const getEmpList = async () => {
               onClick={getEmpList} />
                 <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
               </div>
-              <div className="iconBtnWrap">
-                <PageHeaderIconButton btnName="delete" imageSrc={Delete} altText="삭제" />
-              </div>
             </div>
           </div>
         </div>
@@ -95,12 +86,12 @@ const getEmpList = async () => {
     
          <div className='borderbuttonBold'>
           <button 
-          className={`wcTab1 ${tabState === "0" ? "on" : ""}`}
+          className={`wcTab1 ${tabState === "0" ? "wcOn" : ""}`}
           onClick={ () => tabClick("0")}> 계약서 작성
           </button>  
 
           <button 
-          className={`wcTab2 ${tabState === "1" ? "on" : ""}`} 
+          className={`wcTab2 ${tabState === "1" ? "wcOn" : ""}`} 
           onClick={ ()=>tabClick("1")} > 계약서 조회
           </button>
         </div> 
