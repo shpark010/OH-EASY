@@ -152,7 +152,9 @@ function Table(props) {
         {/* 푸터 추가 */}
         {props.insertRow && (
           <StyledInsertFooter>
-            <StyledTr isHeader>
+            <StyledTr
+            //isHeader
+            >
               <StyledInsertTh
                 colSpan={props.columns.length}
                 onClick={() => {
