@@ -1,12 +1,4 @@
-.wc-searchbar-button {
-    color: white;
-    border: solid 1px white;
-    margin: 2px;
-    padding: 10px;
-  }
-  /*serach bar 전자서명 메일 보내기 버튼*/
-  
-  .wc-grid-container {
+ .wcGridContainer {
     display: grid;
     padding: 10px;
     border: 1px solid #ccc; /* 그리드 아이템에 테두리 설정 */
@@ -18,90 +10,59 @@
   }
   /* grid 전체 style */
   
-  .wc-grid-cell-item1 {
+  .wcGridCellItem1 {
     background-color: white;
     position: relative;
-    
+  
     border-right: solid 1px lightgray;
     border-left:solid 1px lightgray;
     
   }
-  /* 각 grid cell에 배치될 style */
+  /* 왼쪽 Grid cell */
 
-  .wc-grid-cell-item2 {
+  .wcGridCellItem2 {
+    position:relative;
     background-color: white;
-    
     overflow-y: auto;
-    
     border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    
   }
+  /*오른쪽  Grid cell */
   
-  .wc-table-scroll {
-    max-height: 600px; /* 스크롤링 영역의 최대 높이를 지정합니다. */
-    overflow-y: auto; /* 수직 스크롤바를 표시하고 필요할 때 스크롤합니다. */
-    border: 1px solid #ccc; /* 스크롤링 영역에 테두리를 추가 (선택사항) */
-  }
   
-  .wc-table {
-    border-collapse: collapse; /*테이블셀 경계 병합*/
-    width: 100%; /* 표의 너비 설정 (필요에 따라 조절) */
-  }
-  /*사원조회 List Table */
   
-  .wc-th {
-    border: 2px solid black; /* 각 셀의 테두리 스타일 및 두께 설정 */
-    padding: 6px; /* 셀 안의 여백 설정 (필요에 따라 조절) */
-    margin: 10px;
-    text-align: center; /* 셀 내의 텍스트 가운데 정렬 (필요에 따라 조절) */
-    background-color: rgb(175, 198, 238);
-    width: 20%;
-  }
-  /* 사원조회 List Table th  */
-  
-  .wc-td {
-    border: 1px solid black; /* 각 셀의 테두리 스타일 및 두께 설정 */
-    padding: 19px; /* 셀 안의 여백 설정 (필요에 따라 조절) */
-    text-align: center; /* 셀 내의 텍스트 가운데 정렬 (필요에 따라 조절) */
-    width: 20%;
-  }
-  /* 사원조회  List Table td */
-  
-  .wc-bottom-table {
+  .wcBottomTable {
     border-collapse: collapse; /* 테이블셀 경계 병합. */
     width: 100%; /* 표의 너비 설정 (필요에 따라 조절) */
     position: absolute;
     bottom: 0px;
   }
-  /*  */
+  /* 사원인원 보여주는 Table 위치 조정 */
   
-  .wc-bottom-table th {
+  .wcBottomTable th {
     background-color: #a9d0f5;
     border: 1px solid #e6e6e6;
     text-align: center;
     font-size: 16px;
     padding: 5px;
   }
+  /* 사원인원 보여주는 Table style */
   
-  .wc-right-head {
+  .wcRightHead {
     background-color: white;
     border-top: solid 2px #ffffff;
   }
+  /*근로계약서 style*/
   
-  .wc-right-first-table {
+  .wcRightGridTable {
     border-top: 2px solid black;
     border-bottom: 1px solid black;
     width: 100%;
   }
+  /*오른쪽 Grid의 Table*/
   
-  .wc-right-first-table-button {
-    margin-left: 10px;
-    background-color: gray;
-    color: azure;
-    padding: 3px;
-  }
   
-  .wc-right-first-table-left-td {
+  .wcRightGridTableLeftTd {
     background-color: #e6e6e6;
     padding: 10px;
     font-weight: 900;
@@ -110,86 +71,45 @@
     font-size: 16px;
     width: 200px;
   }
+  /*오른쪽 Grid의 첫번째 td*/
   
-  .wc-right-first-table-right-td{
+  .wcRightGridTableRightTd1{
+    width: 80px;
     padding-left: 8px;
   }
+  /*오른쪽 Grid의 두번째 td*/
 
-  .wc-right-first-table-right-td b{
-    padding-left: 4px;
-    font-size: 14px;
-  }
+.wcRightGridTableRightTd2{
+  padding-left: 10px;
+}
+/*오른쪽 Grid 세번째 td*/
 
-  
+.wcRightGridTableRightTd2 b{
+  padding-left: 4px;
+  font-size: 14px;
+}
+/*오른쪽 Grid의 세번째 td 안의 b tag*/
+
+.wcRightGridTableRightTd3{
+width:80px;
+}
+/*오른쪽 Grid 네번째 td*/
 
 
-  .wcRightFirstTableRightTdFirst1 {
-    width: 200px;
-    padding-left: 5px;
-    
-  }
-  .wcRightFirstTableRightTdFirst1 Input[readonly]{
-    background-color: #a9d0f5;
-  }
-  /*오른쪽 첫번째 td태그*/
-
-  .wcRightFirstTableRightTdFirst2{
-    width: 200px;
-    padding-left: 10px;
-    
-
-  }
-
-  .searchBarBox select{
-    width: 135px;
-  }
-
-  .searchBarBox2 select{
-    width: 70px;
-  }
-
-  .searchBarBox3 select{
-    width: 53px;
-  }
-
-  /* selectBox 정렬 맞추기 위한 class */
-  
-  .wc-right-first-table input {
-    padding: 8px;
-    border: 1px solid black;
-    margin: 2px;
-    margin-left: 5px;
-    border-radius: 4px;
-  }
-  
-  .wc-right-second-table-button {
-    margin-left: 10px;
-    background-color: gray;
-    color: azure;
-    padding: 3px;
-    position: absolute;
-    bottom: 1%;
-    right: 2%;
-  }
-  
-  .wc-th-bigo {
-    background-color: white;
-  }
-  
-  .wc-right-cell-td-size {
-    width: 200px;
-  }
-  
 
   
+  .wcRightCellSearchButton{
+    margin-left: 20px;
+  }
+  /*주소검색 버튼*/
   
-  .wc-right-cell-search-button:hover {
+  .wcRightCellSearchButton:hover {
     border-color: rgb(51, 118, 233);
     border-width: 1px;
     cursor: pointer;
     
   }  
-  /*주소조회 버튼 */
+  /*주소검색 버튼 호버링 */
   
   
   .wcTab1{
@@ -214,7 +134,7 @@
   
   
 /* 작성,조회중 button이 클릭 됐을때 Click했을때만 class에 add 될 것.*/
-  .on {
+  .wcOn {
     background-color: var(--color-primary-blue);
   color: var(--color-primary-white);
   border: none;
@@ -248,6 +168,18 @@
     overflow-y: auto;
   }
   
-  .customInput[readonly]{
-    background-color: gray;
+
+  .wcCreateSumbitButton {
+    position: absolute;
+    font-size: 15px;
+    padding : 6px 12px 6px 12px;
+    margin : 10px 0px 10px 0px;
+    border:solid 1px black;
+    right: 10px;
+
+    & :hover{
+      border-color: #a9d0f5;
+    }
+    
   }
+  /*작성 완료 button*/

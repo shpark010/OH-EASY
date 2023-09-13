@@ -1,5 +1,4 @@
 import React,{ useState } from 'react';
-// import '../styles/css/pages/WorkContract.css';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
 import CustomInput from '../../components/Contents/CustomInput';
@@ -9,17 +8,21 @@ import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
 import DaumPostcode from 'react-daum-postcode';
 import SearchSubmitButton from '../SearchBar/SearchSubmitButton';
+import useApiRequest from '../Services/ApiRequest';
 
 
 
 
 
 const WorkContractCreate = ({empList}) => {
-
+  const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
   const [openPostcode, setOpenPostcode] = useState(false);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
+
+
+
 
   const addrButtonClick= () => {
     setOpenPostcode(true);
@@ -67,6 +70,7 @@ const WorkContractCreate = ({empList}) => {
         Header: "✓",
         accessor: "checkbox",
         id: "checkbox",
+        width:"10%",
         Cell: ({ cell: { value } }) =>{ 
           
         return(
@@ -178,6 +182,30 @@ const WorkContractCreate = ({empList}) => {
 
     
   }
+  // 블러처리 이벤트 (해당 tag를 벗어나는 모든 경우를 blur라고한다.)
+
+
+  const submitButtonClick= async () => {
+
+    console.log(empList)
+    
+    // try {
+    //   const responseData = await apiRequest({
+    //     method: "PUT",
+    //     url: `/api2/wc/updateEmpList`,
+    //   });
+
+      
+    //   alert('작성이 완료되었습니다.');
+      
+    // } 
+    // catch (error) {
+    //   console.error("Failed to fetch emp data:", error);
+    // }
+  }
+// 작성완료 Button을 눌렀을때 event 
+// 사원Table의 근로계약서 작성여부가 0->1로 udpate되는 query를 날림.
+// 그 후 setEmpList를 통해 List를 갱신.
 
 
 
@@ -189,7 +217,9 @@ const WorkContractCreate = ({empList}) => {
             <div className="selectWrapper">
               
               <div className="searchBarName">작성년도</div>
-              <CustomCalendar width={130}/>
+              <CustomCalendar width={130}
+              
+              />
               
              
                 
@@ -217,8 +247,8 @@ const WorkContractCreate = ({empList}) => {
 
         
         <section className="section">
-          <div className="wc-grid-container">
-            <div className=" wc-grid-cell-item1 ">
+          <div className="wcGridContainer">
+            <div className="wcGridCellItem1">
             
               <Table
                 columns={columns}
@@ -227,7 +257,7 @@ const WorkContractCreate = ({empList}) => {
                 checkboxWidth={"10%"}
               />
 
-              <table className="wc-bottom-table">
+              <table className="wcBottomTable">
                 <tr>
                   <th>조회된 사원</th>
                   <th>{data.length}명</th>
@@ -235,69 +265,71 @@ const WorkContractCreate = ({empList}) => {
               </table>
             </div>
 
-            <div className="wc-grid-cell-item2">
-              <h1 className="wc-right-head">근로계약서</h1>
-              <table className="wc-right-first-table">
+            <div className="wcGridCellItem2">
+              <h1 className="wcRightHead">근로계약서</h1>
+              <table className="wcRightGridTable">
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 근로계약기간  </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
-                    <CustomCalendar width="179" id="startDate" /> 
+                  <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
+                  <td className="wcRightGridTableRightTd1">
+                    <CustomCalendar width="167" id="startDate" /> 
                   </td>
-                  <td className="wc-right-first-table-right-td">
-                    <CustomCalendar width="179" id="endDate" />
+                  <td className="wcRightGridTableRightTd2">
+                    <CustomCalendar width="167" id="endDate" />
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">근무장소  </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
+                  <td className="wcRightGridTableLeftTd">근무장소  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <CustomInput />
                   </td>
-                  <td className="wc-right-first-table-right-td wc-right-cell-td-size">
-                    <CustomInput width={400} />
-                  </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
+                  <td className="wcRightGridTableRightTd2">
+                    <CustomInput width={425} />
                     <CustomButton
-                      className="wc-right-cell-search-button"
+                      className="wcRightCellSearchButton"
                       text="주소검색"
                       color="black"
                       onClick={addrButtonClick}
                     />
                   </td>
+
+                  <td className="wcRightGridTableRightTd3">
+                    
+                  </td>
                 </tr>
                 <tr>
-                  <th className="wc-right-first-table-left-td">상세주소  </th>
-                  <td className="wcRightFirstTableRightTdFirst1" colSpan="2">
+                  <td className="wcRightGridTableLeftTd">상세주소  </td>
+                  <td className="wcRightGridTableRightTd1" colSpan="2">
                     <CustomInput width={605} onBlur = {onBlur} />
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">업무의 내용 </td>
+                  <td className="wcRightGridTableLeftTd">업무의 내용 </td>
 
-                  <td className="wcRightFirstTableRightTdFirst1" colSpan="2">
+                  <td className="wcRightGridTableRightTd1" colSpan="2">
                     <CustomInput width="605"/>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">소정근로시간 </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
+                  <td className="wcRightGridTableLeftTd">소정근로시간 </td>
+                  <td className="wcRightGridTableRightTd1">
                     <CustomInput></CustomInput>
                   </td>
-                  <td className="wc-right-first-table-right-td">
-                    <CustomInput></CustomInput>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="wc-right-first-table-left-td">휴게시간 </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
-                    <CustomInput></CustomInput>
-                  </td>
-                  <td className="wc-right-first-table-right-td">
+                  <td className="wcRightGridTableRightTd2">
                     <CustomInput></CustomInput>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">근무일  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd">휴게시간 </td>
+                  <td className="wcRightGridTableRightTd1">
+                    <CustomInput></CustomInput>
+                  </td>
+                  <td className="wcRightGridTableRightTd2">
+                    <CustomInput></CustomInput>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="wcRightGridTableLeftTd">근무일  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: '1주에 1일' },
@@ -311,11 +343,11 @@ const WorkContractCreate = ({empList}) => {
                       defaultValue="5"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightFirstTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">주휴일 </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd">주휴일 </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: '매주 월요일' },
@@ -329,11 +361,11 @@ const WorkContractCreate = ({empList}) => {
                       defaultValue="7"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightFirstTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">임금유형 </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd">임금유형 </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 월급 ' },
@@ -344,14 +376,14 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox2"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td">
+                  <td className="wcRightGridTableRightTd2">
                     <CustomInput width={100} /> 
                     <b>원</b>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">임금지급일 </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd">임금지급일 </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 매월 ' },
@@ -362,14 +394,14 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox2"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td">
+                  <td className="wcRightGridTableRightTd2">
                     <CustomInput width={40}/>
                     <b>일</b>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">지급방법  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd">지급방법  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 예금통장에 입금 ' },
@@ -378,11 +410,11 @@ const WorkContractCreate = ({empList}) => {
                       defaultValue="1"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightGridTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 고용보험  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd"> 고용보험  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
@@ -392,11 +424,11 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox3"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightGridTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 산재보험  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd"> 산재보험  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
@@ -406,11 +438,11 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox3"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightGridTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 국민연금  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd"> 국민연금  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
@@ -420,11 +452,11 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox3"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightFirstTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 건강보험  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd"> 건강보험  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
@@ -434,11 +466,11 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox3"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightFirstTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td"> 서명여부  </td>
-                  <td className="wcRightFirstTableRightTdFirst2">
+                  <td className="wcRightGridTableLeftTd"> 서명여부  </td>
+                  <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
                       options={[
                         { value: '1', label: ' 여 ' },
@@ -448,16 +480,22 @@ const WorkContractCreate = ({empList}) => {
                       className="searchBarBox3"
                     />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightFirstTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wc-right-first-table-left-td">작성일자 </td>
-                  <td className="wcRightFirstTableRightTdFirst1">
+                  <td className="wcRightGridTableLeftTd">작성일자 </td>
+                  <td className="wcRightGridTableRightTd1">
                     <CustomCalendar className={'wcCreatedDateCalander'} width="170" id="createDate" />
                   </td>
-                  <td className="wc-right-first-table-right-td"></td>
+                  <td className="wcRightGridTableRightTd2"></td>
                 </tr>
+                
               </table>
+              <button 
+              className='wcCreateSumbitButton' 
+              onClick={submitButtonClick}
+              >
+              작성완료</button>
             </div>
           </div>
 
