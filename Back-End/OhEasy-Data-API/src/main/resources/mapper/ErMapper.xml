@@ -3,7 +3,7 @@
 
 <mapper namespace="kr.or.oheasy.er.dao.ErDao">
 
-    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+<!--    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
         INSERT INTO hr_emp_mst (CD_EMP, NM_EMP, FG_FOREIGN, NO_RESIDENT, DT_HIRE
         <if test="noPositionUnique != null">
             , NO_POSITION_UNIQUE
@@ -20,31 +20,41 @@
             , #{noDepartment}
         </if>
         )
+    </insert>-->
+
+    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+        INSERT INTO hr_emp_mst (CD_EMP) VALUES (#{cdEmp})
     </insert>
 
-    <update id="patchEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
+<!--    <update id="patchEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">-->
+<!--        UPDATE hr_emp_mst-->
+<!--        <set>-->
+<!--            <if test="nmEmp != null">NM_EMP = #{nmEmp},</if>-->
+<!--            <if test="fgForeign != null">FG_FOREIGN = #{fgForeign},</if>-->
+<!--            <if test="noResident != null">NO_RESIDENT = #{noResident},</if>-->
+<!--            <if test="fgEmp != null">FG_EMP = #{fgEmp},</if>-->
+<!--            <if test="dtHire != null">DT_HIRE = #{dtHire},</if>-->
+<!--            <if test="fgGender != null">FG_GENDER = #{fgGender},</if>-->
+<!--            <if test="noPost != null">NO_POST = #{noPost},</if>-->
+<!--            <if test="nmAddress != null">NM_ADDRESS = #{nmAddress},</if>-->
+<!--            <if test="dcAddress != null">DC_ADDRESS = #{dcAddress},</if>-->
+<!--            <if test="noPhone != null">NO_PHONE = #{noPhone},</if>-->
+<!--            <if test="noMobilePhone != null">NO_MOBILE_PHONE = #{noMobilePhone},</if>-->
+<!--            <if test="nmEmail != null">NM_EMAIL = #{nmEmail},</if>-->
+<!--            <if test="cdBank != null">CD_BANK = #{cdBank},</if>-->
+<!--            <if test="idJoin != null">ID_JOIN = #{idJoin},</if>-->
+<!--            <if test="dtResign != null">DT_RESIGN = #{dtResign},</if>-->
+<!--            <if test="noAccount != null">NO_ACCOUNT = #{noAccount},</if>-->
+<!--            <if test="nmAccountHolder != null">NM_ACCOUNT_HOLDER = #{nmAccountHolder},</if>-->
+<!--            <if test="noPositionUnique != null">NO_POSITION_UNIQUE = #{noPositionUnique},</if>-->
+<!--            <if test="noDepartment != null">NO_DEPARTMENT = #{noDepartment}</if>-->
+<!--        </set>-->
+<!--        WHERE CD_EMP = #{cdEmp}-->
+<!--    </update>-->
+
+    <update id="updateEmp">
         UPDATE hr_emp_mst
-        <set>
-            <if test="nmEmp != null">NM_EMP = #{nmEmp},</if>
-            <if test="fgForeign != null">FG_FOREIGN = #{fgForeign},</if>
-            <if test="noResident != null">NO_RESIDENT = #{noResident},</if>
-            <if test="fgEmp != null">FG_EMP = #{fgEmp},</if>
-            <if test="dtHire != null">DT_HIRE = #{dtHire},</if>
-            <if test="fgGender != null">FG_GENDER = #{fgGender},</if>
-            <if test="noPost != null">NO_POST = #{noPost},</if>
-            <if test="nmAddress != null">NM_ADDRESS = #{nmAddress},</if>
-            <if test="dcAddress != null">DC_ADDRESS = #{dcAddress},</if>
-            <if test="noPhone != null">NO_PHONE = #{noPhone},</if>
-            <if test="noMobilePhone != null">NO_MOBILE_PHONE = #{noMobilePhone},</if>
-            <if test="nmEmail != null">NM_EMAIL = #{nmEmail},</if>
-            <if test="cdBank != null">CD_BANK = #{cdBank},</if>
-            <if test="idJoin != null">ID_JOIN = #{idJoin},</if>
-            <if test="dtResign != null">DT_RESIGN = #{dtResign},</if>
-            <if test="noAccount != null">NO_ACCOUNT = #{noAccount},</if>
-            <if test="nmAccountHolder != null">NM_ACCOUNT_HOLDER = #{nmAccountHolder},</if>
-            <if test="noPositionUnique != null">NO_POSITION_UNIQUE = #{noPositionUnique},</if>
-            <if test="noDepartment != null">NO_DEPARTMENT = #{noDepartment},</if>
-        </set>
+        SET ${column} = #{value}
         WHERE CD_EMP = #{cdEmp}
     </update>
 

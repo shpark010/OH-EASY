@@ -1,7 +1,9 @@
 package kr.or.oheasy.er.service;
 
 import kr.or.oheasy.er.dao.ErDao;
+import kr.or.oheasy.utils.Camel;
 import kr.or.oheasy.vo.HrEmpMstVO;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,15 @@ public class ErService {
         return dao.postEmp(hrEmpMstVO);
     }
 
-    public int patchEmp(HrEmpMstVO hrEmpMstVO) {
+//    public int patchEmp(HrEmpMstVO hrEmpMstVO) {
+//        ErDao dao = sqlSession.getMapper(ErDao.class);
+//        return dao.patchEmp(hrEmpMstVO);
+//    }
+
+    public int updateEmp(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value) {
         ErDao dao = sqlSession.getMapper(ErDao.class);
-        return dao.patchEmp(hrEmpMstVO);
+        column = Camel.camelToSnake(column);
+        return dao.updateEmp(cdEmp, column, value);
     }
 
     public boolean isCdEmpValid(String cdEmp) {

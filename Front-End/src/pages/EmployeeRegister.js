@@ -20,7 +20,7 @@ import DaumPostcode from 'react-daum-postcode';
 import Table from "../components/TablesLib/Table";
 import CustomModalInput from "../components/Contents/CustomModalInput";
 import useApiRequest from "../components/Services/ApiRequest";
-import SearchBarBox from "../components/SearchBar/SearchBarBox";
+// import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import moment from "moment";
 
 const EmployeeRegister = () => {
@@ -32,6 +32,7 @@ const EmployeeRegister = () => {
   // const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
   const [zonecode, setZonecode] = useState(""); // 우편번호 상태 관리
   const [address, setAddress] = useState(""); // 주소 상태 관리
+  const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
   
   // 사원정보 테이블 컬럼 상태관리
   const [nmEmp, setNmEmp] = useState(""); // 이름 상태 관리
@@ -65,15 +66,27 @@ const EmployeeRegister = () => {
   const [noPositionUnique, setNoPositionUnique] = useState(""); // 직급고유번호 상태 관리
   const [noDepartment, setNoDepartment] = useState(""); // 부서번호 상태 관리
 
-  const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
+  // const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   // const [cdEmp, setCdEmp] = useState("");
   // const [singleEmp, setSingleEmp] = useState(null);
   // const [detailAddress, setDetailAddress] = useState("");
 
+  // defaultValue 상태 추가
+  const [defaultValue, setDefaultValue] = useState("0");
+
   // 선택된 이메일 주소값 가져오기
   const handleSelectChange = (newValue) => {
-    setSelectedOption(newValue);
+    setSelectedOption(newValue.value);
+    if (newValue.value !== "0") {
+      setDomain(newValue.label);
+    } else {
+      setDomain("");
+    }
+  };
+
+  const handleSelectInputChange = (e) => {
+    setDomain(e.target.value);
   };
 
   // 버튼 클릭시 DaumPostcode 모달 열기
@@ -102,38 +115,34 @@ const EmployeeRegister = () => {
   const handleHeaderCheckboxClick = useCallback(() => {
     console.log("****************************");
     console.log("****************************");
-    console.log(checkedRows);
+    // console.log(checkedRows);
     console.log(empList.length);
-    console.log(checkedRows.length);
+    // console.log(checkedRows.length);
 
-    if (checkedRows.length !== empList.length) {
-      setCheckedRows(empList.map((emp) => emp.cdEmp));
-    } else {
-      setCheckedRows([]);
-    }
-  }, [checkedRows, empList]);
+    // if (checkedRows.length !== empList.length) {
+    //   setCheckedRows(empList.map((emp) => emp.cdEmp));
+    // } else {
+    //   setCheckedRows([]);
+    // }
+  }, [empList]);
 
   // 각 행의 체크박스를 클릭할 때 해당 행의 체크박스 상태를 업데이트
   const handleRowCheckboxClick = useCallback(
     (empCode) => {
-      if (checkedRows.includes(empCode)) {
-        setCheckedRows((prevCheckedRows) =>
-          prevCheckedRows.filter((code) => code !== empCode),
-        );
-      } else {
-        setCheckedRows((prevCheckedRows) => [...prevCheckedRows, empCode]);
-      }
+      // if (checkedRows.includes(empCode)) {
+      //   setCheckedRows((prevCheckedRows) =>
+      //     prevCheckedRows.filter((code) => code !== empCode),
+      //   );
+      // } else {
+      //   setCheckedRows((prevCheckedRows) => [...prevCheckedRows, empCode]);
+      // }
     },
-    [checkedRows],
+    [],
   );
 
   // 모달 닫기
   const closeModal = () => {
     setOpenPostcode(false);
-  }
-
-  const handleSelectInputChange = (e) => {
-    setSelectedOption(e.target.value);
   }
 
   const data = React.useMemo(
@@ -156,7 +165,7 @@ const EmployeeRegister = () => {
           // 이 체크박스는 체크된 행의 수가 전체 empList와 동일한 경우에만 체크되도록 설정 모든 행이 체크되어 있으면 이 체크박스도 체크
           <input
             type="checkbox"
-            checked={checkedRows.length === empList.length}
+            // checked={checkedRows.length === empList.length}
             onChange={handleHeaderCheckboxClick}
           />
         ),
@@ -165,12 +174,12 @@ const EmployeeRegister = () => {
         id: "checkbox",
         Cell: ({ cell: { value }, row: { original } }) => {
           // 현재 행의 체크박스 상태를 결정 checkedRows 배열에 현재 행의 코드가 포함되어 있으면 체크박스는 체크된 상태로 표시
-          const isChecked = checkedRows.includes(original.code);
+          // const isChecked = checkedRows.includes(original.code);
           return (
             <input
               type="checkbox"
               // 행의 체크박스가 클릭될 때의 동작을 handleRowCheckboxClick 함수에 위임, 해당 행의 코드를 인자로 전달
-              checked={isChecked}
+              // checked={isChecked}
               onChange={() => handleRowCheckboxClick(original.code)}
             />
           );
@@ -188,12 +197,51 @@ const EmployeeRegister = () => {
             setInputValue(e.target.value);
           };
           const tableEmpCodeClick = (e) => {
-            console.log('Code 클릭***************************');
-            if (original && original.code) {
-              console.log(original.code);
+            console.log("*************************** Code 클릭");
+            if (original && original.code != null) {
+              console.log("*************************** original.code" + original.code);
               handleGetSingleEmp(original.code);
+              setClickCdEmp(original.code);
             } else {
               console.log('Code is null or undefined');
+            }
+          };
+          const handleInputOnBlur = async (e) => {
+            const inputValue = e.target.value;
+            
+            // 아무 입력이 없으면 아무 것도 하지 않음
+            if (inputValue === null || inputValue.trim() === "") {
+              return;
+            }
+            
+            // 삽입 조건 체크
+            if (original === null || inputValue === null || original.code === null) {
+              const exists = await checkCdEmpExists(inputValue);
+              
+              if (exists) {
+                alert("해당 Code는 이미 존재합니다.");
+                return;
+              }
+              
+              // 공백 제거
+              const noSpaces = inputValue.replace(/\s+/g, '');
+              
+              handleInsertEmp(noSpaces);
+              return;
+            }
+            
+            // 업데이트 조건 체크
+            if (original !== null || inputValue !== null || original.code !== null) {
+              const exists = await checkCdEmpExists(inputValue);
+              
+              if (!exists) {
+                handleUpdateEmp("cdEmp", inputValue, original.code);
+                console.log("******************** cdEmp");
+                console.log("******************** " + inputValue);
+                console.log("******************** " + original.code);
+              }
+              
+              return;
             }
           };
 
@@ -204,6 +252,7 @@ const EmployeeRegister = () => {
               onClick={tableEmpCodeClick}
               isDoubleClick={true}
               className={"doubleLine"}
+              onBlur={handleInputOnBlur}
             />
           );
         },
@@ -222,9 +271,19 @@ const EmployeeRegister = () => {
 
           const tableEmpNmClick = (e) => {
             console.log('사원명 클릭***************************');
-            if (original && original.code) {
+            if (original && original.code != null) {
               console.log(original.code);
               handleGetSingleEmp(original.code);
+            } else {
+              console.log('Code is null or undefined');
+            }
+          };
+          const handleInputOnBlur = (e) => {
+            // const inputValue = e.target.value;
+            // const columnName = original.accessor;
+          
+            if (original.code != null) {
+              handleUpdateEmp("nmEmp", inputValue, original.code);
             } else {
               console.log('Code is null or undefined');
             }
@@ -237,6 +296,7 @@ const EmployeeRegister = () => {
               onClick={tableEmpNmClick}
               isDoubleClick={true}
               className={"doubleLine"}
+              onBlur={handleInputOnBlur}
             />
           );
         },
@@ -283,6 +343,61 @@ const EmployeeRegister = () => {
     ],
     []
   );
+
+  const handleInsertEmp = async (codeValue) => {
+
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/er/postEmpData",
+        data: {
+          cdEmp: codeValue,
+        },
+      });
+  
+      console.log("api 이벤트 발생");
+      console.log(responseData);
+    } catch (error) {
+      console.log("api 요청 실패:", error);
+    }
+  };
+
+  // 이미 존재하는 cdEmp를 체크하는 함수
+  const checkCdEmpExists = async (cdEmp) => {
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/er/checkCdEmpExists?cdEmp=${cdEmp}`,
+
+      });
+
+      console.log("*********************************** checkCdEmpExists");
+      console.log(responseData);
+      return responseData; // data는 boolean 값
+    } catch (error) {
+      console.error("API 요청 실패:", error);
+      return false;
+    }
+  };
+
+  const handleUpdateEmp = async (columnName, newValue, cdEmp) => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/er/updateEmpData",
+        data: {
+          [columnName]: newValue,
+          cdEmp:cdEmp
+        },
+      });
+  
+      console.log("api 이벤트 발생");
+      console.log(responseData);
+    } catch (error) {
+      console.error("API 요청 실패:", error);
+    }
+  };
+  
 
   const handleGetEmpList = async () => {
     try {
@@ -546,23 +661,23 @@ const EmployeeRegister = () => {
                         className="input-cell"
                         value={selectedOption}
                         onChange={handleSelectInputChange}
+                        // onBlur={handleUpdateEmp("사원명","값","사원코드")}
                       />
                     )}
                   </div>
                 </td>
                 <td className="erCellStyle">
-                  <SearchBarBox
+                  <CustomSelect
                     className="erSelectBox"
                     options={[
                       { value: "0", label: "직접입력" },
-                      { value: "gmail.com", label: "gmail.com" },
-                      { value: "kakao.com", label: "kakao.com" },
-                      { value: "nate.com", label: "nate.com" },
-                      { value: "naver.com", label: "naver.com" },
-                      { value: "yahoo.co.kr", label: "yahoo.co.kr" },
+                      { value: "1", label: "gmail.com" },
+                      { value: "2", label: "kakao.com" },
+                      { value: "3", label: "nate.com" },
+                      { value: "4", label: "naver.com" },
+                      { value: "5", label: "yahoo.co.kr" },
                     ]}
-                    value={domain}
-                    defaultValue={"0"}
+                    defaultValue={defaultValue}
                     onChange={handleSelectChange}
                   />
                 </td>
@@ -610,7 +725,7 @@ const EmployeeRegister = () => {
                       { value: "16", label: "직급없음" },
                     ]}
                     value={noPositionUnique}
-                    defaultValue="0"
+                    placeholder="선택"
                   />
                 </td>
               </tr>
