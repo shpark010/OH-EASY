@@ -43,7 +43,7 @@ public class AuthController {
 			System.out.println("생성된 jwt 토큰 : " + token);
 
 			// Redis에 데이터(아이디, 토큰) 저장
-			redisService.setData(loginVO.getUserId(), token);
+			//redisService.setData(loginVO.getUserId(), token);
 
 			String idToken = loginVO.getUserId() + "." + token;
 			System.out.println(idToken);

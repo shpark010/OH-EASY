@@ -264,7 +264,7 @@ body {
 
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
 }
 
 #wrap {
@@ -281,8 +281,8 @@ body {
   width: 100%;
   max-width: 1640px;
   min-width: 1640px;
-  height: 100%;
   max-height: calc(100vh - 115px);
+  /* max-height: calc(100vh - 300px); */
   flex-grow: 1;
   margin: 0 auto;
 }
@@ -738,19 +738,25 @@ table {
 .namePickerBox {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   background-color: #f9f9f9;
   border: 1px solid var(--color-border-gray);
   border-top: none;
+
+  /* max-height: calc(100vh - 300px);
+  overflow-y: auto; */
 }
 
 table {
   /* 사원선택 테이블 설정 */
 }
-.table th,
+.table thead,
+table.namePickerTable thead,
+table.hrTotalTable thead {
+  border-bottom: 1px solid var(--color-border-gray);
+}
 .table td,
-table.namePickerTable th,
 table.namePickerTable td,
-table.hrTotalTable th,
 table.hrTotalTable td {
   border-bottom: 1px solid var(--color-border-gray);
 }
@@ -802,4 +808,4 @@ table.hrTotalTable td + td {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-white);
   border: none;
-} /*# sourceMappingURL=index.css.map */
+}

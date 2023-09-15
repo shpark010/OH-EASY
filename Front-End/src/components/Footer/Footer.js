@@ -6,8 +6,8 @@ const FooterContainer = styled.footer`
   min-height: 35px;
   border-top: 1px solid var(--color-primary-gray);
   font-size: 12px;
-  position: fixed;
-  bottom: 0;
+  /* position: fixed;
+  bottom: 0; */
   background-color: white;
 `;
 

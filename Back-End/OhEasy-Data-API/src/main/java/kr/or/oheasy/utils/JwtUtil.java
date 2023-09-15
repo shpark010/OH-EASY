@@ -17,7 +17,7 @@ public class JwtUtil {
     	System.out.println("진입*************************");
         return Jwts.builder()
                 .setSubject(userId)
-                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))  // 10일 유효
+                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))  
                 .signWith(key)
                 .compact();
     }

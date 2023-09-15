@@ -16,10 +16,9 @@ const StyledTr = styled.tr`
   z-index: 1;
   background-color: white;
   &:hover {
-    background-color: var(--color-secondary-blue);
+    background-color: var(--color-opacity-blue);
   }
 `;
-
 const StyledTh = styled.th`
   width: ${(props) => props.width || "auto"};
   padding: 0;
@@ -66,16 +65,28 @@ const StyledInsertFooter = styled.tfoot`
   }
 `;
 const TableContainer = styled.div`
-  height: 400px;
+  height: 100%;
   overflow-y: auto;
   position: relative;
   border-top: 2.5px solid var(--color-primary-black);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-gray);
+  }
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-opacity-gray);
+  }
 `;
 
 function Table(props) {
   const [inputValues, setInputValues] = useState({});
   //const [showInsertRow, setShowInsertRow] = useState(false);
   const tableContainerRef = useRef(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
   const handleChange = (columnId, value) => {
     setInputValues((prev) => ({ ...prev, [columnId]: value }));
@@ -99,7 +110,7 @@ function Table(props) {
             <StyledTr
               {...headerGroup.getHeaderGroupProps()}
               className="hrHeaderStyle"
-              isHeader // prop 추가하여 헤더임을 명시
+              isHeader
             >
               {headerGroup.headers.map((column) => (
                 <StyledTh {...column.getHeaderProps()} width={column.width}>
@@ -114,6 +125,30 @@ function Table(props) {
         </thead>
 
         <tbody {...getTableBodyProps()}>
+          {rows.map((row, index) => {
+            prepareRow(row);
+            return (
+              <StyledTr
+                {...row.getRowProps()}
+                className="hrRowStyle"
+                onClick={() => setSelectedRowIndex(index)} // 클릭 이벤트 처리
+                style={
+                  index === selectedRowIndex
+                    ? { backgroundColor: "var(--color-secondary-blue)" }
+                    : {}
+                }
+              >
+                {row.cells.map((cell) => (
+                  <StyledTd
+                    {...cell.getCellProps()}
+                    width={getWidthStyle(cell.column.width)}
+                  >
+                    {cell.render("Cell")}
+                  </StyledTd>
+                ))}
+              </StyledTr>
+            );
+          })}
           {props.showInsertRow && (
             <StyledTr>
               {props.columns.map((column) => {
@@ -132,33 +167,21 @@ function Table(props) {
               })}
             </StyledTr>
           )}
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <StyledTr {...row.getRowProps()} className="hrRowStyle">
-                {row.cells.map((cell) => (
-                  <StyledTd
-                    {...cell.getCellProps()}
-                    width={getWidthStyle(cell.column.width)}
-                  >
-                    {cell.render("Cell")}
-                  </StyledTd>
-                ))}
-              </StyledTr>
-            );
-          })}
         </tbody>
 
-        {/* 푸터 추가 */}
         {props.insertRow && (
           <StyledInsertFooter>
-            <StyledTr isHeader>
+            <StyledTr>
               <StyledInsertTh
                 colSpan={props.columns.length}
                 onClick={() => {
-                  if (tableContainerRef.current) {
-                    tableContainerRef.current.scrollTop = 0; // 스크롤을 맨 위로 설정
-                  }
+                  setTimeout(() => {
+                    if (tableContainerRef.current) {
+                      tableContainerRef.current.scrollTop =
+                        tableContainerRef.current.scrollHeight -
+                        tableContainerRef.current.clientHeight;
+                    }
+                  }, 0);
                   props.setShowInsertRow((prevState) => !prevState);
                 }}
               >

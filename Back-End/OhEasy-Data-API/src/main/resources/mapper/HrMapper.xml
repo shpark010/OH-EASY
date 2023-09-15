@@ -7,6 +7,11 @@
 <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
 	select cd_emp,nm_emp from hr_emp_mst
 </select>
+
+
+
+
+
 <!-- 한 사원의 기초정보	 -->
 <select id="getOneEmpBasicData" resultType="kr.or.oheasy.vo.HrEmpMstVO">
 	select * from hr_emp_mst where cd_emp=#{cdEmp}
@@ -35,6 +40,169 @@
     set ${column} = #{value} 
     where SEQ_FAMILY = #{seqFamily}
 </update>
+
+<!-- 조건 검색 카테고리 0 재직자 -->
+<select id="getConditionalEmpListCategory0" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT cd_emp,nm_emp
+    FROM hr_emp_mst
+    WHERE DT_RESIGN IS NULL 
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN cd_emp IS NULL THEN 4
+                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                cd_emp;
+        </when>
+        <!-- 이름 순 정렬 -->
+        <when test="sort == 1">
+            ORDER BY 
+                CASE 
+                    WHEN nm_emp IS NULL THEN 4
+                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
+                    ELSE 4
+                END, 
+                nm_emp;
+        </when>
+        <!-- 입사 순 정렬 -->
+        <when test="sort == 2">
+            ORDER BY 
+                CASE 
+                    WHEN dt_hire IS NOT NULL THEN 1
+                    ELSE 2
+                END, 
+                dt_hire;
+        </when>
+    </choose>
+</select>
+<!-- 조건 검색 카테고리 1 퇴사자 -->
+<select id="getConditionalEmpListCategory1" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT cd_emp,nm_emp
+    FROM hr_emp_mst
+    WHERE DT_RESIGN IS NOT NULL 
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+                ORDER BY 
+                CASE 
+                    WHEN cd_emp IS NULL THEN 4
+                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                cd_emp
+        </when>
+        <!-- 이름 순 정렬 -->
+        <when test="sort == 1">
+            ORDER BY 
+                CASE 
+                    WHEN nm_emp IS NULL THEN 4
+                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
+                    ELSE 4
+                END, 
+                nm_emp
+        </when>
+        <!-- 입사 순 정렬 -->
+        <when test="sort == 2">
+            ORDER BY 
+                CASE 
+                    WHEN dt_hire IS NOT NULL THEN 1
+                    ELSE 2
+                END, 
+                dt_hire asc
+        </when>
+    </choose>
+</select>
+
+<!-- 조건 검색 카테고리 2 재직자 + 당해년도 퇴사자 -->
+<select id="getConditionalEmpListCategory2" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT cd_emp, nm_emp 
+    FROM hr_emp_mst
+    WHERE DT_RESIGN IS NULL OR LEFT(DT_RESIGN, 4) = YEAR(NOW())
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN cd_emp IS NULL THEN 4
+                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    ELSE 3
+                END, 
+                cd_emp
+        </when>
+        <!-- 이름 순 정렬 -->
+        <when test="sort == 1">
+            ORDER BY 
+                CASE 
+                    WHEN nm_emp IS NULL THEN 4
+                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    ELSE 3
+                END,
+                nm_emp
+        </when>
+        <!-- 입사 순 정렬 -->
+        <when test="sort == 2">
+            ORDER BY 
+                CASE 
+                    WHEN dt_hire IS NULL THEN 2
+                    ELSE 1
+                END, 
+                dt_hire
+        </when>
+    </choose>
+</select>
+
+
+<!-- 조건 검색 카테고리 3 작년 퇴사자 + 당해년도 퇴사자 -->
+<select id="getConditionalEmpListCategory3" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT cd_emp, nm_emp 
+    FROM hr_emp_mst
+    WHERE LEFT(DT_RESIGN, 4) IN (YEAR(NOW()), YEAR(NOW()) - 1)
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN cd_emp IS NULL THEN 4
+                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                cd_emp;
+        </when>
+        <!-- 이름 순 정렬 -->
+        <when test="sort == 1">
+            ORDER BY 
+                CASE 
+                    WHEN nm_emp IS NULL THEN 4
+                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
+                    ELSE 4
+                END,
+                nm_emp
+        </when>
+        <!-- 입사 순 정렬 -->
+        <when test="sort == 2">
+            ORDER BY 
+                CASE 
+                    WHEN dt_hire IS NULL THEN 2
+                    ELSE 1
+                END, 
+                dt_hire
+        </when>
+    </choose>
+</select>
 
 </mapper>
 

@@ -49,6 +49,12 @@ const HrFamily = ({ cdEmp }) => {
     accessor,
     inputValue,
   ) => {
+    console.log("현재 inputValue : " + inputValue);
+    if (inputValue == null || inputValue === "" || inputValue === undefined) {
+      console.log("값의 변화가 없음 api요청 안감");
+      return;
+    }
+
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -177,7 +183,7 @@ const HrFamily = ({ cdEmp }) => {
 
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               onBlur={handleInputOnBlur}
@@ -218,7 +224,7 @@ const HrFamily = ({ cdEmp }) => {
           };
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               type="resident"
@@ -419,7 +425,7 @@ const HrFamily = ({ cdEmp }) => {
           };
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
@@ -456,7 +462,7 @@ const HrFamily = ({ cdEmp }) => {
           };
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
@@ -497,7 +503,7 @@ const HrFamily = ({ cdEmp }) => {
           };
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
@@ -539,7 +545,7 @@ const HrFamily = ({ cdEmp }) => {
 
           return (
             <Input
-              value={inputValue}
+              value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
@@ -559,7 +565,7 @@ const HrFamily = ({ cdEmp }) => {
       insertRow={true}
       showInsertRow={showInsertRow}
       setShowInsertRow={setShowInsertRow}
-      scrollHeight={"500"}
+      scrollHeight={"700"}
     />
   );
 };

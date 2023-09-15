@@ -1,23 +1,12 @@
 import React from "react";
-import Table from "../../Tables/Table";
+import Table from "../../TablesLib/Table";
+import useApiRequest from "../../Services/ApiRequest";
 
-const HrEdu = () => {
-  return (
-    <Table
-      headers={[
-        "학교명",
-        "입학일",
-        "졸업일",
-        "구분",
-        "소재지",
-        "전공과목",
-        "부전공",
-        "학위",
-        "주야",
-        "분교",
-      ]}
-    />
-  );
+const HrEdu = ({ cdEmp }) => {
+  const apiRequest = useApiRequest();
+  console.log("학력 페이지 ******");
+  console.log(cdEmp);
+  return <div></div>;
 };
 
 export default HrEdu;

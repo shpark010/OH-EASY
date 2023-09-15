@@ -25,6 +25,27 @@ public class HrService {
     	
     	return dao.getAllEmpList();
     }
+    
+    
+    public List<HrEmpMstVO> getConditionalEmpList(@Param("category") int category,@Param("sort") int sort){
+    	HrDao dao = sqlSession.getMapper(HrDao.class);
+    	
+    	if(category == 0) {
+    		return dao.getConditionalEmpListCategory0(category, sort);
+    	}else if(category == 1) {
+    		return dao.getConditionalEmpListCategory1(category, sort);
+    	}else if(category == 2) {
+    		return dao.getConditionalEmpListCategory2(category, sort);
+    	}else if(category == 3) {
+    		return dao.getConditionalEmpListCategory3(category, sort);
+    	}else {
+    		return dao.getAllEmpList();
+    	}
+    	
+    }
+    
+    
+    
     public HrEmpMstVO getOneEmpBasicData(String cdEmp){
     	HrDao dao = sqlSession.getMapper(HrDao.class);
     	
@@ -35,6 +56,8 @@ public class HrService {
         column = Camel.camelToSnake(column);
         return dao.updateEmpBasicData(cdEmp, column, value);
     }
+    
+    
     
     
     
