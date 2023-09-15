@@ -4,9 +4,9 @@
 <mapper namespace="kr.or.oheasy.wc.dao.WcDao">
 
 <!-- 전사원의 정보 -->
-<select id="getAllEmpList" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+<select id="getAllEmpList"  resultType="kr.or.oheasy.vo.WcGetEmpListVO">
 	SELECT cd_emp,nm_emp,no_resident FROM hr_emp_mst
-	WHERE fg_workcontract = #{tabState}
+	
 </select>
 
   

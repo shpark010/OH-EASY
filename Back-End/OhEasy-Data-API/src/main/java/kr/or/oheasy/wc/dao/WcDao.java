@@ -9,7 +9,7 @@ public interface WcDao {
 
 
 
-		public List<WcGetEmpListVO> getAllEmpList(String tabState); 
+		public List<WcGetEmpListVO> getAllEmpList(); 
 		public int updateEmp0to1();
 		public WcVO getWcData(String code);
 	

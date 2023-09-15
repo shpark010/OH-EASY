@@ -16,9 +16,9 @@ public class WcService {
 	@Autowired
 	private SqlSession sqlSession; //mybatis
 	
-	public List<WcGetEmpListVO> getAllEmpList(String tabState) {
+	public List<WcGetEmpListVO> getAllEmpList() {
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getAllEmpList(tabState);
+		return wcdao.getAllEmpList();
 		
 	}
 	

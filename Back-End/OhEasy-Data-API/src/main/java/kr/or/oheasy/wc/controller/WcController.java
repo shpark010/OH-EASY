@@ -23,12 +23,11 @@ public class WcController {
 	private WcService wcService;
 	
 	@GetMapping("/getEmpList")
-	public ResponseEntity<?> getAllEmpList(@RequestParam String tabState) {
+	public ResponseEntity<?> getAllEmpList() {
 
-	    List<WcGetEmpListVO> result = wcService.getAllEmpList(tabState);
+	    List<WcGetEmpListVO> result = wcService.getAllEmpList();
 
 	    System.out.println("getEmpList 진입");
-	    System.out.println(tabState);
 
 	    return new ResponseEntity<>(result, HttpStatus.OK);
 	}
