@@ -71,11 +71,8 @@
 
 .erInputDisabledStyle {
   border: 1px solid #ffffff;
-  width: 100%;
-}
-
-input:disabled {
   background: #ffffff;
+  width: 100%;
 }
 
 .erLightGreen {
@@ -87,23 +84,23 @@ input:disabled {
 }
 
 /* email */
-.email-cell {
+.erEmailCell {
   display: flex;
   align-items: center;
 }
 
-.at-sign {
+.erAtSign {
   text-align: left;
   font-size: 13px;
   padding-right: 8px;
 }
 
-.input-cell {
+.erInputCell {
   width: 159px;
 }
 
 /* 모달 스타일 */
-.modalOverlay {
+.erModalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -116,7 +113,7 @@ input:disabled {
   align-items: center;
 }
 
-.modalContent {
+.erModalContent {
   background-color: white;
   padding: 30px;
   border-radius: 8px;
