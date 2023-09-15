@@ -1,41 +1,24 @@
 /* 작은 해상도에서의 스타일링 */
-@media (max-width: 1920px) {
-  /* 작은 해상도에서의 스타일 설정 */
-  .sd-section {
-    height: 600px;
-  }
-  .sd-container {
-    /* height: 100%; */
-    padding-top: 1%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 300px;
-    grid-gap: 1rem;
-    grid-template-areas:
-      "a b d f"
-      "a c e f";
-  }
+/* @media (max-width: 1920px) { */
+/* 작은 해상도에서의 스타일 설정 */
+.sd-section {
+  height: calc(100% - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-
-/* 큰 해상도에서의 스타일링 */
-@media (min-width: 1921px) {
-  /* 큰 해상도에서의 스타일 설정 */
-  .sd-section {
-    height: 900px;
-  }
-
-  .sd-container {
-    height: 100%;
-    padding-top: 1%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 380px;
-    grid-gap: 1rem;
-    grid-template-areas:
-      "a b d f"
-      "a c e f";
-  }
+.sd-container {
+  height: calc(100% - 68px);
+  /* height: 100%; */
+  padding-top: 1%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 48%;
+  grid-gap: 1rem;
+  grid-template-areas:
+    "a b d f"
+    "a c e f";
 }
+/* } */
 
 /* .sd-section {
   height: 900px;
@@ -56,6 +39,8 @@
 .searchBarNameCalender {
   display: flex;
   align-items: center;
+  padding-right: 25px;
+  padding-top: 2px;
 }
 
 .searchBarNameCalender span {
@@ -121,6 +106,16 @@
   grid-area: f;
   background-color: #f2f2f2;
   height: 100%;
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-gray);
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-opacity-gray);
+  }
 }
 
 .sd-item1 .sd-empList,
