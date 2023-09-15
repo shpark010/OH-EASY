@@ -7,7 +7,7 @@ const Input = styled.input`
   border: 1px solid var(--color-primary-gray);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   height: 32px;
-  padding: 0 5px;
+  padding: 0 12px;
   background-color: ${(props) => props.backgroundColor || "transparent"};
   font-weight: 700;
   font-family: "NanumSquare", sans-serif;
@@ -29,6 +29,7 @@ function CustomInput({
   onblur,
   backgroundColor,
   readOnly,
+  placeholder,
 }) {
   const handleInputChange = (e) => {
     let newValue = e.target.value;
@@ -74,6 +75,7 @@ function CustomInput({
       onChange={handleInputChange}
       backgroundColor={backgroundColor}
       readOnly={readOnly}
+      placeholder={placeholder}
     />
   );
 }
