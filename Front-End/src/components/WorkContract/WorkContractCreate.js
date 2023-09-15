@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React,{ useState,useRef, useMemo, useEffect }  from 'react';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
 import CustomInput from '../../components/Contents/CustomInput';
@@ -14,14 +14,66 @@ import useApiRequest from '../Services/ApiRequest';
 
 
 
+
 const WorkContractCreate = ({empList}) => {
   const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
   const [openPostcode, setOpenPostcode] = useState(false);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
+  const [checkColumn,setCheckColumn] = useState([]);
+  const [checkBoxState,setCheckBoxState] = useState();
+  const [codeArr, setCodeArr] = useState([]);
+  const schangeCheck2 = (e, originalCode) => {
+    const checkedValue = e.target.checked;
+
+    if (checkedValue) {
+      setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
+    } else {
+      setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
+    }
+  };
+  useEffect(() => {
+    console.log("codeArr 변경됨:", codeArr);
+  }, [codeArr]); // codeArr이 변경될 때만 실행
+  const checkRef = useRef(); // checkbox 용 useRef
+
+  
+ const changeCheck = (e) =>{
+  const checkedValue = e.target.checked;
+  const codeArr = [];
+  console.log(e.target.cdEmp);
+  // empList.forEach(emp => {
+  //     if (checkedValue) {
+  //     console.log("code : " + emp.cdEmp);
+  //     console.log("truefalse : " + checkedValue);
+  
+  //     codeArr.push(emp.cdEmp);
+  //   } else {
+  //     return null; // 혹은 다른 값을 반환하여 해당 요소를 건너뜁니다.
+  //   }
+  // });
+  // const codeArr = empList.map((emp) => {
+  //   if (checkedValue === true) {
+  //     console.log("code : " + emp.cdEmp);
+  //     console.log("truefalse : " + checkedValue);
+  
+  //     // return {
+  //     //   code : emp.cdEmp,
+  //     // };
+  //   } else {
+  //     return null; // 혹은 다른 값을 반환하여 해당 요소를 건너뜁니다.
+  //   }
+  // });
+  console.log(codeArr);
+ 
+}
 
 
+ const selectCheckBox = () =>{
+  checkRef.current.checked = true
+
+ }; // Checkbox all select 되도록하는 함수
 
 
   const addrButtonClick= () => {
@@ -30,7 +82,9 @@ const WorkContractCreate = ({empList}) => {
 
   const closeModal = () => {
     setOpenPostcode(false);
-  }
+  };
+
+  
 
   const handleAddressSelect = (addr) => {
     console.log(`
@@ -53,8 +107,10 @@ const WorkContractCreate = ({empList}) => {
     setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
     setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
     setOpenPostcode(false); // 모달 닫기
-  }
-  const data = React.useMemo(
+  };
+
+
+  const data = useMemo(
     () =>
       empList.map((emp) => ({
         checkbox: false,
@@ -64,40 +120,64 @@ const WorkContractCreate = ({empList}) => {
       })),
     [empList]
   );
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
+
       {
-        Header: "✓",
+        Header:(<input 
+          type='checkbox'
+    
+          onChange={selectCheckBox}
+          />),
         accessor: "checkbox",
         id: "checkbox",
         width:"10%",
-        Cell: ({ cell: { value } }) =>{ 
-          
+        Cell: ({ cell: { value }, row :{original} }) =>{ 
+
+          const onCell = () =>{
+            console.log("checkBox Click");
+            console.log(original.code);
+
+          }
+
+          const changeCheck2 = (e) => {
+            schangeCheck2(e, original.code);
+          }
         return(
           <>
-        
-        <input type="checkbox" />
+        <input type="checkbox" onChange={changeCheck2} />
 
         </>
         );
       
-      },
-      },
+      }
+      }
+      ,
       {
         Header: "Code",
         accessor: "code",
         id: "code",
         width: "20%",
-        Cell: ({ cell: { value } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
+        Cell: ({ cell: { value }, row :{original} }) => {
+          const [inputValue, setInputValue] = useState(value);
           const [modalApper,setModalApper] = useState("off")
+  
+
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
+
           const handleInputClick = (e) => {
-            console.log(e.target);
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            ele.style.backgroundColor = 'var(--color-secondary-blue)';
           };
+
+          const inputBlur = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = '';
+          }
+
 
           /*Code input에서 mouse 올라오면 state 변경하는 함수 */
           const mouseOverModalOn = ()=>{
@@ -122,10 +202,13 @@ const WorkContractCreate = ({empList}) => {
             <Input
               value={inputValue}
               onClick={handleInputClick }
+              onBlur={inputBlur}
               onChange={handleInputChange}
               onMouseOver={mouseOverModalOn}
               onMouseOut= {mouseOutModalOff}
               modalRender = {modalApperFunc}
+              className = {"doubleLine"}
+              
             
             />
 
@@ -138,8 +221,21 @@ const WorkContractCreate = ({empList}) => {
         accessor: "employee",
         id: "employee",
         width: "20%",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row :{original}  }) => {
           const [inputValue, setInputValue] = React.useState(value);
+          
+
+          const handleInputClick = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = 'var(--color-secondary-blue)';
+        
+          }; // input tag Click시 발생할 event
+
+          const inputBlur = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = '';
+          }
+      
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
@@ -148,7 +244,12 @@ const WorkContractCreate = ({empList}) => {
           return (
             <Input
               value={inputValue}
+              onClick={handleInputClick}
+              onBlur={inputBlur}
               onChange={handleInputChange}
+              className = {"doubleLine"}
+              
+              
             />
           );
         },
@@ -158,8 +259,18 @@ const WorkContractCreate = ({empList}) => {
         Header: "주민번호",
         accessor: "resident",
         id: "resident",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row :{original} } ) => {
           const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputClick = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          };
+
+          const inputBlur = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = '';
+          }
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
@@ -169,6 +280,9 @@ const WorkContractCreate = ({empList}) => {
             <Input
               value={inputValue}
               onChange={handleInputChange}
+              onClick={handleInputClick}
+              onBlur={inputBlur}
+              className ={"doubleLine"}
             />
           );
         },
@@ -177,12 +291,7 @@ const WorkContractCreate = ({empList}) => {
     []
   );
   
-  const onBlur = () => {
-    
-
-    
-  }
-  // 블러처리 이벤트 (해당 tag를 벗어나는 모든 경우를 blur라고한다.)
+  
 
 
   const submitButtonClick= async () => {
@@ -299,7 +408,7 @@ const WorkContractCreate = ({empList}) => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">상세주소  </td>
                   <td className="wcRightGridTableRightTd1" colSpan="2">
-                    <CustomInput width={605} onBlur = {onBlur} />
+                    <CustomInput width={605} onBlur = {""} />
                   </td>
                 </tr>
                 <tr>
@@ -515,4 +624,5 @@ const WorkContractCreate = ({empList}) => {
       </>
     );
   }
+
 export default WorkContractCreate;
