@@ -1,10 +1,13 @@
 .erSection {
-  display: grid;
+  display: flex;
+  gap: 1rem;
+  /* display: grid;
   grid-template-columns: 1fr 2fr;
-  grid-gap: 1rem;
+  grid-gap: 1rem; */
+
   width: 100%;
   max-width: 1640px;
-  height: 88%;
+  height: calc(100% - 100px);
   margin: 0 auto;
   padding: 0 15px;
   flex-grow: 1;
@@ -12,15 +15,17 @@
 }
 
 .erGrid {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  border-left: 1px solid #d8d8d8;
+  display: flex;
+  /* display: grid; */
+  /* grid-template-rows: 1fr auto; */
+  /* border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
-  border-bottom: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8; */
   box-sizing: border-box;
-  overflow: auto;
+  /* overflow: auto; */
   background-color: #ffffff;
   position: relative;
+  /* height: calc(100% - 100px); */
 }
 
 .erGridBottomTable {
@@ -42,7 +47,10 @@
 .erlistArea {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  width: 530px;
+  /* height: 100%; */
+
+  /* height: calc(100% - 100px); */
 }
 
 .erGrid2 {
@@ -71,8 +79,11 @@
 
 .erInputDisabledStyle {
   border: 1px solid #ffffff;
-  background: #ffffff;
   width: 100%;
+}
+
+input:disabled {
+  background: #ffffff;
 }
 
 .erLightGreen {

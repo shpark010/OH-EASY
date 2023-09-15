@@ -87,21 +87,57 @@ const WorkContractSelect = ({sleEmpList}) => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "✓",
-        accessor: "checkbox",
-        id: "checkbox",
-        width:"10%",
-        Cell: ({ cell: { value } }) =>{ 
-          
-        return(
-          <>
-        
-        <input type="checkbox" />
+        Header: "작성년월",
+        accessor: "creDate",
+        id: "creDate",
+        width: "20%",
+        Cell: ({ cell: { value },row: { original } }) => {
+          const [inputValue, setInputValue] = React.useState(value);
+          const [modalApper,setModalApper] = useState("off")
 
-        </>
-        );
-      
-      },
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+          const handleInputClick = (e) => {
+
+            console.log("코드 컬럼 클릭 이벤트 실행 **********");
+            getEmpData(value); //
+           
+          };
+
+          /*Code input에서 mouse 올라오면 state 변경하는 함수 */
+          const mouseOverModalOn = ()=>{
+            setModalApper("on");
+          };
+
+          /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
+          const mouseOutModalOff = ()=>{
+            setModalApper("off");
+          };
+
+          /*Code input에 code 도우미 render 함수*/ 
+          const modalApperFunc = () =>{
+            if(modalApper === "on"){
+              return null;
+            }
+            else return null;
+
+          };
+
+          return (
+            <Input
+              value={inputValue}
+              onClick={handleInputClick }
+              onChange={handleInputChange}
+              onMouseOver={mouseOverModalOn}
+              onMouseOut= {mouseOutModalOff}
+              modalRender = {modalApperFunc}
+            
+            />
+
+          );
+
+        },
       },
       {
         Header: "Code",
@@ -230,7 +266,7 @@ const WorkContractSelect = ({sleEmpList}) => {
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
               
-              <div className="searchBarName">작성년도</div>
+              <div className="searchBarName">작성년월</div>
               <CustomCalendar width={130}/>
               <b>~</b>
               <CustomCalendar width={130}/>

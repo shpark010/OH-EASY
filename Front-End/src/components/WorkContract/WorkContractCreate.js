@@ -216,7 +216,7 @@ const WorkContractCreate = ({empList}) => {
           <div className="innerBox fxSpace">
             <div className="selectWrapper">
               
-              <div className="searchBarName">작성년도</div>
+              <div className="searchBarName">작성년월</div>
               <CustomCalendar width={130}
               
               />
@@ -491,11 +491,7 @@ const WorkContractCreate = ({empList}) => {
                 </tr>
                 
               </table>
-              <button 
-              className='wcCreateSumbitButton' 
-              onClick={submitButtonClick}
-              >
-              작성완료</button>
+              
             </div>
           </div>
 
