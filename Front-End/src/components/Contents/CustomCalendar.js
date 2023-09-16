@@ -8,6 +8,10 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 const InputWrapper = styled.div`
   position: relative;
   width: ${(props) => props.width || "100px"};
+
+  input[readonly] + div {
+    cursor: not-allowed;
+  }
 `;
 
 const Input = styled.input`
@@ -24,6 +28,14 @@ const Input = styled.input`
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
+
+  /* 조건부 스타일링 readOnly가 true 일경우 */
+  ${(props) =>
+    props.readOnly &&
+    `
+    background-color: var(--color-opacity-gray);
+    cursor: not-allowed;
+  `}
 `;
 
 const StyledCalendar = styled(Calendar)`
@@ -71,7 +83,16 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar({ width, id, className, onChange, type, name, value }) {
+function CustomCalendar({
+  width,
+  id,
+  className,
+  onChange,
+  type,
+  name,
+  value,
+  readOnly,
+}) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -139,11 +160,13 @@ function CustomCalendar({ width, id, className, onChange, type, name, value }) {
         id={id}
         className={className}
         value={formatDate(value)}
-        onClick={() => setIsOpen(!isOpen)}
+        //onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !readOnly && setIsOpen(!isOpen)}
         onChange={onChange}
+        readOnly={readOnly}
         name={name}
       />
-      <IconWrapper onClick={() => setIsOpen(!isOpen)}>
+      <IconWrapper onClick={() => !readOnly && setIsOpen(!isOpen)}>
         <FaRegCalendarAlt size={17} />
       </IconWrapper>
       {isOpen && (
