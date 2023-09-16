@@ -2,19 +2,33 @@ import React from "react";
 import styled from "styled-components";
 
 const Div = styled.div`
-  display: flex; /* 항목들을 수평으로 배열 */
+  display: flex;
 `;
 
 const Input = styled.input`
   appearance: auto;
   height: 29px;
-  margin-right: 5px; /* 오른쪽 간격 추가 */
+  margin-right: 5px;
+
+  /* 조건부 스타일링 */
+  ${({ readOnly }) =>
+    readOnly &&
+    `
+    accent-color: gray;
+  `}
 `;
 
 const Label = styled.label`
-  display: flex; /* 요소들을 수평으로 배치 */
-  align-items: center; /* 내부 요소를 중앙 정렬 */
-  margin-right: 15px; /* 각 라벨 사이의 간격 추가 */
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+
+  /* 조건부 스타일링 */
+  ${({ readOnly }) =>
+    readOnly &&
+    `
+    pointer-events: none;
+  `}
 `;
 
 const Span = styled.span`
@@ -29,16 +43,18 @@ function CustomRadio({
   options,
   onChange,
   value,
+  readOnly = false, // default로 false 값을 설정
 }) {
   const handleRadioChange = (e) => {
     if (onChange) {
       onChange(e);
     }
   };
+
   return (
     <Div id={id} className={classNameBox}>
       {options.map(([labelText, optionValue]) => (
-        <Label key={optionValue}>
+        <Label key={optionValue} readOnly={readOnly}>
           <Input
             className={classNameRadio}
             type="radio"
@@ -46,6 +62,7 @@ function CustomRadio({
             value={optionValue}
             onChange={handleRadioChange}
             checked={String(value) === optionValue}
+            readOnly={readOnly}
           />
           <Span>{labelText}</Span>
         </Label>
