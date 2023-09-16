@@ -809,3 +809,14 @@ table.hrTotalTable td + td {
   color: var(--color-primary-white);
   border: none;
 }
+
+.test {
+  text-align: center;
+}
+
+.test2 {
+  overflow: auto;
+  /* height: 50%; */
+  flex-grow: 0;
+  padding-bottom: 20px;
+}
