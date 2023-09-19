@@ -16,18 +16,16 @@ import PageHeaderName from '../components/PageHeader/PageHeaderName';
 
 
 
-const WorkContract = () => {
+const WorkContract = () => { 
 
-  const apiRequest = useApiRequest();
   const [tabState,setTab] = useState("0");
-  const [creEmpList,setCreEmpList] = useState([]); //작성 Component에 넘겨줄 prop
-  const [sleEmpList,setSleEmpList] = useState([]); // 조회 Component
   
 
 
-  const tabClick = (tabState) =>{
-    setTab(tabState)
-    console.log({tabState})
+  const tabClick = (e,tabState) =>{
+    
+    setTab(e.target.value)
+    
   
   };
 
@@ -36,11 +34,11 @@ const WorkContract = () => {
     switch(tabState){
       case "0" :
 
-        return (<WorkContractCreate empList={creEmpList} />);
+        return (<WorkContractCreate />);
 
         // 계약서 작성 Tab Click
       case "1" :
-        return <WorkContractSelect sleEmpList={sleEmpList}  />;
+        return <WorkContractSelect />;
         // 계약서 조회 Tab Click
       default : 
       return null;
@@ -50,26 +48,8 @@ const WorkContract = () => {
   };
 
 
-const getEmpList = async () => { 
-  try {
-    const responseData = await apiRequest({
-      method: "GET",
-      url: `/api2/wc/getEmpList?tabState=${tabState}`,
-    });
-    
-    if(tabState==="0"){
-      setCreEmpList(responseData);
-      
-    }
-    else if(tabState==="1"){
-      setSleEmpList(responseData);
-      
-    }
-    
-  } catch (error) {
-    console.error("Failed to fetch emp data:", error);
-  }
-};
+  
+
 
 
     
@@ -82,7 +62,7 @@ const getEmpList = async () => {
           <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                  <button onClick={getEmpList}>Test용 </button>
+                  
                 <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
               </div>
               <div className="iconBtnWrap">
@@ -115,12 +95,14 @@ const getEmpList = async () => {
          <div className='borderbuttonBold'>
           <button 
           className={`wcTab1 ${tabState === "0" ? "wcOn" : ""}`}
-          onClick={ () => tabClick("0")}> 계약서 작성
+          onClick={tabClick}
+          value={0}> 계약서 작성
           </button>  
 
           <button 
           className={`wcTab2 ${tabState === "1" ? "wcOn" : ""}`} 
-          onClick={ ()=>tabClick("1")} > 계약서 조회
+          onClick={ tabClick} 
+          value={1}> 계약서 조회
           </button>
         </div> 
         

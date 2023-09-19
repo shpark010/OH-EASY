@@ -1,5 +1,4 @@
-import React,{ useState } from 'react';
-// import '../styles/css/pages/WorkContract.css';
+import React,{ useState,useRef, useMemo, useEffect }  from 'react';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
 import CustomInput from '../../components/Contents/CustomInput';
@@ -14,14 +13,53 @@ import useApiRequest from '../Services/ApiRequest';
 
 
 
-const WorkContractSelect = ({sleEmpList}) => {
+
+
+const WorkContractCreate = () => {
 
   const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
   const [openPostcode, setOpenPostcode] = useState(false);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
-  const [addr,setAddr] = useState("");
+  const [checkColumn,setCheckColumn] = useState([]);
+  const [isChecked, setIsChecked] = useState(false);
+  const [codeArr, setCodeArr] = useState([]);
+  // const [optionEmpList,setOptionEmpList] = ([]); // 조건조회로 받아온 data
+  const [belongingDate, setBelongingDate] = useState(""); //년월 달력 상태 관리.
+  const [belongingDate2,setBelongingDate2]= useState(""); //년월 달력 상태 관리 끝 날짜.
+  const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
+  
+
+
+  
+
+  // const schangeCheck2 = (e, originalCode) => {
+  //   const checkedValue = e.target.checked;
+
+  //   if (checkedValue) {
+  //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
+  //   } else {
+  //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
+  //   }
+  // };
+  // useEffect(() => {
+  //   console.log("codeArr 변경됨:", codeArr);
+  // }, [codeArr]); // codeArr이 변경될 때만 실행
+  
+  const handleBelongingDateChange = (newDate) => {
+    
+    newDate = newDate.replace(/-/g, "");
+    setBelongingDate(newDate);
+  }; // 년월 달력 변경 이벤트시 작동하는 함수. 시작날짜
+  
+  const handleBelongingDateChange2 = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
+    setBelongingDate2(newDate);
+  }; // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
+  //e 넣으면 오류뜸 why? 함수하나로 분기처리 하고싶은데 안됨.
+
+
 
   const addrButtonClick= () => {
     setOpenPostcode(true);
@@ -29,7 +67,9 @@ const WorkContractSelect = ({sleEmpList}) => {
 
   const closeModal = () => {
     setOpenPostcode(false);
-  }
+  };
+
+  
 
   const handleAddressSelect = (addr) => {
     console.log(`
@@ -37,8 +77,8 @@ const WorkContractSelect = ({sleEmpList}) => {
         주소: ${addr.address}
     `);
     // // 주소와 우편번호 값을 가져온 데이터로 설정
-    // const address = data.address;
-    // const zipcode = data.zipcode;
+    // const address = addr.address;
+    // const zipcode = addr.zipcode;
   
     // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
     // setEmpList((prevEmpList) => [
@@ -52,111 +92,191 @@ const WorkContractSelect = ({sleEmpList}) => {
     setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
     setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
     setOpenPostcode(false); // 모달 닫기
+  };
+
+
+  const data = useMemo(
+    () =>
+    employeeData.map((emp) => ({
+        dtCreated: emp.dtCreated,
+        cdEmp: emp.cdEmp,
+        nmEmp: emp.nmEmp,
+        noResident: emp.noResident,
+      })),
+    [employeeData]
+  );
+  
+
+  const selectAllCheckBox = (e) =>{
+
+    
+    // const newEmpList = empList.map(emp=>({
+    //   checkbox : e.target.checked,
+    //   cdEmp: emp.cdEmp,
+    //   nmEmp: emp.nmEmp,
+    //   noResident: emp.noResident,
+    // }));
+    // console.log(newEmpList);
+
+    
+
+    const allInputs = e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input');
+  //   // 모든 Table까지 가서 모든 input tag select 하면 배열로 return
+  //   console.log(e.target.checked); // 현재 누른 이벤트 check 값
+    
+    if (e.target.checked){
+    allInputs.forEach(input => {
+      input.checked = true;
+    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
+    setIsChecked(true)
+    
   }
 
-  const getEmpData = async (data) => {
-    console.log("눌리긴하네요");
-      try {
-        const responseData = await apiRequest({
-          method: "GET",
-          url: `/api2/wc/getWcData?code=${data}`,
-        });
-        
-        setAddr(responseData);
-        console.log(responseData);
-        console.log(addr.addrWorkDtl);
-        
-      } catch (error) {
-        console.error("Failed to fetch emp data:", error);
-      }
-    };
+  else if (!e.target.checked){
+    allInputs.forEach(input => {
+      input.checked = false;
+    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
+    setIsChecked(false)
+    
+  }
+    //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
+    
+    
+  }
+
+  const conditionSearch = async () => { // 작성년월과 조회 날짜를 받아 조회하는 버튼
+    setEmployeeData([]);
+
+    try {
+     
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
+      });
+     
+      setEmployeeData(responseData)
+      console.log(employeeData);
+    
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+
+    
+  }//조건조회
+
+
+  const searchOrderOption = (e) =>{
+    setSearchOrder(e.target.value)
+    
+  } // 정렬 option button 변경시 호출하는 이벤트
+  useEffect(() => {
+    console.log(searchOrder);
+  }, [searchOrder]); //codeArr이 변경될때만 실행.
 
   
 
-
-  const data = React.useMemo(
-    () =>
-      sleEmpList.map((emp) => ({
-        checkbox: false,
-        code: emp.cdEmp,
-        employee: emp.nmEmp,
-        resident: emp.noResident,
-      })),
-    [sleEmpList]
-  );
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
+
       {
-        Header: "작성년월",
-        accessor: "creDate",
-        id: "creDate",
-        width: "20%",
-        Cell: ({ cell: { value },row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
+        Header:
+        
+          "작성년월"
+        ,
+        accessor: "dtCreated",
+        id: "dtCreated",
+        width:"20%",
+        Cell: ({ cell: { value }, row :{original} }) =>{ 
+          const [inputValue, setInputValue] = useState(value);
           const [modalApper,setModalApper] = useState("off")
+         const getCodeArr = (e) =>{
+           const codeValue = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+          console.log(codeValue);
 
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
-          const handleInputClick = (e) => {
 
-            console.log("코드 컬럼 클릭 이벤트 실행 **********");
-            getEmpData(value); //
-           
-          };
+  
+         }
 
-          /*Code input에서 mouse 올라오면 state 변경하는 함수 */
-          const mouseOverModalOn = ()=>{
-            setModalApper("on");
-          };
+         const handleInputChange = (e) => {
+          setInputValue(e.target.value);
+        };
 
-          /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
-          const mouseOutModalOff = ()=>{
-            setModalApper("off");
-          };
+        const handleInputClick = (e) => {
+          // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+          // ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          console.log(value);
+        };
 
-          /*Code input에 code 도우미 render 함수*/ 
-          const modalApperFunc = () =>{
-            if(modalApper === "on"){
-              return null;
-            }
-            else return null;
+        const inputBlur = (e) => {
+          // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+          //  ele.style.backgroundColor = '';
+        }
 
-          };
 
-          return (
-            <Input
+        /*Code input에서 mouse 올라오면 state 변경하는 함수 */
+        const mouseOverModalOn = ()=>{
+          setModalApper("on");
+        };
+
+        /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
+        const mouseOutModalOff = ()=>{
+          setModalApper("off");
+        };
+
+        /*Code input에 code 도우미 render 함수*/ 
+        const modalApperFunc = () =>{
+          if(modalApper === "on"){
+            return null;
+          }
+          else return null;
+
+        };
+        return(
+          <>
+          <Input
               value={inputValue}
               onClick={handleInputClick }
+              onBlur={inputBlur}
               onChange={handleInputChange}
               onMouseOver={mouseOverModalOn}
               onMouseOut= {mouseOutModalOff}
               modalRender = {modalApperFunc}
+              className = {"doubleLine"}
+              
             
             />
-
-          );
-
-        },
-      },
+        
+        </>
+        );
+      
+      }
+      }
+      ,
       {
         Header: "Code",
-        accessor: "code",
-        id: "code",
+        accessor: "cdEmp",
+        id: "cdEmp",
         width: "20%",
-        Cell: ({ cell: { value },row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
+        Cell: ({ cell: { value }, row :{original} }) => {
+          const [inputValue, setInputValue] = useState(value);
           const [modalApper,setModalApper] = useState("off")
+  
+
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-          const handleInputClick = (e) => {
 
-            console.log("코드 컬럼 클릭 이벤트 실행 **********");
-            getEmpData(value); //
-           
+          const handleInputClick = (e) => {
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
           };
+
+          const inputBlur = (e) => {
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = '';
+          }
+
 
           /*Code input에서 mouse 올라오면 state 변경하는 함수 */
           const mouseOverModalOn = ()=>{
@@ -181,10 +301,13 @@ const WorkContractSelect = ({sleEmpList}) => {
             <Input
               value={inputValue}
               onClick={handleInputClick }
+              onBlur={inputBlur}
               onChange={handleInputChange}
               onMouseOver={mouseOverModalOn}
               onMouseOut= {mouseOutModalOff}
               modalRender = {modalApperFunc}
+              className = {"doubleLine"}
+              
             
             />
 
@@ -194,28 +317,38 @@ const WorkContractSelect = ({sleEmpList}) => {
       },
       {
         Header: "사원명",
-        accessor: "employee",
-        id: "employee",
+        accessor: "nmEmp",
+        id: "nmEmp",
         width: "20%",
-        Cell: ({ cell: { value } ,row: { original }}) => {
+        Cell: ({ cell: { value }, row :{original}  }) => {
           const [inputValue, setInputValue] = React.useState(value);
+          
+
+          const handleInputClick = (e) => {
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
+        
+          }; // input tag Click시 발생할 event
+
+          const inputBlur = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = '';
+          }
+      
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
 
-          const handleInputClick = (e) => {
-            console.log("사원명 Click Event 실행*****");
-            getEmpData(original.code);
-             
-          };
-
           return (
             <Input
               value={inputValue}
-              onChange={handleInputChange}
               onClick={handleInputClick}
-
+              onBlur={inputBlur}
+              onChange={handleInputChange}
+              className = {"doubleLine"}
+              
+              
             />
           );
         },
@@ -223,19 +356,23 @@ const WorkContractSelect = ({sleEmpList}) => {
       
       {
         Header: "주민번호",
-        accessor: "resident",
-        id: "resident",
-        Cell: ({ cell: { value },row: { original } }) => {
+        accessor: "noResident",
+        id: "noResident",
+        Cell: ({ cell: { value }, row :{original} } ) => {
           const [inputValue, setInputValue] = React.useState(value);
+
+          const handleInputClick = (e) => {
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          };
+
+          const inputBlur = (e) => {
+            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+             ele.style.backgroundColor = '';
+          }
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-          };
-
-          const handleInputClick = (e) => {
-            console.log("주민번호 Click Event 실행*****");
-            getEmpData(original.code);
-             
           };
 
           return (
@@ -243,6 +380,8 @@ const WorkContractSelect = ({sleEmpList}) => {
               value={inputValue}
               onChange={handleInputChange}
               onClick={handleInputClick}
+              onBlur={inputBlur}
+              className ={"doubleLine"}
             />
           );
         },
@@ -251,11 +390,7 @@ const WorkContractSelect = ({sleEmpList}) => {
     []
   );
   
-  const onBlur = () => {
-    
-
-    
-  }
+  
 
 
 
@@ -267,11 +402,21 @@ const WorkContractSelect = ({sleEmpList}) => {
             <div className="selectWrapper">
               
               <div className="searchBarName">작성년월</div>
-              <CustomCalendar width={130}/>
+              <CustomCalendar
+                    width="150"
+                    type="month"
+                    value={belongingDate}
+                    onChange={handleBelongingDateChange}
+                    id="creDateStart"
+                  />
               <b>~</b>
-              <CustomCalendar width={130}/>
-              
-             
+              <CustomCalendar
+                    width="150"
+                    type="month"
+                    value={belongingDate2}
+                    onChange={handleBelongingDateChange2}
+                    id="creDateEnd"
+                  />
                 
 
                 <SearchBarBox
@@ -280,16 +425,18 @@ const WorkContractSelect = ({sleEmpList}) => {
                       options={[
                         { value: '1', label: '사원코드 순' },
                         { value: '2', label: '사원이름 순' },
+                        { value: '3', label: '작성년월 순' },
                        
                       ]}
                       defaultValue="1"
+                      onChange={searchOrderOption}
                       
                     />
 
              
             </div>
             <div className="btnWrapper">
-            <SearchSubmitButton text="조회" />
+            <SearchSubmitButton onClick={conditionSearch} text="조회" />
             </div>
           </div>
         </div>
@@ -302,7 +449,7 @@ const WorkContractSelect = ({sleEmpList}) => {
             
               <Table
                 columns={columns}
-                data={data}
+                data={data}   
                 showInsertRow={true}
                 checkboxWidth={"10%"}
               />
@@ -328,7 +475,7 @@ const WorkContractSelect = ({sleEmpList}) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">근무주소  </td>
+                  <td className="wcRightGridTableLeftTd">근무장소  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomInput />
                   </td>
@@ -349,7 +496,7 @@ const WorkContractSelect = ({sleEmpList}) => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">상세주소  </td>
                   <td className="wcRightGridTableRightTd1" colSpan="2">
-                    <CustomInput width={605} value={addr.addrWorkDtl} />
+                    <CustomInput width={605} onBlur = {""} />
                   </td>
                 </tr>
                 <tr>
@@ -539,11 +686,24 @@ const WorkContractSelect = ({sleEmpList}) => {
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
                 </tr>
+                
               </table>
+              
             </div>
           </div>
 
-        
+         {/* 모달 창 */}
+         {openPostcode && (
+          <div className="wcModal1" onClick={closeModal}>
+            <div className="wcModal2" onClick={(e) => e.stopPropagation()}>
+              <DaumPostcode 
+                style={{ height: "100%" }}
+                onComplete={handleAddressSelect}  
+                autoClose={false} 
+              />
+            </div>
+          </div>
+        )}
 
 
 
@@ -552,4 +712,5 @@ const WorkContractSelect = ({sleEmpList}) => {
       </>
     );
   }
-export default WorkContractSelect;
+
+export default WorkContractCreate;

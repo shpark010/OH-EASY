@@ -15,65 +15,46 @@ import useApiRequest from '../Services/ApiRequest';
 
 
 
-const WorkContractCreate = ({empList}) => {
+const WorkContractCreate = () => {
+
   const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
   const [openPostcode, setOpenPostcode] = useState(false);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
   const [checkColumn,setCheckColumn] = useState([]);
-  const [checkBoxState,setCheckBoxState] = useState();
+  const [isChecked, setIsChecked] = useState(false);
   const [codeArr, setCodeArr] = useState([]);
-  const schangeCheck2 = (e, originalCode) => {
-    const checkedValue = e.target.checked;
+  // const [optionEmpList,setOptionEmpList] = ([]); // 조건조회로 받아온 data
+  const [belongingDate, setBelongingDate] = useState(""); //년월 달력 상태 관리.
+  const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
+  
 
-    if (checkedValue) {
-      setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
-    } else {
-      setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
-    }
-  };
-  useEffect(() => {
-    console.log("codeArr 변경됨:", codeArr);
-  }, [codeArr]); // codeArr이 변경될 때만 실행
-  const checkRef = useRef(); // checkbox 용 useRef
 
   
- const changeCheck = (e) =>{
-  const checkedValue = e.target.checked;
-  const codeArr = [];
-  console.log(e.target.cdEmp);
-  // empList.forEach(emp => {
-  //     if (checkedValue) {
-  //     console.log("code : " + emp.cdEmp);
-  //     console.log("truefalse : " + checkedValue);
-  
-  //     codeArr.push(emp.cdEmp);
+
+  // const schangeCheck2 = (e, originalCode) => {
+  //   const checkedValue = e.target.checked;
+
+  //   if (checkedValue) {
+  //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
   //   } else {
-  //     return null; // 혹은 다른 값을 반환하여 해당 요소를 건너뜁니다.
+  //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
   //   }
-  // });
-  // const codeArr = empList.map((emp) => {
-  //   if (checkedValue === true) {
-  //     console.log("code : " + emp.cdEmp);
-  //     console.log("truefalse : " + checkedValue);
+  // };
+  // useEffect(() => {
+  //   console.log("codeArr 변경됨:", codeArr);
+  // }, [codeArr]); // codeArr이 변경될 때만 실행
   
-  //     // return {
-  //     //   code : emp.cdEmp,
-  //     // };
-  //   } else {
-  //     return null; // 혹은 다른 값을 반환하여 해당 요소를 건너뜁니다.
-  //   }
-  // });
-  console.log(codeArr);
- 
-}
+  const handleBelongingDateChange = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
+    setBelongingDate(newDate);
+    console.log(belongingDate);//202310
+  }; // 년월 달력
+  
 
 
- const selectCheckBox = () =>{
-  checkRef.current.checked = true
 
- }; // Checkbox all select 되도록하는 함수
 
 
   const addrButtonClick= () => {
@@ -92,8 +73,8 @@ const WorkContractCreate = ({empList}) => {
         주소: ${addr.address}
     `);
     // // 주소와 우편번호 값을 가져온 데이터로 설정
-    // const address = data.address;
-    // const zipcode = data.zipcode;
+    // const address = addr.address;
+    // const zipcode = addr.zipcode;
   
     // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
     // setEmpList((prevEmpList) => [
@@ -112,41 +93,125 @@ const WorkContractCreate = ({empList}) => {
 
   const data = useMemo(
     () =>
-      empList.map((emp) => ({
-        checkbox: false,
-        code: emp.cdEmp,
-        employee: emp.nmEmp,
-        resident: emp.noResident,
+    employeeData.map((emp) => ({
+        checkbox: emp.checkbox,
+        cdEmp: emp.cdEmp,
+        nmEmp: emp.nmEmp,
+        noResident: emp.noResident,
       })),
-    [empList]
+    [employeeData]
   );
+
+  useEffect(() => {
+    console.log("employeeData 변경됨:", employeeData);
+  }, [employeeData]); //  변경될 때만 실행
+  
+  
+
+  const selectAllCheckBox = (e) =>{
+
+    
+    // const newEmpList = empList.map(emp=>({
+    //   checkbox : e.target.checked,
+    //   cdEmp: emp.cdEmp,
+    //   nmEmp: emp.nmEmp,
+    //   noResident: emp.noResident,
+    // }));
+    // console.log(newEmpList);
+
+    
+
+    const allInputs = e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input');
+  //   // 모든 Table까지 가서 모든 input tag select 하면 배열로 return
+  //   console.log(e.target.checked); // 현재 누른 이벤트 check 값
+    
+    if (e.target.checked){
+    allInputs.forEach(input => {
+      input.checked = true;
+    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
+    setIsChecked(true)
+    
+  }
+
+  else if (!e.target.checked){
+    allInputs.forEach(input => {
+      input.checked = false;
+    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
+    setIsChecked(false)
+    
+  }
+    //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
+    
+    
+  }
+
+  const conditionSearch = async () => { // 작성년월과 조회 날짜를 받아 조회하는 버튼
+    setEmployeeData([]);
+
+    try {
+     
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/wc/getEmpList?creDate=${belongingDate}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
+      });
+     
+      setEmployeeData(responseData)
+      console.log(employeeData);
+    
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+
+    
+  }//조건조회
+
+
+  const searchOrderOption = (e) =>{
+    setSearchOrder(e.target.value)
+    
+  } // 정렬 option button 변경시 호출하는 이벤트
+  useEffect(() => {
+    console.log(searchOrder);
+  }, [searchOrder]); //codeArr이 변경될때만 실행.
+
+  
+
   const columns = useMemo(
     () => [
 
       {
-        Header:(<input 
+        Header:
+        
+          ()=>{
+
+            
+
+            return(
+            <input 
           type='checkbox'
-    
-          onChange={selectCheckBox}
-          />),
+          
+          onClick={selectAllCheckBox}
+          />)
+          }
+        ,
         accessor: "checkbox",
         id: "checkbox",
         width:"10%",
         Cell: ({ cell: { value }, row :{original} }) =>{ 
+          
+         const getCodeArr = (e) =>{
+           const codeValue = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+          console.log(codeValue);
 
-          const onCell = () =>{
-            console.log("checkBox Click");
-            console.log(original.code);
 
-          }
+  
+         }
 
-          const changeCheck2 = (e) => {
-            schangeCheck2(e, original.code);
-          }
+          
         return(
           <>
-        <input type="checkbox" onChange={changeCheck2} />
-
+        <input type="checkbox"  onChange={getCodeArr}  />
+        
         </>
         );
       
@@ -155,8 +220,8 @@ const WorkContractCreate = ({empList}) => {
       ,
       {
         Header: "Code",
-        accessor: "code",
-        id: "code",
+        accessor: "cdEmp",
+        id: "cdEmp",
         width: "20%",
         Cell: ({ cell: { value }, row :{original} }) => {
           const [inputValue, setInputValue] = useState(value);
@@ -169,13 +234,13 @@ const WorkContractCreate = ({empList}) => {
           };
 
           const handleInputClick = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            ele.style.backgroundColor = 'var(--color-secondary-blue)';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
           };
 
           const inputBlur = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-             ele.style.backgroundColor = '';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = '';
           }
 
 
@@ -218,16 +283,16 @@ const WorkContractCreate = ({empList}) => {
       },
       {
         Header: "사원명",
-        accessor: "employee",
-        id: "employee",
+        accessor: "nmEmp",
+        id: "nmEmp",
         width: "20%",
         Cell: ({ cell: { value }, row :{original}  }) => {
           const [inputValue, setInputValue] = React.useState(value);
           
 
           const handleInputClick = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-             ele.style.backgroundColor = 'var(--color-secondary-blue)';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
         
           }; // input tag Click시 발생할 event
 
@@ -257,14 +322,14 @@ const WorkContractCreate = ({empList}) => {
       
       {
         Header: "주민번호",
-        accessor: "resident",
-        id: "resident",
+        accessor: "noResident",
+        id: "noResident",
         Cell: ({ cell: { value }, row :{original} } ) => {
           const [inputValue, setInputValue] = React.useState(value);
 
           const handleInputClick = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            ele.style.backgroundColor = 'var(--color-secondary-blue)';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
           };
 
           const inputBlur = (e) => {
@@ -294,29 +359,6 @@ const WorkContractCreate = ({empList}) => {
   
 
 
-  const submitButtonClick= async () => {
-
-    console.log(empList)
-    
-    // try {
-    //   const responseData = await apiRequest({
-    //     method: "PUT",
-    //     url: `/api2/wc/updateEmpList`,
-    //   });
-
-      
-    //   alert('작성이 완료되었습니다.');
-      
-    // } 
-    // catch (error) {
-    //   console.error("Failed to fetch emp data:", error);
-    // }
-  }
-// 작성완료 Button을 눌렀을때 event 
-// 사원Table의 근로계약서 작성여부가 0->1로 udpate되는 query를 날림.
-// 그 후 setEmpList를 통해 List를 갱신.
-
-
 
 
     return (
@@ -326,9 +368,12 @@ const WorkContractCreate = ({empList}) => {
             <div className="selectWrapper">
               
               <div className="searchBarName">작성년월</div>
-              <CustomCalendar width={130}
-              
-              />
+              <CustomCalendar
+                    width="150"
+                    type="month"
+                    value={belongingDate}
+                    onChange={handleBelongingDateChange}
+                  />
               
              
                 
@@ -339,16 +384,17 @@ const WorkContractCreate = ({empList}) => {
                       options={[
                         { value: '1', label: '사원코드 순' },
                         { value: '2', label: '사원이름 순' },
-                       
+                        
                       ]}
                       defaultValue="1"
+                      onChange={searchOrderOption}
                       
                     />
 
              
             </div>
             <div className="btnWrapper">
-            <SearchSubmitButton text="조회" />
+            <SearchSubmitButton onClick={conditionSearch} text="조회" />
             </div>
           </div>
         </div>
@@ -361,7 +407,7 @@ const WorkContractCreate = ({empList}) => {
             
               <Table
                 columns={columns}
-                data={data}
+                data={data}   
                 showInsertRow={true}
                 checkboxWidth={"10%"}
               />
