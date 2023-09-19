@@ -9,9 +9,9 @@ const SelectContainer = styled.div`
 
 const StyledSelect = styled.select`
   width: ${(props) => (props.width ? `${props.width}px` : "100%")};
-  /* 여기에 기본 select 스타일을 추가하세요 */
+  pointer-events: ${(props) => (props.readOnly ? "none" : "auto")}; // 클릭 방지
+  cursor: ${(props) => (props.readOnly ? "not-allowed" : "pointer")};
 `;
-
 function CustomSelect({
   id,
   className,
@@ -20,7 +20,8 @@ function CustomSelect({
   defaultValue,
   width,
   onChange,
-  placeholder, // 추가한 props
+  placeholder,
+  readOnly, // 추가된 props
 }) {
   const showPlaceholder = value === ""; // value가 ""이면 true, 아니면 false
 
@@ -33,6 +34,7 @@ function CustomSelect({
         defaultValue={defaultValue}
         onChange={onChange}
         width={width}
+        readOnly={readOnly}
       >
         {placeholder && (
           <option value="" disabled hidden={!showPlaceholder}>
