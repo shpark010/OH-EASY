@@ -15,6 +15,13 @@ const Input = styled.input`
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
+
+    ${(props) =>
+    props.readOnly &&
+    `
+    background-color: var(--color-opacity-gray);
+    cursor: not-allowed;
+  `}
 `;
 
 //사이즈를 주면 그사이즈대로 안주면 100px
@@ -56,6 +63,12 @@ function CustomInput({
       if (newValue.length > 14) {
         newValue = newValue.substring(0, 14);
       }
+    } else if (type === "email") {
+      // 영문 및 숫자만 허용
+      newValue = newValue.replace(/[^a-zA-Z0-9]/g, "");
+    } else if (type === "number") {
+      // 숫자만 허용
+      newValue = newValue.replace(/[^0-9]/g, "");
     }
 
     if (onChange) {

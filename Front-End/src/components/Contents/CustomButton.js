@@ -17,6 +17,11 @@ const StyledButton = styled.button.withConfig({
   & + button {
     margin-left: 10px;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--color-opacity-gray);
+  }
 `;
 
 const CustomButton = ({
@@ -26,6 +31,7 @@ const CustomButton = ({
   id,
   className,
   onClick,
+  disabled,
 }) => {
   return (
     <StyledButton
@@ -34,6 +40,7 @@ const CustomButton = ({
       onClick={onClick}
       color={color}
       backgroundColor={backgroundColor}
+      disabled={disabled}
     >
       {text}
     </StyledButton>
