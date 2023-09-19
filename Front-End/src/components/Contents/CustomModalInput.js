@@ -14,14 +14,14 @@ const Input = styled.input`
   border: 1px solid var(--color-primary-gray);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   height: 32px;
-  padding: 0 5px;
+  padding: 0 12px;
 
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
 `;
 
-function CustomModalInput({ width, id, className, children }) {
+function CustomModalInput({ id, className, width, children, value, style, onChange }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -30,6 +30,10 @@ function CustomModalInput({ width, id, className, children }) {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleInputChange = (event) => {
+    onChange(event.target.value);
   };
 
   return (
@@ -41,6 +45,9 @@ function CustomModalInput({ width, id, className, children }) {
           width={`${width}px`}
           onClick={openModal}
           readOnly
+          style={style}
+          value={value}
+          onChange={handleInputChange}
         />
         <IconWrapper onClick={() => setIsModalOpen(!isModalOpen)}>
           <TbCalendarSearch size={18} />
