@@ -767,7 +767,7 @@ const EmployeeRegister = () => {
                   <CustomInput width={180} value={noPost} setZonecode={setNoPost} readOnly />
                 </td>
                 <td className="erCellStyle" colSpan="2">
-                  <CustomInput width={370} value={nmAddress} setAddress={setNmAddress} readOnly />
+                  <CustomInput width={368} value={nmAddress} setAddress={setNmAddress} readOnly />
                 </td>
                 <td className="erCellStyle">
                   <CustomButton text="검색" color="black" onClick={handleAddressButtonClick} />
@@ -869,7 +869,7 @@ const EmployeeRegister = () => {
                     <div className="erAtSign">@</div>
                       <CustomInput
                         className="erInputCell"
-                        width={180}
+                        width={160}
                         value={domainMap[selectedOption] === "직접입력" ? domain : domainMap[selectedOption]}
                         onChange={(e) => setDomain(e.target.value)}
                         onBlur={handleEmailUpdate}
