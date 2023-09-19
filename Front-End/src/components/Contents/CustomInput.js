@@ -26,7 +26,7 @@ function CustomInput({
   value,
   onChange,
   name,
-  onblur,
+  onBlur,
   backgroundColor,
   readOnly,
 }) {
@@ -70,7 +70,7 @@ function CustomInput({
       width={`${width}px`}
       value={value}
       name={name}
-      onBlur={onblur}
+      onBlur={onBlur}
       onChange={handleInputChange}
       backgroundColor={backgroundColor}
       readOnly={readOnly}
