@@ -20,7 +20,7 @@ const WorkContract = () => {
 
   const apiRequest = useApiRequest();
   const [tabState,setTab] = useState("0");
-  const [creEmpList,setEmpList] = useState([]); //작성 Component에 넘겨줄 prop
+  const [creEmpList,setCreEmpList] = useState([]); //작성 Component에 넘겨줄 prop
   const [sleEmpList,setSleEmpList] = useState([]); // 조회 Component
   
 
@@ -58,7 +58,7 @@ const getEmpList = async () => {
     });
     
     if(tabState==="0"){
-      setEmpList(responseData);
+      setCreEmpList(responseData);
       
     }
     else if(tabState==="1"){
@@ -82,12 +82,12 @@ const getEmpList = async () => {
           <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-              
+                  <button onClick={getEmpList}>Test용 </button>
                 <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
               </div>
               <div className="iconBtnWrap">
               <PageHeaderIconButton
-                btnName="print mouseOver" //mouseover시 x
+                btnName="print wcMouseOver" //mouseover시 x
                 imageSrc={Print}
                 altText="프린트"
               />
@@ -97,7 +97,7 @@ const getEmpList = async () => {
                 altText="삭제"
               />
               <PageHeaderIconButton
-                btnName="calc mouseOver"
+                btnName="calc wcMouseOver"
                 imageSrc={Calc}
                 altText="계산기"
               />

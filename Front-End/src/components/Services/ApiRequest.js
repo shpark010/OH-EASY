@@ -37,6 +37,7 @@ const useApiRequest = () => {
     // loginInfo 쿠키가 없는 경우 사용자를 로그인 페이지로 리디렉션
     if (!loginInfo) {
       alert("유효하지 않은 요청입니다");
+      setLoading(false);
       navigate("/login");
       return;
     }

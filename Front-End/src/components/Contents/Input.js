@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 const InputTag = styled.input`
-  width: 100%;
+  width: ${(props) => props.width || "100%"};
   height: 100%;
   border: none;
   outline: none;

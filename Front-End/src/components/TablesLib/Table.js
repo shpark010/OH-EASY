@@ -10,9 +10,8 @@ const StyledTd = styled.td`
 
 const StyledTr = styled.tr`
   box-sizing: border-box;
-  position: ${(props) => (props.isHeader ? "sticky" : "static")};
-  top: ${(props) =>
-    props.stickyTop ? props.stickyTop : "0"}px; // 동적 top 값 추가
+  position: ${(props) => (props["data-is-header"] ? "sticky" : "static")};
+  top: ${(props) => (props.stickyTop ? props.stickyTop : "0")}px;
   z-index: 1;
   background-color: white;
   &:hover {
@@ -110,7 +109,7 @@ function Table(props) {
             <StyledTr
               {...headerGroup.getHeaderGroupProps()}
               className="hrHeaderStyle"
-              isHeader
+              data-is-header={true}
             >
               {headerGroup.headers.map((column) => (
                 <StyledTh {...column.getHeaderProps()} width={column.width}>

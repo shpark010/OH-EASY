@@ -168,7 +168,7 @@ width:80px;
   /*Modal style*/
 
 
-  .mouseOver:hover{
+  .wcMouseOver:hover{
     cursor: not-allowed;
   }
   /*오른쪽 상단 Icon hovering시 css*/

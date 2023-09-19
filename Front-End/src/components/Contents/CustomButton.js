@@ -1,16 +1,24 @@
 import React from "react";
 import styled from "styled-components";
 
-const Button = styled.button`
+const StyledButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !["color", "backgroundColor"].includes(prop),
+})`
   height: 32px;
   padding: 6px 12px;
   font-size: 14px;
   vertical-align: bottom;
-  background-color: ${(props) =>
-    props.backgroundColor || "var(--color-primary-white)"};
-  color: ${(props) => props.color || "var(--color-primary-white)"};
+  border: 1px solid
+    ${({ backgroundColor }) => backgroundColor || "var(--color-primary-black)"};
+  background-color: ${({ backgroundColor }) =>
+    backgroundColor || "var(--color-primary-white)"};
+  color: ${({ color }) => color || "var(--color-primary-black)"};
+
+  & + button {
+    margin-left: 10px;
+  }
 `;
-//color 안주면 기본 화이트
+
 const CustomButton = ({
   text,
   color,
@@ -20,9 +28,15 @@ const CustomButton = ({
   onClick,
 }) => {
   return (
-    <Button color={color} id={id} className={className} onClick={onClick}>
+    <StyledButton
+      id={id}
+      className={className}
+      onClick={onClick}
+      color={color}
+      backgroundColor={backgroundColor}
+    >
       {text}
-    </Button>
+    </StyledButton>
   );
 };
 
