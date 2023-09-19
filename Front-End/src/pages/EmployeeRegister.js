@@ -20,6 +20,7 @@ import DaumPostcode from 'react-daum-postcode';
 import Table from "../components/TablesLib/Table";
 import CustomModalInput from "../components/Contents/CustomModalInput";
 import useApiRequest from "../components/Services/ApiRequest";
+import moment from "moment";
 
 const EmployeeRegister = () => {
   const apiRequest = useApiRequest();
@@ -78,19 +79,45 @@ const EmployeeRegister = () => {
     handleGetEmpList();
   }, []);
 
-  // 선택된 이메일 주소값 가져오기
-  const handleSelectChange = (newValue) => {
-    setSelectedOption(newValue.value);
-    if (newValue.value !== "0") {
-      setDomain(newValue.label);
-    } else {
-      setDomain("");
-    }
+  // 공통 도메인 맵
+  const domainMap = {
+    "0": "직접입력",
+    "1": "gmail.com",
+    "2": "kakao.com",
+    "3": "nate.com",
+    "4": "naver.com",
+    "5": "yahoo.co.kr",
   };
 
-  const handleSelectInputChange = (e) => {
-    setDomain(e.target.value);
+  // 선택된 이메일 주소값 가져오기
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    const newDomain = domainMap[selectedValue];
+    
+    setSelectedOption(selectedValue);
+
+    if (newDomain === "직접입력") {
+      setDomain("");
+    } else {
+      setDomain(newDomain);
+    }
+  
+    handleEmailUpdate(username, newDomain === "직접입력" ? "" : newDomain);
+    
+    console.log("selectedValue : " + selectedValue);
+    console.log("username : " + username);
+    console.log("newDomain : " + newDomain);
   };
+
+  // CustomSelect에 넘겨줄 options
+  const options = Object.keys(domainMap).map((key) => ({
+    value: key,
+    label: domainMap[key],
+  }));
+
+  // const handleSelectInputChange = (e) => {
+  //   setDomain(e.target.value);
+  // };
 
   // 버튼 클릭시 DaumPostcode 모달 열기
   const handleAddressButtonClick = () => {
@@ -147,6 +174,43 @@ const EmployeeRegister = () => {
   const closeModal = () => {
     setOpenPostcode(false);
   }
+
+  // 달력 하이픈 제거 함수
+  const handleDateChange = (field, newDate) => {
+    const formattedDateForUI = moment(newDate).format('YYYY-MM-DD');
+    const formattedDateForDB = moment(newDate).format('YYYYMMDD'); // '-' 제거
+
+    if (field === 'dtHire') {
+      setDtHire(formattedDateForUI);
+    } else if (field === 'dtResign') {
+      setDtResign(formattedDateForUI);
+    }
+
+    handleUpdateEmp(field, clickCdEmp, formattedDateForDB); // '-'가 제거된 형태로 전달
+    console.log("새로 선택한 날짜 : " + formattedDateForUI);
+  };
+
+  // 전화번호 하나로 합치기
+  const handlePhoneUpdate = () => {
+    // 세 부분을 하이픈(-)으로 연결
+    const fullPhone = `${noPhone1}-${noPhone2}-${noPhone3}`;
+    
+    handleUpdateEmp("noPhone", clickCdEmp, fullPhone);
+  };
+  
+  // 휴대폰번호 하나로 합치기
+  const handleMobilePhoneUpdate = () => {
+    const fullMobilePhone = `${noMobilePhone1}-${noMobilePhone2}-${noMobilePhone3}`;
+    
+    handleUpdateEmp("noMobilePhone", clickCdEmp, fullMobilePhone);
+  };
+
+  // 이메일 하나로 합치기
+  const handleEmailUpdate = (username, newDomain) => {
+    const email = `${username}@${newDomain}`;
+    
+    handleUpdateEmp("nmEmail", clickCdEmp, email);
+  };
 
   const data = useMemo(
     () =>
@@ -227,7 +291,7 @@ const EmployeeRegister = () => {
 
             // inputValue가 null or undefined or 빈 문자열일 때, 앞뒤 공백을 제거한 문자열이 비어있지 않을 때, onChange 이벤트 발생 x
             if (!inputValue || (original && inputValue === original.code) || !inputValue.trim() || !changed) {
-              console.log("*********************************** onChange 이벤트 x 종료");
+              console.log("*********************************** onChange 없으니 종료");
               return;
             }
           
@@ -280,29 +344,45 @@ const EmployeeRegister = () => {
         width: "20%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value);
+          const [changed, setChanged] = useState(false);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
+            setChanged(true);
           };
 
+          
           const tableEmpNmClick = (e) => {
-            console.log('사원명 클릭***************************');
+            console.log("*************************** 사원명 클릭");
+            console.log("tableEmpNmClick is called. original:", original);
             if (original && original.code != null) {
-              console.log(original.code);
+              console.log("*************************** original.code " + original.code);
               handleGetSingleEmp(original.code);
-            } else {
-              console.log('Code is null or undefined');
+              setClickCdEmp(original.code);
             }
           };
-
+          
+          
           const handleInputOnBlurNmEmp = (e) => {
             const inputValue = e.target.value?.trim();
-            console.log("Calling handleUpdateEmp with nmEmp, clickCdEmp, inputValue: ", "nmEmp", clickCdEmp, inputValue);
-  
-            handleUpdateEmp("nmEmp", clickCdEmp, inputValue);
-            console.log("******************** nmEmp");
-            console.log("******************** code " + clickCdEmp);
-            console.log("******************** updated name " + inputValue);
+            
+            if (!changed) {
+              console.log("*********************************** onChange 없으니 종료");
+              return;
+            }
+
+            setChanged(false);
+
+            if (original && original.code) {
+              console.log("Calling handleUpdateEmp with nmEmp, original.code, inputValue: ", "nmEmp", original.code, inputValue);
+          
+              handleUpdateEmp("nmEmp", original.code, inputValue);
+              console.log("******************** nmEmp");
+              console.log("******************** code " + original.code);
+              console.log("******************** updated name " + inputValue);
+            } else {
+              console.log("original or original.code is null or undefined. Exiting...");
+            }
           };
           
           return (
@@ -322,18 +402,40 @@ const EmployeeRegister = () => {
         accessor: "foreign",
         id: "foreign",
         width: "12%",
-        Cell: ({ cell: { value } }) => {
-          const [inputValue, setInputValue] = useState(value);
-
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const [inputValue, setInputValue] = useState(value === 0 ? "내" : value === 1 ? "외" : value);
+  
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
+              const newValue = e.target.value;
+              // 입력값이 '내' 또는 '외'일 때 DB에 저장할 수 있는 형태 (0 또는 1)로 변환
+              if (newValue === "내") {
+                  setInputValue(0);
+              } else if (newValue === "외") {
+                  setInputValue(1);
+              } else {
+                  setInputValue(newValue);
+              }
           };
-
+  
+          const tableFgForeignClick = (e) => {
+              console.log("*************************** 내/외 클릭");
+              console.log("tableFgForeignClick is called. original:", original);
+              if (original && original.code != null) {
+                  console.log("*************************** original.code " + original.code);
+                  handleGetSingleEmp(original.code);
+                  setClickCdEmp(original.code);
+              }
+          };
+  
           return (
-            <Input
-              value={inputValue}
-              onChange={handleInputChange}
-            />
+              <Input
+                  value={inputValue === 0 ? "내" : inputValue === 1 ? "외" : inputValue}
+                  onChange={handleInputChange}
+                  onClick={tableFgForeignClick}
+                  isDoubleClick={true}
+                  className={"doubleLine"}
+                  // onBlur={handleInputOnBluFgForeign}
+              />
           );
         },
       },
@@ -341,17 +443,56 @@ const EmployeeRegister = () => {
         Header: "주민번호",
         accessor: "resident",
         id: "resident",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value);
+          const [changed, setChanged] = useState(false);
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
+            setChanged(true);
+          };
+
+          const tableNoResidentClick = (e) => {
+            console.log("*************************** 주민번호 클릭");
+            console.log("tableNoResidentClick is called. original:", original);
+            if (original && original.code != null) {
+              console.log("*************************** original.code " + original.code);
+              handleGetSingleEmp(original.code);
+              setClickCdEmp(original.code);
+            }
+          };
+
+          const handleInputOnBlurNoResident = (e) => {
+            const inputValue = e.target.value?.trim();
+            
+            if (!changed) {
+              console.log("*********************************** onChange 없으니 종료");
+              return;
+            }
+
+            setChanged(false);
+
+            if (original && original.code) {
+              console.log("Calling handleUpdateEmp with noResident, original.code, inputValue: ", "noResident", original.code, inputValue);
+          
+              handleUpdateEmp("noResident", original.code, inputValue);
+              console.log("******************** noResident");
+              console.log("******************** code " + original.code);
+              console.log("******************** updated noResident " + inputValue);
+            } else {
+              console.log("original or original.code is null or undefined. Exiting...");
+            }
           };
 
           return (
             <Input
-              value={inputValue}
-              onChange={handleInputChange}
+            type={"resident"}
+            value={inputValue}
+            onChange={handleInputChange}
+            onClick={tableNoResidentClick}
+            isDoubleClick={true}
+            className={"doubleLine"}
+            onBlur={handleInputOnBlurNoResident}
             />
           );
         },
@@ -493,7 +634,7 @@ const EmployeeRegister = () => {
       const [username, domain] = (responseData.nmEmail || "").split('@');
       setUsername(username || "");
       setDomain(domain || "");
-
+      setSelectedOption("0");
       setCdBank(responseData.cdBank || "");
       setDtResign(responseData.dtResign || "");
       setNoAccount(responseData.noAccount || "");
@@ -582,7 +723,12 @@ const EmployeeRegister = () => {
               <tr>
                 <th className="erHeaderStyle">입사일자</th>
                 <td className="erCellStyle">
-                  <CustomCalendar width={180} id="erDate1" value={dtHire || ""} />
+                  <CustomCalendar 
+                    width={180} 
+                    id="erDate1" 
+                    value={dtHire} 
+                    onChange={(newDate) => handleDateChange("dtHire", newDate)}
+                  />
                 </td>
               </tr>
               <tr>
@@ -630,37 +776,76 @@ const EmployeeRegister = () => {
               <tr>
                 <th className="erHeaderStyle">상세주소</th>
                 <td className="erCellStyle" colSpan="5">
-                  <CustomInput width={845} value={dcAddress} />
+                  <CustomInput 
+                    width={845} 
+                    value={dcAddress} 
+                    onChange={(e) => {
+                      setDcAddress(e.target.value);
+                    }}
+                    onBlur={() => {
+                      handleUpdateEmp("dcAddress", clickCdEmp, dcAddress);
+                    }}
+                  />
                 </td>
               </tr>
               <tr>
                 <th className="erHeaderStyle">전화번호</th>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={3} /> */}
-                  <CustomInput width={180} value={noPhone1} />
+                  <CustomInput 
+                    width={180} 
+                    value={noPhone1} 
+                    onChange={(e) => setNoPhone1(e.target.value)}
+                    onBlur={handlePhoneUpdate}
+                    maxLength={3}
+                  />
                 </td>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={4} /> */}
-                  <CustomInput width={180} value={noPhone2} />
+                  <CustomInput 
+                    width={180} 
+                    value={noPhone2} 
+                    onChange={(e) => setNoPhone2(e.target.value)}
+                    onBlur={handlePhoneUpdate}
+                    maxLength={4}
+                  />
                 </td>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={4} /> */}
-                  <CustomInput width={180} value={noPhone3} />
+                  <CustomInput 
+                    width={180} 
+                    value={noPhone3} 
+                    onChange={(e) => setNoPhone3(e.target.value)}
+                    onBlur={handlePhoneUpdate}
+                    maxLength={4}
+                  />
                 </td>
               </tr>
               <tr>
                 <th className="erHeaderStyle">휴대폰번호</th>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={3} /> */}
-                  <CustomInput width={180} value={noMobilePhone1} />
+                  <CustomInput 
+                    width={180} 
+                    value={noMobilePhone1} 
+                    onChange={(e) => setNoMobilePhone1(e.target.value)}
+                    onBlur={handleMobilePhoneUpdate}
+                    maxLength={3}
+                  />
                 </td>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={4} /> */}
-                  <CustomInput width={180} value={noMobilePhone2} />
+                  <CustomInput 
+                    width={180} 
+                    value={noMobilePhone2} 
+                    onChange={(e) => setNoMobilePhone2(e.target.value)}
+                    onBlur={handleMobilePhoneUpdate}
+                    maxLength={4}
+                  />
                 </td>
                 <td className="erCellStyle">
-                  {/* <CustomNumberInput width={180} maxLength={4} /> */}
-                  <CustomInput width={180} value={noMobilePhone3} />
+                  <CustomInput 
+                    width={180} 
+                    value={noMobilePhone3} 
+                    onChange={(e) => setNoMobilePhone3(e.target.value)}
+                    onBlur={handleMobilePhoneUpdate}
+                    maxLength={4}
+                  />
                 </td>
                 {/* disabled */}
                 <td width={298}>
@@ -671,42 +856,32 @@ const EmployeeRegister = () => {
                 <th className="erHeaderStyle">이메일</th>
                 <td className="erCellStyle">
                   <div>
-                    {/* <CustomEmailInput width={180} value={username} /> */}
-                    <CustomInput width={180} value={username} />
+                    <CustomInput 
+                      width={180} 
+                      value={username} 
+                      onChange={(e) => setUsername(e.target.value)} 
+                      onBlur={handleEmailUpdate} 
+                    />
                   </div>
                 </td>
                 <td className="erCellStyle">
                   <div className="erEmailCell">
                     <div className="erAtSign">@</div>
-                    {selectedOption === "0" ? (
                       <CustomInput
                         className="erInputCell"
-                        value={domain}
-                        onChange={handleSelectInputChange}
+                        width={180}
+                        value={domainMap[selectedOption] === "직접입력" ? domain : domainMap[selectedOption]}
+                        onChange={(e) => setDomain(e.target.value)}
+                        onBlur={handleEmailUpdate}
                       />
-                    ) : (
-                      <CustomInput
-                        className="erInputCell"
-                        value={selectedOption}
-                        onChange={handleSelectInputChange}
-                        // onBlur={handleUpdateEmp("사원명","값","사원코드")}
-                      />
-                    )}
                   </div>
                 </td>
                 <td className="erCellStyle">
                   <CustomSelect
                     className="erSelectBox"
-                    options={[
-                      { value: "0", label: "직접입력" },
-                      { value: "1", label: "gmail.com" },
-                      { value: "2", label: "kakao.com" },
-                      { value: "3", label: "nate.com" },
-                      { value: "4", label: "naver.com" },
-                      { value: "5", label: "yahoo.co.kr" },
-                    ]}
-                    defaultValue="0"
-                    onChange={handleSelectChange}
+                    options={options}
+                    value={selectedOption}
+                    onChange={handleSelectChange} 
                   />
                 </td>
               </tr>
@@ -759,7 +934,12 @@ const EmployeeRegister = () => {
               <tr>
                 <th className="erHeaderStyle">퇴사일자</th>
                 <td className="erCellStyle">
-                  <CustomCalendar width={180} id="erDate2" value={dtResign || ""} />
+                  <CustomCalendar 
+                    width={180} 
+                    id="erDate2" 
+                    value={dtResign} 
+                    onChange={(newDate) => handleDateChange("dtResign", newDate)}
+                  />
                 </td>
               </tr>
               <tr>
@@ -771,9 +951,15 @@ const EmployeeRegister = () => {
                 </td>
                 <td className="erCellStyle">
                   <CustomInput 
-                  width={180} 
-                  value={noAccount} 
-                  placeholder="계좌번호를 입력해주세요."
+                    width={180} 
+                    value={noAccount} 
+                    onChange={(e) => {
+                      setNoAccount(e.target.value);
+                    }}
+                    onBlur={() => {
+                      handleUpdateEmp("noAccount", clickCdEmp, noAccount);
+                    }}
+                    placeholder="계좌번호를 입력해주세요."
                   />
                 </td>
                 <td className="erCellStyle">
