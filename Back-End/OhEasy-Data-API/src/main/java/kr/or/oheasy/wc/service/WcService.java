@@ -16,11 +16,43 @@ public class WcService {
 	@Autowired
 	private SqlSession sqlSession; //mybatis
 	
-	public List<WcGetEmpListVO> getAllEmpList() {
+	public List<WcGetEmpListVO> getOptionEmpList(String creDate,String orderValue) {
+		
+		switch(orderValue) {
+		case "1":
+			orderValue = "cd_emp";
+			break;
+		case "2" : 
+			orderValue ="nm_emp";
+			break;
+		}
+		System.out.println(orderValue);
+	
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getAllEmpList();
+		return wcdao.getOptionEmpList(creDate,orderValue);
 		
 	}
+	
+public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, String orderValue) {
+		
+		switch(orderValue) {
+		case "1":
+			orderValue = "cd_emp";
+			break;
+		case "2" : 
+			orderValue ="nm_emp";
+			break;
+		}
+		
+		System.out.println(orderValue);
+	
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.getOptionEmpList2(creDate,creDate2,orderValue);
+		
+	}
+	
+
+
 	
 	public int updateEmp0to1(){
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);

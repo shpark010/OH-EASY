@@ -1,6 +1,7 @@
 package kr.or.oheasy.wc.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import kr.or.oheasy.vo.WcGetEmpListVO;
 import kr.or.oheasy.vo.WcVO;
 import kr.or.oheasy.wc.service.WcService;
@@ -23,13 +25,40 @@ public class WcController {
 	private WcService wcService;
 	
 	@GetMapping("/getEmpList")
-	public ResponseEntity<?> getAllEmpList() {
+//	public ResponseEntity<?> getOptionEmpList(@RequestParam String creDate,@RequestParam String creDate2, @RequestParam String orderValue) {
+	public ResponseEntity<?> getOptionEmpList(@RequestParam Map<String,String> data) {
+		
+		System.out.println("getEmpList 진입");
+		System.out.println(data);		 
+		int dataSize = data.size();
+		List<WcGetEmpListVO> result;
+		switch(dataSize) {
+		case 2:{
+			String param1 = data.get("creDate");
+			String param2 = data.get("orderValue");
+			result = wcService.getOptionEmpList(param1,param2);
+			break;
 
-	    List<WcGetEmpListVO> result = wcService.getAllEmpList();
+		    
+		}
+		
+		case 3: {
+			String param1 = data.get("creDate");
+			String param2 = data.get("creDate2");
+			String param3 = data.get("orderValue");
+			result = wcService.getOptionEmpList2(param1,param2,param3);
+			break;
+		}
+		
+		default :{
+			return null;
+		}
+	}
+		
+		System.out.println(result);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 
-	    System.out.println("getEmpList 진입");
-
-	    return new ResponseEntity<>(result, HttpStatus.OK);
+	  
 	}
 	
 	@PutMapping("/updateEmpList")

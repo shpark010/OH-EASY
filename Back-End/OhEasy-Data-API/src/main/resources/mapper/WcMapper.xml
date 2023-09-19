@@ -3,12 +3,22 @@
 
 <mapper namespace="kr.or.oheasy.wc.dao.WcDao">
 
-<!-- 전사원의 정보 -->
-<select id="getAllEmpList"  resultType="kr.or.oheasy.vo.WcGetEmpListVO">
-	SELECT cd_emp,nm_emp,no_resident FROM hr_emp_mst
-	
+<!-- 사원의 정보 조건조회 -->
+<select id="getOptionEmpList" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+	SELECT c.cd_emp, e.nm_emp, e.no_resident 
+	FROM hr_contract_info AS c
+	JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
+	WHERE dt_created = #{param1}
+	ORDER BY #{param2}
 </select>
 
+<select id="getOptionEmpList2" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+	SELECT c.cd_emp, e.nm_emp, e.no_resident, c.dt_created
+	FROM hr_contract_info AS c
+	JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
+	WHERE dt_created BETWEEN #{param1} AND #{param2}
+	ORDER BY #{param3}
+</select>
   
 <update id="updateEmp0to1" >
 update hr_emp_mst
