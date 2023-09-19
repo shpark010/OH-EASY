@@ -3,49 +3,60 @@ import CustomButton from "../../Contents/CustomButton";
 import CustomInput from "../../Contents/CustomInput";
 import Input from "../../Contents/Input";
 import CustomCalender from "../../Contents/CustomCalendar";
+import CustomSelect from "../../Contents/CustomSelect";
+
 import CustomRadio from "../../Contents/CustomRadio";
 import useApiRequest from "../../Services/ApiRequest";
 const defaultEmpBasicData = {
   cdEmp: "", // 사원코드
-  nmEmp: "", // 사원명
   nmEngEmp: "", // 영문명
   nmHanjaEmp: "", // 한자명
-  fgForeign: "", // 내외국인 구분
   noResident: "", //  주민번호
-  fgEmp: "", // 재직구분
-  dtHire: "", // 입사일
-  fgGender: "", // 성별
-  noPost: "", // 우편번호
-  nmAddress: "", // 주소
-  dcAddress: "", // 상세 주소
-  noPhone: "", // 전화번호
-  noMobilePhone: "", // 핸드폰
-  nmEmail: "", // 이메일
-  cdBank: "", // 은팽코드
-  idJoin: "", // 가입ID
-  dtResign: "", // 퇴사일
-  noAccount: "", // 계좌번호
-  nmAccountHolder: "", // 예금주명
-  noPositionUnique: "", // 직급고유번호
-  noDepartment: "", // 부서번호
-  fgWorkcontract: "", // 근로계약서작성여부
+  dtBirth: "", // 생년월일
   fgMarriage: "", // 결혼여부
+  noDepartment: "", // 부서번호
+  noPositionUnique: "", // 직급고유번호
+  fgWorkcontract: "", // 근로계약서작성여부
+  dtHire: "", // 입사일
+  dtResign: "", // 퇴사일
 };
 const HrBasic = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [empBasicData, setEmpBasicData] = useState({ ...defaultEmpBasicData });
-
   const handleInputBlur = async (e) => {
-    if (cdEmp === undefined) {
+    console.log("블러이벤 ****************************");
+    const { name, value } = e.target;
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || value === "") {
       return;
     }
+
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/hr/updateBasicEmpData?cdEmp=${cdEmp}&${name}=${value}`,
+      });
+      console.log("API Response:", responseData);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    setEmpBasicData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = async (e, columns) => {
+    if (cdEmp === undefined || cdEmp == null || cdEmp === "") {
+      return;
+    }
+    console.log("handleSelectChange 이벤 ***********");
     const { name, value } = e.target;
     console.log(name);
     console.log(value);
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/updateBasicEmpdata?cdEmp=${cdEmp}&${name}=${value}`,
+        url: `/api2/hr/updateBasicEmpData?cdEmp=${cdEmp}&${columns}=${value}`,
       });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -64,7 +75,7 @@ const HrBasic = ({ cdEmp }) => {
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/updateBasicEmpdata?cdEmp=${cdEmp}&${name}=${value}`,
+        url: `/api2/hr/updateBasicEmpData?cdEmp=${cdEmp}&${name}=${value}`,
       });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -77,40 +88,31 @@ const HrBasic = ({ cdEmp }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log("인풋값변경~~~~~~~~~~~~~~~~~");
+    console.log(value);
     setEmpBasicData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
-
-  const extractBirthDate = (noResident) => {
-    if (!noResident) return "";
-
-    const year = noResident.slice(0, 2);
-    const month = noResident.slice(2, 4);
-    const day = noResident.slice(4, 6);
+  const determineGenderFromResident = (noResident) => {
+    if (!noResident || noResident.length < 8) return "";
 
     const genderIndicator = noResident[7];
-    let century;
-
-    if (genderIndicator === "1" || genderIndicator === "2") {
-      century = "19";
-    } else if (genderIndicator === "3" || genderIndicator === "4") {
-      century = "20";
-    } else {
-      // 성별 구분자가 올바르지 않은 경우 기본값을 설정하거나 에러를 던질 수 있습니다.
-      century = ""; // 기본값으로 설정
-      // throw new Error("Invalid resident number");  // 에러를 던지는 방법
+    if (genderIndicator === "1" || genderIndicator === "3") {
+      return "0"; // 남
+    } else if (genderIndicator === "2" || genderIndicator === "4") {
+      return "1"; // 여
     }
-
-    return `${century}${year}-${month}-${day}`;
+    return ""; // 불명확한 경우
   };
 
   useEffect(() => {
-    if (cdEmp === undefined || cdEmp === null) {
+    if (cdEmp === undefined || cdEmp === null || cdEmp === "") {
+      setEmpBasicData(defaultEmpBasicData);
       return;
     }
-    setEmpBasicData(defaultEmpBasicData);
+
     const handleGetEmpBasicData = async (cdEmp) => {
       try {
         const responseData = await apiRequest({
@@ -181,30 +183,51 @@ const HrBasic = ({ cdEmp }) => {
                   width={322}
                   name={"noResident"}
                   value={empBasicData.noResident || ""}
-                  onblur={handleInputBlur}
-                  onChange={handleInputChange}
+                  readOnly={true}
                 />
               </td>
             </tr>
             <tr>
               <th>생년월일</th>
               <td>
-                <CustomInput
+                {/* <CustomInput
                   className="hrInfoBaseInput"
                   width={322}
                   value={extractBirthDate(empBasicData.noResident)}
+                /> */}
+                <CustomCalender
+                  className="hrInfoBaseInput"
+                  value={empBasicData.dtBirth}
+                  name="dtBirth"
+                  onChange={(e) => handleDateChange(e, "dtBirth")}
                 />
               </td>
             </tr>
             <tr>
               <th>부서</th>
               <td>
-                <CustomInput
+                {/* <CustomInput
                   width={322}
                   name={"noDepartment"}
                   value={empBasicData.noDepartment || ""}
                   onblur={handleInputBlur}
                   onChange={handleInputChange}
+                /> */}
+                <CustomSelect
+                  options={[
+                    { value: "000", label: "부서미선택" },
+                    { value: "001", label: "인사부" },
+                    { value: "002", label: "재무부" },
+                    { value: "003", label: "영업부" },
+                    { value: "004", label: "개발부" },
+                    { value: "005", label: "마케팅부" },
+                    { value: "006", label: "고객지원부" },
+                    { value: "007", label: "생산부" },
+                    { value: "008", label: "구매부" },
+                  ]}
+                  placeholder="선택"
+                  value={empBasicData.noDepartment || "000"}
+                  onChange={(e) => handleSelectChange(e, "noDepartment")}
                 />
               </td>
             </tr>
@@ -219,8 +242,9 @@ const HrBasic = ({ cdEmp }) => {
                     ["재직", "0"],
                     ["퇴사", "1"],
                   ]}
-                  value={empBasicData.fgEmp}
-                  onChange={handleInputBlur}
+                  // dtResign 값이 있으면 "1" (퇴사), 없으면 "0" (재직)
+                  value={empBasicData.dtResign ? "1" : "0"}
+                  readOnly={true}
                 />
               </td>
             </tr>
@@ -231,6 +255,7 @@ const HrBasic = ({ cdEmp }) => {
                   className="hrInfoBaseInput"
                   value={empBasicData.dtHire}
                   name="dtHire"
+                  readOnly={true}
                   onChange={(e) => handleDateChange(e, "dtHire")}
                 />
               </td>
@@ -243,7 +268,8 @@ const HrBasic = ({ cdEmp }) => {
                 <CustomInput
                   value={empBasicData.nmHanjaEmp || ""}
                   width={322}
-                  onblur={handleInputBlur}
+                  name={"nmHanjaEmp"}
+                  onBlur={handleInputBlur}
                   onChange={handleInputChange}
                 />
               </td>
@@ -256,11 +282,11 @@ const HrBasic = ({ cdEmp }) => {
                   classNameBox="hrInfoBaseBox"
                   classNameRadio="classNameRadio"
                   options={[
-                    ["남", "0"],
-                    ["여", "1"],
+                    ["남성", "0"],
+                    ["여성", "1"],
                   ]}
-                  value={empBasicData.fgGender}
-                  onChange={handleInputBlur}
+                  value={determineGenderFromResident(empBasicData.noResident)}
+                  readOnly={true}
                 />
               </td>
             </tr>
@@ -287,7 +313,7 @@ const HrBasic = ({ cdEmp }) => {
                   width={322}
                   name={"noPositionUnique"}
                   value={empBasicData.noPositionUnique || ""}
-                  onblur={handleInputChange}
+                  onBlur={handleInputChange}
                 />
               </td>
             </tr>
@@ -312,8 +338,9 @@ const HrBasic = ({ cdEmp }) => {
               <td>
                 <CustomCalender
                   className="hrInfoBaseInput"
-                  name="dtResign"
                   value={empBasicData.dtResign}
+                  name="dtResign"
+                  readOnly={true}
                   onChange={(e) => handleDateChange(e, "dtResign")}
                 />
               </td>
