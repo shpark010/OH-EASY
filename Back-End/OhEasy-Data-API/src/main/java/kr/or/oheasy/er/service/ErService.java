@@ -21,11 +21,6 @@ public class ErService {
         return dao.postEmp(hrEmpMstVO);
     }
 
-//    public int patchEmp(HrEmpMstVO hrEmpMstVO) {
-//        ErDao dao = sqlSession.getMapper(ErDao.class);
-//        return dao.patchEmp(hrEmpMstVO);
-//    }
-
     public int updateEmp(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value) {
         ErDao dao = sqlSession.getMapper(ErDao.class);
         column = Camel.camelToSnake(column);

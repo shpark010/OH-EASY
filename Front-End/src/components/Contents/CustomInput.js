@@ -7,7 +7,7 @@ const Input = styled.input`
   border: 1px solid var(--color-primary-gray);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   height: 32px;
-  padding: 0 5px;
+  padding: 0 12px;
   background-color: ${(props) => props.backgroundColor || "transparent"};
   font-weight: 700;
   font-family: "NanumSquare", sans-serif;
@@ -26,9 +26,11 @@ function CustomInput({
   value,
   onChange,
   name,
-  onblur,
+  onBlur,
   backgroundColor,
   readOnly,
+  placeholder,
+  maxLength,
 }) {
   const handleInputChange = (e) => {
     let newValue = e.target.value;
@@ -50,9 +52,9 @@ function CustomInput({
         newValue = newValue.substring(0, 6) + "-" + newValue.substring(6);
       }
 
-      // 13자리 이상 입력 방지
-      if (newValue.length > 13) {
-        newValue = newValue.substring(0, 13);
+      // 14자리 이상 입력 방지
+      if (newValue.length > 14) {
+        newValue = newValue.substring(0, 14);
       }
     }
 
@@ -70,10 +72,12 @@ function CustomInput({
       width={`${width}px`}
       value={value}
       name={name}
-      onBlur={onblur}
+      onBlur={onBlur}
       onChange={handleInputChange}
       backgroundColor={backgroundColor}
       readOnly={readOnly}
+      placeholder={placeholder}
+      maxLength={maxLength}
     />
   );
 }

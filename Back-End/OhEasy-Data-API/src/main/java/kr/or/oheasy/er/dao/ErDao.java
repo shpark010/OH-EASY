@@ -9,11 +9,9 @@ public interface ErDao {
 
     public int postEmp(HrEmpMstVO hrEmpMstVO); // 사원등록
 
-//    public int patchEmp(HrEmpMstVO hrEmpMstVO); // 사원수정
-
     public int updateEmp(@Param("cdEmp") String cdEmp,
-                        @Param("column") String column,
-                        @Param("value") String value); // 사원수정
+                         @Param("column") String column,
+                         @Param("value") String value); // 사원수정
 
     public int checkCdEmpExistence(String cdEmp); // 사원코드 존재여부검사
 

@@ -109,9 +109,9 @@ function Input({
         newValue = newValue.substring(0, 6) + "-" + newValue.substring(6);
       }
 
-      // 13자리 이상 입력 방지
-      if (newValue.length > 13) {
-        newValue = newValue.substring(0, 13);
+      // 14자리 이상 입력 방지 ('-' 포함)
+      if (newValue.length > 14) {
+        newValue = newValue.substring(0, 14);
       }
     }
 

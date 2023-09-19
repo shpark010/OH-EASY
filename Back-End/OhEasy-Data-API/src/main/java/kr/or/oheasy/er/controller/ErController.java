@@ -47,55 +47,34 @@ public class ErController {
         }
     }
 
-//    @PostMapping("/updateEmpData")
-//    public ResponseEntity<Integer> patchEmp(@RequestBody HrEmpMstVO hrEmpMstVO) {
-//
-//        System.out.println("updateEmpData 진입 ***********************************");
-//        System.out.println(hrEmpMstVO.getCdEmp());
-//
-//        try {
-//            if (erService.isCdEmpValid(hrEmpMstVO.getCdEmp())) {
-//                int result = erService.patchEmp(hrEmpMstVO);
-//                if (result > 0) {
-//                    return new ResponseEntity<>(result, HttpStatus.OK);
-//                } else {
-//                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-//                }
-//            } else {
-//                return new ResponseEntity<>(0, HttpStatus.NOT_FOUND);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
     @PostMapping("updateEmpData")
-    public ResponseEntity<?> updateEmp(@RequestBody Map<String, String> params){
+    public ResponseEntity<?> updateEmp(@RequestBody Map<String, Object> params) {
 
         System.out.println("updateEmpData 진입***************************");
-        System.out.println(params);
+        System.out.println("params : " + params);
 
-        String cdEmp = params.remove("cdEmp");
-
+        String cdEmp = (String) params.remove("cdEmp");
         System.out.println(cdEmp);
-        if(params.isEmpty()) {
-            // 여기에서 적절한 에러 응답을 반환할 수 있습니다.
+
+        if (params.isEmpty() || !params.containsKey("updateField")) {
             return new ResponseEntity<>("No column to update specified", HttpStatus.BAD_REQUEST);
         }
 
-        Map.Entry<String, String> entry = params.entrySet().iterator().next();
+        Map<String, String> updateFields = (Map<String, String>) params.get("updateField");
+
+        if (updateFields == null || updateFields.isEmpty()) {
+            return new ResponseEntity<>("No fields in updateField specified", HttpStatus.BAD_REQUEST);
+        }
+
+        Map.Entry<String, String> entry = updateFields.entrySet().iterator().next();
         String column = entry.getKey();
         String value = entry.getValue();
-
-        System.out.println("column******************" + column);
-        System.out.println("value*******************" + value);
 
         System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
 
         int result = erService.updateEmp(cdEmp, column, value);
 
-        return new ResponseEntity<>(result,HttpStatus.OK);
+        return new ResponseEntity<>("1", HttpStatus.OK);
     }
 
     @GetMapping("/getAllEmpList")
