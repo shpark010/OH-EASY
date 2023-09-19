@@ -97,6 +97,8 @@ function Input({
       newValue = newValue.replace(/,/g, "");
       // 숫자만 허용
       newValue = newValue.replace(/[^0-9]/g, "");
+      // 앞에 0을 제거
+      newValue = newValue.replace(/^0+/, "");
       // 3자리마다 쉼표 추가
       newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       // newValue = Number(newValue).toLocaleString("ko-KR");

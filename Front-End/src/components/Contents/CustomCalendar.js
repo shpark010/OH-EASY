@@ -92,6 +92,7 @@ function CustomCalendar({
   name,
   value,
   readOnly,
+  onClick,
 }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -155,7 +156,7 @@ function CustomCalendar({
   };
 
   return (
-    <InputWrapper ref={ref} width={`${width}px`}>
+    <InputWrapper ref={ref} width={`${width}px`} onClick={onClick}>
       <Input
         id={id}
         className={className}
