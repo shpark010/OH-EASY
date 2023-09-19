@@ -2,7 +2,12 @@ import React from "react";
 import SearchBarBox from "../SearchBar/SearchBarBox";
 import SearchSubmitButton from "../SearchBar/SearchSubmitButton";
 import useApiRequest from "../Services/ApiRequest";
-const HrSearchBar = ({ conditions, setConditions, setEmpList }) => {
+const HrSearchBar = ({
+  conditions,
+  setConditions,
+  setEmpList,
+  setClickEmpCode,
+}) => {
   const apiRequest = useApiRequest();
 
   const handleSelectChange = (e, name) => {
@@ -18,6 +23,7 @@ const HrSearchBar = ({ conditions, setConditions, setEmpList }) => {
       });
       console.log(responseData);
       setEmpList(responseData);
+      setClickEmpCode();
     } catch (error) {
       console.error("api 요청 실패:", error);
     }

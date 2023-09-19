@@ -8,9 +8,13 @@ import Calc from "../../images/pages/common/calc.png";
 import Print from "../../images/pages/common/print.png";
 import Delete from "../../images/pages/common/delete.png";
 import useApiRequest from "../Services/ApiRequest";
+import SweetAlert from "../Contents/SweetAlert";
 
-const HrPageHeader = ({ checkedRows, setEmpList }) => {
+const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
   const apiRequest = useApiRequest();
+
+  // 알림창 표시 상태 관리
+  const [showAlert, setShowAlert] = React.useState(false);
 
   // 체크된 사원들을 가져와서 db에서 삭제
   const handleSendCheckedCdEmpListDelete = async () => {
@@ -42,20 +46,38 @@ const HrPageHeader = ({ checkedRows, setEmpList }) => {
         url: "/api2/hr/getAllEmpList",
       });
       setEmpList(responseData);
+      setClickEmpCode();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
   };
+  const handleCloseAlert = () => {
+    setShowAlert(false); // 알림창 표시 상태를 false로 설정
+  };
 
   return (
     <div className="pageHeader">
+      {showAlert && (
+        <SweetAlert
+          text="인사테이블에 등록되지않은 사원 정보를 불러올까요?"
+          showCancel={true}
+          onConfirm={() => {
+            // 여기에 원하는 액션을 추가하세요.
+            handleGetEmpList();
+            handleCloseAlert();
+          }}
+          onCancel={handleCloseAlert}
+        />
+      )}
       <div className="innerBox fxSpace">
         <PageHeaderName text="인사관리등록" />
         <div className="fxAlignCenter">
           <div className="btnWrapper textBtnWrap">
             <PageHeaderTextButton
               text="사원불러오기"
-              onClick={handleGetEmpList}
+              onClick={(e) => {
+                setShowAlert(true);
+              }}
             />
           </div>
           <div className="iconBtnWrap">

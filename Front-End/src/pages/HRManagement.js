@@ -11,16 +11,57 @@ import HrBody from "../components/HRManagement/HrDetail/HrBody";
 import HrMilitary from "../components/HRManagement/HrDetail/HrMilitary";
 import HrLicense from "../components/HRManagement/HrDetail/HrLicense";
 import useApiRequest from "../components/Services/ApiRequest";
+import CustomModal from "../components/Contents/CustomModal";
+import CustomButton from "../components/Contents/CustomButton";
 import "../styles/css/pages/HRManagement.css";
+import Alert from "../components/Contents/SweetAlert";
+import PageHeaderName from "../components/PageHeader/PageHeaderName";
 
 function HRManagement() {
   const apiRequest = useApiRequest();
+
   const [empList, setEmpList] = useState([]); //첫번째 테이블의 사원정보들 관리
+
   const [activeTab, setActiveTab] = useState("family"); // 가족,학력,경력,신체,병역,자격 탭 상태 관리
+
+  const [modalEmpList, setModalEmpList] = useState([]); // 모달창 사원 정보
+  const [modalIsOpen, setModalIsOpen] = useState(false); // 모달창 관리
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  // 모달창 닫으면 바로 사원 인서트
+  const closeModalAndEmpInsert = async () => {
+    closeModal();
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/hr/insertHrEmpData?cdEmp=${clickModalEmpCode}`,
+      });
+      //서버에서 넘어온 데이터
+      // HRManagement.js:68 {cdEmp: 'CD046', nmEmp: '장영호'}
+      //setEmpList(responseData);
+      setShowInsertRow(false);
+      console.log("서버에서 넘어온 데이터 ");
+      console.log(responseData);
+      setEmpList((prevEmpList) => [...prevEmpList, responseData]);
+      setClickEmpCode(clickModalEmpCode);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  const [showInsertRow, setShowInsertRow] = useState(false); // 행추가 관리
 
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
-  const [clickEmpCode, setclickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
+  const [clickEmpCode, setClickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
+  const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [conditions, setConditions] = useState({
     category: 0,
     sort: 3,
@@ -57,16 +98,37 @@ function HRManagement() {
     [checkedRows],
   );
 
+  // 사원정보 API 요청 후 사원정보 setEmpList
+  const handleGetEmpList = async () => {
+    try {
+      const responseData = await apiRequest({
+        method: "GET",
+        url: "/api2/hr/getAllModalEmpList",
+      });
+      setModalEmpList(responseData);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
   // 첫번째 테이블에 보내야할 data 파라미터
   const data = useMemo(
     () =>
       empList.map((emp) => ({
         checkbox: false,
-        code: emp.cdEmp,
-        employee: emp.nmEmp,
+        cdEmp: emp.cdEmp,
+        nmEmp: emp.nmEmp,
         onRowClick: () => handleRowClick(emp.cdEmp), // 여기 추가
       })),
     [empList],
+  );
+  const dataModalEmpList = useMemo(
+    () =>
+      modalEmpList.map((emp) => ({
+        cdEmp: emp.cdEmp,
+        nmEmp: emp.nmEmp,
+      })),
+    [modalEmpList],
   );
   // 첫번째 테이블에 보내야할 colums 파라미터
   const columns = useMemo(
@@ -85,86 +147,65 @@ function HRManagement() {
         id: "checkbox",
         Cell: ({ cell: { value }, row: { original } }) => {
           // 현재 행의 체크박스 상태를 결정 checkedRows 배열에 현재 행의 코드가 포함되어 있으면 체크박스는 체크된 상태로 표시
-          const isChecked = checkedRows.includes(original.code);
+          const isChecked = checkedRows.includes(original?.cdEmp);
           return (
             <input
               type="checkbox"
               // 행의 체크박스가 클릭될 때의 동작을 handleRowCheckboxClick 함수에 위임, 해당 행의 코드를 인자로 전달
               checked={isChecked}
-              onChange={() => handleRowCheckboxClick(original.code)}
+              onChange={() => handleRowCheckboxClick(original?.cdEmp)}
             />
           );
         },
       },
       {
-        Header: "Code",
-        accessor: "code",
+        Header: "사원코드",
+        accessor: "cdEmp",
         width: "45%",
-        id: "code",
+        id: "cdEmp",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || "");
-
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
           const handleInputClick = (e) => {
-            console.log("code클릭이벤발생");
-            //console.log(original.code);
-            setclickEmpCode(original.code);
-            //handleGetEmpBasicData(original.code);
+            if (original) {
+              console.log("code클릭이벤발생");
+              setClickEmpCode(original.cdEmp); // 이 부분
+            } else {
+              console.log("Insert row input clicked!");
+              openModal(e);
+              handleGetEmpList();
+            }
           };
           return (
             <Input
-              value={inputValue || ""}
+              value={original?.cdEmp || ""}
               onClick={handleInputClick}
-              onChange={handleInputChange}
               isDoubleClick={false}
+              className={"doubleLine"}
             />
           );
         },
       },
       {
-        Header: "사원",
-        accessor: "employee",
-        id: "employee",
+        Header: "사원명",
+        accessor: "nmEmp",
+        id: "nmEmp",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || "");
-
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
           const handleInputClick = (e) => {
-            console.log("hr : 클릭이벤");
-            console.log(original.code);
-            setclickEmpCode(original.code);
-            //handleGetEmpBasicData(original.code);
-          };
-          const defaultTdOnBlur = (e) => {
-            console.log("hr: td 블러이벤");
-          };
-          const handleEnterPress = (e) => {
-            console.log("Enter 키가 눌렸습니다.");
-            setclickEmpCode(original.code);
-            console.log(clickEmpCode);
-            // 여기에서 DB 접근 등의 원하는 작업 수행
-            //handleGetEmpBasicData(original.code);
-          };
-
-          const handleTabPress = (e) => {
-            console.log("Tab 키가 눌렸습니다.");
-            // 여기에서 DB 접근 등의 원하는 작업 수행
+            if (original) {
+              console.log("code클릭이벤발생");
+              setClickEmpCode(original.cdEmp); // 이 부분
+            } else {
+              console.log("Insert row input clicked!");
+              openModal(e);
+              handleGetEmpList();
+            }
             //handleGetEmpBasicData(original.code);
           };
 
           return (
             <Input
-              value={inputValue || ""}
+              value={original?.nmEmp || ""}
               onClick={handleInputClick}
-              onChange={handleInputChange}
-              onBlur={defaultTdOnBlur}
-              onEnterPress={handleEnterPress}
-              onTabPress={handleTabPress}
-              isDoubleClick={true}
+              isDoubleClick={false}
               className={"doubleLine"}
             />
           );
@@ -173,6 +214,50 @@ function HRManagement() {
     ],
     [checkedRows, empList],
   );
+
+  const columnsModal = useMemo(
+    () => [
+      {
+        Header: "사원코드",
+        accessor: "cdEmp",
+        width: "45%",
+        id: "cdEmp",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.cdEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+      {
+        Header: "사원명",
+        accessor: "nmEmp",
+        id: "nmEmp",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.nmEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+    ],
+    [modalEmpList],
+  );
+
   const tabs = [
     { id: "family", label: "가족", component: HrFamily },
     { id: "edu", label: "학력", component: HrEdu },
@@ -193,11 +278,13 @@ function HRManagement() {
         checkedRows={checkedRows}
         setCheckedRows={setCheckedRows}
         setEmpList={setEmpList}
+        setClickEmpCode={setClickEmpCode}
       />
       <HrSearchBar
         conditions={conditions}
         setConditions={setConditions}
         setEmpList={setEmpList}
+        setClickEmpCode={setClickEmpCode}
       />
       <section className="section hr-section">
         <div className="hrGrid">
@@ -207,9 +294,9 @@ function HRManagement() {
               <Table
                 columns={columns}
                 data={data}
-                //insertRow={false}
-                //showInsertRow={showInsertRow}
-                //setShowInsertRow={setShowInsertRow}
+                insertRow={true}
+                showInsertRow={showInsertRow}
+                setShowInsertRow={setShowInsertRow}
               />
             </div>
             <div className="totalBox">
@@ -249,6 +336,34 @@ function HRManagement() {
           </div>
         </div>
       </section>
+      <CustomModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        contentStyle={{
+          backgroundColor: "white",
+          border: "1px solid gray",
+        }}
+      >
+        <PageHeaderName text="추가목록" />
+        <div className="test2">
+          <Table columns={columnsModal} data={dataModalEmpList} />
+        </div>
+        <div className="test">
+          <CustomButton
+            backgroundColor={"var(--color-primary-blue)"}
+            color={"var(--color-primary-white)"}
+            onClick={closeModalAndEmpInsert}
+            text={"추가하기"}
+          />
+          <CustomButton
+            backgroundColor={"var(--color-primary-gray)"}
+            color={"var(--color-primary-white)"}
+            onClick={closeModal}
+            text={"취소"}
+          />
+        </div>
+      </CustomModal>
     </>
   );
 }

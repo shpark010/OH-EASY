@@ -157,3 +157,26 @@
 .hrDetailSelect {
   margin: 7px 10px;
 }
+
+.hrBody {
+  display: flex;
+}
+
+.hrBody .table,
+.hrBody .table tr {
+  display: flex;
+}
+.hrBody .table tbody {
+  width: 50%;
+}
+.hrBody .table th {
+  width: 200px;
+  text-align: right;
+  border: none;
+  flex-shrink: 0;
+}
+.hrBody .table td {
+  width: 100%;
+  padding: 3px 10px;
+  border: none;
+}
