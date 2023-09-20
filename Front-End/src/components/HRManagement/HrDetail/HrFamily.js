@@ -10,7 +10,6 @@ const HrFamily = ({ cdEmp }) => {
   // prop 이름 변경
   const apiRequest = useApiRequest();
   const [familyList, setfamilyList] = useState([]);
-  const [familyEmpCode, setfamilyEmpCode] = useState(cdEmp);
   const [showInsertRow, setShowInsertRow] = useState(false);
 
   const isFirstRender = useRef(true);
@@ -28,10 +27,12 @@ const HrFamily = ({ cdEmp }) => {
 
     setShowInsertRow(false);
     handleSendEmpCodeGetFamilyData(cdEmp); // 함수 호출시 인자로 empCode 전달
-    setfamilyEmpCode(cdEmp);
   }, [cdEmp]);
 
   const handleSendEmpCodeGetFamilyData = async (cdEmp) => {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -49,6 +50,9 @@ const HrFamily = ({ cdEmp }) => {
     accessor,
     inputValue,
   ) => {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
     console.log("현재 inputValue : " + inputValue);
     if (inputValue == null || inputValue === "" || inputValue === undefined) {
       console.log("값의 변화가 없음 api요청 안감");
@@ -565,7 +569,7 @@ const HrFamily = ({ cdEmp }) => {
       insertRow={true}
       showInsertRow={showInsertRow}
       setShowInsertRow={setShowInsertRow}
-      scrollHeight={"700"}
+      //scrollHeight={"700"}
     />
   );
 };

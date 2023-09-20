@@ -3,31 +3,56 @@
 
 <mapper namespace="kr.or.oheasy.er.dao.ErDao">
 
+    <!--사원등록-->
     <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
         INSERT INTO hr_emp_mst (CD_EMP) VALUES (#{cdEmp})
     </insert>
 
+    <!--사원수정-->
     <update id="updateEmp">
         UPDATE hr_emp_mst
         SET ${column} = #{value}
         WHERE CD_EMP = #{cdEmp}
     </update>
 
+    <!--사원코드 존재여부검사-->
     <select id="checkCdEmpExistence" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
     </select>
 
-
+    <!--사원전체조회-->
     <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
         select * from hr_emp_mst
     </select>
 
+<!--    <select id="getCdEmp" resultType="kr.or.oheasy.vo.HrEmpMstVO">-->
+<!--        SELECT * FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}-->
+<!--    </select>-->
+
+    <!--사원조회-->
     <select id="getCdEmp" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-        SELECT * FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
+        SELECT
+        E.*,
+        BD.NM_BANK AS nmBank,
+        BD.TP_BANK AS tpBank,
+        DD.NM_DEPARTMENT AS nmDepartment,
+        PS.NM_POSITION AS nmPosition,
+        PS.SQ_POSITION AS sqPosition,
+        PC.NM_POSITION_CATEGORY AS nmPositionCategory
+        FROM hr_emp_mst E
+        LEFT JOIN bank_data_sdtl BD ON E.CD_BANK = BD.CD_BANK
+        LEFT JOIN department_dtl DD ON E.NO_DEPARTMENT = DD.NO_DEPARTMENT
+        LEFT JOIN position_sdtl PS ON E.NO_POSITION_UNIQUE = PS.NO_POSITION_UNIQUE
+        LEFT JOIN position_category_dtl PC ON PS.NO_POSITION_CATEGORY = PC.NO_POSITION_CATEGORY
+        WHERE E.CD_EMP = #{cdEmp}
     </select>
 
+    <!--사원삭제-->
     <delete id="deleteEmp">
         delete from hr_emp_mst where CD_EMP = #{cdEmp}
     </delete>
+
+
+
 
 </mapper>

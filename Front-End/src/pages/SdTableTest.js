@@ -18,6 +18,9 @@ import useApiRequest from "../components/Services/ApiRequest";
 const TableTest = (props) => {
   // const [editing, setEditing] = useState(false);
   const [pay, setPay] = useState("");
+  useEffect(() => {
+    console.log("pay state has changed:", pay);
+  }, [pay]);
   const [beforePay, setBeforePay] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [empList, setEmpList] = useState([]);
@@ -567,10 +570,10 @@ const TableTest = (props) => {
                 label="정렬"
                 id="sd-order-category"
                 options={[
-                  { value: "cdEmp", label: "0. 코드순" },
-                  { value: "1", label: "1. 이름순" },
-                  { value: "2", label: "2. 직급순" },
-                  { value: "3", label: "3. 입사일순" },
+                  { value: "CD_EMP", label: "0. 코드순" },
+                  { value: "NM_EMP", label: "1. 이름순" },
+                  { value: "NO_POSITION_UNIQUE", label: "2. 직급순" },
+                  { value: "DT_HRIRE", label: "3. 입사일순" },
                 ]}
                 defaultValue={searchOrder}
                 onChange={handleSearchTypeChange}
