@@ -8,7 +8,7 @@ public class WcVO {
     private String cdEmp; //코드
     private String dtStartCont; //근로계약 시작날짜
     private String dtEndCont; //근로계약 종료날짜
-    private String noPost; // 우편번호
+    private String noWorkPost; // 우편번호
     private String addrWork; // 근무장소
     private String addrWorkDtl; // 상세주소
     private String cntnJob; // 업무내용

@@ -199,4 +199,10 @@ public class HrService {
         return dao.updateLicenseData(seqLicense, column, value);
     }
     
+    public int insertLicenseData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value) {
+    	HrDao dao = sqlSession.getMapper(HrDao.class);
+    	column = Camel.camelToSnake(column);
+    	return dao.insertLicenseData(cdEmp, column, value);
+    }
+    
 }

@@ -322,16 +322,32 @@ public class HrController {
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
+	@GetMapping("insertLienscData")
+	public ResponseEntity<?> insertLienscData(@RequestParam Map<String, String> params){
+		System.out.println("insertLienscData");
+		String cdEmp = params.remove("cdEmp");
+		Entry<String, String> entry = params.entrySet().iterator().next();
+		String column = entry.getKey();
+		String value = entry.getValue();
+		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
+		System.out.println("인서트 경력 정보 *************************");
+		
+		int result = hrService.insertLicenseData(cdEmp, column, value);
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	
+	
 	@GetMapping("updateLicenseData")
 	public ResponseEntity<?> updateLicenseData(@RequestParam Map<String, String> params){
 		System.out.println("updateLicenseData");
-	    String seqFamily = params.remove("seqFamily");
+	    String seqLicense = params.remove("seqLicense");
 	    Entry<String, String> entry = params.entrySet().iterator().next();
 	    String column = entry.getKey();
 	    String value = entry.getValue();
-	    System.out.println("seqFamily : " + seqFamily + ", column : " + column + ", value : " + value);
+	    System.out.println("seqLicense : " + seqLicense + ", column : " + column + ", value : " + value);
 	    
-	    int result = hrService.updateLicenseData(seqFamily, column, value);
+	    int result = hrService.updateLicenseData(seqLicense, column, value);
 	    
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
