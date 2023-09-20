@@ -27,7 +27,6 @@ public class WcController {
 	@GetMapping("/getEmpList")
 //	public ResponseEntity<?> getOptionEmpList(@RequestParam String creDate,@RequestParam String creDate2, @RequestParam String orderValue) {
 	public ResponseEntity<?> getOptionEmpList(@RequestParam Map<String,String> data) {
-		
 		System.out.println("getEmpList 진입");
 		System.out.println(data);		 
 		int dataSize = data.size();
@@ -38,8 +37,6 @@ public class WcController {
 			String param2 = data.get("orderValue");
 			result = wcService.getOptionEmpList(param1,param2);
 			break;
-
-		    
 		}
 		
 		case 3: {
@@ -54,32 +51,38 @@ public class WcController {
 			return null;
 		}
 	}
-		
 		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
-
 	  
 	}
 	
-	@PutMapping("/updateEmpList")
-	public int updateEmp0to1() {
-		System.out.println("updataeEmpList 진입");
+	
+	@GetMapping("/getCodeParamEmpList")
+	public ResponseEntity<?> getCodeParam(@RequestParam String code) {
+		System.out.println("getCodeParam진입");
+		System.out.println(code);
+		WcVO result = wcService.getCodeParam(code);
+		System.out.println(result);
 		
-	    int result = wcService.updateEmp0to1();
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	} //조회 Tab에서 왼쪽 Grid Table 눌렀을 경우.code로 wctable에서 가져오는 사원 data
+	
+	
+	
+	@PutMapping("/updateEmpList")
+	public int updateEmpList(@RequestParam String cdEmp,@RequestParam String colum,@RequestParam String data ) {
+		System.out.println("updataeEmpList 진입");
+		System.out.println(cdEmp + colum+ data);
+	    int result = wcService.updateEmpList(cdEmp,colum,data);
 
 
 	    return result;
 	} // 작성 Tab에서 작성완료 눌렀을 경우
 	
 	
-	@GetMapping("/getWcData")
-	public ResponseEntity<?> getWcData(@RequestParam String code) {
-		System.out.println("getWcData진입");
-	    WcVO result = wcService.getWcData(code);
-	    System.out.println(result);
-	    
-	    return new ResponseEntity<>(result, HttpStatus.OK);
-	} //조회 Tab에서 왼쪽 Grid Table 눌렀을 경우.
+	
+	
+	
 	
 	
 }

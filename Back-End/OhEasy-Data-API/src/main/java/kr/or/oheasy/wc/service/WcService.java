@@ -20,10 +20,10 @@ public class WcService {
 		
 		switch(orderValue) {
 		case "1":
-			orderValue = "cd_emp";
+			orderValue = "e.cd_emp";
 			break;
 		case "2" : 
-			orderValue ="nm_emp";
+			orderValue ="e.nm_emp";
 			break;
 		}
 		System.out.println(orderValue);
@@ -37,10 +37,13 @@ public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, St
 		
 		switch(orderValue) {
 		case "1":
-			orderValue = "cd_emp";
+			orderValue = "e.cd_emp";
 			break;
 		case "2" : 
-			orderValue ="nm_emp";
+			orderValue ="e.nm_emp";
+			break;
+		case "3" : 
+			orderValue ="c.dt_created";
 			break;
 		}
 		
@@ -52,17 +55,17 @@ public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, St
 	}
 	
 
+	public WcVO getCodeParam(String code){
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.getCodeParam(code);
+	}
 
 	
-	public int updateEmp0to1(){
+	public int updateEmpList(String cdEmp, String colum, String data){
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.updateEmp0to1();
+		return wcdao.updateEmpList(cdEmp,colum,data);
 	}
 	
-	public WcVO getWcData(String code){
-		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getWcData(code);
-	}
 	
 
 }

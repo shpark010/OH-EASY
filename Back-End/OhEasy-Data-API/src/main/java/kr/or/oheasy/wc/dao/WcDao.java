@@ -11,8 +11,8 @@ public interface WcDao {
 
 		public List<WcGetEmpListVO> getOptionEmpList(String creDate,String orderValue);
 		public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, String orderValue); 
-		public int updateEmp0to1();
-		public WcVO getWcData(String code);
+		public WcVO getCodeParam(String code);
+		public int updateEmpList(String cdEmp, String colum, String data);
 	
 
 	
