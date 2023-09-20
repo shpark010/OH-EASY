@@ -3,23 +3,55 @@
 
 <mapper namespace="kr.or.oheasy.wc.dao.WcDao">
 
-<!-- 전사원의 정보 -->
-<select id="getAllEmpList"  resultType="kr.or.oheasy.vo.WcGetEmpListVO">
-	SELECT cd_emp,nm_emp,no_resident FROM hr_emp_mst
-	
+<!-- 사원의 정보 조건조회 -->
+<select id="getOptionEmpList" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+	 <![CDATA[
+    SELECT c.cd_emp, e.nm_emp, e.no_resident 
+    FROM hr_contract_info AS c
+    JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
+    WHERE c.dt_created = #{param1}
+    ORDER BY
+    ]]>
+    <choose>
+        <when test="param2 == 'e.nm_emp'">e.nm_emp</when>
+        <!-- 다른 열 이름에 대한 검증 로직 추가 -->
+        <otherwise>e.cd_emp</otherwise>
+    </choose>
 </select>
 
+
+<select id="getOptionEmpList2" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpListVO">
+	<![CDATA[
+	SELECT c.cd_emp, e.nm_emp, e.no_resident, c.dt_created
+	FROM hr_contract_info AS c
+	JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
+	WHERE dt_created BETWEEN #{param1} AND #{param2}
+	ORDER BY ]]>
+    <choose>
+        <when test="param3 == 'e.nm_emp'">e.nm_emp</when>
+        <when test="param3 == 'e.cd_emp'">e.cd_emp</when>
+        <!-- 다른 열 이름에 대한 검증 로직 추가 -->
+        <otherwise>c.dt_created</otherwise>
+    </choose>
+</select>
   
-<update id="updateEmp0to1" >
-update hr_emp_mst
-set fg_workcontract = 1
+  
+  <select id = "getCodeParam" parameterType="String" resultType="kr.or.oheasy.vo.WcVO">
+	SELECT * FROM hr_contract_info WHERE cd_emp = #{code}
+
+</select>
+  
+  
+	<update id="updateEmpList" parameterType="String" >
+    UPDATE hr_contract_info
+    SET 
+    <choose>
+        <when test="param2 == 'cntnJob'">CNTN_JOB</when>
+        <!-- 다른 열 이름에 대한 검증 로직 추가 -->
+    </choose> = #{param3}
+    WHERE cd_emp = #{param1}
 </update>
 
-
-<select id = "getWcData" parameterType="String" resultType="kr.or.oheasy.vo.WcVO">
-	SELECT * FROM hr_contract_infO WHERE cd_emp = #{code}
-
-</select>
 
 
 </mapper>

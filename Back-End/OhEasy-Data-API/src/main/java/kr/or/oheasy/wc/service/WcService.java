@@ -16,21 +16,56 @@ public class WcService {
 	@Autowired
 	private SqlSession sqlSession; //mybatis
 	
-	public List<WcGetEmpListVO> getAllEmpList() {
+	public List<WcGetEmpListVO> getOptionEmpList(String creDate,String orderValue) {
+		
+		switch(orderValue) {
+		case "1":
+			orderValue = "e.cd_emp";
+			break;
+		case "2" : 
+			orderValue ="e.nm_emp";
+			break;
+		}
+		System.out.println(orderValue);
+	
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getAllEmpList();
+		return wcdao.getOptionEmpList(creDate,orderValue);
 		
 	}
 	
-	public int updateEmp0to1(){
+public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, String orderValue) {
+		
+		switch(orderValue) {
+		case "1":
+			orderValue = "e.cd_emp";
+			break;
+		case "2" : 
+			orderValue ="e.nm_emp";
+			break;
+		case "3" : 
+			orderValue ="c.dt_created";
+			break;
+		}
+		
+		System.out.println(orderValue);
+	
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.updateEmp0to1();
+		return wcdao.getOptionEmpList2(creDate,creDate2,orderValue);
+		
 	}
 	
-	public WcVO getWcData(String code){
+
+	public WcVO getCodeParam(String code){
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getWcData(code);
+		return wcdao.getCodeParam(code);
 	}
+
+	
+	public int updateEmpList(String cdEmp, String colum, String data){
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.updateEmpList(cdEmp,colum,data);
+	}
+	
 	
 
 }
