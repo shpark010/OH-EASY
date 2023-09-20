@@ -88,6 +88,8 @@ public interface HrDao {
     // 자격 테이블 
     public List<HrLicenseDtlVO> getLicenseDataList(String cdEmp);
 	
+    public int insertLicenseData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);
+    
     public int updateLicenseData(@Param("seqLicense") String seqLicense, @Param("column") String column, @Param("value") String value);
 	
 }

@@ -167,6 +167,11 @@ WHERE d.CD_EMP IS NULL;
     where SEQ_LICENSE = #{seqLicense}
 </update>
 
+<!-- 한사원의 한명의 가족 정보 insert -->
+<insert id="insertLicenseData">
+	insert into hr_License_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
 <!-- 자격증 리스트 가져오기 -->
 <select id="getLicenseList" resultType="kr.or.oheasy.vo.HrLicenseSdtlVO">
 	select * from hr_License_Sdtl
