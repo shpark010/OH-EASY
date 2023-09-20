@@ -8,9 +8,10 @@ function SearchBarBox({
   defaultValue,
   onChange,
   value,
+  onClick,
 }) {
   return (
-    <div className={`searchBarBox ${className}`}>
+    <div className={`searchBarBox ${className}`} onClick={onClick}>
       {label && <span className="searchBarName">{label}</span>}
       <select id={id} className="selectBox" onChange={onChange} value={value}>
         {options.map((option, index) => (

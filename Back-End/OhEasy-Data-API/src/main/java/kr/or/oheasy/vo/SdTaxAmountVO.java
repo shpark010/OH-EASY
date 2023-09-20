@@ -17,17 +17,4 @@ public class SdTaxAmountVO {
 	private long longtermNursingInsurance;	//장기요양보험료
 	private long incomeTax;					//소득세
 	private long localIncomeTax;			//지방소득세
-	
-	public SdTaxAmountVO(long nationalPension, long healthInsurance, long employmentInsurance,
-			long longtermNursingInsurance, long incomeTax, long localIncomeTax) {
-		super();
-		this.nationalPension = nationalPension;
-		this.healthInsurance = healthInsurance;
-		this.employmentInsurance = employmentInsurance;
-		this.longtermNursingInsurance = longtermNursingInsurance;
-		this.incomeTax = incomeTax;
-		this.localIncomeTax = localIncomeTax;
-	}
-	
-	
 }

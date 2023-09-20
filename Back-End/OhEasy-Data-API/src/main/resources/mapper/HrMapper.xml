@@ -3,23 +3,69 @@
 
 <mapper namespace="kr.or.oheasy.hrm.dao.HrDao">
 
-<!-- 전사원의 정보 -->
+<!-- 사원테이블에 존재하면서 인사테이블에도 존재하는 사원 리스트 -->
 <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-	select cd_emp,nm_emp from hr_emp_mst
+SELECT m.*
+FROM hr_emp_mst m
+INNER JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP;
 </select>
 
 
+<!-- 사원테이블엔 존재하지만 인사테이블엔 존재하지 않는 사원 리스트 -->
+<select id="getAllModalEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+SELECT m.*
+FROM hr_emp_mst m
+LEFT JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
+WHERE d.CD_EMP IS NULL;
+</select>
 
+<!-- 인사테이블 insert -->
+<insert id="insertHrEmpData">
+	insert into hr_emp_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+
+<!-- 인사테이블 한명 정보 가져오기 -->
+<select id="getOneHrEmpData" parameterType="string" resultType="kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO">
+    SELECT 
+        m.CD_EMP as cd_Emp,
+        m.NM_EMP as nm_Emp
+    FROM hr_emp_mst m
+    JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
+    WHERE m.CD_EMP = #{cdEmp}
+</select>
 
 
 <!-- 한 사원의 기초정보	 -->
-<select id="getOneEmpBasicData" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-	select * from hr_emp_mst where cd_emp=#{cdEmp}
+<select id="getOneEmpBasicData" resultType="kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO">
+    select
+    	m.CD_EMP as cd_emp,
+    	m.NO_RESIDENT as no_resident,
+    	m.NO_DEPARTMENT as no_department,
+    	m.NO_POSITION_UNIQUE as no_positionUnique,
+    	m.DT_HIRE as dt_hire,
+    	m.DT_RESIGN as dt_resign,
+        d.NM_ENG_EMP as nm_eng_emp, 
+        d.NM_HANJA_EMP as nm_hanja_emp, 
+        d.FG_WORKCONTRACT as fg_workcontract, 
+        d.FG_MARRIAGE as fg_marriage, 
+        d.DT_BIRTH as dt_birth 
+    from 
+        hr_emp_mst m
+    left join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    where 
+        m.CD_EMP=#{cdEmp}
 </select>
 
-<!-- 한 사원의 기초정보	 update-->
-<update id="updateEmpBasicData">
+<!-- 한 사원의 사원테이블 update-->
+<update id="updateHrEmpMst">
     update hr_emp_mst
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+<!-- 한 사원의 인사테이블 update-->
+<update id="updateHrEmpDtl">
+    update hr_emp_dtl
     set ${column} = #{value} 
     where cd_emp = #{cdEmp}
 </update>
@@ -41,123 +87,221 @@
     where SEQ_FAMILY = #{seqFamily}
 </update>
 
+<!-- 한사원의 학력 정보 -->
+<select id="getEduDataList" resultType="kr.or.oheasy.vo.HrEducationDtlVO">
+	select * from hr_education_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 한명의 학력 정보 insert -->
+<insert id="insertEduData">
+	insert into hr_education_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+<!-- 한사원의 한명의 학력 정보 update -->
+<update id="updateEduData">
+    update hr_education_dtl
+    set ${column} = #{value} 
+    where SEQ_EDUCATION = #{seqEducation}
+</update>
+
+<!-- 한 사원의 경력정보 -->
+<select id="getCareerDataList" resultType="kr.or.oheasy.vo.HrCareerDtlVO">
+	select * from hr_career_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 경력 정보 insert -->
+<insert id="insertCareerData">
+	insert into hr_career_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+<!-- 한사원의 경력 정보 update -->
+<update id="updateCareerData">
+    update hr_career_dtl
+    set ${column} = #{value} 
+    where SEQ_CAREER = #{seqCareer}
+</update>
+
+<!-- 한사원의 신체 정보 -->
+<select id="getBodyData" resultType="kr.or.oheasy.vo.HrBodyDataDtlVO">
+	select * from hr_body_data_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 신체 정보 insert-->
+<insert id="insertBodyData">
+	insert into hr_Body_data_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+<!-- 한 사원의 신체 정보 update-->
+<update id="updateBodyData">
+    update hr_Body_data_dtl
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+
+<!-- 한사원의 병역 정보 -->
+<select id="getMilitaryData" resultType="kr.or.oheasy.vo.HrMilitaryInfoDtlVO">
+	select * from hr_Military_info_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 병역 정보 insert-->
+<insert id="insertMilitaryData">
+	insert into hr_military_info_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+
+<!-- 한 사원의 신체 정보 update-->
+<update id="updateMilitaryData">
+    update hr_military_info_dtl
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+
+<!-- 한 사원의 자격정보 -->
+<select id="getLicenseDataList" resultType="kr.or.oheasy.vo.HrLicenseDtlVO">
+	select * from hr_License_dtl where cd_emp=#{cdEmp}
+</select>
+
+
+<!-- 한사원의 자격정보 update -->
+<update id="updateLicenseData">
+    update hr_License_dtl
+    set ${column} = #{value} 
+    where SEQ_LICENSE = #{seqLicense}
+</update>
+
+<!-- 자격증 리스트 가져오기 -->
+<select id="getLicenseList" resultType="kr.or.oheasy.vo.HrLicenseSdtlVO">
+	select * from hr_License_Sdtl
+</select>
+
+
 <!-- 조건 검색 카테고리 0 재직자 -->
 <select id="getConditionalEmpListCategory0" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT cd_emp,nm_emp
-    FROM hr_emp_mst
-    WHERE DT_RESIGN IS NULL 
+    SELECT m.cd_emp as cd_emp
+    ,m.nm_emp as nm_emp
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NULL 
     <choose>
         <!-- 코드 순 정렬 -->
         <when test="sort == 0">
             ORDER BY 
                 CASE 
-                    WHEN cd_emp IS NULL THEN 4
-                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
-                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
                     ELSE 3
                 END, 
-                cd_emp;
+                m.cd_emp;
         </when>
         <!-- 이름 순 정렬 -->
         <when test="sort == 1">
             ORDER BY 
                 CASE 
-                    WHEN nm_emp IS NULL THEN 4
-                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
+                    WHEN m.nm_emp IS NULL THEN 4
+                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN m.nm_emp REGEXP '^[0-9]' THEN 3
                     ELSE 4
                 END, 
-                nm_emp;
+                m.nm_emp;
         </when>
         <!-- 입사 순 정렬 -->
         <when test="sort == 2">
             ORDER BY 
                 CASE 
-                    WHEN dt_hire IS NOT NULL THEN 1
+                    WHEN m.dt_hire IS NOT NULL THEN 1
                     ELSE 2
                 END, 
-                dt_hire;
+                m.dt_hire;
         </when>
     </choose>
 </select>
 <!-- 조건 검색 카테고리 1 퇴사자 -->
 <select id="getConditionalEmpListCategory1" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT cd_emp,nm_emp
-    FROM hr_emp_mst
-    WHERE DT_RESIGN IS NOT NULL 
+    SELECT m.cd_emp as cd_emp
+    ,m.nm_emp as nm_emp
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NOT NULL 
     <choose>
         <!-- 코드 순 정렬 -->
         <when test="sort == 0">
                 ORDER BY 
                 CASE 
-                    WHEN cd_emp IS NULL THEN 4
-                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
-                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
                     ELSE 3
                 END, 
-                cd_emp
+                m.cd_emp
         </when>
         <!-- 이름 순 정렬 -->
         <when test="sort == 1">
             ORDER BY 
                 CASE 
-                    WHEN nm_emp IS NULL THEN 4
-                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
+                    WHEN m.nm_emp IS NULL THEN 4
+                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN m.nm_emp REGEXP '^[0-9]' THEN 3
                     ELSE 4
                 END, 
-                nm_emp
+                m.nm_emp
         </when>
         <!-- 입사 순 정렬 -->
         <when test="sort == 2">
             ORDER BY 
                 CASE 
-                    WHEN dt_hire IS NOT NULL THEN 1
+                    WHEN m.dt_hire IS NOT NULL THEN 1
                     ELSE 2
                 END, 
-                dt_hire asc
+                m.dt_hire asc
         </when>
     </choose>
 </select>
 
 <!-- 조건 검색 카테고리 2 재직자 + 당해년도 퇴사자 -->
 <select id="getConditionalEmpListCategory2" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT cd_emp, nm_emp 
-    FROM hr_emp_mst
-    WHERE DT_RESIGN IS NULL OR LEFT(DT_RESIGN, 4) = YEAR(NOW())
+    SELECT m.cd_emp as cd_emp
+    ,m.nm_emp as nm_emp
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NULL OR LEFT(m.DT_RESIGN, 4) = YEAR(NOW())
     <choose>
         <!-- 코드 순 정렬 -->
         <when test="sort == 0">
             ORDER BY 
                 CASE 
-                    WHEN cd_emp IS NULL THEN 4
-                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
-                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
                     ELSE 3
                 END, 
-                cd_emp
+                m.cd_emp
         </when>
         <!-- 이름 순 정렬 -->
         <when test="sort == 1">
             ORDER BY 
                 CASE 
-                    WHEN nm_emp IS NULL THEN 4
-                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
+                    WHEN m.nm_emp IS NULL THEN 4
+                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
+                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
                     ELSE 3
                 END,
-                nm_emp
+                m.nm_emp
         </when>
         <!-- 입사 순 정렬 -->
         <when test="sort == 2">
             ORDER BY 
                 CASE 
-                    WHEN dt_hire IS NULL THEN 2
+                    WHEN m.dt_hire IS NULL THEN 2
                     ELSE 1
                 END, 
-                dt_hire
+                m.dt_hire
         </when>
     </choose>
 </select>
@@ -203,6 +347,13 @@
         </when>
     </choose>
 </select>
+
+
+
+
+
+
+
 
 </mapper>
 
