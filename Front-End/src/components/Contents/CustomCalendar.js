@@ -176,7 +176,7 @@ function CustomCalendar({
           formatDay={(locale, date) => moment(date).format("DD")}
           onChange={type === "month" ? handleMonthChange : handleDateChange}
           value={formatDate(value) || new Date()}
-          view={type === "month" ? "year" : "month"}
+          view={type === "month" ? "year" : ""}
           onClickMonth={type === "month" ? handleMonthChange : undefined}
         />
       )}
