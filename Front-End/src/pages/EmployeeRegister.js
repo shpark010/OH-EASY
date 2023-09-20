@@ -26,13 +26,8 @@ const EmployeeRegister = () => {
   const [selectedOption, setSelectedOption] = useState("0"); // 이메일 선택값 관리
   const [openPostcode, setOpenPostcode] = useState(false); // 카카오 API 모달창 상태관리
   const [empList, setEmpList] = useState([]); // 첫번째 테이블의 사원정보들 관리
-  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
-  // const [clickEmpCode, setclickEmpCode] = useState(); // 현재 클릭한 cdEmp 저장하는 상태
-  // const [zonecode, setZonecode] = useState(""); // 우편번호 상태 관리
-  // const [address, setAddress] = useState(""); // 주소 상태 관리
   const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
   const [showAlert, setShowAlert] = useState(false); // sweetAlert 상태 관리
-  const [isNmAccountHolderChanged, setIsNmAccountHolderChanged] = useState(false); // 예금주명 상태 관리
   
   // 사원정보 테이블 컬럼 상태관리
   const [nmEmp, setNmEmp] = useState(""); // 이름 상태 관리
@@ -64,7 +59,8 @@ const EmployeeRegister = () => {
   const [noPositionUnique, setNoPositionUnique] = useState(""); // 직급고유번호 상태 관리
   const [noDepartment, setNoDepartment] = useState(""); // 부서번호 상태 관리
 
-  // const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
+  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
+  const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
 
   // 컴포넌트가 처음 마운트될 때 handleGetEmpList 실행
@@ -130,27 +126,38 @@ const EmployeeRegister = () => {
 
   // 내/외 업데이트 함수
   const handleFgForeignChange = (event) => {
-    const selectedValue = event.target.value; // 선택된 값을 얻습니다.
+    const selectedValue = event.target.value;
     console.log("Selected option value:", selectedValue);
   
     if (selectedValue !== undefined) {
-      setFgForeign(selectedValue); // 상태를 업데이트합니다.
-      handleUpdateEmp("fgForeign", clickCdEmp, selectedValue); // 백엔드에 업데이트 요청을 보냅니다.
+      setFgForeign(selectedValue);
+      handleUpdateEmp("fgForeign", clickCdEmp, selectedValue);
+    }
+  };
+
+  // 직급 업데이트 함수
+  const handleNoPositionUniqueChange = (event) => {
+    const selectedValue = event.target.value;
+    console.log("Selected option value:", selectedValue);
+  
+    if (selectedValue !== undefined) {
+      setNoPositionUnique(selectedValue);
+      handleUpdateEmp("noPositionUnique", clickCdEmp, selectedValue);
     }
   };
 
   // 성별 자동입력 함수
   const genderFromNoResident = (noResident) => {
-    const genderDigit = noResident?.split('-')[1]?.[0];
-    console.log("genderDigit : " + genderDigit);
-  
+
+    const genderDigit = noResident.split('-')[1]?.[0];
+    
     let result = null;
     if (genderDigit === '2' || genderDigit === '4' || genderDigit === '6') {
       result = '1';
     } else {
       result = '0';
     }
-  
+    
     return result;
   };
 
@@ -180,40 +187,35 @@ const EmployeeRegister = () => {
     setOpenPostcode(false); // 모달 닫기
   };
 
-    // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
-    const handleRowClick = useCallback((empCode) => {
-      setSelectedEmpCode(empCode);
-      console.log(selectedEmpCode);
-    }, []);
+  // checkedRows 변화감지 useEffect
+  useEffect(() => {
+    console.log("checkedRows changed:", checkedRows);
+  }, [checkedRows]);
 
-  //헤더 체크박스를 클릭할 때 호출되어, 모든 체크박스를 체크하거나 체크를 해제
+  // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
+  const handleRowClick = useCallback((clickCdEmp) => {
+    setSelectedEmpCode(clickCdEmp);
+    console.log("clickCdEmp : " + clickCdEmp);
+  }, []);
+
+  // 헤더 체크박스를 클릭할 때 모든 체크박스를 체크하거나 체크를 해제
   const handleHeaderCheckboxClick = useCallback(() => {
-    console.log("****************************");
-    console.log("****************************");
-    // console.log(checkedRows);
-    console.log(empList.length);
-    // console.log(checkedRows.length);
-
-    // if (checkedRows.length !== empList.length) {
-    //   setCheckedRows(empList.map((emp) => emp.cdEmp));
-    // } else {
-    //   setCheckedRows([]);
-    // }
-  }, [empList]);
+    if (checkedRows.length !== empList.length) {
+      const newCheckedRows = empList.map((emp) => emp.cdEmp);
+      setCheckedRows(newCheckedRows);
+    } else {
+      setCheckedRows([]);
+    }
+  }, [empList, checkedRows]);
 
   // 각 행의 체크박스를 클릭할 때 해당 행의 체크박스 상태를 업데이트
-  const handleRowCheckboxClick = useCallback(
-    (empCode) => {
-      // if (checkedRows.includes(empCode)) {
-      //   setCheckedRows((prevCheckedRows) =>
-      //     prevCheckedRows.filter((code) => code !== empCode),
-      //   );
-      // } else {
-      //   setCheckedRows((prevCheckedRows) => [...prevCheckedRows, empCode]);
-      // }
-    },
-    [],
-  );
+  const handleRowCheckboxClick = useCallback((empCode) => {
+    if (checkedRows.includes(empCode)) {
+      setCheckedRows((prev) => prev.filter((code) => code !== empCode));
+    } else {
+      setCheckedRows((prev) => [...prev, empCode]);
+    }
+  }, [checkedRows]);
 
   // 모달 닫기
   const closeModal = () => {
@@ -258,37 +260,33 @@ const EmployeeRegister = () => {
         employee: emp.nmEmp,
         foreign: emp.fgForeign,
         resident: emp.noResident,
-        onRowClick: () => handleRowClick(emp.cdEmp), // 여기 추가
+        onRowClick: () => handleRowClick(emp.cdEmp),
       })),
-    [empList]
+    [empList, handleRowClick]
   );
 
-  // useEffect(() => {
-  //   console.log('Updated clickCdEmp:', clickCdEmp);
-  // }, [clickCdEmp]);
-
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => [
       {
-        Header: (
-          // 이 체크박스는 체크된 행의 수가 전체 empList와 동일한 경우에만 체크되도록 설정 모든 행이 체크되어 있으면 이 체크박스도 체크
-          <input
-            type="checkbox"
-            // checked={checkedRows.length === empList.length}
-            onChange={handleHeaderCheckboxClick}
-          />
-        ),
-        accessor: "checkbox",
+      Header: (
+        <input
+          type="checkbox"
+          checked={empList.length > 0 && checkedRows.length === empList.length}
+          onChange={handleHeaderCheckboxClick}
+        />
+      ),
+      accessor: "checkbox",
         width: "10%",
         id: "checkbox",
         Cell: ({ cell: { value }, row: { original } }) => {
-          // 현재 행의 체크박스 상태를 결정 checkedRows 배열에 현재 행의 코드가 포함되어 있으면 체크박스는 체크된 상태로 표시
-          // const isChecked = checkedRows.includes(original.code);
+          
+          if (original === null) {
+            return null;
+          }
+
           return (
             <input
               type="checkbox"
-              // 행의 체크박스가 클릭될 때의 동작을 handleRowCheckboxClick 함수에 위임, 해당 행의 코드를 인자로 전달
-              // checked={isChecked}
+              checked={checkedRows.includes(original.code)}
               onChange={() => handleRowCheckboxClick(original.code)}
             />
           );
@@ -337,33 +335,6 @@ const EmployeeRegister = () => {
           
             setChanged(false); // onBlur 이벤트가 처리된 후 changed를 다시 false로 설정
           
-          //   try {
-          //     const exists = await checkCdEmpExists(inputValue);
-          //     console.log("checkCdEmpExists의 반환값 : ", exists);
-          
-          //     if (!original || !original.code) {
-          //       if (exists) {
-          //         alert("(InsertEmp) 해당 Code는 이미 존재합니다.");
-          //         window.location.reload();
-          //         return;
-          //       }
-          //       const noSpaces = inputValue.replace(/\s+/g, '');
-          //       handleInsertEmp(noSpaces);
-          //     } else {
-          //       if (!exists || (exists && original.code === inputValue)) {
-          //         handleUpdateEmp("cdEmp", original.code, inputValue);
-          //         console.log("******************** cdEmp");
-          //         console.log("******************** before " + original.code);
-          //         console.log("******************** after " + inputValue);
-          //       } else {
-          //         alert("(UpdateEmp)해당 Code는 이미 존재합니다.");
-          //         window.location.reload();
-          //       }
-          //     }
-          //   } catch (error) {
-          //     console.error("An error occurred:", error);
-          //   }
-          // };
             try {
               const exists = await checkCdEmpExists(inputValue);
       
@@ -575,8 +546,7 @@ const EmployeeRegister = () => {
           );
         },
       },
-    ],
-    []
+    ], [empList, checkedRows, handleRowCheckboxClick, handleHeaderCheckboxClick]
   );
 
   // Insert
@@ -645,6 +615,7 @@ const EmployeeRegister = () => {
 
   // 전체사원 조회
   const handleGetEmpList = async () => {
+    console.log("************************************************* 전체사원 조회");
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -723,16 +694,22 @@ const EmployeeRegister = () => {
     setIsReadOnly(false);
   }
 
-  // Delete
+  // Delete 체크된 모든 행을 삭제
   const handleDeleteEmp = async () => {
-    try {
-      const responseData = await apiRequest({
+    // 여러 Promise를 동시에 실행하기 위한 배열
+    const deletePromises = checkedRows.map((cdEmp) =>
+      apiRequest({
         method: "DELETE",
-        url: `/api2/er/deleteEmpData?cdEmp=${clickCdEmp}`,
-      });
-      console.log("****************************** handleDeleteEmp");
-      console.log(responseData);
+        url: `/api2/er/deleteEmpData?cdEmp=${cdEmp}`,
+      })
+    );
+
+    try {
+      // 모든 DELETE 요청을 병렬로 실행
+      await Promise.all(deletePromises);
+      console.log("Successfully deleted all selected rows");
       handleGetEmpList(); // 삭제 후, 목록을 다시 가져옵니다.
+      setCheckedRows([]); // 삭제 후 checkedRows 초기화
     } catch (error) {
       console.log("api 요청 실패:", error);
     }
@@ -756,32 +733,29 @@ const EmployeeRegister = () => {
                 altText="프린트"
               />
               <PageHeaderIconButton
-                btnName="delete"
-                imageSrc={Delete}
-                altText="삭제"
-                onClick={() => setShowAlert(true)}
-              />
-              
-              {showAlert && (
-                <SweetAlert
-                  text="정말 삭제하시겠습니까?"
-                  showCancel={true}
-                  confirmText="확인"
-                  cancelText="취소"
-                  onConfirm={() => {
-                    setShowAlert(false);
-                    handleDeleteEmp().then(() => {
-                      window.location.reload();
-                    }).catch(error => {
-                      console.error("삭제 실패:", error);
-                    });
-                  }}
-                  onCancel={() => {
-                    setShowAlert(false);
-                    console.log("삭제 취소");
-                  }}
+                  btnName="delete"
+                  imageSrc={Delete}
+                  altText="삭제"
+                  onClick={() => setShowAlert(true)}
                 />
-              )}
+                
+                {showAlert && (
+                  <SweetAlert
+                    text="정말 삭제하시겠습니까?"
+                    showCancel={true}
+                    confirmText="확인"
+                    cancelText="취소"
+                    onConfirm={async () => {
+                      setShowAlert(false);
+                      await handleDeleteEmp();
+                      window.location.reload();
+                    }}
+                    onCancel={() => {
+                      setShowAlert(false);
+                      console.log("삭제 취소");
+                    }}
+                  />
+                )}
 
               <PageHeaderIconButton
                 btnName="calc"
@@ -1085,6 +1059,7 @@ const EmployeeRegister = () => {
                       { value: "16", label: "직급없음" },
                     ]}
                     value={noPositionUnique}
+                    onChange={handleNoPositionUniqueChange}
                     placeholder="선택"
                     disabled={isReadOnly}
                   />
