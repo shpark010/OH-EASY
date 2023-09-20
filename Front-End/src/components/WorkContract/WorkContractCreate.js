@@ -1,4 +1,4 @@
-import React,{ useState,useRef, useMemo, useEffect }  from 'react';
+import React,{ useState, useMemo, useEffect }  from 'react';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
 import CustomInput from '../../components/Contents/CustomInput';
@@ -22,38 +22,114 @@ const WorkContractCreate = () => {
   const [openPostcode, setOpenPostcode] = useState(false);
   const [zonecode, setZonecode] = useState("");
   const [address, setAddress] = useState("");
-  const [checkColumn,setCheckColumn] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
-  const [codeArr, setCodeArr] = useState([]);
-  // const [optionEmpList,setOptionEmpList] = ([]); // 조건조회로 받아온 data
-  const [belongingDate, setBelongingDate] = useState(""); //년월 달력 상태 관리.
+  const [checkColumn,setCheckColumn] = useState([]); 
+  const [isChecked, setIsChecked] = useState(false); // checked 상태 관리
+  const [belongingDate, setBelongingDate] = useState(""); //조건조회시 년월 달력 상태 관리.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
+  const [paramGetEmpList1,setParamGetEmpList1] = useState({
+    dtStartCont: '',
+    dtEndCont: '',
+    noWorkPost: '',
+    addrWork: '',
+    addrWorkDtl: '',
+    cntnJob: '',
+    tmStartRegularWork: '',
+    tmEndRegularWork: '',
+    tmStartBreak: '',
+    tmEndBreak: '',
+    ddWorking: '',
+    dotw: '',
+    tpSal: '',
+    amtSal: '',
+    tpPayDtSal: '',
+    ddPaySal: '',
+    methodPay: '',
+    ynEmpInsurance: '',
+    ynIndustrialAccidentInsurance: '',
+    ynNationalPension: '',
+    ynHealthInsurance: '',
+    stSign: '',
+    dtCreated: '',
+  }) // 오른쪽 table 상태관리
+  const [clickCode,setClickCode] = useState(""); //code click시 값을 저장할 state
   
 
 
   
+  const contractPeriodCalendar1 = (newDate) => {
+    
+    newDate = newDate.replace(/-/g, "");
+    console.log(newDate);
+    setParamGetEmpList1({ ...paramGetEmpList1, dtStartCont: newDate })
+    
+  }// 이벤트를 동시에 받은다음에 값이 더작은걸 1에할당 더큰것을 2에할당. e로 식별불가.
+  
+  const contractPeriodCalendar2 = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
+    console.log(newDate);
+    setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: newDate })
+  }
 
+  const contractPeriodCalendar3 = (newDate) => {
+    newDate = newDate.replace(/-/g, "");
+    console.log(newDate);
+    setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: newDate })
+  }
+
+  
+  const inputOnChange = (e) =>{
+    console.log(e.target.id); //select box, input은 name, id 다 들어가니 id로 받으면됨.
+    setParamGetEmpList1({...paramGetEmpList1,
+    [e.target.id] : e.target.value
+      })
+  } // input tag에 변화가 발생했을때 상태를 복사하고 바뀐값만 변경하는 set함수 호출
+  // 상태만 변경하는 함수.
+
+  
+  const inputOnBlur = async (e) =>{ //onBlur시 put 요청을 보낼 함수.
+     const cdEmp = clickCode
+     const colum = e.target.id
+     const data = e.target.value
+
+     console.log(cdEmp);
+     console.log(colum);
+     console.log(data); //잘 가져옴.
+
+     try {
+      const responseData = await apiRequest({
+        method: "PUT",
+        url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
+      });
+    } 
+    catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+
+  }
+  
   // const schangeCheck2 = (e, originalCode) => {
-  //   const checkedValue = e.target.checked;
-
-  //   if (checkedValue) {
-  //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
-  //   } else {
-  //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
-  //   }
-  // };
-  // useEffect(() => {
-  //   console.log("codeArr 변경됨:", codeArr);
-  // }, [codeArr]); // codeArr이 변경될 때만 실행
-  
-  const handleBelongingDateChange = (newDate) => {
+    //   const checkedValue = e.target.checked;
+    
+    //   if (checkedValue) {
+      //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
+      //   } else {
+        //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
+        //   }
+        // };
+        // useEffect(() => {
+          //   console.log("codeArr 변경됨:", codeArr);
+          // }, [codeArr]); // codeArr이 변경될 때만 실행
+          
+          
+          
+      const handleBelongingDateChange = (newDate) => {
     newDate = newDate.replace(/-/g, "");
     setBelongingDate(newDate);
     console.log(belongingDate);//202310
-  }; // 년월 달력
+       }; // 작성년월로 조건조회할 때 onchange이벤트시 호출할 함수.
   
-
-
+  
+  
 
 
 
@@ -78,8 +154,8 @@ const WorkContractCreate = () => {
   
     // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
     // setEmpList((prevEmpList) => [
-    //   ...prevEmpList,
-    //   {
+      //   ...prevEmpList,
+      //   {
     //     // 이전 데이터 유지하고 주소와 우편번호 추가
     //     address: address, // 주소 상태 값 사용
     //     zipcode: zipcode, // 우편번호 상태 값 사용
@@ -89,7 +165,7 @@ const WorkContractCreate = () => {
     setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
     setOpenPostcode(false); // 모달 닫기
   };
-
+  
 
   const data = useMemo(
     () =>
@@ -138,7 +214,7 @@ const WorkContractCreate = () => {
       input.checked = false;
     }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
     setIsChecked(false)
-    
+    console.log(isChecked);
   }
     //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
     
@@ -147,7 +223,7 @@ const WorkContractCreate = () => {
 
   const conditionSearch = async () => { // 작성년월과 조회 날짜를 받아 조회하는 버튼
     setEmployeeData([]);
-
+    
     try {
      
       const responseData = await apiRequest({
@@ -168,11 +244,43 @@ const WorkContractCreate = () => {
 
   const searchOrderOption = (e) =>{
     setSearchOrder(e.target.value)
-    
   } // 정렬 option button 변경시 호출하는 이벤트
   useEffect(() => {
     console.log(searchOrder);
   }, [searchOrder]); //codeArr이 변경될때만 실행.
+
+
+  const handleInputClick = async(e) => { //왼쪽 Table 클릭시 호출되는 함수.
+    
+    
+    // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
+    // 2. e.target으로 찾기.
+    // 어차피 e.target을 통해 찾아야 함.
+    const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+    const param = code.value
+    setClickCode(param);
+    console.log(param); //잘가져옴
+    try {
+     
+      const responseData = await apiRequest({
+        method: "GET",
+        url: `/api2/wc/getCodeParamEmpList?code=${param}`, 
+      });
+     
+      setParamGetEmpList1(responseData) //code get emplist
+  
+      
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+
+  }; //왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
+  // 방법 1 : 조건조회할때 미리 다 가져와 뿌리기. 사람이 많아졌을때 고려하면 x
+  // 방법 2 : 필요한 VO만 가져온후 왼쪽 Table 누를 경우 api 보내기
+
+  useEffect(() => {
+    console.log(paramGetEmpList1);
+  }, [paramGetEmpList1]); // 변경될때만 실행. 가져온 VO확인용
 
   
 
@@ -233,10 +341,10 @@ const WorkContractCreate = () => {
             setInputValue(e.target.value);
           };
 
-          const handleInputClick = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-          };
+          // const handleInputClick = (e) => {
+          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+          //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          // };
 
           const inputBlur = (e) => {
             // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
@@ -290,11 +398,11 @@ const WorkContractCreate = () => {
           const [inputValue, setInputValue] = React.useState(value);
           
 
-          const handleInputClick = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          // const handleInputClick = (e) => {
+          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+          //   //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
         
-          }; // input tag Click시 발생할 event
+          // }; // input tag Click시 발생할 event
 
           const inputBlur = (e) => {
             const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
@@ -327,10 +435,10 @@ const WorkContractCreate = () => {
         Cell: ({ cell: { value }, row :{original} } ) => {
           const [inputValue, setInputValue] = React.useState(value);
 
-          const handleInputClick = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-          };
+          // const handleInputClick = (e) => {
+          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+          //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
+          // };
 
           const inputBlur = (e) => {
             const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
@@ -355,6 +463,7 @@ const WorkContractCreate = () => {
     ],
     []
   );
+  
   
   
 
@@ -426,24 +535,48 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <CustomCalendar width="167" id="startDate" /> 
+                    <CustomCalendar 
+                    width="180" 
+                    id={"dtStartCont"}
+                    value={paramGetEmpList1.dtStartCont}
+                    onChange={contractPeriodCalendar1}
+                    
+                     /> 
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomCalendar width="167" id="endDate" />
+                    <CustomCalendar 
+                    width="180" 
+                    id={"dtEndCont"}
+                    value={paramGetEmpList1.dtEndCont}
+                    onChange={contractPeriodCalendar2}
+
+                    />
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">근무장소  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <CustomInput />
+                    <CustomInput 
+                    
+                    value={paramGetEmpList1.noWorkPost}
+                    id={"NO_WORK_POST"}
+
+                     />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={425} />
+                    <CustomInput 
+                    width={415}
+                    id={"ADDR_WORK"}
+
+                    value={paramGetEmpList1.addrWork}
+                    
+                    />
                     <CustomButton
                       className="wcRightCellSearchButton"
                       text="주소검색"
                       color="black"
                       onClick={addrButtonClick}
+                      
                     />
                   </td>
 
@@ -454,38 +587,82 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">상세주소  </td>
                   <td className="wcRightGridTableRightTd1" colSpan="2">
-                    <CustomInput width={605} onBlur = {""} />
+                    <CustomInput 
+                    width={605} 
+                    value={paramGetEmpList1.addrWorkDtl}
+                    id={"addrWorkDtl"}
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+
+                     />
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">업무의 내용 </td>
 
                   <td className="wcRightGridTableRightTd1" colSpan="2">
-                    <CustomInput width="605"/>
+                    <CustomInput 
+                    width="605"
+                    value={paramGetEmpList1.cntnJob}
+                    id={"cntnJob"}
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+                    />
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">소정근로시간 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <CustomInput></CustomInput>
+                    <CustomInput 
+                    value={paramGetEmpList1.tmStartRegularWork}
+                    id={"tmStartRegularWork"}
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+                    >
+                      
+                    </CustomInput>
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput></CustomInput>
+                    <CustomInput
+                    value={paramGetEmpList1.tmEndRegularWork}
+                    id={"tmEndRegularWork"}
+                    name={"tmEndRegularWork"}
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+                    >
+                    </CustomInput>
+
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">휴게시간 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <CustomInput></CustomInput>
+                    <CustomInput
+                     value={paramGetEmpList1.tmStartBreak}
+                     id={"tmStartBreak"}
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+                    >
+
+                    </CustomInput>
                   </td>
+
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput></CustomInput>
+                    <CustomInput
+                     value={paramGetEmpList1.tmEndBreak}
+                    id={"tmEndBreak"}
+                     
+                     onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
+                    ></CustomInput>
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">근무일  </td>
                   <td className="wcRightGridTableRightTd1">
                     <SearchBarBox
+                      
                       options={[
                         { value: '1', label: '1주에 1일' },
                         { value: '2', label: '1주에 2일' },
@@ -495,7 +672,12 @@ const WorkContractCreate = () => {
                         { value: '6', label: '1주에 6일' },
                         { value: '7', label: '1주에 7일' },
                       ]}
-                      defaultValue="5"
+                      value={paramGetEmpList1.ddWorking}
+                      id={"ddWorking"}
+                     
+                     onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+                      
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -513,7 +695,11 @@ const WorkContractCreate = () => {
                         { value: '6', label: '매주 토요일' },
                         { value: '7', label: '매주 일요일' },
                       ]}
-                      defaultValue="7"
+                      value={paramGetEmpList1.dotw}
+
+                      id={"dotw"}
+                     onChange={inputOnChange}
+                     onBlur={inputOnBlur}
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -527,12 +713,24 @@ const WorkContractCreate = () => {
                         { value: '2', label: ' 일급 ' },
                         { value: '3', label: ' 시급 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.tpSal}
                       className="searchBarBox2"
+
+                      name={"tpSal"}
+                     onChange={inputOnChange}
+                     onBlur={inputOnBlur}
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={100} /> 
+                    <CustomInput 
+                    width={100}
+                    value={paramGetEmpList1.amtSal}
+                    id ={"amtSal"}
+                    
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+
+                     /> 
                     <b>원</b>
                   </td>
                 </tr>
@@ -545,12 +743,25 @@ const WorkContractCreate = () => {
                         { value: '2', label: ' 매주 ' },
                         { value: '3', label: ' 매일 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.tpPayDtSal}
                       className="searchBarBox2"
+                      id={"tpPayDtSal"}
+                      
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={40}/>
+                    <CustomInput 
+                    width={40}
+                    value={paramGetEmpList1.ddPaySal}
+                    id ={"ddPaySal"}
+                    
+                    onChange={inputOnChange}
+                    onBlur={inputOnBlur}
+
+                    />
                     <b>일</b>
                   </td>
                 </tr>
@@ -562,7 +773,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 예금통장에 입금 ' },
                         { value: '2', label: ' 직접지급 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.methodPay}
+                      id={`methodPay`}
+                      
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
@@ -575,7 +791,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.ynEmpInsurance}
+                      id={"ynEmpInsurance"}
+                      
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                       className="searchBarBox3"
                     />
                   </td>
@@ -589,7 +810,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.ynIndustrialAccidentInsurance}
+                      id={"ynIndustrialAccidentInsurance"}
+                    
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                       className="searchBarBox3"
                     />
                   </td>
@@ -603,7 +829,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.ynNationalPension}
+                      id={"ynNationalPension"}
+                      
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                       className="searchBarBox3"
                     />
                   </td>
@@ -617,7 +848,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      defaultValue="1"
+                      value={paramGetEmpList1.ynHealthInsurance}
+                      id={"ynHealthInsurance"}
+                      
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                       className="searchBarBox3"
                     />
                   </td>
@@ -631,7 +867,12 @@ const WorkContractCreate = () => {
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      defaultValue="2"
+                      value={paramGetEmpList1.stSign}
+                      id={"stSign"}
+                      
+                      onChange={inputOnChange}
+                     onBlur={inputOnBlur}
+
                       className="searchBarBox3"
                     />
                   </td>
@@ -640,7 +881,17 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">작성일자 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <CustomCalendar className={'wcCreatedDateCalander'} width="170" id="createDate" />
+                    <CustomCalendar 
+                    className={'wcCreatedDateCalander'} 
+                    width="170" 
+                    id="createDate"
+                    value={paramGetEmpList1.dtCreated}
+
+                    name={"dtCreated"}
+                    onChange={contractPeriodCalendar3}
+                     
+
+                    />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
                 </tr>
