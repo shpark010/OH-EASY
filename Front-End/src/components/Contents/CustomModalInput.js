@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import Modal from "react-modal";
 import styled from "styled-components";
 import { TbCalendarSearch } from "react-icons/tb";
+import CustomModal from "./CustomModal";
 
 const InputWrapper = styled.div`
   position: relative;
   width: 100%;
+  
+  input[readonly] + div {
+    cursor: not-allowed;
+  }
 `;
 
 const Input = styled.input`
@@ -15,13 +19,34 @@ const Input = styled.input`
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   height: 32px;
   padding: 0 12px;
+  font-weight: 700;
+  font-family: "NanumSquare", sans-serif;
 
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
+
+    ${(props) =>
+    props.readOnly &&
+    `
+    background-color: var(--color-opacity-gray);
+    cursor: not-allowed;
+  `}
 `;
 
-function CustomModalInput({ id, className, width, children, value, style, onChange }) {
+function CustomModalInput({ 
+  id, 
+  className, 
+  width, 
+  children, 
+  value, 
+  style, 
+  onChange,
+  readOnly,
+  overlayStyle,
+  contentStyle,
+  placeholder,
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -38,41 +63,30 @@ function CustomModalInput({ id, className, width, children, value, style, onChan
 
   return (
     <InputWrapper>
-      <div>
-        <Input
-          id={id}
-          className={className}
-          width={`${width}px`}
-          onClick={openModal}
-          readOnly
-          style={style}
-          value={value}
-          onChange={handleInputChange}
-        />
-        <IconWrapper onClick={() => setIsModalOpen(!isModalOpen)}>
-          <TbCalendarSearch size={18} />
-        </IconWrapper>
-        {/* CustomModal 사용 */}
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={closeModal}
-          style={{
-            overlay: {
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            },
-            content: {
-              backgroundColor: "white",
-              width: "30%",
-              height: "55%",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            },
-          }}
+      <Input
+        id={id}
+        className={className}
+        width={`${width}px`}
+        onClick={() => !readOnly && openModal()}
+        readOnly={readOnly}
+        style={style}
+        value={value}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+      />
+      
+      <IconWrapper onClick={() => !readOnly && setIsModalOpen(!isModalOpen)}>
+        <TbCalendarSearch size={18} />
+      </IconWrapper>
+      
+      <CustomModal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        overlayStyle={overlayStyle}
+        contentStyle={contentStyle}
         >
-          {children}
-        </Modal>
-      </div>
+        {children}
+      </CustomModal>
     </InputWrapper>
   );
 }
