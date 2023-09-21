@@ -281,4 +281,58 @@ public class SdService {
 		resultData.put("searchTaxInfo", searchTaxInfo);
 		return resultData;
 	}
+	
+	//급여 자료 삭제
+		public Map<String, Object> deletePayData(Map<String, Object> deleteData) {
+			SdDao dao = sqlSession.getMapper(SdDao.class);
+			// 사원코드
+			List<String> cdEmpList = (List<String>)deleteData.get("code");
+			// 연도
+			String yyAllowance = deleteData.get("belongingDate").toString().substring(0, 4);
+			// 귀속월
+			String mmBelong = deleteData.get("belongingDate").toString().substring(4, 6);
+			// 지급일
+			String dtAllowance = deleteData.get("payDay").toString();
+			// 조회 구분
+			String searchTaxOrder = deleteData.get("searchTaxOrder").toString();
+			HashMap<String, String> empData = new HashMap<>();
+			empData.put("yyAllowance", yyAllowance);
+			empData.put("mmBelong", mmBelong);
+			empData.put("dtAllowance", dtAllowance);
+			empData.put("searchTaxOrder", searchTaxOrder);
+			Map<String, Object> resultData = new HashMap<>();
+			//계산 결과 조회
+			SdTaxAmountVO emptaxInfo = new SdTaxAmountVO();
+			SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
+			int deleteResult = 0;
+			try {
+				deleteResult = dao.deletePayData(empData, cdEmpList);
+			} catch (Exception e) {
+				System.out.println("급여 삭제 오류");
+				System.out.println(e.getMessage());
+			}
+			try {
+				List<SdDeducationVO> empTaxInfoList = dao.getEmpTax(empData);
+				emptaxInfo = new SdTaxAmountVO(empTaxInfoList.get(0).getAmtAllowance(), empTaxInfoList.get(1).getAmtAllowance(),
+						empTaxInfoList.get(2).getAmtAllowance(), empTaxInfoList.get(4).getAmtAllowance(),
+						empTaxInfoList.get(3).getAmtAllowance(), empTaxInfoList.get(5).getAmtAllowance(),
+						empTaxInfoList.get(6).getAmtAllowance());
+			} catch (Exception e) {
+				System.out.println("사원 급여 오류");
+				System.out.println(e.getMessage());
+			}
+			try {
+				List<Long> searchTaxInfoList = dao.getTaxInfo(empData);
+				searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
+						searchTaxInfoList.get(2), searchTaxInfoList.get(4),
+						searchTaxInfoList.get(3), searchTaxInfoList.get(5),
+						searchTaxInfoList.get(6));
+			} catch (Exception e) {
+				System.out.println("조회구분 오류");
+				System.out.println(e.getMessage());
+			}
+			resultData.put("empTaxInfo", emptaxInfo);
+			resultData.put("searchTaxInfo", searchTaxInfo);
+			return resultData;
+		}
 }
