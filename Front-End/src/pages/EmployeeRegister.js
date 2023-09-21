@@ -19,12 +19,20 @@ import CustomModalInput from "../components/Contents/CustomModalInput";
 import useApiRequest from "../components/Services/ApiRequest";
 import moment from "moment";
 import SweetAlert from "../components/Contents/SweetAlert";
+import CustomModal from "../components/Contents/CustomModal";
 
 const EmployeeRegister = () => {
   const apiRequest = useApiRequest();
   const [isReadOnly, setIsReadOnly] = useState(true); // 모든 입력 필드가 readOnly 상태인지 아닌지 확인
   const [selectedOption, setSelectedOption] = useState("0"); // 이메일 선택값 관리
+
+  // 모달창 관련 상태관리
   const [openPostcode, setOpenPostcode] = useState(false); // 카카오 API 모달창 상태관리
+  const [openEmpSearch, setOpenEmpSearch] = useState(false); // 사원검색 모달창 상태관리
+  const [openConSearch, setOpenConSearch] = useState(false); // 조건검색 모달창 상태관리
+  const [openSortSearch, setOpenSortSearch] = useState(false); // 데이터정렬 모달창 상태관리
+  const [openSettingModal, setOpenSettingModal] = useState(false); // 데이터정렬 모달창 상태관리
+  
   const [empList, setEmpList] = useState([]); // 첫번째 테이블의 사원정보들 관리
   const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
   const [showAlert, setShowAlert] = useState(false); // sweetAlert 상태 관리
@@ -59,7 +67,7 @@ const EmployeeRegister = () => {
   const [noPositionUnique, setNoPositionUnique] = useState(""); // 직급고유번호 상태 관리
   const [noDepartment, setNoDepartment] = useState(""); // 부서번호 상태 관리
 
-  const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
+  // const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
 
@@ -187,16 +195,10 @@ const EmployeeRegister = () => {
     setOpenPostcode(false); // 모달 닫기
   };
 
-  // checkedRows 변화감지 useEffect
+  // checkedRows useEffect
   useEffect(() => {
-    console.log("checkedRows changed:", checkedRows);
+    console.log("checkedRows changed : " + checkedRows);
   }, [checkedRows]);
-
-  // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
-  const handleRowClick = useCallback((clickCdEmp) => {
-    setSelectedEmpCode(clickCdEmp);
-    console.log("clickCdEmp : " + clickCdEmp);
-  }, []);
 
   // 헤더 체크박스를 클릭할 때 모든 체크박스를 체크하거나 체크를 해제
   const handleHeaderCheckboxClick = useCallback(() => {
@@ -260,9 +262,10 @@ const EmployeeRegister = () => {
         employee: emp.nmEmp,
         foreign: emp.fgForeign,
         resident: emp.noResident,
-        onRowClick: () => handleRowClick(emp.cdEmp),
+        // onRowClick: () => handleRowClick(emp.cdEmp),
+        onRowClick: () => (emp.cdEmp),
       })),
-    [empList, handleRowClick]
+    [empList]
   );
 
   const columns = useMemo(() => [
@@ -546,7 +549,7 @@ const EmployeeRegister = () => {
           );
         },
       },
-    ], [empList, checkedRows, handleRowCheckboxClick, handleHeaderCheckboxClick]
+    ], [checkedRows]
   );
 
   // Insert
@@ -715,6 +718,122 @@ const EmployeeRegister = () => {
     }
   };
 
+  // 사원검색 모달창
+  const handleOpenEmpSearch = () => setOpenEmpSearch(true);
+  const handleCloseEmpSearch = () => setOpenEmpSearch(false);
+
+  // 조건검색 모달창
+  const handleOpenConSearch = () => setOpenConSearch(true);
+  const handleCloseConSearch = () => setOpenConSearch(false);
+
+  // 데이터정렬 모달창
+  const handleOpenSortSearch = () => setOpenSortSearch(true);
+  const handleCloseSortSearch = () => setOpenSortSearch(false);
+
+  // setting 모달창
+  const handleOpenSetting = () => {
+    setOpenSettingModal(!openSettingModal);
+  };
+
+
+  const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
+  const [modalEmpList, setModalEmpList] = useState([]); // 모달창 사원 정보
+
+  const columnsDept = useMemo(
+    () => [
+      {
+        Header: "Code",
+        accessor: "noDepartment",
+        width: "35%",
+        id: "noDepartment",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.cdEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+      {
+        Header: "부서명",
+        accessor: "nmDepartment",
+        id: "nmDepartment",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.nmEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const dataModalEmpList = useMemo(
+    () =>
+      modalEmpList.map((emp) => ({
+        cdEmp: emp.cdEmp,
+        nmEmp: emp.nmEmp,
+      })),
+    [modalEmpList],
+  );
+
+  const columnsBank = useMemo(
+    () => [
+      {
+        Header: "Code",
+        accessor: "cdBank",
+        width: "35%",
+        id: "cdBank",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.cdEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+      {
+        Header: "은행명",
+        accessor: "nmBank",
+        id: "nmBank",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleInputClick = (e) => {
+            console.log("code클릭이벤발생");
+            setClickModalEmpCode(original.cdEmp);
+          };
+          return (
+            <Input
+              value={original?.nmEmp || ""}
+              onClick={handleInputClick}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+    ],
+    [],
+  );
+
   return (
     <>
       <div className="pageHeader">
@@ -722,21 +841,68 @@ const EmployeeRegister = () => {
           <PageHeaderName text="사원등록" />
           <div className="fxAlignCenter">
             <div className="btnWrapper textBtnWrap">
-              <PageHeaderTextButton text="사원검색" />
-              <PageHeaderTextButton text="조건검색" />
-              <PageHeaderTextButton text="데이터정렬" />
+              <div>
+                <PageHeaderTextButton 
+                  text="사원검색" 
+                  onClick={handleOpenEmpSearch}
+                />
+                {openEmpSearch && (
+                  <CustomModal 
+                    isOpen={openEmpSearch}
+                    onRequestClose={handleCloseEmpSearch}
+                  >
+                    <h2>사원검색</h2>
+                  </CustomModal>
+                )}
+              </div>
+              <div>
+                <PageHeaderTextButton 
+                  text="조건검색" 
+                  onClick={handleOpenConSearch}
+                />
+                {openConSearch && (
+                  <CustomModal 
+                    isOpen={openConSearch}
+                    onRequestClose={handleCloseConSearch}
+                  >
+                    <h2>조건검색</h2>
+                  </CustomModal>
+                )}
+              </div>
+              <div>
+                <PageHeaderTextButton 
+                  text="데이터정렬" 
+                  onClick={handleOpenSortSearch}
+                />
+                {openSortSearch && (
+                  <CustomModal 
+                    isOpen={openSortSearch}
+                    onRequestClose={handleCloseSortSearch}
+                  >
+                    <h2>데이터정렬</h2>
+                  </CustomModal>
+                )}
+              </div>
             </div>
             <div className="iconBtnWrap">
               <PageHeaderIconButton
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
+                disabled={true}
               />
               <PageHeaderIconButton
                   btnName="delete"
                   imageSrc={Delete}
                   altText="삭제"
-                  onClick={() => setShowAlert(true)}
+                  onClick={() => {
+                    // 체크박스에 체크가 된 상태인 경우에만 SweetAlert 창을 띄움
+                    if (checkedRows.length > 0) {
+                      setShowAlert(true);
+                    } else {
+                      console.log("체크박스에 체크된 항목이 없습니다.");
+                    }
+                  }}
                 />
                 
                 {showAlert && (
@@ -761,11 +927,13 @@ const EmployeeRegister = () => {
                 btnName="calc"
                 imageSrc={Calc}
                 altText="계산기"
+                disabled={true}
               />
               <PageHeaderIconButton
                 btnName="setting"
                 imageSrc={Setting}
                 altText="세팅"
+                onClick={handleOpenSetting}
               />
             </div>
           </div>
@@ -1024,8 +1192,25 @@ const EmployeeRegister = () => {
                     width={180} 
                     value={noDepartment} 
                     readOnly={isReadOnly}
-                    />
-
+                    placeholder="부서 코드도움"
+                  >
+                    <h2>부서 코드도움</h2><br/>
+                    <Table columns={columnsDept} data={dataModalEmpList} />
+                    <div className="test">
+                      <CustomButton 
+                        backgroundColor={"var(--color-primary-blue)"}
+                        color={"var(--color-primary-white)"}
+                        onClick={""}
+                        text={"확인"}
+                      />
+                      <CustomButton 
+                        backgroundColor={"var(--color-primary-blue)"}
+                        color={"var(--color-primary-white)"}
+                        onClick={""}
+                        text={"취소"}
+                      />
+                    </div>
+                  </CustomModalInput>
                 </td>
               </tr>
               <tr>
@@ -1083,8 +1268,24 @@ const EmployeeRegister = () => {
                     width={180} 
                     value={cdBank} 
                     readOnly={isReadOnly}
+                    placeholder="급여이체은행 코드도움"
                     >
-                    <h2>은행</h2>
+                    <h2>급여이체은행 코드도움</h2><br/>
+                    <Table columns={columnsBank} data={dataModalEmpList} />
+                    <div className="test">
+                      <CustomButton 
+                        backgroundColor={"var(--color-primary-blue)"}
+                        color={"var(--color-primary-white)"}
+                        onClick={""}
+                        text={"확인"}
+                      />
+                      <CustomButton 
+                        backgroundColor={"var(--color-primary-blue)"}
+                        color={"var(--color-primary-white)"}
+                        onClick={""}
+                        text={"취소"}
+                      />
+                    </div>
                   </CustomModalInput>
                 </td>
                 <td className="erCellStyle">
@@ -1120,7 +1321,7 @@ const EmployeeRegister = () => {
           </table>
         </div>
 
-        {/* 모달 창 */}
+        {/* 주소검색 모달 */}
         {openPostcode && (
           <div className="erModalOverlay" onClick={closeModal}>
             <div className="erModalContent" onClick={(e) => e.stopPropagation()}>
@@ -1132,6 +1333,7 @@ const EmployeeRegister = () => {
             </div>
           </div>
         )}
+
       </section>
     </>
   );
