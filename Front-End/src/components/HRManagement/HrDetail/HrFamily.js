@@ -53,6 +53,9 @@ const HrFamily = ({ cdEmp }) => {
     if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
+    if (seqFamily == null || seqFamily === "" || seqFamily === undefined) {
+      return;
+    }
     console.log("현재 inputValue : " + inputValue);
     if (inputValue == null || inputValue === "" || inputValue === undefined) {
       console.log("값의 변화가 없음 api요청 안감");
@@ -74,6 +77,9 @@ const HrFamily = ({ cdEmp }) => {
     accessor,
     inputValue,
   ) => {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -248,11 +254,13 @@ const HrFamily = ({ cdEmp }) => {
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-            handleSendEmpCodeUpdateFamilyData(
-              original.seqFamily,
-              "fgFamily",
-              e.target.value,
-            );
+            if (original) {
+              handleSendEmpCodeUpdateFamilyData(
+                original.seqFamily,
+                "fgFamily",
+                e.target.value,
+              );
+            }
           };
 
           return (
@@ -280,11 +288,13 @@ const HrFamily = ({ cdEmp }) => {
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-            handleSendEmpCodeUpdateFamilyData(
-              original.seqFamily,
-              "fgEducation",
-              e.target.value,
-            );
+            if (original) {
+              handleSendEmpCodeUpdateFamilyData(
+                original.seqFamily,
+                "fgEducation",
+                e.target.value,
+              );
+            }
           };
 
           return (
@@ -314,11 +324,13 @@ const HrFamily = ({ cdEmp }) => {
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-            handleSendEmpCodeUpdateFamilyData(
-              original.seqFamily,
-              "fgGraduate",
-              e.target.value,
-            );
+            if (original) {
+              handleSendEmpCodeUpdateFamilyData(
+                original.seqFamily,
+                "fgGraduate",
+                e.target.value,
+              );
+            }
           };
 
           return (
@@ -346,11 +358,13 @@ const HrFamily = ({ cdEmp }) => {
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-            handleSendEmpCodeUpdateFamilyData(
-              original.seqFamily,
-              "fgCohabitation",
-              e.target.value,
-            );
+            if (original) {
+              handleSendEmpCodeUpdateFamilyData(
+                original.seqFamily,
+                "fgCohabitation",
+                e.target.value,
+              );
+            }
           };
 
           return (
@@ -377,11 +391,13 @@ const HrFamily = ({ cdEmp }) => {
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
-            handleSendEmpCodeUpdateFamilyData(
-              original.seqFamily,
-              "fgSolarLunar",
-              e.target.value,
-            );
+            if (original) {
+              handleSendEmpCodeUpdateFamilyData(
+                original.seqFamily,
+                "fgSolarLunar",
+                e.target.value,
+              );
+            }
           };
           return (
             <CustomSelect

@@ -65,7 +65,7 @@ const HrCareer = ({ cdEmp }) => {
   const handleDateChange = async (value, name, seqCareer) => {
     console.log("handleDateChange ******************");
 
-    if (cdEmp === undefined) {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
     value = value.replace(/-/g, "");
@@ -129,6 +129,9 @@ const HrCareer = ({ cdEmp }) => {
     inputValue,
     beforeValue,
   ) => {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
     console.log("현재 inputValue : " + inputValue);
     console.log("현재 inputValue : " + inputValue);
     console.log("현재 inputValue : " + inputValue);
@@ -328,13 +331,14 @@ const HrCareer = ({ cdEmp }) => {
               handleSendEmpCodeCareerData(cdEmp);
               setInputValue(e.target.value);
             } else {
-              // update
-              handleSendEmpCodeUpdateCareerData(
-                original.seqCareer,
-                "nmCompany",
-                e.target.value,
-                original.nmCompany,
-              );
+              if (original.nmCompany !== inputValue)
+                // update
+                handleSendEmpCodeUpdateCareerData(
+                  original.seqCareer,
+                  "nmCompany",
+                  e.target.value,
+                  original.nmCompany,
+                );
               setInputValue(e.target.value);
             }
           };
@@ -369,12 +373,14 @@ const HrCareer = ({ cdEmp }) => {
               setInputValue(e.target.value);
             } else {
               // update
-              handleSendEmpCodeUpdateCareerData(
-                original.seqCareer,
-                "dcDuty",
-                e.target.value,
-              );
-              setInputValue(e.target.value);
+              if (original.dcDuty !== inputValue) {
+                handleSendEmpCodeUpdateCareerData(
+                  original.seqCareer,
+                  "dcDuty",
+                  e.target.value,
+                );
+                setInputValue(e.target.value);
+              }
             }
           };
 
@@ -412,12 +418,14 @@ const HrCareer = ({ cdEmp }) => {
               setInputValue(e.target.value);
             } else {
               // update
-              handleSendEmpCodeUpdateCareerData(
-                original.seqCareer,
-                "nmPosition",
-                e.target.value,
-              );
-              setInputValue(e.target.value);
+              if (original.nmPosition !== inputValue) {
+                handleSendEmpCodeUpdateCareerData(
+                  original.seqCareer,
+                  "nmPosition",
+                  e.target.value,
+                );
+                setInputValue(e.target.value);
+              }
             }
           };
 
@@ -454,12 +462,14 @@ const HrCareer = ({ cdEmp }) => {
               setInputValue(e.target.value);
             } else {
               // update
-              handleSendEmpCodeUpdateCareerData(
-                original.seqCareer,
-                "amtPay",
-                e.target.value,
-              );
-              setInputValue(e.target.value);
+              if (original.amtPay !== inputValue) {
+                handleSendEmpCodeUpdateCareerData(
+                  original.seqCareer,
+                  "amtPay",
+                  e.target.value,
+                );
+                setInputValue(e.target.value);
+              }
             }
           };
 
@@ -498,12 +508,14 @@ const HrCareer = ({ cdEmp }) => {
               setInputValue(e.target.value);
             } else {
               // update
-              handleSendEmpCodeUpdateCareerData(
-                original.seqCareer,
-                "dcRetr",
-                e.target.value,
-              );
-              setInputValue(e.target.value);
+              if (original.dcRetr !== inputValue) {
+                handleSendEmpCodeUpdateCareerData(
+                  original.seqCareer,
+                  "dcRetr",
+                  e.target.value,
+                );
+                setInputValue(e.target.value);
+              }
             }
           };
 

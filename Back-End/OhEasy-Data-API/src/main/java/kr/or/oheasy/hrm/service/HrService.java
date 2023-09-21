@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.oheasy.hrm.dao.HrDao;
@@ -39,6 +40,18 @@ public class HrService {
     	
     	return dao.getAllModalEmpList();
     }
+    
+    // 인사테이블 삭제
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteHrEmpDtlList(List<String> cdEmpList) {
+    	HrDao dao = sqlSession.getMapper(HrDao.class);
+    	
+    	for(String cdEmp : cdEmpList) {
+    		dao.deleteHrEmpDtl(cdEmp);
+    	}
+    }
+    
+    
     public List<HrLicenseSdtlVO> getLicenseList(){
     	HrDao dao = sqlSession.getMapper(HrDao.class);
     	
@@ -204,5 +217,7 @@ public class HrService {
     	column = Camel.camelToSnake(column);
     	return dao.insertLicenseData(cdEmp, column, value);
     }
+    
+
     
 }

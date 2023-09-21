@@ -107,6 +107,9 @@ const HrLicense = ({ cdEmp }) => {
     accessor,
     inputValue,
   ) => {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -159,7 +162,7 @@ const HrLicense = ({ cdEmp }) => {
   const handleDateChange = async (value, name, seqLicense) => {
     console.log("handleDateChange ******************");
 
-    if (cdEmp === undefined || cdEmp == null) {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
     value = value.replace(/-/g, "");
@@ -351,6 +354,92 @@ const HrLicense = ({ cdEmp }) => {
               value={value || ""}
               name="dtCertified"
               onChange={handleInputChange}
+            />
+          );
+        },
+      },
+      {
+        Header: "자격증번호",
+        accessor: "noLicense",
+        id: "noLicense",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          const handleInputOnBlur = (e) => {
+            if (original == null) {
+              // insert
+              handleSendEmpCodeInsertLicenseData(
+                cdEmp,
+                "noLicense",
+                e.target.value,
+              );
+              handleSendEmpCodeGetLicenseData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
+              handleSendEmpCodeUpdateLicenseData(
+                original.seqLicense,
+                "noLicense",
+                e.target.value,
+              );
+              setInputValue(e.target.value);
+            }
+          };
+
+          return (
+            <Input
+              value={inputValue || ""}
+              onChange={handleInputChange}
+              isDoubleClick={true}
+              onBlur={handleInputOnBlur}
+              className={"doubleLine"}
+            />
+          );
+        },
+      },
+      {
+        Header: "발행기관",
+        accessor: "nmIssuing",
+        id: "nmIssuing",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
+
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
+          };
+
+          const handleInputOnBlur = (e) => {
+            if (original == null) {
+              // insert
+              handleSendEmpCodeInsertLicenseData(
+                cdEmp,
+                "nmIssuing",
+                e.target.value,
+              );
+              handleSendEmpCodeGetLicenseData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
+              handleSendEmpCodeUpdateLicenseData(
+                original.seqLicense,
+                "nmIssuing",
+                e.target.value,
+              );
+              setInputValue(e.target.value);
+            }
+          };
+
+          return (
+            <Input
+              value={inputValue || ""}
+              onChange={handleInputChange}
+              isDoubleClick={true}
+              onBlur={handleInputOnBlur}
+              className={"doubleLine"}
             />
           );
         },

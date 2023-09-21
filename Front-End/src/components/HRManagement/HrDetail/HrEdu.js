@@ -91,7 +91,7 @@ const HrEdu = ({ cdEmp }) => {
   const handleDateChange = async (value, name, seqEducation) => {
     console.log("handleDateChange ******************");
 
-    if (cdEmp === undefined) {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
     value = value.replace(/-/g, "");
@@ -208,7 +208,9 @@ const HrEdu = ({ cdEmp }) => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleInputChange = (e) => {
             const seqEducationValue = original ? original.seqEducation : null;
-            handleDateChange(e, "dtEntrance", seqEducationValue);
+            if (original) {
+              handleDateChange(e, "dtEntrance", seqEducationValue);
+            }
           };
           return (
             <CustomCalender

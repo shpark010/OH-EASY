@@ -25,6 +25,8 @@ public interface HrDao {
 	public HrEmpMstCdEmpNmNameVO getOneHrEmpData(String cdEmp);
 	// 사원테이블엔 존재하지만 인사테이블엔 존재하지 않는 사원 리스트
 	public List<HrEmpMstVO> getAllModalEmpList();
+	// 인사테이블 삭제
+	 public void deleteHrEmpDtl(String cdEmp);
 	// 자격증 리스트
 	public List<HrLicenseSdtlVO> getLicenseList();
 	// 조건 검색 사원 리스트 category = 0 재직자
@@ -92,4 +94,6 @@ public interface HrDao {
     
     public int updateLicenseData(@Param("seqLicense") String seqLicense, @Param("column") String column, @Param("value") String value);
 	
+   
+    
 }
