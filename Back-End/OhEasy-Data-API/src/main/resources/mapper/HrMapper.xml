@@ -24,6 +24,11 @@ WHERE d.CD_EMP IS NULL;
 	insert into hr_emp_dtl(cd_emp) values(#{cdEmp}) 
 </insert>
 
+<delete id="deleteHrEmpDtl">
+    DELETE FROM hr_emp_dtl
+    WHERE CD_EMP = #{cdEmp}
+</delete>
+
 <!-- 인사테이블 한명 정보 가져오기 -->
 <select id="getOneHrEmpData" parameterType="string" resultType="kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO">
     SELECT 

@@ -109,9 +109,14 @@ public class HrController {
 	}
 	
 	@PostMapping("/HrEmpDataDelete")
-	public ResponseEntity<?> empDataDelete(@RequestBody String cdEmp){
+	public ResponseEntity<?> deleteHrEmpDtlList(@RequestBody Map<String, List<String>> payload){
 		
-		System.out.println(cdEmp);
+	    List<String> cdEmpList = payload.get("selectedEmpCodes");
+	    
+	    // 넘어온 사원리스트 삭제 
+	    hrService.deleteHrEmpDtlList(cdEmpList);
+	    
+	    
 		
 		return new ResponseEntity<>(1,HttpStatus.OK);
 	}
@@ -322,15 +327,15 @@ public class HrController {
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
-	@GetMapping("insertLienscData")
+	@GetMapping("insertLicenseData")
 	public ResponseEntity<?> insertLienscData(@RequestParam Map<String, String> params){
-		System.out.println("insertLienscData");
+		System.out.println("insertLicenseData");
 		String cdEmp = params.remove("cdEmp");
 		Entry<String, String> entry = params.entrySet().iterator().next();
 		String column = entry.getKey();
 		String value = entry.getValue();
 		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
-		System.out.println("인서트 경력 정보 *************************");
+		System.out.println("인서트 자격증 정보 *************************");
 		
 		int result = hrService.insertLicenseData(cdEmp, column, value);
 		return new ResponseEntity<>(result,HttpStatus.OK);
