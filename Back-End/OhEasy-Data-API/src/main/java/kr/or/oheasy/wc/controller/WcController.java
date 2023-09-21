@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
-import kr.or.oheasy.vo.WcGetEmpListVO;
+import kr.or.oheasy.vo.WcGetEmpVO;
 import kr.or.oheasy.vo.WcVO;
 import kr.or.oheasy.wc.service.WcService;
 
@@ -30,18 +31,23 @@ public class WcController {
 		System.out.println("getEmpList 진입");
 		System.out.println(data);		 
 		int dataSize = data.size();
-		List<WcGetEmpListVO> result;
+		List<WcGetEmpVO> result;
 		switch(dataSize) {
 		case 2:{
-			String param1 = data.get("creDate");
-			String param2 = data.get("orderValue");
-			result = wcService.getOptionEmpList(param1,param2);
+			
+			String month = data.get("creDate");
+			String day = "01"; // 20230901
+			String day2 = "31"; // 20230931
+			String param1 = month+day;
+			String param2 = month+day2;
+			String param3 = data.get("orderValue");
+			result = wcService.getOptionEmpList(param1,param2,param3);
 			break;
 		}
 		
 		case 3: {
 			String param1 = data.get("creDate");
-			String param2 = data.get("creDate2");
+			String param2 = data.get("creDate2")+"31";
 			String param3 = data.get("orderValue");
 			result = wcService.getOptionEmpList2(param1,param2,param3);
 			break;
@@ -68,14 +74,35 @@ public class WcController {
 	} //조회 Tab에서 왼쪽 Grid Table 눌렀을 경우.code로 wctable에서 가져오는 사원 data
 	
 	
+	@GetMapping("/getModalEmpList")
+	public ResponseEntity<?> getModalEmpList(){
+		System.out.println("getModalEmpList진입");
+		List<WcGetEmpVO> result = wcService.getAllModalEmpList();
+		System.out.println(result);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/getModalData")
+	public WcGetEmpVO getModalData(@RequestParam String cdEmp){
+		System.out.println("getModalData진입");
+		// modal 에띄워진 data db에서 가져오면서 code insert
+		wcService.insertEmpData(cdEmp);
+		WcGetEmpVO result = wcService.getModalData(cdEmp);
+		return result;
+	}
+	
 	
 	@PutMapping("/updateEmpList")
 	public int updateEmpList(@RequestParam String cdEmp,@RequestParam String colum,@RequestParam String data ) {
 		System.out.println("updataeEmpList 진입");
 		System.out.println(cdEmp + colum+ data);
+		
+//		if (colum.equals("dtCreated")) { //맨 마지막 달력이 업데이트 될 경우만 insert해라.
+//		    wcService.insertEmpData(cdEmp);
+//		}
+		
 	    int result = wcService.updateEmpList(cdEmp,colum,data);
-
-
 	    return result;
 	} // 작성 Tab에서 작성완료 눌렀을 경우
 	
