@@ -40,8 +40,6 @@ public class SdController {
 		System.out.println("귀속년월 : " + empInfo.get("belongingDate"));
 		System.out.println("지급일 : " + empInfo.get("payDay"));
 		Map<String, Object> result = sdService.getEmpDetailData(empInfo);
-//		System.out.println("코드로 조회한 사원 정보 : " + result);
-//		int result = 1;
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
@@ -71,5 +69,14 @@ public class SdController {
 		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
+	
+	// 급여 삭제
+		@PostMapping("/deletePayData")
+		public ResponseEntity<?> deletePayData(@RequestBody Map<String, Object> deleteData) {
+			System.out.println("삭제 컨트롤러 진입");
+			System.out.println(deleteData.get("code"));
+			Map<String, Object> result = sdService.deletePayData(deleteData);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		}
 	
 }

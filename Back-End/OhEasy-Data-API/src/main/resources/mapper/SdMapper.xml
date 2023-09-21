@@ -453,12 +453,14 @@
 		SALARY_DEDUCTION_INFO s ON t.CD_TAX_RATE =
 		s.CD_TAX_RATE
 		<choose>
+			<!-- 전체사원 당월 -->
 			<when test="searchTaxOrder == 0">
 				WHERE
 				s.YY_ALLOWANCE = #{yyAllowance}
 				AND
 				s.MM_BELONG = #{mmBelong}
 			</when>
+			<!-- 현제사원 당월 -->
 			<when test="searchTaxOrder == 1">
 				WHERE
 				s.YY_ALLOWANCE = #{yyAllowance}
@@ -467,15 +469,15 @@
 				AND
 				s.CD_EMP = #{cdEmp}
 			</when>
+			<!-- 전체사원 연간 -->
 			<when test="searchTaxOrder == 2">
 				WHERE
 				s.YY_ALLOWANCE = #{yyAllowance}
 			</when>
+			<!-- 현제사원 연간 -->
 			<when test="searchTaxOrder == 3">
 				WHERE
 				s.YY_ALLOWANCE = #{yyAllowance}
-				AND
-				s.MM_BELONG = #{mmBelong}
 				AND
 				s.CD_EMP = #{cdEmp}
 			</when>
@@ -483,6 +485,18 @@
 		GROUP BY
 		t.CD_TAX_RATE
 	</select>
+	
+	<!-- 급여 자료 삭제 -->
+	<delete id="deletePayData">
+	    DELETE FROM SALARY_DEDUCTION_INFO
+	    WHERE YY_ALLOWANCE = #{empData.YY_ALLOWANCE}
+	    AND MM_BELONG = #{empData.MM_BELONG}
+	    AND DT_ALLOWANCE = #{empData.DT_ALLOWANCE}
+	    AND CD_EMP IN
+	    <foreach item="item" index="index" collection="cdEmpList" open="(" separator="," close=")">
+	        #{item}
+	    </foreach>
+	</delete>
 </mapper>
 
 

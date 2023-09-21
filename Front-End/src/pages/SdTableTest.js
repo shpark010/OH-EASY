@@ -15,41 +15,48 @@ import Input from "../components/Contents/Input";
 import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
 
-const TableTest = (props) => {
-  // const [editing, setEditing] = useState(false);
+const SalaryData = (props) => {
+  // 수정 가능 여부
+  const [edit, setEdit] = useState(false);
+  // 입력 급여
   const [pay, setPay] = useState("");
-  useEffect(() => {
-    console.log("pay state has changed:", pay);
-  }, [pay]);
+  // 기존(조회된) 급여
   const [beforePay, setBeforePay] = useState("");
+  // 모달 여닫기
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  // 사원 조회
   const [empList, setEmpList] = useState([]);
+  // 귀속년월
   const [belongingDate, setBelongingDate] = useState("");
   const handleBelongingDateChange = (newDate) => {
     newDate = newDate.replace(/-/g, "");
     setBelongingDate(newDate);
     console.log("귀속년월 : " + belongingDate);
   };
+  // 지급일
   const [payDay, setPayDay] = useState();
   const handlePayDateChange = (newDate) => {
     newDate = newDate.replace(/-/g, "");
     setPayDay(newDate);
     console.log("지급일 : " + payDay);
   };
-  const [searchOrder, setSearchOrder] = useState("cdEmp");
+  // 정렬
+  const [searchOrder, setSearchOrder] = useState("0");
   // 선택된 값이 변경될 때 호출될 콜백 함수
-  const handleSearchTypeChange = (newValue) => {
-    setSearchOrder(newValue);
-    console.log("정렬기준 : " + searchOrder);
+  const handleSearchTypeChange = (e) => {
+    setSearchOrder(e.target.value);
   };
-  const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-  const [clickEmpCode, setClickEmpCode] = useState("aaa"); // 현재 클릭한 cdEmp 저장하는 상태
-
+  // 테이블의 insertRow의 상태
+  const [showInsertRow, setShowInsertRow] = useState(false);
+  // 현재 클릭한 cdEmp 저장하는 상태
+  const [clickEmpCode, setClickEmpCode] = useState("");
+  // 클릭한 사원 코드 확인
   useEffect(() => {
     if (clickEmpCode !== undefined) {
       console.log("insert : " + clickEmpCode);
     }
   }, [clickEmpCode]);
+  // 선택 사원 세액
   const [taxAmount, setTaxAmount] = useState({
     nationalPension: "", //국민연금
     healthInsurance: "", //건강보험
@@ -58,6 +65,51 @@ const TableTest = (props) => {
     incomeTax: "", //소득세
     localIncomeTax: "", //지방소득세
   }); //단일 세금 금액
+
+  //포멧 함수
+  const changeFormat = (changeValue) => {
+    let newValue = String(changeValue);
+    // 쉼표(,) 제거 후 숫자만 남김
+    newValue = newValue.replace(/,/g, "");
+    // 숫자만 허용
+    newValue = newValue.replace(/[^0-9]/g, "");
+    // 앞에 0을 제거
+    newValue = newValue.replace(/^0+/, "");
+    // 3자리마다 쉼표 추가
+    newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // newValue = Number(newValue).toLocaleString("ko-KR");
+    return newValue;
+  };
+
+  //개인 종합 세액
+  const [personalTax, setPersonalTax] = useState({
+    deduction: "",
+    differencePayment: "",
+  });
+
+  // 조회 구분
+  const [searchTaxOrder, setSearchTaxOrder] = useState("0");
+
+  const handleSearchTaxTypeChange = (e) => {
+    setSearchTaxOrder(e.target.value);
+    handleChangeSearch(e);
+  };
+
+  //
+  const [searchTax, setSearchTax] = useState({
+    amtAllowance: "", //기본급 총액
+    nationalPension: "", //국민연금 총액
+    healthInsurance: "", //건강보험 총액
+    employmentInsurance: "", //고용보험 총액
+    longtermNursingInsurance: "", //장기요양보험 총액
+    incomeTax: "", //소득세 총액
+    localIncomeTax: "", //지방소득세 총액
+  });
+
+  const [totalTax, setTotalTax] = useState({
+    deduction: "",
+    differencePayment: "",
+  });
 
   const [empDetailInfo, setEmpDetailInfo] = useState({
     hireDate: "", //입사일
@@ -90,10 +142,61 @@ const TableTest = (props) => {
     setModalIsOpen(false);
   };
 
+  //조회 아래 영역 초기화
+  const resetStates = () => {
+    setPay("");
+    setBeforePay("");
+    setModalIsOpen(false);
+    setEmpList([]);
+    setShowInsertRow(false);
+    setClickEmpCode("");
+    setTaxAmount({
+      nationalPension: "",
+      healthInsurance: "",
+      employmentInsurance: "",
+      longtermNursingInsurance: "",
+      incomeTax: "",
+      localIncomeTax: "",
+    });
+    setPersonalTax({
+      deduction: "",
+      differencePayment: "",
+    });
+    setSearchTaxOrder("0");
+    setSearchTax({
+      amtAllowance: "",
+      nationalPension: "",
+      healthInsurance: "",
+      employmentInsurance: "",
+      longtermNursingInsurance: "",
+      incomeTax: "",
+      localIncomeTax: "",
+    });
+    setTotalTax({
+      deduction: "",
+      differencePayment: "",
+    });
+    setEmpDetailInfo({
+      hireDate: "",
+      gender: "",
+      address: "",
+      detailAddress: "",
+      phone: "",
+      email: "",
+      leavingDate: "",
+      department: "",
+      domesticForeign: "",
+      family: "",
+      military: "",
+      obstacle: "",
+      certificate: "",
+    });
+  };
+
   //조회 버튼 클릭시 사원리스트 불러오기(select)
   const handleFetchEmpData = async () => {
     // data 객체의 속성들이 undefined, null 또는 공백인지 확인
-    if (!belongingDate || !payDay || !searchOrder) {
+    if (!belongingDate || !payDay) {
       alert("조회 조건 사항을 모두 선택해 주세요");
       return;
     }
@@ -105,15 +208,43 @@ const TableTest = (props) => {
           belongingDate: belongingDate,
           payDay: payDay,
           searchOrder: searchOrder,
+          searchTaxOrder: searchTaxOrder,
         },
       });
-      setEmpList(responseData);
+      const searchTaxInfo = responseData.searchTaxInfo;
+      const formattedDeducation = Object.fromEntries(
+        Object.entries(searchTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const totalAmount = Object.keys(searchTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + searchTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const minAmt = searchTaxInfo.amtAllowance - totalAmount;
+      setEmpList(responseData.empSearch);
+      setSearchTax({
+        amtAllowance: formattedDeducation.amtAllowance,
+        nationalPension: formattedDeducation.nationalPension,
+        healthInsurance: formattedDeducation.healthInsurance,
+        employmentInsurance: formattedDeducation.employmentInsurance,
+        longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
+        incomeTax: formattedDeducation.incomeTax,
+        localIncomeTax: formattedDeducation.localIncomeTax,
+      });
+      setTotalTax({
+        deduction: changeFormat(totalAmount),
+        differencePayment: changeFormat(minAmt),
+      });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
   };
 
-  //사원 클릭시 사원정보와 급여 정보 불러오기
+  //사원 클릭시 사원정보&급여 정보 불러오기
   const handleGetEmpDetailData = async (code) => {
     try {
       const responseData = await apiRequest({
@@ -123,16 +254,66 @@ const TableTest = (props) => {
           code: code,
           belongingDate: belongingDate,
           payDay: payDay,
+          searchTaxOrder: searchTaxOrder,
         },
       });
-      console.log("사원 클릭시 : ");
-      console.log(responseData.searchInfo);
-      console.log("사원 클릭시 : ");
-      console.log(responseData.deducation);
-      setPay(responseData.pay);
-      setBeforePay(responseData.pay);
+      const empTaxInfo = responseData.empTaxInfo;
+      const searchTaxInfo = responseData.searchTaxInfo;
+      const formattedEmpTaxInfo = Object.fromEntries(
+        Object.entries(empTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const formattedSearchTaxInfo = Object.fromEntries(
+        Object.entries(searchTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + empTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + searchTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
+      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
+      setPay(formattedEmpTaxInfo.amtAllowance);
+      setBeforePay(formattedEmpTaxInfo.amtAllowance);
+      setTaxAmount({
+        nationalPension: formattedEmpTaxInfo.nationalPension,
+        healthInsurance: formattedEmpTaxInfo.healthInsurance,
+        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
+        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedEmpTaxInfo.incomeTax,
+        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
+      });
+      setSearchTax({
+        amtAllowance: formattedSearchTaxInfo.amtAllowance,
+        nationalPension: formattedSearchTaxInfo.nationalPension,
+        healthInsurance: formattedSearchTaxInfo.healthInsurance,
+        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
+        longtermNursingInsurance:
+          formattedSearchTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedSearchTaxInfo.incomeTax,
+        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
+      });
+      setPersonalTax({
+        deduction: changeFormat(empTotalTax),
+        differencePayment: changeFormat(empDiffPayAmt),
+      });
+      setTotalTax({
+        deduction: changeFormat(searchTotalTax),
+        differencePayment: changeFormat(searchDiffPayAmt),
+      });
       setEmpDetailInfo(responseData.searchInfo);
-      setTaxAmount(responseData.deducation);
       setClickEmpCode(code);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -150,9 +331,190 @@ const TableTest = (props) => {
           pay: pay,
           belongingDate: belongingDate,
           payDay: payDay,
+          searchTaxOrder: searchTaxOrder,
         },
       });
-      setTaxAmount(responseData);
+      const empTaxInfo = responseData.empTaxInfo;
+      const searchTaxInfo = responseData.searchTaxInfo;
+      const formattedEmpTaxInfo = Object.fromEntries(
+        Object.entries(empTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const formattedSearchTaxInfo = Object.fromEntries(
+        Object.entries(searchTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + empTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + searchTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
+      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
+      setPay(formattedEmpTaxInfo.amtAllowance);
+      setBeforePay(formattedEmpTaxInfo.amtAllowance);
+      setTaxAmount({
+        nationalPension: formattedEmpTaxInfo.nationalPension,
+        healthInsurance: formattedEmpTaxInfo.healthInsurance,
+        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
+        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedEmpTaxInfo.incomeTax,
+        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
+      });
+      setSearchTax({
+        amtAllowance: formattedSearchTaxInfo.amtAllowance,
+        nationalPension: formattedSearchTaxInfo.nationalPension,
+        healthInsurance: formattedSearchTaxInfo.healthInsurance,
+        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
+        longtermNursingInsurance:
+          formattedSearchTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedSearchTaxInfo.incomeTax,
+        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
+      });
+      setPersonalTax({
+        deduction: changeFormat(empTotalTax),
+        differencePayment: changeFormat(empDiffPayAmt),
+      });
+      setTotalTax({
+        deduction: changeFormat(searchTotalTax),
+        differencePayment: changeFormat(searchDiffPayAmt),
+      });
+      setClickEmpCode(code);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //급여 정보 수정
+  const handleUpdateData = async (code, pay) => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/updateEmpPay",
+        data: {
+          code: code,
+          pay: pay,
+          belongingDate: belongingDate,
+          payDay: payDay,
+          searchTaxOrder: searchTaxOrder,
+        },
+      });
+      const empTaxInfo = responseData.empTaxInfo;
+      const searchTaxInfo = responseData.searchTaxInfo;
+      const formattedEmpTaxInfo = Object.fromEntries(
+        Object.entries(empTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const formattedSearchTaxInfo = Object.fromEntries(
+        Object.entries(searchTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + empTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + searchTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
+      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
+      setPay(formattedEmpTaxInfo.amtAllowance);
+      setBeforePay(formattedEmpTaxInfo.amtAllowance);
+      setTaxAmount({
+        nationalPension: formattedEmpTaxInfo.nationalPension,
+        healthInsurance: formattedEmpTaxInfo.healthInsurance,
+        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
+        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedEmpTaxInfo.incomeTax,
+        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
+      });
+      setSearchTax({
+        amtAllowance: formattedSearchTaxInfo.amtAllowance,
+        nationalPension: formattedSearchTaxInfo.nationalPension,
+        healthInsurance: formattedSearchTaxInfo.healthInsurance,
+        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
+        longtermNursingInsurance:
+          formattedSearchTaxInfo.longtermNursingInsurance,
+        incomeTax: formattedSearchTaxInfo.incomeTax,
+        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
+      });
+      setPersonalTax({
+        deduction: changeFormat(empTotalTax),
+        differencePayment: changeFormat(empDiffPayAmt),
+      });
+      setTotalTax({
+        deduction: changeFormat(searchTotalTax),
+        differencePayment: changeFormat(searchDiffPayAmt),
+      });
+      setClickEmpCode(code);
+      console.log(taxAmount.nationalPension);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  const handleChangeSearch = async (e) => {
+    setSearchOrder(e.target.value);
+    const newValue = e.target.value;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/searchTaxInfo",
+        data: {
+          code: clickEmpCode,
+          belongingDate: belongingDate,
+          payDay: payDay,
+          searchTaxOrder: newValue,
+        },
+      });
+      const searchTaxInfo = responseData.searchTaxInfo;
+      console.log(searchTaxInfo);
+      const formattedDeducation = Object.fromEntries(
+        Object.entries(searchTaxInfo).map(([key, value]) => [
+          key,
+          changeFormat(value),
+        ]),
+      );
+      const totalAmount = Object.keys(searchTaxInfo).reduce((acc, key) => {
+        if (key !== "amtAllowance") {
+          return acc + searchTaxInfo[key];
+        }
+        return acc;
+      }, 0);
+      const minAmt = searchTaxInfo.amtAllowance - totalAmount;
+      setSearchTax({
+        amtAllowance: formattedDeducation.amtAllowance,
+        nationalPension: formattedDeducation.nationalPension,
+        healthInsurance: formattedDeducation.healthInsurance,
+        employmentInsurance: formattedDeducation.employmentInsurance,
+        longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
+        incomeTax: formattedDeducation.incomeTax,
+        localIncomeTax: formattedDeducation.localIncomeTax,
+      });
+      setTotalTax({
+        deduction: changeFormat(totalAmount),
+        differencePayment: changeFormat(minAmt),
+      });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -276,7 +638,7 @@ const TableTest = (props) => {
         },
       },
     ],
-    [belongingDate, payDay],
+    [belongingDate, payDay, searchTaxOrder],
   );
 
   //급여항목 , 급액 item2
@@ -304,14 +666,28 @@ const TableTest = (props) => {
             console.log(clickEmpCode);
             setInputValue(e.target.value);
             console.log(inputValue);
+            console.log("바뀜");
           };
           const insertPayAmount = (e) => {
-            console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
+            // console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
+            // console.log("가져온 급여 : " + beforePay);
+            console.log("입력 급여 : " + inputValue);
             console.log("가져온 급여 : " + beforePay);
-            if (inputValue !== Number(beforePay).toLocaleString()) {
-              const insertPay = e.target.value;
-              const clickedCode = clickEmpCode;
-              handleInsertData(clickedCode, insertPay);
+            const insertPay = e.target.value; //입력한 금액
+            const clickedCode = clickEmpCode; //클릭한 사원 코드
+            if (
+              inputValue !== Number(beforePay).toLocaleString() &&
+              inputValue != beforePay
+            ) {
+              if (!beforePay) {
+                //신규 급여 insert
+                handleInsertData(clickedCode, insertPay);
+                console.log("신규 작성 조건");
+              } else {
+                //기존 급여 update
+                handleUpdateData(clickEmpCode, insertPay);
+                console.log("급여 수정 조건");
+              }
             }
           };
           return (
@@ -399,8 +775,7 @@ const TableTest = (props) => {
   const dummyItem4 = [
     {
       nm_tax: "기본급",
-      fg_tax: 0, // 0 과세 , 1비과세
-      amt_allowance: 0,
+      amt_allowance: searchTax.amtAllowance,
     },
   ];
   const columnsItem4 = React.useMemo(
@@ -411,47 +786,56 @@ const TableTest = (props) => {
         id: "nm_tax",
       },
       {
-        Header: "TX",
-        accessor: "fg_tax",
-        id: "fg_tax",
-      },
-      {
         Header: "금액",
         width: "60%",
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return <Input />;
+          const [inputValue, setInputValue] = React.useState(value);
+          const handleInputChange = (e) => {
+            console.log(e.target.value);
+            setInputValue(e.target.value);
+          };
+          return (
+            <Input
+              id="price-input"
+              value={inputValue}
+              width={100}
+              className={"doubleLine"}
+              onChange={handleInputChange}
+              type="price"
+            />
+          );
         },
       },
     ],
-    [],
+    [searchTax],
   );
   //item5
   const dummyItem5 = [
     {
       nm_tax: "국민연금",
-      amt_allowance: 0,
+      amt_allowance: searchTax.nationalPension,
     },
     {
       nm_tax: "건강보험",
-      amt_allowance: 1000,
+      amt_allowance: searchTax.healthInsurance,
     },
     {
       nm_tax: "고용보험",
-      amt_allowance: 2000,
+      amt_allowance: searchTax.employmentInsurance,
     },
     {
       nm_tax: "장기요양보험료",
-      amt_allowance: 3121212,
+      amt_allowance: searchTax.longtermNursingInsurance,
     },
     {
       nm_tax: "소득세",
-      amt_allowance: 3333333,
+      amt_allowance: searchTax.incomeTax,
     },
     {
       nm_tax: "지방소득세",
-      amt_allowance: 122222,
+      amt_allowance: searchTax.localIncomeTax,
     },
   ];
   const columnsItem5 = React.useMemo(
@@ -467,23 +851,35 @@ const TableTest = (props) => {
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
-          return <Input />;
+          const [inputValue, setInputValue] = React.useState(value);
+          const handleInputChange = (e) => {
+            console.log(e.target.value);
+            setInputValue(e.target.value);
+          };
+          return (
+            <Input
+              id="price-input"
+              value={inputValue}
+              width={100}
+              className={"doubleLine"}
+              onChange={handleInputChange}
+              type="price"
+            />
+          );
         },
       },
     ],
-    [],
+    [searchTax],
   );
 
   return (
     <>
       <div className="pageHeader">
         <div className="innerBox fxSpace">
-          <PageHeaderName text="급여자료입력(테스트)" />
+          <PageHeaderName text="급여자료입력" />
           <div className="fxAlignCenter">
             <div className="btnWrapper textBtnWrap">
-              <PageHeaderTextButton text="급여대장" />
-              <PageHeaderTextButton text="지급일자" />
-              <PageHeaderTextButton text="수당/공제등록" onClick={openModal} />
+              <PageHeaderTextButton text="세율변경" onClick={openModal} />
               <CustomModal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
@@ -499,8 +895,6 @@ const TableTest = (props) => {
                 <p>커스텀 모달 내용</p>
                 <button onClick={closeModal}>닫기</button>
               </CustomModal>
-              <PageHeaderTextButton text="재계산" />
-              <PageHeaderTextButton text="완료" />
               <PageHeaderTextButton text="급여메일보내기" />
               <PageHeaderTextButton text="급여명세 문자보내기" />
             </div>
@@ -541,6 +935,7 @@ const TableTest = (props) => {
                     type="month"
                     value={belongingDate}
                     onChange={handleBelongingDateChange}
+                    onClick={resetStates}
                   />
                 </div>
               </div>
@@ -563,6 +958,7 @@ const TableTest = (props) => {
                     show="top"
                     value={payDay}
                     onChange={handlePayDateChange}
+                    onClick={resetStates}
                   />
                 </div>
               </div>
@@ -570,13 +966,14 @@ const TableTest = (props) => {
                 label="정렬"
                 id="sd-order-category"
                 options={[
-                  { value: "CD_EMP", label: "0. 코드순" },
-                  { value: "NM_EMP", label: "1. 이름순" },
-                  { value: "NO_POSITION_UNIQUE", label: "2. 직급순" },
-                  { value: "DT_HRIRE", label: "3. 입사일순" },
+                  { value: "0", label: "0. 코드순" },
+                  { value: "1", label: "1. 이름순" },
+                  { value: "2", label: "2. 입사일순" },
+                  { value: "3", label: "3. 직급순" },
                 ]}
-                defaultValue={searchOrder}
+                value={searchOrder || "0"}
                 onChange={handleSearchTypeChange}
+                onClick={resetStates}
               />
             </div>
             <div className="btnWrapper">
@@ -608,32 +1005,12 @@ const TableTest = (props) => {
             </table>
           </div>
           <div className="sd-item sd-item2">
-            <Table
-              data={dummyItem2}
-              columns={columnsItem2}
-              // editing={editing}
-              // setEditing={setEditing}
-              // pay={pay}
-              // setPay={setPay}
-              page={"sd"}
-            />
+            <Table data={dummyItem2} columns={columnsItem2} page={"sd"} />
             <table className="sd-allowance-top-calTable">
               <tbody>
                 <tr>
-                  <td>과세</td>
-                  <td>999,999,999</td>
-                </tr>
-                <tr>
-                  <td>비과세</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>감면 소득</td>
-                  <td></td>
-                </tr>
-                <tr>
                   <td>지급액 계</td>
-                  <td>999,999,999</td>
+                  <td>{pay}</td>
                 </tr>
               </tbody>
             </table>
@@ -644,11 +1021,11 @@ const TableTest = (props) => {
               <tbody>
                 <tr>
                   <td>공제액 계</td>
-                  <td>456,641,770</td>
+                  <td>{personalTax.deduction}</td>
                 </tr>
                 <tr>
                   <td>차인지급액</td>
-                  <td>534,358,229</td>
+                  <td>{personalTax.differencePayment}</td>
                 </tr>
               </tbody>
             </table>
@@ -661,12 +1038,11 @@ const TableTest = (props) => {
                 options={[
                   { value: "0", label: "0. 전체사원_당월" },
                   { value: "1", label: "1. 현재사원_당월" },
-                  { value: "2", label: "2. 전체사원_현재" },
-                  { value: "3", label: "3. 현재사원_현재" },
-                  { value: "4", label: "4. 전체사원_연간" },
-                  { value: "5", label: "5. 현재사원_연간" },
+                  { value: "2", label: "2. 전체사원_연간" },
+                  { value: "3", label: "3. 현재사원_연간" },
                 ]}
-                defaultValue="0"
+                value={searchTaxOrder}
+                onChange={handleSearchTaxTypeChange}
               />
             </div>
             <div className="sd-tableArea">
@@ -674,20 +1050,8 @@ const TableTest = (props) => {
               <table className="sd-search-allowance-top-calTable">
                 <tbody>
                   <tr>
-                    <td>과세</td>
-                    <td>1,000,000,149</td>
-                  </tr>
-                  <tr>
-                    <td>비과세</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>감면 소득</td>
-                    <td></td>
-                  </tr>
-                  <tr>
                     <td>지급액 계</td>
-                    <td>1,000,000,149</td>
+                    <td>{searchTax.amtAllowance}</td>
                   </tr>
                 </tbody>
               </table>
@@ -699,11 +1063,11 @@ const TableTest = (props) => {
               <tbody>
                 <tr>
                   <td>공제액 계</td>
-                  <td>456,641,770</td>
+                  <td>{totalTax.deduction}</td>
                 </tr>
                 <tr>
                   <td>차인지급액</td>
-                  <td>534,358,229</td>
+                  <td>{totalTax.differencePayment}</td>
                 </tr>
               </tbody>
             </table>
@@ -754,4 +1118,4 @@ const TableTest = (props) => {
   );
 };
 
-export default TableTest;
+export default SalaryData;

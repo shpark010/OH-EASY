@@ -27,5 +27,8 @@ public interface SdDao {
 	
 	//세액 조건 조회
 	public List<Long> getTaxInfo(Map<String, String> empSearch);
+	
+	//급여 자료 삭제
+	public int deletePayData(Map<String, String> deleteData, List<String> codeList);
 
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Setting from "../images/pages/common/setting.png";
 import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
@@ -24,8 +24,33 @@ const SalaryData = (props) => {
   const [beforePay, setBeforePay] = useState("");
   // 모달 여닫기
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  // 사원 조회
+  // 사원 조회 리스트
   const [empList, setEmpList] = useState([]);
+  // 체크 리스트
+  const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
+  //헤더 체크박스를 클릭할 때 호출되어, 모든 체크박스를 체크하거나 체크를 해제
+  const handleHeaderCheckboxClick = useCallback(() => {
+    if (checkedRows.length !== empList.length) {
+      setCheckedRows(empList.map((emp) => emp.cdEmp));
+
+      console.log(checkedRows);
+    } else {
+      setCheckedRows([]);
+    }
+  }, [checkedRows, empList]);
+  // 각 행의 체크박스를 클릭할 때 해당 행의 체크박스 상태를 업데이트
+  const handleRowCheckboxClick = useCallback(
+    (empCode) => {
+      if (checkedRows.includes(empCode)) {
+        setCheckedRows((prevCheckedRows) =>
+          prevCheckedRows.filter((code) => code !== empCode),
+        );
+      } else {
+        setCheckedRows((prevCheckedRows) => [...prevCheckedRows, empCode]);
+      }
+    },
+    [checkedRows],
+  );
   // 귀속년월
   const [belongingDate, setBelongingDate] = useState("");
   const handleBelongingDateChange = (newDate) => {
@@ -92,7 +117,7 @@ const SalaryData = (props) => {
 
   const handleSearchTaxTypeChange = (e) => {
     setSearchTaxOrder(e.target.value);
-    handleChangeSearch();
+    handleChangeSearch(e);
   };
 
   //
@@ -148,7 +173,6 @@ const SalaryData = (props) => {
     setBeforePay("");
     setModalIsOpen(false);
     setEmpList([]);
-    setSearchOrder("0");
     setShowInsertRow(false);
     setClickEmpCode("");
     setTaxAmount({
@@ -194,6 +218,82 @@ const SalaryData = (props) => {
     });
   };
 
+  //세금 정보 포멧
+  const formatTaxInfo = (taxInfo) => {
+    const formattedDeducation = Object.fromEntries(
+      Object.entries(taxInfo).map(([key, value]) => [key, changeFormat(value)]),
+    );
+    return formattedDeducation;
+  };
+
+  //총 세액
+  const calTotalTax = (taxInfo) => {
+    const totalAmount = Object.keys(taxInfo).reduce((acc, key) => {
+      if (key !== "amtAllowance") {
+        return acc + taxInfo[key];
+      }
+      return acc;
+    }, 0);
+    return totalAmount;
+  };
+
+  //차인지급액
+  const calMinTax = (taxInfo, totalAmount) => {
+    const minAmt = taxInfo.amtAllowance - totalAmount;
+    return minAmt;
+  };
+
+  //개별 사원 set
+  const handleSetPersonal = (formattedDeducation, totalAmount, minAmt) => {
+    setPay(formattedDeducation.amtAllowance);
+    setBeforePay(formattedDeducation.amtAllowance);
+    setTaxAmount({
+      nationalPension: formattedDeducation.nationalPension,
+      healthInsurance: formattedDeducation.healthInsurance,
+      employmentInsurance: formattedDeducation.employmentInsurance,
+      longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
+      incomeTax: formattedDeducation.incomeTax,
+      localIncomeTax: formattedDeducation.localIncomeTax,
+    });
+    setPersonalTax({
+      deduction: changeFormat(totalAmount),
+      differencePayment: changeFormat(minAmt),
+    });
+  };
+
+  //조건 조회 set
+  const handleSetSearch = (formattedDeducation, totalAmount, minAmt) => {
+    setSearchTax({
+      amtAllowance: formattedDeducation.amtAllowance,
+      nationalPension: formattedDeducation.nationalPension,
+      healthInsurance: formattedDeducation.healthInsurance,
+      employmentInsurance: formattedDeducation.employmentInsurance,
+      longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
+      incomeTax: formattedDeducation.incomeTax,
+      localIncomeTax: formattedDeducation.localIncomeTax,
+    });
+    setTotalTax({
+      deduction: changeFormat(totalAmount),
+      differencePayment: changeFormat(minAmt),
+    });
+  };
+
+  //조건 조회 세금
+  const handleSearchTax = (searchTaxInfo) => {
+    const formattedDeducation = formatTaxInfo(searchTaxInfo);
+    const totalAmount = calTotalTax(searchTaxInfo);
+    const minAmt = calMinTax(searchTaxInfo, totalAmount);
+    handleSetSearch(formattedDeducation, totalAmount, minAmt);
+  };
+
+  //개별 사원 세금
+  const handlePersonalTax = (empTaxInfo) => {
+    const formattedDeducation = formatTaxInfo(empTaxInfo);
+    const totalAmount = calTotalTax(empTaxInfo);
+    const minAmt = calMinTax(empTaxInfo, totalAmount);
+    handleSetPersonal(formattedDeducation, totalAmount, minAmt);
+  };
+
   //조회 버튼 클릭시 사원리스트 불러오기(select)
   const handleFetchEmpData = async () => {
     // data 객체의 속성들이 undefined, null 또는 공백인지 확인
@@ -212,34 +312,9 @@ const SalaryData = (props) => {
           searchTaxOrder: searchTaxOrder,
         },
       });
-      const searchTaxInfo = responseData.searchTaxInfo;
-      const formattedDeducation = Object.fromEntries(
-        Object.entries(searchTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const totalAmount = Object.keys(searchTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + searchTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const minAmt = searchTaxInfo.amtAllowance - totalAmount;
       setEmpList(responseData.empSearch);
-      setSearchTax({
-        amtAllowance: formattedDeducation.amtAllowance,
-        nationalPension: formattedDeducation.nationalPension,
-        healthInsurance: formattedDeducation.healthInsurance,
-        employmentInsurance: formattedDeducation.employmentInsurance,
-        longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
-        incomeTax: formattedDeducation.incomeTax,
-        localIncomeTax: formattedDeducation.localIncomeTax,
-      });
-      setTotalTax({
-        deduction: changeFormat(totalAmount),
-        differencePayment: changeFormat(minAmt),
-      });
+      const searchTaxInfo = responseData.searchTaxInfo;
+      handleSearchTax(searchTaxInfo);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -260,60 +335,8 @@ const SalaryData = (props) => {
       });
       const empTaxInfo = responseData.empTaxInfo;
       const searchTaxInfo = responseData.searchTaxInfo;
-      const formattedEmpTaxInfo = Object.fromEntries(
-        Object.entries(empTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const formattedSearchTaxInfo = Object.fromEntries(
-        Object.entries(searchTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + empTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + searchTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
-      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
-      setPay(formattedEmpTaxInfo.amtAllowance);
-      setBeforePay(formattedEmpTaxInfo.amtAllowance);
-      setTaxAmount({
-        nationalPension: formattedEmpTaxInfo.nationalPension,
-        healthInsurance: formattedEmpTaxInfo.healthInsurance,
-        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
-        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedEmpTaxInfo.incomeTax,
-        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
-      });
-      setSearchTax({
-        amtAllowance: formattedSearchTaxInfo.amtAllowance,
-        nationalPension: formattedSearchTaxInfo.nationalPension,
-        healthInsurance: formattedSearchTaxInfo.healthInsurance,
-        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
-        longtermNursingInsurance:
-          formattedSearchTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedSearchTaxInfo.incomeTax,
-        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
-      });
-      setPersonalTax({
-        deduction: changeFormat(empTotalTax),
-        differencePayment: changeFormat(empDiffPayAmt),
-      });
-      setTotalTax({
-        deduction: changeFormat(searchTotalTax),
-        differencePayment: changeFormat(searchDiffPayAmt),
-      });
+      handlePersonalTax(empTaxInfo);
+      handleSearchTax(searchTaxInfo);
       setEmpDetailInfo(responseData.searchInfo);
       setClickEmpCode(code);
     } catch (error) {
@@ -337,60 +360,8 @@ const SalaryData = (props) => {
       });
       const empTaxInfo = responseData.empTaxInfo;
       const searchTaxInfo = responseData.searchTaxInfo;
-      const formattedEmpTaxInfo = Object.fromEntries(
-        Object.entries(empTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const formattedSearchTaxInfo = Object.fromEntries(
-        Object.entries(searchTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + empTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + searchTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
-      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
-      setPay(formattedEmpTaxInfo.amtAllowance);
-      setBeforePay(formattedEmpTaxInfo.amtAllowance);
-      setTaxAmount({
-        nationalPension: formattedEmpTaxInfo.nationalPension,
-        healthInsurance: formattedEmpTaxInfo.healthInsurance,
-        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
-        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedEmpTaxInfo.incomeTax,
-        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
-      });
-      setSearchTax({
-        amtAllowance: formattedSearchTaxInfo.amtAllowance,
-        nationalPension: formattedSearchTaxInfo.nationalPension,
-        healthInsurance: formattedSearchTaxInfo.healthInsurance,
-        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
-        longtermNursingInsurance:
-          formattedSearchTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedSearchTaxInfo.incomeTax,
-        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
-      });
-      setPersonalTax({
-        deduction: changeFormat(empTotalTax),
-        differencePayment: changeFormat(empDiffPayAmt),
-      });
-      setTotalTax({
-        deduction: changeFormat(searchTotalTax),
-        differencePayment: changeFormat(searchDiffPayAmt),
-      });
+      handlePersonalTax(empTaxInfo);
+      handleSearchTax(searchTaxInfo);
       setClickEmpCode(code);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -413,62 +384,9 @@ const SalaryData = (props) => {
       });
       const empTaxInfo = responseData.empTaxInfo;
       const searchTaxInfo = responseData.searchTaxInfo;
-      const formattedEmpTaxInfo = Object.fromEntries(
-        Object.entries(empTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const formattedSearchTaxInfo = Object.fromEntries(
-        Object.entries(searchTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const empTotalTax = Object.keys(empTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + empTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const searchTotalTax = Object.keys(searchTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + searchTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const empDiffPayAmt = empTaxInfo.amtAllowance - empTotalTax;
-      const searchDiffPayAmt = searchTaxInfo.amtAllowance - searchTotalTax;
-      setPay(formattedEmpTaxInfo.amtAllowance);
-      setBeforePay(formattedEmpTaxInfo.amtAllowance);
-      setTaxAmount({
-        nationalPension: formattedEmpTaxInfo.nationalPension,
-        healthInsurance: formattedEmpTaxInfo.healthInsurance,
-        employmentInsurance: formattedEmpTaxInfo.employmentInsurance,
-        longtermNursingInsurance: formattedEmpTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedEmpTaxInfo.incomeTax,
-        localIncomeTax: formattedEmpTaxInfo.localIncomeTax,
-      });
-      setSearchTax({
-        amtAllowance: formattedSearchTaxInfo.amtAllowance,
-        nationalPension: formattedSearchTaxInfo.nationalPension,
-        healthInsurance: formattedSearchTaxInfo.healthInsurance,
-        employmentInsurance: formattedSearchTaxInfo.employmentInsurance,
-        longtermNursingInsurance:
-          formattedSearchTaxInfo.longtermNursingInsurance,
-        incomeTax: formattedSearchTaxInfo.incomeTax,
-        localIncomeTax: formattedSearchTaxInfo.localIncomeTax,
-      });
-      setPersonalTax({
-        deduction: changeFormat(empTotalTax),
-        differencePayment: changeFormat(empDiffPayAmt),
-      });
-      setTotalTax({
-        deduction: changeFormat(searchTotalTax),
-        differencePayment: changeFormat(searchDiffPayAmt),
-      });
+      handlePersonalTax(empTaxInfo);
+      handleSearchTax(searchTaxInfo);
       setClickEmpCode(code);
-      console.log(taxAmount.nationalPension);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -489,33 +407,29 @@ const SalaryData = (props) => {
         },
       });
       const searchTaxInfo = responseData.searchTaxInfo;
-      console.log(searchTaxInfo);
-      const formattedDeducation = Object.fromEntries(
-        Object.entries(searchTaxInfo).map(([key, value]) => [
-          key,
-          changeFormat(value),
-        ]),
-      );
-      const totalAmount = Object.keys(searchTaxInfo).reduce((acc, key) => {
-        if (key !== "amtAllowance") {
-          return acc + searchTaxInfo[key];
-        }
-        return acc;
-      }, 0);
-      const minAmt = searchTaxInfo.amtAllowance - totalAmount;
-      setSearchTax({
-        amtAllowance: formattedDeducation.amtAllowance,
-        nationalPension: formattedDeducation.nationalPension,
-        healthInsurance: formattedDeducation.healthInsurance,
-        employmentInsurance: formattedDeducation.employmentInsurance,
-        longtermNursingInsurance: formattedDeducation.longtermNursingInsurance,
-        incomeTax: formattedDeducation.incomeTax,
-        localIncomeTax: formattedDeducation.localIncomeTax,
+      handleSearchTax(searchTaxInfo);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  const handleDeletePayData = async () => {
+    try {
+      console.log(checkedRows);
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/deletePayData",
+        data: {
+          code: checkedRows,
+          belongingDate: belongingDate,
+          payDay: payDay,
+          searchTaxOrder: searchTaxOrder,
+        },
       });
-      setTotalTax({
-        deduction: changeFormat(totalAmount),
-        differencePayment: changeFormat(minAmt),
-      });
+      const empTaxInfo = responseData.empTaxInfo;
+      const searchTaxInfo = responseData.searchTaxInfo;
+      handlePersonalTax(empTaxInfo);
+      handleSearchTax(searchTaxInfo);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -532,30 +446,31 @@ const SalaryData = (props) => {
     [empList],
   );
 
-  const columnsItem1 = React.useMemo(
+  const columnsItem1 = useMemo(
     () => [
       {
-        Header: "✓",
+        Header: (
+          // 이 체크박스는 체크된 행의 수가 전체 empList와 동일한 경우에만 체크되도록 설정 모든 행이 체크되어 있으면 이 체크박스도 체크
+          <input
+            type="checkbox"
+            checked={checkedRows.length === empList.length}
+            onChange={handleHeaderCheckboxClick}
+          />
+        ),
         accessor: "checkbox",
-        width: "20%",
+        width: "10%",
         id: "checkbox",
-        //Cell: ({ cell: { value } }) => <input type="checkbox" />,
-        Cell: ({ cell: { value } }) => {
-          const [inputValue, setInputValue] = React.useState(value);
-
-          const handleInputChange = (e) => {
-            const newValue = !inputValue;
-            console.log("현재 체크박스 value : ", inputValue);
-            setInputValue(newValue);
-            console.log("변경 체크박스 value : ", newValue);
-          };
-
+        Cell: ({ cell: { value }, row: { original } }) => {
+          // 현재 행의 체크박스 상태를 결정 checkedRows 배열에 현재 행의 코드가 포함되어 있으면 체크박스는 체크된 상태로 표시
+          const isChecked = checkedRows.includes(original?.code);
           return (
             <input
               type="checkbox"
-              checked={inputValue} // checked 속성 사용
-              value={inputValue}
-              onChange={handleInputChange}
+              // 행의 체크박스가 클릭될 때의 동작을 handleRowCheckboxClick 함수에 위임, 해당 행의 코드를 인자로 전달
+              checked={isChecked}
+              onChange={() => {
+                handleRowCheckboxClick(original?.code);
+              }}
             />
           );
         },
@@ -639,7 +554,7 @@ const SalaryData = (props) => {
         },
       },
     ],
-    [belongingDate, payDay, searchTaxOrder],
+    [belongingDate, payDay, searchTaxOrder, checkedRows, empList],
   );
 
   //급여항목 , 급액 item2
@@ -909,6 +824,7 @@ const SalaryData = (props) => {
                 btnName="delete"
                 imageSrc={Delete}
                 altText="삭제"
+                onClick={handleDeletePayData}
               />
               <PageHeaderIconButton
                 btnName="calc"
@@ -940,7 +856,7 @@ const SalaryData = (props) => {
                   />
                 </div>
               </div>
-              <SearchBarBox
+              {/* <SearchBarBox
                 label="구분"
                 id="sd-salary-category"
                 options={[
@@ -950,7 +866,7 @@ const SalaryData = (props) => {
                   { value: "3", label: "3. 추급" },
                   { value: "4", label: "4. 추상" },
                 ]}
-              />
+              /> */}
               <div className="searchBarName">
                 <div className="searchBarNameCalender">
                   <span>지급일</span>
@@ -972,7 +888,7 @@ const SalaryData = (props) => {
                   { value: "2", label: "2. 입사일순" },
                   { value: "3", label: "3. 직급순" },
                 ]}
-                value={searchOrder}
+                value={searchOrder || "0"}
                 onChange={handleSearchTypeChange}
                 onClick={resetStates}
               />
@@ -1043,7 +959,7 @@ const SalaryData = (props) => {
                   { value: "3", label: "3. 현재사원_연간" },
                 ]}
                 value={searchTaxOrder}
-                onChange={handleChangeSearch}
+                onChange={handleSearchTaxTypeChange}
               />
             </div>
             <div className="sd-tableArea">
