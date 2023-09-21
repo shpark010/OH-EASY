@@ -1,12 +1,12 @@
 package kr.or.oheasy.wc.service;
-
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kr.or.oheasy.vo.WcGetEmpListVO;
+import kr.or.oheasy.vo.WcGetEmpVO;
 import kr.or.oheasy.vo.WcVO;
 import kr.or.oheasy.wc.dao.WcDao;
 
@@ -16,7 +16,7 @@ public class WcService {
 	@Autowired
 	private SqlSession sqlSession; //mybatis
 	
-	public List<WcGetEmpListVO> getOptionEmpList(String creDate,String orderValue) {
+	public List<WcGetEmpVO> getOptionEmpList(String param1,String param2,String orderValue) {
 		
 		switch(orderValue) {
 		case "1":
@@ -29,11 +29,11 @@ public class WcService {
 		System.out.println(orderValue);
 	
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
-		return wcdao.getOptionEmpList(creDate,orderValue);
+		return wcdao.getOptionEmpList(param1,param2,orderValue);
 		
 	}
 	
-public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, String orderValue) {
+public List<WcGetEmpVO> getOptionEmpList2(String creDate,String creDate2, String orderValue) {
 		
 		switch(orderValue) {
 		case "1":
@@ -60,6 +60,31 @@ public List<WcGetEmpListVO> getOptionEmpList2(String creDate,String creDate2, St
 		return wcdao.getCodeParam(code);
 	}
 
+	
+	
+	public List<WcGetEmpVO> getAllModalEmpList(){
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.getModalEmpList();
+	}
+	
+	public WcGetEmpVO getModalData(String cdEmp) {
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.getModalData(cdEmp);
+	}
+	
+	public int insertEmpData(String cdEmp) {
+		// 사원코드는 insert 됐는데 작성일자를 넣지 못한 사람들을 위한 validation
+		
+		LocalDate date = LocalDate.now();
+		 String dateString = date.toString(); // LocalDate를 문자열로 변환
+	     String formattedDate = dateString.replace("-", ""); // 하이픈 제거
+		System.out.println(formattedDate);
+		
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.insertEmpData(cdEmp,formattedDate);
+	}
+	
+	
 	
 	public int updateEmpList(String cdEmp, String colum, String data){
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
