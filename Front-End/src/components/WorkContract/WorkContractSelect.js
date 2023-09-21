@@ -209,220 +209,10 @@ const WorkContractCreate = () => {
   }, [paramGetEmpList]); // 변경될때만 실행.
 
 
-  // const columns =  [
-
-  //     {
-  //       Header:
-        
-  //         "작성년월"
-  //       ,
-  //       accessor: "dtCreated",
-  //       id: "dtCreated",
-  //       width:"20%",
-  //       Cell: ({ cell: { value }, row :{original} }) =>{ 
-  //         const [inputValue, setInputValue] = useState(value);
-  //         const [modalApper,setModalApper] = useState("off")
-  //        const getCodeArr = (e) =>{
-  //          const codeValue = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
-  //         console.log(codeValue);
-
-
-  
-  //        }
-
-  //        const handleInputChange = (e) => {
-  //         setInputValue(e.target.value);
-  //       };
-
-  //       // const handleInputClick = (e) => {
-  //       //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //       //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-  //       //   console.log(value);
-  //       // };
-
-  //       const inputBlur = (e) => {
-  //         // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //         //  ele.style.backgroundColor = '';
-  //       }
-
-
-  //       /*Code input에서 mouse 올라오면 state 변경하는 함수 */
-  //       const mouseOverModalOn = ()=>{
-  //         setModalApper("on");
-  //       };
-
-  //       /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
-  //       const mouseOutModalOff = ()=>{
-  //         setModalApper("off");
-  //       };
-
-  //       /*Code input에 code 도우미 render 함수*/ 
-  //       const modalApperFunc = () =>{
-  //         if(modalApper === "on"){
-  //           return null;
-  //         }
-  //         else return null;
-
-  //       };
-  //       return(
-  //         <>
-  //         <Input
-  //             value={inputValue}
-  //             onClick={handleInputClick }
-  //             onBlur={inputBlur}
-  //             onChange={handleInputChange}
-  //             onMouseOver={mouseOverModalOn}
-  //             onMouseOut= {mouseOutModalOff}
-  //             modalRender = {modalApperFunc}
-  //             className = {"doubleLine"}
-              
-            
-  //           />
-        
-  //       </>
-  //       );
-      
-  //     }
-  //     }
-  //     ,
-  //     {
-  //       Header: "Code",
-  //       accessor: "cdEmp",
-  //       id: "cdEmp",
-  //       width: "20%",
-  //       Cell: ({ cell: { value }, row :{original} }) => {
-  //         const [inputValue, setInputValue] = useState(value);
-  //         const [modalApper,setModalApper] = useState("off")
-  
-
-
-  //         const handleInputChange = (e) => {
-  //           setInputValue(e.target.value);
-  //         };
-
-  //         // const handleInputClick = (e) => {
-  //         //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //         //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-  //         // };
-
-  //         const inputBlur = (e) => {
-  //           // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //           //  ele.style.backgroundColor = '';
-  //         }
-
-
-  //         /*Code input에서 mouse 올라오면 state 변경하는 함수 */
-  //         const mouseOverModalOn = ()=>{
-  //           setModalApper("on");
-  //         };
-
-  //         /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
-  //         const mouseOutModalOff = ()=>{
-  //           setModalApper("off");
-  //         };
-
-  //         /*Code input에 code 도우미 render 함수*/ 
-  //         const modalApperFunc = () =>{
-  //           if(modalApper === "on"){
-  //             return null;
-  //           }
-  //           else return null;
-
-  //         };
-
-  //         return (
-  //           <Input
-  //             value={inputValue}
-  //             onClick={handleInputClick }
-  //             onBlur={inputBlur}
-  //             onChange={handleInputChange}
-  //             onMouseOver={mouseOverModalOn}
-  //             onMouseOut= {mouseOutModalOff}
-  //             modalRender = {modalApperFunc}
-  //             className = {"doubleLine"}
-              
-            
-  //           />
-
-  //         );
-
-  //       },
-  //     },
-  //     {
-  //       Header: "사원명",
-  //       accessor: "nmEmp",
-  //       id: "nmEmp",
-  //       width: "20%",
-  //       Cell: ({ cell: { value }, row :{original}  }) => {
-  //         const [inputValue, setInputValue] = React.useState(value);
-          
-
-  //         // const handleInputClick = (e) => {
-  //         //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //         //   //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
-        
-  //         // }; // input tag Click시 발생할 event
-
-  //         const inputBlur = (e) => {
-  //           const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //            ele.style.backgroundColor = '';
-  //         }
-      
-
-  //         const handleInputChange = (e) => {
-  //           setInputValue(e.target.value);
-  //         };
-
-  //         return (
-  //           <Input
-  //             value={inputValue}
-  //             onClick={handleInputClick}
-  //             onBlur={inputBlur}
-  //             onChange={handleInputChange}
-  //             className = {"doubleLine"}
-              
-              
-  //           />
-  //         );
-  //       },
-  //     },
-      
-  //     {
-  //       Header: "주민번호",
-  //       accessor: "noResident",
-  //       id: "noResident",
-  //       Cell: ({ cell: { value }, row :{original} } ) => {
-  //         const [inputValue, setInputValue] = React.useState(value);
-
-  //         // const handleInputClick = (e) => {
-  //         //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //         //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-  //         // };
-
-  //         const inputBlur = (e) => {
-  //           const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-  //            ele.style.backgroundColor = '';
-  //         }
-
-  //         const handleInputChange = (e) => {
-  //           setInputValue(e.target.value);
-  //         };
-
-  //         return (
-  //           <Input
-  //             value={inputValue}
-  //             onChange={handleInputChange}
-  //             onClick={handleInputClick}
-  //             onBlur={inputBlur}
-  //             className ={"doubleLine"}
-  //           />
-  //         );
-  //       },
-  //     },
-  //   ]
+ 
   const columns = useMemo(() => [
     {
-      Header: "작성년월",
+      Header: "작성일자",
       accessor: "dtCreated",
       id: "dtCreated",
       width: "20%",
@@ -441,7 +231,10 @@ const WorkContractCreate = () => {
           setInputValue(e.target.value);
         };
   
-        const inputBlur = (e) => {};
+        const inputBlur = (e) => {
+
+          
+        };
   
         const mouseOverModalOn = () => {
           setModalApper("on");
@@ -542,6 +335,7 @@ const WorkContractCreate = () => {
             onClick={handleInputClick}
             onBlur={inputBlur}
             onChange={handleInputChange}
+            
             className={"doubleLine"}
           />
         );
@@ -619,7 +413,7 @@ const WorkContractCreate = () => {
                       options={[
                         { value: '1', label: '사원코드 순' },
                         { value: '2', label: '사원이름 순' },
-                        { value: '3', label: '작성년월 순' },
+                        { value: '3', label: '작성일자 순' },
                        
                       ]}
                       defaultValue="1"
@@ -644,7 +438,7 @@ const WorkContractCreate = () => {
               <Table
                 columns={columns}
                 data={data}   
-                showInsertRow={true}
+                showInsertRow={false}
                 checkboxWidth={"10%"}
               />
 
