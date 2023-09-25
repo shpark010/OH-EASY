@@ -93,5 +93,10 @@ public List<WcGetEmpVO> getOptionEmpList2(String creDate,String creDate2, String
 	}
 	
 	
-
+	public int deleteEmpList(String cdEmp) {
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.deleteEmp(cdEmp);
+	}
+	
+	
 }

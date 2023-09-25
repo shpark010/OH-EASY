@@ -106,6 +106,12 @@ WHERE w.cd_emp IS NULL;
     WHERE cd_emp = #{param1}
 </update>
 
+	 <delete id="deleteEmp" parameterType="String">
+        DELETE FROM hr_contract_info
+        WHERE cd_Emp = #{cdEmp}
+    </delete>
+
+
 
 
 </mapper>
