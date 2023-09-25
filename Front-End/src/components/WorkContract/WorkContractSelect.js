@@ -57,7 +57,7 @@ const WorkContractCreate = () => {
     const formattedDate = newDate.replace(/-/g, "");
     setBelongingDate2(formattedDate); //set을해도 useState는 비동기적으로 작동해서 요청을 보내기전에 set이 안될 수 있음
     console.log(belongingDate2);
-    if (belongingDate && belongingDate < formattedDate) {
+    if (belongingDate && belongingDate <= formattedDate) {
       setEmployeeData([]);
       try {
        
@@ -684,7 +684,7 @@ const WorkContractCreate = () => {
                       className={"wcSelect2"}                    />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={100} readOnly value={paramGetEmpList.amtSal|| "" } /> 
+                    <CustomInput width={180} readOnly value={paramGetEmpList.amtSal|| "" } /> 
                     <b>원</b>
                   </td>
                 </tr>
@@ -703,7 +703,7 @@ const WorkContractCreate = () => {
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={40} readOnly value={paramGetEmpList.ddPaySal|| "" } />
+                    <CustomInput width={180} readOnly value={paramGetEmpList.ddPaySal|| "" } />
                     <b>일</b>
                   </td>
                 </tr>

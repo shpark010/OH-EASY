@@ -7,21 +7,22 @@ import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
 import DaumPostcode from 'react-daum-postcode';
-import SearchSubmitButton from '../SearchBar/SearchSubmitButton';
 import useApiRequest from '../Services/ApiRequest';
 import CustomModal from '../../components/Contents/CustomModal';
 import PageHeaderName from "../../components/PageHeader/PageHeaderName";
 import CustomSelect from '../../components/Contents/CustomSelect';
+import Swal from 'sweetalert2';
 
 
 
 
-const WorkContractCreate = ({deleteEvent}) => {
+const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,employeeData,setEmployeeData }) => {
 
   const apiRequest = useApiRequest();
-  const [employeeData, setEmployeeData] = useState([]); //왼쪽table사원 data
+  // const [employeeData, setEmployeeData] = useState([]); //왼쪽table사원 data
   const [openPostcode, setOpenPostcode] = useState(false); // 주소모달 상태
-  const [checkColumn,setCheckColumn] = useState([]);  //checkColumn 담는 배열
+  // const [CheckColumn2,setCheckColumn2] = useState(checkColumn);  //pops로 받은 checkcoulmn복사하기
+  const [selectAll, setSelectAll] = useState(false); // checkbox가 모두 check된 상태 관리
   const [belongingDate, setBelongingDate] = useState(""); //조건조회시 년월 달력 상태 관리.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
   const [paramGetEmpList1,setParamGetEmpList1] = useState({
@@ -55,65 +56,81 @@ const WorkContractCreate = ({deleteEvent}) => {
   const [modalIsOpen2, setModalIsOpen2] = useState(false); // 추가 모달 on off 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [payState,setPayState] = useState("on"); // 임금지급일에 따른 style 상태 관리, 초기값 on
+  // const [addrWorkDtl,setaddrWorkDtl] = useState(""); // validation을 위한 상세주소 값 addrWorkDtl
+  // const [valicntnJob,setValicntnJob] = useState(""); // validation을 위한 업무내용 값 cntnJob
+  // const [valitmStartRegularWork,setValitmStartRegularWork] = useState(""); // validation을 위한 근로시작시간 값 tmStartRegularWork
+  // const [valitmEndRegularWork,setValitmEndRegularWork] = useState(""); // validation을 위한 근로종료시간 값 tmEndRegularWork
+  // const [valitmStartBreak,setValitmStartBreak] = useState(""); // validation을 위한 휴게시간 시작 tmStartBreak
+  // const [valitmEndBreak,setValitmEndBreak] = useState(""); // validation을 위한 휴게시간 종료 tmEndBreak
 
+  const [validate,setValidate] = useState({
+    addrWorkDtl: '',
+    cntnJob: '',
+    tmStartRegularWork: '',
+    tmEndRegularWork: '',
+    tmStartBreak: '',
+    tmEndBreak: '',
+  })
 
-
-
+  const showContError = (message) => {
+    Swal.fire({
+      icon: 'error',
+      title: message,
+    });
+  };
   
-  const contractPeriodCalendar1 = async(newDate,e) => {
-
-    
-
-    newDate = newDate.replace(/-/g, "");
-    const cdEmp = clickCode
-    const data = newDate
-    const colum = "dtStartCont"
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "") {
-      return;
-    }
-    console.log(cdEmp);
-    console.log(data);
-    console.log(colum);
-
-    setParamGetEmpList1({ ...paramGetEmpList1, dtStartCont: data })
-
-    try {
-      const responseData = await apiRequest({
-        method: "PUT",
-        url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
-      });
-    } 
-    catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
-    
-  }// 이벤트를 동시에 받은다음에 값이 더작은걸 1에할당 더큰것을 2에할당. e로 식별불가.
+  const contractPeriodCalendar1 = async(newDate) => {
+      newDate = newDate.replace(/-/g, "");
+      const cdEmp = clickCode;
+      const data = newDate;
+      const colum = "dtStartCont";
+  
+      if (!cdEmp || data === "") return;
+  
+      // 만약 dtEndCont 값이 있고, dtStartCont가 dtEndCont보다 크다면 오류를 표시합니다.
+      if (paramGetEmpList1.dtEndCont && data > paramGetEmpList1.dtEndCont) {
+        showContError('시작 근로계약 기간은 종료 근로계약 기간보다 클 수 없습니다.');
+          return;
+      }
+  
+      setParamGetEmpList1({ ...paramGetEmpList1, dtStartCont: data });
+  
+      try {
+        const responseData = await apiRequest({
+          method: "PUT",
+          url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
+        });
+      } 
+      catch (error) {
+        console.error("Failed to fetch emp data:", error);
+      }
+  }
   
   const contractPeriodCalendar2 = async(newDate) => {
-
-    newDate = newDate.replace(/-/g, "");
-    const cdEmp = clickCode
-    const data = newDate
-    const colum = "dtEndCont"
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "") {
-      return;
-    }
-    console.log(cdEmp);
-    console.log(data);
-    console.log(colum);
-
-    setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: data })
-
-    try {
-      const responseData = await apiRequest({
-        method: "PUT",
-        url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
-      });
-    } 
-    catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
-    
+      newDate = newDate.replace(/-/g, "");
+      const cdEmp = clickCode;
+      const data = newDate;
+      const colum = "dtEndCont";
+  
+      if (!cdEmp || data === "") return;
+  
+      // 만약 dtStartCont 값이 있고, dtEndCont가 dtStartCont보다 작다면 오류를 표시합니다.
+      if (paramGetEmpList1.dtStartCont && data < paramGetEmpList1.dtStartCont) {
+        showContError('종료 근로계약 기간은 시작 근로계약 기간보다 작을 수 없습니다.');
+          return;
+      }
+  
+      setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: data });
+  
+      try {
+        const responseData = await apiRequest({
+          method: "PUT",
+          url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
+        });
+      } 
+      catch (error) {
+        console.error("Failed to fetch emp data:", error);
+      }
   }
 
   const contractPeriodCalendar3 = async(newDate) => {
@@ -135,6 +152,16 @@ const WorkContractCreate = ({deleteEvent}) => {
         method: "PUT",
         url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
       });
+
+      const empListResponseData = await apiRequest({
+        method: "GET",
+        url: `/api2/wc/getEmpList?creDate=${belongingDate}&orderValue=${searchOrder}`, 
+      });
+
+      
+      setEmployeeData(empListResponseData);
+
+
     } 
     catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -145,8 +172,8 @@ const WorkContractCreate = ({deleteEvent}) => {
   }
 
 
-  
-  const inputOnChange = async (e) =>{ //validation 및 update
+  // 온체인지
+  const inputOnChange = async (e) =>{ // select tag나 건드릴수 없는 input tag의 경우만. put api날리고 나머지는 set만 set한건 onBlur에서 put api날릴 것
     
     const cdEmp = clickCode;
     const data = e.target.value;
@@ -157,7 +184,8 @@ const WorkContractCreate = ({deleteEvent}) => {
     if (cdEmp === null || cdEmp === "" || cdEmp === undefined) {
       return;
     } // code값이 공백이면 종료
-    if (data === "") {
+    
+    if (data === "") { //맨앞자리가 지워지지않는 것때문에
       setParamGetEmpList1({
         ...paramGetEmpList1,
         [e.target.id]: data
@@ -186,51 +214,12 @@ const WorkContractCreate = ({deleteEvent}) => {
       return;
     }
     
-    // switch (colum) {
-    //   case "tmStartRegularWork":
-    //     setWorkStartTime(data);
-    //     break;
-    //   case "tmEndRegularWork":
-    //     setWorkEndTime(data);
-    //     break;
-    //   case "tmStartBreak":
-    //     setBreakStartTime(data);
-    //     break;
-    //   case "tmEndBreak":
-    //     setBreakEndTime(data);
-    //     break;
-    //   default:
-        
-    // }
-
-
-      // if(paramGetEmpList1.tmStartRegularWork && paramGetEmpList1.tmEndRegularWork ){
-      //   if(paramGetEmpList1.tmStartRegularWork> paramGetEmpList1.tmEndRegularWork){
-      //     return
-      //   }
-      // }
-      // if(paramGetEmpList1.tmStartBreak && paramGetEmpList1.tmEndBreak ){
-      //   if(paramGetEmpList1.tmStartBreak > paramGetEmpList1.tmEndBreak){
-      //     return
-      //   }
-      // }
+  
     
   }
 
 
-    // 입력값을 숫자로만 받게 해놨는데  : 를 추가하면 변경이 안됨.
-
-    // const numbersOnly = data.replace(/\D/g, '');
-
-    // // 숫자가 4자리일 때만 변환
-    //   if (numbersOnly.length === 4){
-    //   const formattedData = `${numbersOnly.slice(0, 2)}:${numbersOnly.slice(2)}`;
     
-    //   setParamGetEmpList1({...paramGetEmpList1,
-    //     [e.target.id] : formattedData
-    //       })
-    //     }
-
     
     
     
@@ -276,23 +265,30 @@ const WorkContractCreate = ({deleteEvent}) => {
       }
 
 
+      
+
+      
+
 
     setParamGetEmpList1({...paramGetEmpList1,
     [e.target.id] : data
       })
 
-      // if(
-      //   colum ==="noWorkPost" ||
-      //   colum === "ddWorking" ||
-      // colum === "dotw" ||
-      // colum === "tpSal" ||
-      // colum === "tpPayDtSal" ||
-      // colum === "methodPay" ||
-      // colum === "ynEmpInsurance" ||
-      // colum === "ynIndustrialAccidentInsurance" ||
-      // colum === "ynNationalPension" ||
-      // colum === "ynHealthInsurance" ||
-      // colum === "stSign") {
+      
+
+      if(
+        colum ==="noWorkPost" ||
+        colum === "addrWork" ||
+        colum === "ddWorking" ||
+      colum === "dotw" ||
+      colum === "tpSal" ||
+      colum === "tpPayDtSal" ||
+      colum === "methodPay" ||
+      colum === "ynEmpInsurance" ||
+      colum === "ynIndustrialAccidentInsurance" ||
+      colum === "ynNationalPension" ||
+      colum === "ynHealthInsurance" ||
+      colum === "stSign") {
 
           try {
             const responseData = await apiRequest({
@@ -304,7 +300,7 @@ const WorkContractCreate = ({deleteEvent}) => {
             console.error("Failed to fetch emp data:", error);
           }
 
-        // }
+        }
         
 
 
@@ -313,68 +309,76 @@ const WorkContractCreate = ({deleteEvent}) => {
 
 
   
-  const inputOnBlur = async (e) =>{ //onBlur시 put 요청을 보낼 함수.
+  const showError = (message) => { //시간관련 sweetalrert
+    Swal.fire({
+      icon: 'error',
+      title: message,
+    });
+  };
+  
+  //온블러
+  const inputOnBlur = async (e) => {
     
-     const cdEmp = clickCode
-     const colum = e.target.id
-     const data = e.target.value
-     if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "") {
-      return;
-    }
-    
-    
+    const cdEmp = clickCode;
+    const colum = e.target.id;
+    const data = e.target.value;
+  
+   
 
-      //시작시간과 종료시간 validation
-     if(colum === "tmStartRegularWork" ||
-     colum === "tmEndRegularWork" ||
-     colum === "tmStartBreak" ||
-     colum === "tmEndBreak" 
-  ) {
-    if(paramGetEmpList1.tmStartRegularWork.length === paramGetEmpList1.tmEndRegularWork.length){
-      if(paramGetEmpList1.tmStartRegularWork>paramGetEmpList1.tmEndRegularWork){
-        alert("시작시간보다 빠른 시간을 입력할 수 없습니다.")
-        return
+    if (!cdEmp || data === "") return;
+     if( validate[colum]===data){ 
+      console.log("초기값과 같으면 종료");
+      return};
+    
+ 
+    if (
+      colum === "tmStartRegularWork" ||
+      colum === "tmEndRegularWork" ||
+      colum === "tmStartBreak" ||
+      colum === "tmEndBreak"
+    ) {
+
+      if (data.length !== 4) {
+        showError('시간은 4자리여야 합니다.');
+        return;
+      }
+      // Assure values are available and have correct length
+      const isValuesValid =
+        paramGetEmpList1.tmStartRegularWork &&
+        paramGetEmpList1.tmEndRegularWork &&
+        paramGetEmpList1.tmStartRegularWork.length === 4 &&
+        paramGetEmpList1.tmEndRegularWork.length === 4;
+  
+      if (isValuesValid) {
+        if (paramGetEmpList1.tmStartRegularWork > paramGetEmpList1.tmEndRegularWork) {
+          showError('종료시간은 시작시간보다 느려야 합니다.');
+          return;
+        }
+        if (paramGetEmpList1.tmStartBreak > paramGetEmpList1.tmEndBreak) {
+          showError('종료시간은 시작시간보다 느려야 합니다.');
+          return;
+        }
       }
     }
-    if(paramGetEmpList1.tmStartBreak.length === paramGetEmpList1.tmEndBreak.length){
-      if(paramGetEmpList1.tmStartBreak>paramGetEmpList1.tmEndBreak){
-        alert("시작시간보다 빠른 시간을 입력할 수 없습니다.")
-        return
-      }
-    }
-  }
-
-     try {
+  
+    try {
+      console.log("onBlur진입 put");
       const responseData = await apiRequest({
         method: "PUT",
         url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
       });
-    } 
-    catch (error) {
+      
+    } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
-
-  }
-
+  };
 
 
-  
-  // const schangeCheck2 = (e, originalCode) => {
-    //   const checkedValue = e.target.checked;
-    
-    //   if (checkedValue) {
-      //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
-      //   } else {
-        //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
-        //   }
-        // };
-        // useEffect(() => {
-          //   console.log("codeArr 변경됨:", codeArr);
-          // }, [codeArr]); // codeArr이 변경될 때만 실행
-          
+
           
           
           const handleBelongingDateChange = async (newDate) => {
+            setParamGetEmpList1([]);
             newDate = newDate.replace(/-/g, "");
             setBelongingDate(newDate);
             
@@ -385,6 +389,7 @@ const WorkContractCreate = ({deleteEvent}) => {
                     url: `/api2/wc/getEmpList?creDate=${newDate}&orderValue=${searchOrder}`,
                 });
                 setEmployeeData(responseData);
+                
             } catch (error) {
                 console.error("Failed to fetch emp data:", error);
             }
@@ -501,24 +506,20 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   
 //delete 맨위 체크박스 all selcet의 이벤트 핸들러
   const selectAllCheckBox = (e) =>{
-    const allInputs = e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input');
-  //   // 모든 Table까지 가서 모든 input tag select 하면 배열로 return
-  //   console.log(e.target.checked); // 현재 누른 이벤트 check 값
-    if (e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = true;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
+  
+    if (selectAll) {
+      setCheckColumn([]); // 모두 해제
+    } else {
+      setCheckColumn(data.map(d => d.cdEmp)); // 모든 cdEmp 값을 배열에 넣음
+    }
+    setSelectAll(!selectAll); // selectAll 상태 토글
 
-  }
-  else if (!e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = false;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
-   
-  }
-    //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
+    
+  
     
   }
+
+
 
   
 
@@ -533,7 +534,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
             });
             setEmployeeData(responseData);
             console.log(employeeData);
-
+            setParamGetEmpList1([]);
         } catch (error) {
             console.error("Failed to fetch emp data:", error);
         }
@@ -550,7 +551,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
 
 
-
+//테이블
   const handleInputClick = async(e) => { //왼쪽 Table 클릭시 호출되는 함수.
     // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
     // 2. e.target으로 찾기.
@@ -559,7 +560,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
     const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
 
     if(code.value){
-    
+      
     const param = code.value
     setClickCode(param);
     console.log(param); //잘가져옴
@@ -571,6 +572,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
       });
      
       setParamGetEmpList1(responseData) //code get emplist
+      setValidate(responseData); //가져와서 set하지만 update에서 set하지않음, 초기값 저장.
   
       
     } catch (error) {
@@ -592,15 +594,18 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
   }
   
-  
-
-  }; //왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
+  };
+  //왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
   // 방법 1 : 조건조회할때 미리 다 가져와 뿌리기. 사람이 많아졌을때 고려하면 x
   // 방법 2 : 필요한 VO만 가져온후 왼쪽 Table 누를 경우 api 보내기
 
   useEffect(() => {
     console.log(paramGetEmpList1);
-  }, [paramGetEmpList1]); // 변경될때만 실행. 가져온 VO확인용
+  }, [paramGetEmpList1]); // 변경될때만 실행. 가져온 VO확인용, set이 제대로 반영됐는지 안됐는지 확인할때 쓰는 용
+
+  useEffect(() => {
+    console.log(checkColumn);
+  }, [checkColumn]); // 
 
 
 
@@ -627,17 +632,13 @@ modal 에서 주소눌렀을때 이벤트 핸들러
     () => [
 
       {
-        Header: // delete 작업중
-        
+        Header: 
           ()=>{
-
-            
-
             return(
             <input 
           type='checkbox'
-          onClick={selectAllCheckBox}
-          checked={data.length===checkColumn}
+          onChange={selectAllCheckBox}
+          checked={data.length===checkColumn.length}
           />)
           }
         ,
@@ -645,18 +646,15 @@ modal 에서 주소눌렀을때 이벤트 핸들러
         id: "checkbox",
         width:"10%",
         Cell: ({ cell: { value }, row :{original} }) =>{ 
-          
-         const getCodeArr = (e) =>{
-          console.log(e.target.checked);
-          
-         }
         return(
           <>
         <input 
         type="checkbox"  
-        onChange={getCodeArr}
+        onChange={e => handleCheckboxChange(e, original.cdEmp)}
+        checked={original && original.cdEmp && checkColumn.includes(original.cdEmp)} // 현재 체크박스가 checkColumn 배열에 있는지 확인
+        //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
         className = {"doubleLine"}
-  
+        
           />
         
         </>
@@ -674,10 +672,11 @@ modal 에서 주소눌렀을때 이벤트 핸들러
           const [inputValue, setInputValue] = useState(value);
           const [modalApper,setModalApper] = useState("")
   
-
+          //console.log(original.cdEmp);console.log(value); 둘이 같다.
+          
 
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
+            // setInputValue(e.target.value);
           };
 
           // const handleInputClick = (e) => {
@@ -688,12 +687,14 @@ modal 에서 주소눌렀을때 이벤트 핸들러
           const inputBlur = (e) => {
             // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
             //  ele.style.backgroundColor = '';
+            
           }
 
 
           /*Code input에서 mouse 올라오면 state 변경하는 함수 */
           const mouseOverModalOn = ()=>{
             setModalApper("on");
+            
           };
 
           /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
@@ -744,8 +745,8 @@ modal 에서 주소눌렀을때 이벤트 핸들러
           // }; // input tag Click시 발생할 event
 
           const inputBlur = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-             ele.style.backgroundColor = '';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = '';
           }
       
 
@@ -780,14 +781,14 @@ modal 에서 주소눌렀을때 이벤트 핸들러
           // };
 
           const inputBlur = (e) => {
-            const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-             ele.style.backgroundColor = '';
+            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
+            //  ele.style.backgroundColor = '';
           }
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
           };
-
+          //original?.noResident||""
           return (
             <Input
               value={original?.noResident||""}
@@ -800,8 +801,13 @@ modal 에서 주소눌렀을때 이벤트 핸들러
         },
       },
     ],
-    []
+    [checkColumn,handleCheckboxChange] //checkColum 변경시마다 check해제 되도록
   );
+
+
+
+
+
   const columnsModal = useMemo(
     () => [
       {
@@ -916,7 +922,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
                 columns={columns}
                 data={data}   
                 checkboxWidth={"10%"}
-                insertRow={true}
+                insertRow={true} //table 추가하기 on of
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
                 />
@@ -1034,7 +1040,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
                     maxLength="4"
                     placeholder={"ex) 0900 "}
                     width={180}
-                  
+                    
                     
                     >
                       
@@ -1158,12 +1164,12 @@ modal 에서 주소눌렀을때 이벤트 핸들러
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomInput 
-                    width={180}
+                    className={"wcSelect2"}
                     value={paramGetEmpList1.amtSal || "" }
                     id ={"amtSal"}
                     onChange={inputOnChange}
                     onBlur={inputOnBlur}
-                    maxLength="17"
+                    maxLength="11"
                     placeholder={"ex) 10000000"}
                     type={"number"}
                      /> 
@@ -1190,13 +1196,12 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
                   <td className="wcRightGridTableRightTd2">
                     <CustomInput 
-                    width={180}
                     value={paramGetEmpList1.ddPaySal || "" }
                     id ={"ddPaySal"}
                     onChange={inputOnChange}
                     onBlur={inputOnBlur}
                     maxLength="2"
-                    className={`${payState === "off" ? "wcPayDayOff" : ""} `}
+                    className={`wcSelect2 ${payState === "off" ? "wcPayDayOff" : ""} `}
                     placeholder={"ex) 17"}
                     type={"number"}
                     />
@@ -1277,7 +1282,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
                       value={paramGetEmpList1.ynNationalPension || "0" }
                       id={"ynNationalPension"}
                       onChange={inputOnChange}
-                
+                      
 
                       className="wcSelect3"
                     />
