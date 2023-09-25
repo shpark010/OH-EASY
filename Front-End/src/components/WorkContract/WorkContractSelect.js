@@ -6,9 +6,8 @@ import CustomButton from '../../components/Contents/CustomButton';
 import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
-import DaumPostcode from 'react-daum-postcode';
-import SearchSubmitButton from '../SearchBar/SearchSubmitButton';
 import useApiRequest from '../Services/ApiRequest';
+import CustomSelect from '../../components/Contents/CustomSelect';
 
 
 
@@ -30,6 +29,7 @@ const WorkContractCreate = () => {
   const [belongingDate2,setBelongingDate2]= useState(""); //년월 달력 상태 관리 끝 날짜.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
   const [paramGetEmpList,setParamGetEmpList] = useState([]);// code로 가져온 표준근로계약서 사원
+  //paramgetEmpList1 은 Create Tab
 
 
   
@@ -53,9 +53,42 @@ const WorkContractCreate = () => {
     setBelongingDate(newDate);
   }; // 년월 달력 변경 이벤트시 작동하는 함수. 시작날짜
   
-  const handleBelongingDateChange2 = (newDate) => {
-    newDate = newDate.replace(/-/g, "");
-    setBelongingDate2(newDate);
+  const handleBelongingDateChange2 = async(newDate) => {
+    const formattedDate = newDate.replace(/-/g, "");
+    setBelongingDate2(formattedDate); //set을해도 useState는 비동기적으로 작동해서 요청을 보내기전에 set이 안될 수 있음
+    console.log(belongingDate2);
+    if (belongingDate && belongingDate < formattedDate) {
+      setEmployeeData([]);
+      try {
+       
+        const responseData = await apiRequest({
+          method: "GET",
+          url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${formattedDate}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
+        });
+       
+        const modifiedresponseData = responseData.map(responseData => {
+          const originalDate = responseData.dtCreated;
+          
+          // 문자열에서 뒤에서 두 자리 자르기 
+          // 20231022 -> 202310
+          const year = originalDate.slice(0, 4); // "2023"
+        const month = originalDate.slice(4, 6); // "10"
+  
+      const formattedDate = `${year}년 ${month}월`;
+          responseData.dtCreated = formattedDate;
+          
+          return responseData;
+        });
+  
+  
+        setEmployeeData(modifiedresponseData)
+        console.log(employeeData);
+      
+      } catch (error) {
+        console.error("Failed to fetch emp data:", error);
+      }
+  }
+
   }; // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
   //e 넣으면 오류뜸 why? 함수하나로 분기처리 하고싶은데 안됨.
 
@@ -98,7 +131,7 @@ const WorkContractCreate = () => {
   const data = useMemo(
     () =>
     employeeData.map((emp) => ({
-        dtCreated: emp.dtCreated, //작성년월로 하되 뒤에 2개 자르던지, 일자로 하던지
+        dtCreated: emp.dtCreated,
         cdEmp: emp.cdEmp,
         nmEmp: emp.nmEmp,
         noResident: emp.noResident,
@@ -156,7 +189,22 @@ const WorkContractCreate = () => {
         url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
       });
      
-      setEmployeeData(responseData)
+      const modifiedresponseData = responseData.map(responseData => {
+        const originalDate = responseData.dtCreated;
+        
+        // 문자열에서 뒤에서 두 자리 자르기 
+        // 20231022 -> 202310
+        const year = originalDate.slice(0, 4); // "2023"
+      const month = originalDate.slice(4, 6); // "10"
+
+    const formattedDate = `${year}년 ${month}월`;
+        responseData.dtCreated = formattedDate;
+        
+        return responseData;
+      });
+
+
+      setEmployeeData(modifiedresponseData)
       console.log(employeeData);
     
     } catch (error) {
@@ -164,14 +212,41 @@ const WorkContractCreate = () => {
     }
 
     
+
+
   }//조건조회
 
 
 
-  const searchOrderOption = (e) =>{
-    setSearchOrder(e.target.value)
+  const searchOrderOption = async (e) => {
+    const orderValue = e.target.value;
+    setSearchOrder(orderValue);
     
-  } // 정렬 option button 변경시 호출하는 이벤트
+    // 두 달력의 상태값이 모두 있을 경우 API 요청을 보냅니다.
+    if (belongingDate && belongingDate2) {
+        try {
+            const responseData = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${orderValue}`,
+            });
+
+            const modifiedresponseData = responseData.map(responseData => {
+                const originalDate = responseData.dtCreated;
+                const year = originalDate.slice(0, 4);
+                const month = originalDate.slice(4, 6);
+                const formattedDate = `${year}년 ${month}월`;
+                responseData.dtCreated = formattedDate;
+                
+                return responseData;
+            });
+
+            setEmployeeData(modifiedresponseData);
+        } catch (error) {
+            console.error("Failed to fetch emp data:", error);
+        }
+    }
+};
+
   useEffect(() => {
     console.log(employeeData);
   }, [employeeData]); // 변경될때만 실행.
@@ -192,7 +267,9 @@ const WorkContractCreate = () => {
         method: "GET",
         url: `/api2/wc/getCodeParamEmpList?code=${param}`, 
       });
-     
+      
+
+      
       setParamGetEmpList(responseData)
       
       
@@ -212,7 +289,7 @@ const WorkContractCreate = () => {
  
   const columns = useMemo(() => [
     {
-      Header: "작성일자",
+      Header: "작성년월",
       accessor: "dtCreated",
       id: "dtCreated",
       width: "20%",
@@ -253,7 +330,7 @@ const WorkContractCreate = () => {
         return (
           <>
             <Input
-              value={inputValue}
+              value={original?.dtCreated||""}
               onClick={handleInputClick}
               onBlur={inputBlur}
               onChange={handleInputChange}
@@ -297,7 +374,7 @@ const WorkContractCreate = () => {
   
         return (
           <Input
-            value={inputValue}
+            value={original?.cdEmp||""}
             onClick={handleInputClick}
             onBlur={inputBlur}
             onChange={handleInputChange}
@@ -331,7 +408,7 @@ const WorkContractCreate = () => {
   
         return (
           <Input
-            value={inputValue}
+            value={original?.nmEmp||""}
             onClick={handleInputClick}
             onBlur={inputBlur}
             onChange={handleInputChange}
@@ -362,7 +439,7 @@ const WorkContractCreate = () => {
   
         return (
           <Input
-            value={inputValue}
+            value={original?.noResident||""}
             onChange={handleInputChange}
             onClick={handleInputClick}
             onBlur={inputBlur}
@@ -424,7 +501,7 @@ const WorkContractCreate = () => {
              
             </div>
             <div className="btnWrapper">
-            <SearchSubmitButton onClick={conditionSearch} text="조회" />
+            {/* <SearchSubmitButton onClick={conditionSearch} text="조회" /> */}
             </div>
           </div>
         </div>
@@ -434,19 +511,22 @@ const WorkContractCreate = () => {
         <section className="section">
           <div className="wcGridContainer">
             <div className="wcGridCellItem1">
-            
+            <div className="namePickerBox">
               <Table
                 columns={columns}
                 data={data}   
-                showInsertRow={false}
                 checkboxWidth={"10%"}
-              />
-
+         
+                />
+              </div>
               <table className="wcBottomTable">
+              <tbody>
                 <tr>
-                  <th>조회된 사원</th>
-                  <th>{data.length}명</th>
+                  <td>조회된 사원</td>
+                  <td>{data.length}명</td>
                 </tr>
+              </tbody>
+          
               </table>
             </div>
 
@@ -458,13 +538,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar width="181" id="startDate" 
                       readOnly
-                      value={paramGetEmpList.dtStartCont}
+                      value={paramGetEmpList.dtStartCont||""}
                     /> 
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomCalendar width="181" id="endDate"
                       readOnly
-                      value={paramGetEmpList.dtEndCont}
+                      value={paramGetEmpList.dtEndCont||""}
                     />
                   </td>
                 </tr>
@@ -472,7 +552,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">근무장소  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomInput 
-                    value={paramGetEmpList.noWorkPost}
+                    value={paramGetEmpList.noWorkPost||""}
 
                     readOnly />
                   </td>
@@ -480,7 +560,7 @@ const WorkContractCreate = () => {
                     <CustomInput 
                     readOnly 
                     width={415} 
-                    value={paramGetEmpList.addrWork}
+                    value={paramGetEmpList.addrWork||""}
                     />
                     <CustomButton
                       className="wcRightCellSearchButton"
@@ -501,7 +581,7 @@ const WorkContractCreate = () => {
                     <CustomInput 
                     width={605} 
                     readOnly
-                    value={paramGetEmpList.addrWorkDtl}
+                    value={paramGetEmpList.addrWorkDtl||""}
                     />
                   </td>
                 </tr>
@@ -511,7 +591,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1" colSpan="2">
                     <CustomInput width="605" 
                     readOnly
-                    value={paramGetEmpList.cntnJob}
+                    value={paramGetEmpList.cntnJob||""}
                     />
                   </td>
                 </tr>
@@ -520,13 +600,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1">
                     <CustomInput 
                     readOnly
-                    value={paramGetEmpList.tmStartRegularWork}
+                    value={paramGetEmpList.tmStartRegularWork||""}
                     ></CustomInput>
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomInput 
                     readOnly
-                    value={paramGetEmpList.tmEndRegularWork}
+                    value={paramGetEmpList.tmEndRegularWork||""}
                     ></CustomInput>
                   </td>
                 </tr>
@@ -535,14 +615,14 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1">
                     <CustomInput 
                     readOnly
-                    value={paramGetEmpList.tmStartBreak}
+                    value={paramGetEmpList.tmStartBreak||""}
 
                     ></CustomInput>
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomInput 
                     readOnly
-                    value={paramGetEmpList.tmEndBreak}
+                    value={paramGetEmpList.tmEndBreak||""}
 
                      ></CustomInput>
                   </td>
@@ -550,7 +630,7 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">근무일  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: '1주에 1일' },
@@ -561,8 +641,9 @@ const WorkContractCreate = () => {
                         { value: '6', label: '1주에 6일' },
                         { value: '7', label: '1주에 7일' },
                       ]}
+                     className={"wcSelect1"}
                       
-                      value={paramGetEmpList.ddWorking}
+                      value={paramGetEmpList.ddWorking|| "" }
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -570,7 +651,7 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">주휴일 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: '매주 월요일' },
@@ -581,7 +662,10 @@ const WorkContractCreate = () => {
                         { value: '6', label: '매주 토요일' },
                         { value: '7', label: '매주 일요일' },
                       ]}
-                      value={paramGetEmpList.dotw}
+                      value={paramGetEmpList.dotw|| "" }
+                     className={"wcSelect1"}
+                  
+
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -589,51 +673,51 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd">임금유형 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 월급 ' },
                         { value: '2', label: ' 일급 ' },
                         { value: '3', label: ' 시급 ' },
                       ]}
-                      value={paramGetEmpList.tpSal}
-                      className="searchBarBox2"
-                    />
+                      value={paramGetEmpList.tpSal|| "" }
+                      className={"wcSelect2"}                    />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={100} readOnly value={paramGetEmpList.amtSal} /> 
+                    <CustomInput width={100} readOnly value={paramGetEmpList.amtSal|| "" } /> 
                     <b>원</b>
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">임금지급일 </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 매월 ' },
                         { value: '2', label: ' 매주 ' },
                         { value: '3', label: ' 매일 ' },
                       ]}
-                      value={paramGetEmpList.tpPayDtSal}
-                      className="searchBarBox2"
+                      value={paramGetEmpList.tpPayDtSal|| "" }
+                      className={"wcSelect2"}
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2">
-                    <CustomInput width={40} readOnly value={paramGetEmpList.ddPaySal} />
+                    <CustomInput width={40} readOnly value={paramGetEmpList.ddPaySal|| "" } />
                     <b>일</b>
                   </td>
                 </tr>
                 <tr>
                   <td className="wcRightGridTableLeftTd">지급방법  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 예금통장에 입금 ' },
                         { value: '2', label: ' 직접지급 ' },
                       ]}
-                      value={paramGetEmpList.methodPay}
+                      value={paramGetEmpList.methodPay|| "" }
+                      
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
@@ -641,14 +725,14 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 고용보험  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynEmpInsurance}
-                      className="searchBarBox3"
+                      value={paramGetEmpList.ynEmpInsurance|| "" }
+                      className="wcSelect3"
 
                     />
                   </td>
@@ -657,14 +741,14 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 산재보험  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynIndustrialAccidentInsurance}
-                      className="searchBarBox3"
+                      value={paramGetEmpList.ynIndustrialAccidentInsurance|| "" }
+                      className="wcSelect3"
                     />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
@@ -672,14 +756,14 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 국민연금  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynNationalPension}
-                      className="searchBarBox3"
+                      value={paramGetEmpList.ynNationalPension|| "" }
+                      className="wcSelect3"
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -687,14 +771,14 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 건강보험  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynHealthInsurance}
-                      className="searchBarBox3"
+                      value={paramGetEmpList.ynHealthInsurance|| "" }
+                      className="wcSelect3"
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -702,14 +786,14 @@ const WorkContractCreate = () => {
                 <tr>
                   <td className="wcRightGridTableLeftTd"> 서명여부  </td>
                   <td className="wcRightGridTableRightTd1">
-                    <SearchBarBox
+                    <CustomSelect
                     readOnly
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.stSign}
-                      className="searchBarBox3"
+                      value={paramGetEmpList.stSign|| "2" }
+                      className="wcSelect3"
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -718,7 +802,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">작성일자 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar 
-                    value={paramGetEmpList.dtCreated}
+                    value={paramGetEmpList.dtCreated||""}
                      readOnly 
                      className={'wcCreatedDateCalander'} 
                      width="170" 

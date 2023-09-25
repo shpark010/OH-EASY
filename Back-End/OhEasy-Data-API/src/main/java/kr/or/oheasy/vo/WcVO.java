@@ -19,9 +19,9 @@ public class WcVO {
     private String ddWorking; //근무일
     private String dotw; //주휴일
     private String tpSal; //임금유형
-    private int amtSal; // 임금금액
+    private String amtSal; // 임금금액
     private String tpPayDtSal; //임금지급일 유형, 매월 매주 매일
-    private String ddPaySal; //임금지급일
+    private int ddPaySal; //임금지급일
     private String methodPay; //임금지급 방법
     private String ynEmpInsurance; // 고용보험
     private String ynIndustrialAccidentInsurance; // 산재보험

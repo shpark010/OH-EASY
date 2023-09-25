@@ -1,5 +1,6 @@
 package kr.or.oheasy.wc.controller;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -7,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import kr.or.oheasy.vo.WcGetEmpVO;
 import kr.or.oheasy.vo.WcVO;
 import kr.or.oheasy.wc.service.WcService;
@@ -57,7 +56,11 @@ public class WcController {
 			return null;
 		}
 	}
+		
 		System.out.println(result);
+		
+		
+		
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	  
 	}
@@ -69,6 +72,18 @@ public class WcController {
 		System.out.println(code);
 		WcVO result = wcService.getCodeParam(code);
 		System.out.println(result);
+		
+		// 금액 , 찍어주기
+		
+		String amount = result.getAmtSal();
+		if(amount !=null) {
+		System.out.println(amount);
+		
+		 int number = Integer.parseInt(amount);
+	      DecimalFormat decimalFormat = new DecimalFormat("#,###");
+	      String formattedNumber = decimalFormat.format(number);	      
+	      result.setAmtSal(formattedNumber);
+		}
 		
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	} //조회 Tab에서 왼쪽 Grid Table 눌렀을 경우.code로 wctable에서 가져오는 사원 data
@@ -97,12 +112,11 @@ public class WcController {
 	public int updateEmpList(@RequestParam String cdEmp,@RequestParam String colum,@RequestParam String data ) {
 		System.out.println("updataeEmpList 진입");
 		System.out.println(cdEmp + colum+ data);
-		
+		String modifyData = data.replace(",", "");
 //		if (colum.equals("dtCreated")) { //맨 마지막 달력이 업데이트 될 경우만 insert해라.
 //		    wcService.insertEmpData(cdEmp);
 //		}
-		
-	    int result = wcService.updateEmpList(cdEmp,colum,data);
+	    int result = wcService.updateEmpList(cdEmp,colum,modifyData);
 	    return result;
 	} // 작성 Tab에서 작성완료 눌렀을 경우
 	

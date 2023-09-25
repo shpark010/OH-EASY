@@ -27,11 +27,12 @@ public class WcService {
 			break;
 		}
 		System.out.println(orderValue);
-	
+		System.out.println(param1+param2);
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
 		return wcdao.getOptionEmpList(param1,param2,orderValue);
 		
 	}
+	
 	
 public List<WcGetEmpVO> getOptionEmpList2(String creDate,String creDate2, String orderValue) {
 		

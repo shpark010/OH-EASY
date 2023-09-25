@@ -33,7 +33,7 @@ const WorkContract = () => {
     switch(tabState){
       case "0" :
 
-        return (<WorkContractCreate />);
+        return (<WorkContractCreate deleteEvent={deleteEmp} />);
 
         // 계약서 작성 Tab Click
       case "1" :
@@ -47,7 +47,9 @@ const WorkContract = () => {
   };
 
 
-  
+  const deleteEmp = () =>{
+    console.log("안녕");
+  }
 
 
 
@@ -74,6 +76,8 @@ const WorkContract = () => {
                 btnName="delete "
                 imageSrc={Delete}
                 altText="삭제"
+                onClick={deleteEmp}
+                
               />
               <PageHeaderIconButton
                 btnName="calc wcMouseOver"
