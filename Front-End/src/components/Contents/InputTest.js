@@ -7,7 +7,8 @@ const InputTag = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  text-align: center;
+  text-align: ${(props) => (props.align === "right" ? "right" : "center")};
+  padding-right: ${(props) => (props.align === "right" ? "10px" : "0")};
   font-size: 15px;
   font-weight: 600;
   font-family: "NanumSquare", sans-serif;
@@ -31,7 +32,14 @@ const InputTag = styled.input`
   }
 `;
 
-function Input({ isDoubleClick, onChange, type, readOnly, ...otherProps }) {
+function Input({
+  isDoubleClick,
+  onChange,
+  type,
+  readOnly,
+  align,
+  ...otherProps
+}) {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       console.log("엔터키 확인~");
@@ -56,6 +64,12 @@ function Input({ isDoubleClick, onChange, type, readOnly, ...otherProps }) {
   const handleClick = (e) => {
     if (otherProps.onClick) {
       otherProps.onClick(e);
+    }
+  };
+
+  const handleDoubleClick = (e) => {
+    if (otherProps.onDoubleClick) {
+      otherProps.onDoubleClick(e);
     }
   };
 
@@ -95,7 +109,9 @@ function Input({ isDoubleClick, onChange, type, readOnly, ...otherProps }) {
 
   return (
     <InputTag
+      align={align}
       {...otherProps}
+      inputType={type}
       spellCheck="false"
       readOnly={readOnly}
       onClick={handleClick}
@@ -103,6 +119,7 @@ function Input({ isDoubleClick, onChange, type, readOnly, ...otherProps }) {
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       onChange={handleInputChange}
+      onDoubleClick={handleDoubleClick}
     />
   );
 }
