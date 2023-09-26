@@ -329,6 +329,10 @@ body {
   background-color: var(--color-primary-blue);
   color: #fff;
 }
+.selectBox.blue:disabled {
+  background-color: var(--color-primary-gray);
+  cursor: not-allowed;
+}
 .contents .selectBox {
   border: 1px solid var(--color-primary-gray);
 }

@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import Table from "../../TablesLib/Table";
 import CustomCalender from "../../Contents/CustomCalendar";
 import useApiRequest from "../../Services/ApiRequest";
-import Input from "../../Contents/Input";
+//import Input from "../../Contents/Input";
+import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
 
 const HrEdu = ({ cdEmp }) => {

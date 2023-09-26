@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { setCookie, getCookie, removeCookie } from "../../../containers/Cookie";
 import axios from "axios";
@@ -87,41 +87,33 @@ const logout = async (event) => {
   }
 };
 
-class Profile extends Component {
-  state = {
-    isProfileBoxVisible: false,
+const Profile = (props) => {
+  const [isProfileBoxVisible, setIsProfileBoxVisible] = useState(false);
+
+  const toggleProfileBox = () => {
+    setIsProfileBoxVisible((prev) => !prev);
   };
 
-  toggleProfileBox = () => {
-    this.setState((prevState) => ({
-      isProfileBoxVisible: !prevState.isProfileBoxVisible,
-    }));
-  };
-
-  render() {
-    const { isProfileBoxVisible } = this.state;
-
-    return (
-      <ProfileWrapper onClick={this.toggleProfileBox}>
-        <ProfileName>이재훈 사원</ProfileName>
-        <ProfileImageWrapper>
-          <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
-        </ProfileImageWrapper>
-        {isProfileBoxVisible && (
-          <ProfileBox>
-            <ProfileBoxItem href="">
-              <IconWrapper className="ico-person"></IconWrapper>
-              <span>마이페이지</span>
-            </ProfileBoxItem>
-            <ProfileBoxItem onClick={logout}>
-              <IconWrapper className="ico-logout"></IconWrapper>
-              <span>로그아웃</span>
-            </ProfileBoxItem>
-          </ProfileBox>
-        )}
-      </ProfileWrapper>
-    );
-  }
-}
+  return (
+    <ProfileWrapper onClick={toggleProfileBox}>
+      <ProfileName>{props.name} 님</ProfileName>
+      <ProfileImageWrapper>
+        <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
+      </ProfileImageWrapper>
+      {isProfileBoxVisible && (
+        <ProfileBox>
+          <ProfileBoxItem href="">
+            <IconWrapper className="ico-person"></IconWrapper>
+            <span>마이페이지</span>
+          </ProfileBoxItem>
+          <ProfileBoxItem onClick={logout}>
+            <IconWrapper className="ico-logout"></IconWrapper>
+            <span>로그아웃</span>
+          </ProfileBoxItem>
+        </ProfileBox>
+      )}
+    </ProfileWrapper>
+  );
+};
 
 export default Profile;

@@ -40,4 +40,6 @@ public class HrEmpMstVO {
     private String nmPosition;          // 직급명
     private String sqPosition;          // 직급순서
 
+    // 년도
+    private String year;		// 년도
 }

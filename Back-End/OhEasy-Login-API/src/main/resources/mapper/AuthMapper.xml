@@ -7,7 +7,9 @@
 	select count(*) from users where id=#{userId} and password=#{userPwd}
 </select>
 
-
+<select id="userData" resultType="kr.or.oheasy.vo.LoginVO">
+	select * from users where id=#{userId}
+</select>
 
 
 

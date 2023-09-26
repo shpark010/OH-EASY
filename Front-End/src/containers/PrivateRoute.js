@@ -4,6 +4,7 @@ import { setCookie, getCookie, removeCookie } from "../containers/Cookie";
 function PrivateRoute() {
   //const token = localStorage.getItem("token");
   const token = getCookie("loginInfo");
+
   // 토큰이 있으면 요청한 페이지로 이동
   if (token) {
     return <Outlet />;
