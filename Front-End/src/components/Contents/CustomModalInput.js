@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import styled from "styled-components";
 import { TbCalendarSearch } from "react-icons/tb";
 import CustomModal from "./CustomModal";
@@ -7,7 +6,7 @@ const InputWrapper = styled.div`
   position: relative;
   width: 100%;
   
-  input[readonly] + div {
+  input[disabled] + div {
     cursor: not-allowed;
   }
 `;
@@ -27,7 +26,7 @@ const Input = styled.input`
   }
 
     ${(props) =>
-    props.readOnly &&
+    props.disabled &&
     `
     background-color: var(--color-opacity-gray);
     cursor: not-allowed;
@@ -46,19 +45,16 @@ function CustomModalInput({
   overlayStyle,
   contentStyle,
   placeholder,
+  onClick,
+  isOpen,
+  onRequestClose,
+  disabled,
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
 
   const handleInputChange = (event) => {
-    onChange(event.target.value);
+    if(!readOnly) {
+      onChange(event.target.value);
+    }
   };
 
   return (
@@ -67,21 +63,32 @@ function CustomModalInput({
         id={id}
         className={className}
         width={`${width}px`}
-        onClick={() => !readOnly && openModal()}
+        onClick={() => {
+          if (!disabled && onClick) {
+            onClick();
+          }
+        }}
         readOnly={readOnly}
         style={style}
         value={value}
         onChange={handleInputChange}
         placeholder={placeholder}
+        disabled={disabled}
       />
       
-      <IconWrapper onClick={() => !readOnly && setIsModalOpen(!isModalOpen)}>
+      <IconWrapper 
+        onClick={() => {
+          if (!disabled && onClick) {
+            onClick();
+          }
+        }}
+      >
         <TbCalendarSearch size={18} />
       </IconWrapper>
       
       <CustomModal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
+        isOpen={isOpen}
+        onRequestClose={onRequestClose}
         overlayStyle={overlayStyle}
         contentStyle={contentStyle}
         >
