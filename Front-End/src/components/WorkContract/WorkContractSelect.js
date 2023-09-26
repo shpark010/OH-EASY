@@ -473,6 +473,8 @@ const WorkContractCreate = () => {
                     value={belongingDate}
                     onChange={handleBelongingDateChange}
                     id="creDateStart"
+                    readOnly
+                    
                   />
               <b>~</b>
               <CustomCalendar
@@ -481,6 +483,7 @@ const WorkContractCreate = () => {
                     value={belongingDate2}
                     onChange={handleBelongingDateChange2}
                     id="creDateEnd"
+                    readOnly
                   />
                 
 
@@ -537,13 +540,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar width="181" id="startDate" 
-                      readOnly
+                      disabled
                       value={paramGetEmpList.dtStartCont||""}
                     /> 
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomCalendar width="181" id="endDate"
-                      readOnly
+                      disabled
                       value={paramGetEmpList.dtEndCont||""}
                     />
                   </td>
@@ -631,7 +634,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">근무일  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: '1주에 1일' },
                         { value: '2', label: '1주에 2일' },
@@ -652,7 +655,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">주휴일 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: '매주 월요일' },
                         { value: '2', label: '매주 화요일' },
@@ -674,7 +677,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">임금유형 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 월급 ' },
                         { value: '2', label: ' 일급 ' },
@@ -692,7 +695,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">임금지급일 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 매월 ' },
                         { value: '2', label: ' 매주 ' },
@@ -711,7 +714,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">지급방법  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 예금통장에 입금 ' },
                         { value: '2', label: ' 직접지급 ' },
@@ -726,7 +729,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 고용보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
@@ -742,7 +745,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 산재보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
@@ -757,7 +760,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 국민연금  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
@@ -772,7 +775,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 건강보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
@@ -787,7 +790,7 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 서명여부  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
@@ -806,7 +809,9 @@ const WorkContractCreate = () => {
                      readOnly 
                      className={'wcCreatedDateCalander'} 
                      width="170" 
-                     id="createDate" />
+                     id="createDate" 
+                     disabled
+                     />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
                 </tr>
