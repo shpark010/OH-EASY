@@ -33,6 +33,7 @@ const InputTag = styled.input`
 `;
 
 function Input({
+  inputType,
   onEnterPress,
   onTabPress,
   isDoubleClick,
@@ -131,8 +132,8 @@ function Input({
 
   return (
     <InputTag
+      inputType={inputType}
       {...otherProps}
-      inputType={type}
       className={className}
       spellCheck="false"
       readOnly={readOnlyState}

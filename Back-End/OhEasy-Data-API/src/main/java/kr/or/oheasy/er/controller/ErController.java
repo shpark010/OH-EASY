@@ -118,4 +118,26 @@ public class ErController {
         }
     }
 
+    // 부서전체조회
+    @GetMapping("/getDeptList")
+    public ResponseEntity<?> getDeptList() {
+        List<HrEmpMstVO> result = erService.getDeptList();
+
+        System.out.println("getDeptList 메서드진입");
+        System.out.println(result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // 은행전체조회
+    @GetMapping("/getBankList")
+    public ResponseEntity<?> getBankList() {
+        List<HrEmpMstVO> result = erService.getBankList();
+
+        System.out.println("getBankList 메서드진입");
+        System.out.println(result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }

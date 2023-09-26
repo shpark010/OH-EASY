@@ -20,4 +20,8 @@ public interface ErDao {
     public HrEmpMstVO getCdEmp(String cdEmp); // 사원조회
 
     public int deleteEmp(String cdEmp); // 사원삭제
+
+    public List<HrEmpMstVO> getDeptList(); // 부서전체조회
+
+    public List<HrEmpMstVO> getBankList(); // 은행전체조회
 }

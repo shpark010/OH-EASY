@@ -48,4 +48,16 @@ public class ErService {
         return dao.deleteEmp(cdEmp);
     }
 
+    // 부서전체조회
+    public List<HrEmpMstVO> getDeptList() {
+        ErDao dao = sqlSession.getMapper(ErDao.class);
+        return dao.getDeptList();
+    }
+
+    // 은행전체조회
+    public List<HrEmpMstVO> getBankList() {
+        ErDao dao = sqlSession.getMapper(ErDao.class);
+        return dao.getBankList();
+    }
+
 }

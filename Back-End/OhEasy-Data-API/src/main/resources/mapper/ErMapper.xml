@@ -22,12 +22,8 @@
 
     <!--사원전체조회-->
     <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-        select * from hr_emp_mst
+        SELECT * FROM hr_emp_mst
     </select>
-
-<!--    <select id="getCdEmp" resultType="kr.or.oheasy.vo.HrEmpMstVO">-->
-<!--        SELECT * FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}-->
-<!--    </select>-->
 
     <!--사원조회-->
     <select id="getCdEmp" resultType="kr.or.oheasy.vo.HrEmpMstVO">
@@ -49,10 +45,17 @@
 
     <!--사원삭제-->
     <delete id="deleteEmp">
-        delete from hr_emp_mst where CD_EMP = #{cdEmp}
+        DELETE FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
     </delete>
 
+    <!--부서전체조회-->
+    <select id="getDeptList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+        SELECT * FROM department_dtl
+    </select>
 
-
+    <!--은행전체조회-->
+    <select id="getBankList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+        SELECT * FROM bank_data_sdtl
+    </select>
 
 </mapper>
