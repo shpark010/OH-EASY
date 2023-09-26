@@ -56,19 +56,13 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   const [modalIsOpen2, setModalIsOpen2] = useState(false); // 추가 모달 on off 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [payState,setPayState] = useState("on"); // 임금지급일에 따른 style 상태 관리, 초기값 on
-  // const [addrWorkDtl,setaddrWorkDtl] = useState(""); // validation을 위한 상세주소 값 addrWorkDtl
-  // const [valicntnJob,setValicntnJob] = useState(""); // validation을 위한 업무내용 값 cntnJob
-  // const [valitmStartRegularWork,setValitmStartRegularWork] = useState(""); // validation을 위한 근로시작시간 값 tmStartRegularWork
-  // const [valitmEndRegularWork,setValitmEndRegularWork] = useState(""); // validation을 위한 근로종료시간 값 tmEndRegularWork
-  // const [valitmStartBreak,setValitmStartBreak] = useState(""); // validation을 위한 휴게시간 시작 tmStartBreak
-  // const [valitmEndBreak,setValitmEndBreak] = useState(""); // validation을 위한 휴게시간 종료 tmEndBreak
-  const [showAlert, setShowAlert] = React.useState(false); // sweetalret1
-  const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret2
-  const [showAlert3, setShowAlert3] = React.useState(false); // sweetalret2
-  const [showAlert4, setShowAlert4] = React.useState(false); // sweetalret2
-  const [showAlert5, setShowAlert5] = React.useState(false); // sweetalret2
-  const [showAlert6, setShowAlert6] = React.useState(false); // sweetalret2
-  const [showAlert7, setShowAlert7] = React.useState(false); // sweetalret2
+  const [showAlert, setShowAlert] = React.useState(false); // sweetalret
+  const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret
+  const [showAlert3, setShowAlert3] = React.useState(false); // sweetalret
+  const [showAlert4, setShowAlert4] = React.useState(false); // sweetalret
+  const [showAlert5, setShowAlert5] = React.useState(false); // sweetalret
+  const [showAlert6, setShowAlert6] = React.useState(false); // sweetalret
+  const [showAlert7, setShowAlert7] = React.useState(false); // sweetalret
 
 
 
@@ -81,11 +75,13 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     tmEndBreak: '',
   }) //get, update후 최초값과 비교하기 위해 사용할 state
 
-  const prevParamGetEmpList1Ref = useRef(paramGetEmpList1);
+  
 
-  useEffect(() => {
-    prevParamGetEmpList1Ref.current = paramGetEmpList1;
-  });
+  // const prevParamGetEmpList1Ref = useRef(paramGetEmpList1);
+
+  // useEffect(() => {
+  //   prevParamGetEmpList1Ref.current = paramGetEmpList1;
+  // });
 
   
   const contractPeriodCalendar1 = async(newDate) => {
@@ -1025,7 +1021,7 @@ const firstRowRef = useRef(null);
                     id={"dtStartCont"}
                     value={paramGetEmpList1.dtStartCont}
                     onChange={contractPeriodCalendar1}
-                    
+                    readOnly
                     
                      /> 
                   </td>
@@ -1035,7 +1031,7 @@ const firstRowRef = useRef(null);
                     id={"dtEndCont"}
                     value={paramGetEmpList1.dtEndCont}
                     onChange={contractPeriodCalendar2}
-
+                    readOnly
                     />
                   </td>
                 </tr>
@@ -1408,14 +1404,14 @@ const firstRowRef = useRef(null);
                   <td className="wcRightGridTableLeftTd">작성일자 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar
-                    className={'wcCreatedDateCalander'} 
+                    
                     width="180" 
                     id="createDate"
                     value={paramGetEmpList1.dtCreated || "" }
-
+                    readOnly
                     name={"dtCreated"}
                     onChange={contractPeriodCalendar3}
-                     
+                    position="up"
 
                     />
                   </td>

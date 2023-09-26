@@ -29,8 +29,7 @@ const WorkContract = () => {
   const tabClick = (e,tabState) =>{
     
     setTab(e.target.value)
-    
-  
+    setEmployeeData([]);  //tab전환시 table 초기화
   };
 
   const tabComponent = () =>{
