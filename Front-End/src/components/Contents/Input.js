@@ -7,7 +7,8 @@ const InputTag = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  text-align: center;
+  text-align: ${(props) => (props.inputType === "price" ? "right" : "center")};
+  padding-right: ${(props) => (props.inputType === "price" ? "10px" : "0")};
   font-size: 15px;
   font-weight: 600;
   font-family: "NanumSquare", sans-serif;
@@ -37,6 +38,7 @@ function Input({
   isDoubleClick,
   onChange,
   type,
+  className,
   ...otherProps
 }) {
   const [readOnlyState, setReadOnlyState] = useState(true);
@@ -126,6 +128,8 @@ function Input({
   return (
     <InputTag
       {...otherProps}
+      inputType={type}
+      className={className}
       spellCheck="false"
       readOnly={readOnlyState}
       onClick={handleClick}
