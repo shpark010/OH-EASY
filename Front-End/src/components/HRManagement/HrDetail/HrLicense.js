@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import Table from "../../TablesLib/Table";
 import useApiRequest from "../../Services/ApiRequest";
-import Input from "../../Contents/Input";
+//import Input from "../../Contents/Input";
+import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
 import PageHeaderName from "../../PageHeader/PageHeaderName";
 import CustomButton from "../../Contents/CustomButton";
@@ -13,61 +14,11 @@ const HrLicense = ({ cdEmp }) => {
   const [showInsertRow, setShowInsertRow] = useState(false);
 
   const [modalLicenseList, setModalLicenseList] = useState([]); // 모달창 자격증 정보
-  const [modalIsOpen, setModalIsOpen] = useState(false); // 모달창 관리
 
   const [clickSeqLicense, setClickSeqLicense] = useState();
-  const [clickModalNmLicense, setClickModalNmLicense] = useState(); // 현재 클릭한 자격증이름
 
   console.log("현재 클릭중인 자격증 고유번호 : ");
   console.log(clickSeqLicense);
-
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  // 모달창 닫으면서 api 요청
-  const okModalBtn = async () => {
-    closeModal();
-    if (clickSeqLicense === undefined) {
-      console.log("인서트 요청~~~~~");
-      handleSendEmpCodeInsertLicenseData(
-        cdEmp,
-        "nmLicense",
-        clickModalNmLicense,
-      );
-    } else {
-      console.log("업데이트 요청~~~~~");
-      handleSendEmpCodeUpdateLicenseData(
-        clickSeqLicense,
-        "nmLicense",
-        clickModalNmLicense,
-      );
-    }
-    // 이 부분에서 API 호출이 끝나고 나면
-    if (clickSeqLicense !== undefined) {
-      // update 경우만 해당됩니다.
-      const updatedLicense = {
-        seqLicense: clickSeqLicense,
-        nmLicense: clickModalNmLicense,
-        // 여기에 필요한 다른 정보들도 추가해야 합니다.
-      };
-
-      setLicenseList((prevLicenseList) => {
-        const newLicenseList = [...prevLicenseList]; // 배열 복사
-        const index = newLicenseList.findIndex(
-          (license) => license.seqLicense === updatedLicense.seqLicense,
-        );
-        if (index !== -1) {
-          newLicenseList[index] = updatedLicense; // 해당 위치에 업데이트된 데이터 할당
-        }
-        return newLicenseList;
-      });
-    }
-  };
 
   const isFirstRender = useRef(true);
 
@@ -276,22 +227,37 @@ const HrLicense = ({ cdEmp }) => {
         id: "nmLicense",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
-
-          const handleModalOnclick = (e) => {
-            if (!original) {
-              setClickSeqLicense();
-            } else {
-              setClickSeqLicense(original.seqLicense);
-            }
-            handleGetLicenseList();
-            openModal(e);
+          const handleInputChange = (e) => {
+            setInputValue(e.target.value);
           };
 
+          const handleInputOnBlur = (e) => {
+            if (original == null) {
+              // insert
+              handleSendEmpCodeInsertLicenseData(
+                cdEmp,
+                "nmLicense",
+                e.target.value,
+              );
+              handleSendEmpCodeGetLicenseData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
+              handleSendEmpCodeUpdateLicenseData(
+                original.seqLicense,
+                "nmLicense",
+                e.target.value,
+              );
+              setInputValue(e.target.value);
+            }
+          };
           return (
             <Input
               value={inputValue || ""}
+              onChange={handleInputChange}
+              isDoubleClick={true}
+              onBlur={handleInputOnBlur}
               className={"doubleLine"}
-              onClick={(e) => handleModalOnclick(e)}
             />
           );
         },
@@ -350,6 +316,7 @@ const HrLicense = ({ cdEmp }) => {
           };
           return (
             <CustomCalender
+              // readOnly={true}
               className="hrInfoBaseInput"
               value={value || ""}
               name="dtCertified"
@@ -448,98 +415,14 @@ const HrLicense = ({ cdEmp }) => {
     [licenseList],
   );
 
-  const dataModalLicenscList = React.useMemo(
-    () =>
-      modalLicenseList.map((license) => ({
-        cdLicense: license.cdLicense, // 자격증 코드번호
-        nmLicense: license.nmLicense, // 자격증 명
-      })),
-    [modalLicenseList],
-  );
-  const columnsModal = React.useMemo(
-    () => [
-      {
-        Header: "자격증 코드번호",
-        accessor: "cdLicense",
-        id: "cdLicense",
-        width: "50%",
-        Cell: ({ cell: { value }, row: { original } }) => {
-          const handleInputClick = (e) => {
-            console.log("code클릭이벤발생");
-            console.log(original);
-            setClickModalNmLicense(original.nmLicense);
-          };
-          return (
-            <Input
-              value={original.cdLicense || ""}
-              className={"doubleLine"}
-              onClick={handleInputClick}
-            />
-          );
-        },
-      },
-      {
-        Header: "자격증(외국어명)",
-        accessor: "nmLicense",
-        id: "nmLicense",
-        Cell: ({ cell: { value }, row: { original } }) => {
-          const handleInputClick = (e) => {
-            console.log("code클릭이벤발생");
-            console.log(original);
-            setClickModalNmLicense(original.nmLicense);
-          };
-          return (
-            <Input
-              value={original.nmLicense || ""}
-              className={"doubleLine"}
-              onClick={handleInputClick}
-            />
-          );
-        },
-      },
-    ],
-    [modalLicenseList],
-  );
-
   return (
-    <>
-      <Table
-        data={data}
-        columns={columns}
-        insertRow={true}
-        showInsertRow={showInsertRow}
-        setShowInsertRow={setShowInsertRow}
-        //scrollHeight={"700"}
-      />
-      <CustomModal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        contentStyle={{
-          backgroundColor: "white",
-          border: "1px solid gray",
-        }}
-      >
-        <PageHeaderName text="추가목록" />
-        <div className="test2">
-          <Table columns={columnsModal} data={dataModalLicenscList} />
-        </div>
-        <div className="test">
-          <CustomButton
-            backgroundColor={"var(--color-primary-blue)"}
-            color={"var(--color-primary-white)"}
-            onClick={okModalBtn}
-            text={"확인"}
-          />
-          <CustomButton
-            backgroundColor={"var(--color-primary-gray)"}
-            color={"var(--color-primary-white)"}
-            onClick={closeModal}
-            text={"취소"}
-          />
-        </div>
-      </CustomModal>
-    </>
+    <Table
+      data={data}
+      columns={columns}
+      insertRow={true}
+      showInsertRow={showInsertRow}
+      setShowInsertRow={setShowInsertRow}
+    />
   );
 };
 

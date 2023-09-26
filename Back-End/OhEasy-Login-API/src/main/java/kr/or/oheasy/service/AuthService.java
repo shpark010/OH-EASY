@@ -21,6 +21,12 @@ public class AuthService {
     	
     	return dao.login(loginVO);
     }
+    
+    public LoginVO userData(String userId) {
+    	AuthDao dao = sqlSession.getMapper(AuthDao.class);
+    	
+    	return dao.userData(userId);
+    }
       
     
     

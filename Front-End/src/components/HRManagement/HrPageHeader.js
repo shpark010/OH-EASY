@@ -61,8 +61,11 @@ const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
         <SweetAlert
           text="인사테이블에 등록되지않은 사원 정보를 불러올까요?"
           showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
           onConfirm={() => {
-            // 여기에 원하는 액션을 추가하세요.
             handleGetEmpList();
             handleCloseAlert();
           }}

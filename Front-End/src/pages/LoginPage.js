@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setCookie, getCookie, removeCookie } from "../containers/Cookie";
+import { setCookie, getCookie } from "../containers/Cookie";
+
 import "../styles/css/pages/LoginPage.css";
 
 function LoginPage() {
@@ -38,12 +39,23 @@ function LoginPage() {
       if (response.status === 200) {
         console.log(response.data);
         //localStorage.setItem("token", token);
-        setCookie("loginInfo", response.data, {
+        setCookie("loginInfo", response.data.idToken, {
+          path: "/",
+          maxAge: 28800,
+        });
+        setCookie("companyName", response.data.companyName, {
+          path: "/",
+          maxAge: 28800,
+        });
+        setCookie("name", response.data.name, {
           path: "/",
           maxAge: 28800,
         });
         console.log("로그인 성공!");
         console.log("저장된 쿠키값 가져오기 : " + getCookie("loginInfo"));
+        console.log("저장된 쿠키값 가져오기 : " + getCookie("companyName"));
+        console.log("저장된 쿠키값 가져오기 : " + getCookie("name"));
+
         navigate("/main");
       } else if (response.status === 401) {
         console.log("아이디 or 비밀번호 틀림");

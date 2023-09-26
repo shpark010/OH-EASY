@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/Layout/Layout";
 import PrivateRoute from "../containers/PrivateRoute";
@@ -12,28 +12,34 @@ import WorkContract from "../pages/WorkContract";
 import SalaryData from "../pages/SalaryData";
 import TableTest from "../pages/SdTableTest";
 
-function AppContent() {
-  return (
-    <Layout>
-      <Routes>
-        <Route path="/register" element={<MemberRegister />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+import { YearProvider } from "../containers/YearContext";
 
-        {/* 로그인이 필요한 라우트들을 PrivateRoute 안에 묶기 */}
-        <Route path="/" element={<PrivateRoute />}>
-          <Route index element={<Navigate to="/main" />} /> {/* 추가된 부분 */}
-          <Route path="/main" element={<MainPage />} />
-          <Route path="/er" element={<EmployeeRegister />} />
-          <Route path="/hrm" element={<HRManagement />} />
-          <Route path="/wc" element={<WorkContract />} />
-          <Route path="/sd" element={<SalaryData />} />
-          <Route path="/test" element={<TableTest />} />
-        </Route>
-        {/* Catch-all 라우트 */}
-        <Route path="*" element={<Navigate to="/main" />} />
-      </Routes>
-    </Layout>
+function AppContent() {
+  const [selectedYear, setSelectedYear] = useState("2023");
+  return (
+    <YearProvider value={{ selectedYear, setSelectedYear }}>
+      <Layout>
+        <Routes>
+          <Route path="/register" element={<MemberRegister />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
+          {/* 로그인이 필요한 라우트들을 PrivateRoute 안에 묶기 */}
+          <Route path="/" element={<PrivateRoute />}>
+            <Route index element={<Navigate to="/main" />} />{" "}
+            {/* 추가된 부분 */}
+            <Route path="/main" element={<MainPage />} />
+            <Route path="/er" element={<EmployeeRegister />} />
+            <Route path="/hrm" element={<HRManagement />} />
+            <Route path="/wc" element={<WorkContract />} />
+            <Route path="/sd" element={<SalaryData />} />
+            <Route path="/test" element={<TableTest />} />
+          </Route>
+          {/* Catch-all 라우트 */}
+          <Route path="*" element={<Navigate to="/main" />} />
+        </Routes>
+      </Layout>
+    </YearProvider>
   );
 }
 
