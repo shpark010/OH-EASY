@@ -16,6 +16,7 @@ public interface WcDao {
 		public WcGetEmpVO getModalData(String cdEmp); //Modal에서 Click해서 가져올 Data
 		public int insertEmpData(String cdEmp,String formattedDate ); // 모달에서 추가시 insert
 		public int updateEmpList(String cdEmp, String colum, String data);
+		public int deleteEmp(String cdEmp);
 
 	
 }

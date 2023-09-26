@@ -11,7 +11,7 @@
   /* grid 전체 style */
   
   .wcGridCellItem1 {
-    background-color: white;
+    /* background-color: white; */
     position: relative;
     border-right: solid 1px lightgray;
     border-left:solid 1px lightgray;
@@ -21,7 +21,7 @@
 
   .wcGridCellItem2 {
     position:relative;
-    background-color: white;
+    /* background-color: white; */
     overflow-y: auto;
     
   }
@@ -181,6 +181,7 @@ width:80px;
 
   .wcSelect2{
     width: 180px;
+    text-align: right;
 
   }
 
