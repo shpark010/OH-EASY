@@ -81,6 +81,12 @@ const StyledCalendar = styled(Calendar)`
     background: var(--color-primary-blue);
     color: white;
   }
+  ${(props) =>
+    props.position === "up" &&
+    `
+      bottom: 100%;
+      top: auto;
+    `}
 `;
 
 function CustomCalendar({
@@ -94,6 +100,7 @@ function CustomCalendar({
   readOnly,
   onClick,
   disabled,
+  position,
 }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -180,6 +187,7 @@ function CustomCalendar({
           value={formatDate(value) || new Date()}
           onClickMonth={type === "month" ? handleMonthChange : undefined}
           defaultView={type === "month" ? "year" : "month"}
+          position={position}
         />
       )}
     </InputWrapper>
