@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Spinner from "../images/spinner.gif";
+import Spinner from "../images/spinner3.gif";
 
 export const Background = styled.div`
   position: absolute;
@@ -8,7 +8,8 @@ export const Background = styled.div`
   height: 100vh;
   top: 0;
   left: 0;
-  background: #ffffffb7;
+  /* background: #ffffffb7; */
+  background: none;
   z-index: 999;
   display: flex;
   flex-direction: column;
@@ -27,7 +28,7 @@ const Loading = () => {
   return (
     <Background>
       {/* <LoadingText>잠시만 기다려 주세요.</LoadingText> */}
-      <img src={Spinner} alt="로딩중" width="30%" />
+      <img src={Spinner} alt="로딩중" width="20%" />
     </Background>
   );
 };

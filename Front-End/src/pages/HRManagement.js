@@ -16,9 +16,12 @@ import CustomButton from "../components/Contents/CustomButton";
 import "../styles/css/pages/HRManagement.css";
 import Alert from "../components/Contents/SweetAlert";
 import PageHeaderName from "../components/PageHeader/PageHeaderName";
+//import { useYear } from "../containers/YearContext";
 
 function HRManagement() {
   const apiRequest = useApiRequest();
+  //const { selectedYear } = useYear();
+  //console.log(selectedYear);
 
   const [empList, setEmpList] = useState([]); //첫번째 테이블의 사원정보들 관리
 
@@ -36,12 +39,25 @@ function HRManagement() {
   };
 
   // 모달창 닫으면 바로 사원 인서트
-  const closeModalAndEmpInsert = async () => {
+  const closeModalAndEmpInsert = async (e, cdEmp) => {
     closeModal();
+    if (!cdEmp && !clickModalEmpCode) {
+      console.log("cdEmp 도없거 clickModalEmpCode 도 없어 ");
+      return;
+    }
+
+    console.log("모달이벤트 ~~~~~~~~~~~~~~~~~~~~~");
+    console.log(cdEmp);
+    let url;
+    if (!cdEmp) {
+      url = `/api2/hr/insertHrEmpData?cdEmp=${clickModalEmpCode}`;
+    } else {
+      url = `/api2/hr/insertHrEmpData?cdEmp=${cdEmp}`;
+    }
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/insertHrEmpData?cdEmp=${clickModalEmpCode}`,
+        url: url,
       });
       //서버에서 넘어온 데이터
       // HRManagement.js:68 {cdEmp: 'CD046', nmEmp: '장영호'}
@@ -51,6 +67,7 @@ function HRManagement() {
       console.log(responseData);
       setEmpList((prevEmpList) => [...prevEmpList, responseData]);
       setClickEmpCode(clickModalEmpCode);
+      setClickModalEmpCode();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -62,6 +79,7 @@ function HRManagement() {
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
   const [clickEmpCode, setClickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
+
   const [conditions, setConditions] = useState({
     category: 0,
     sort: 3,
@@ -226,12 +244,20 @@ function HRManagement() {
           const handleInputClick = (e) => {
             console.log("code클릭이벤발생");
             setClickModalEmpCode(original.cdEmp);
+            console.log(original.cdEmp);
+          };
+          const handleDoubleClick = (e) => {
+            console.log("모달안 테이블 안에 더블 클릭 발생");
+            console.log(original.cdEmp);
+            setClickModalEmpCode(original.cdEmp);
+            closeModalAndEmpInsert(e, original.cdEmp);
           };
           return (
             <Input
               value={original?.cdEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              onDoubleClick={handleDoubleClick}
             />
           );
         },
@@ -244,12 +270,20 @@ function HRManagement() {
           const handleInputClick = (e) => {
             console.log("code클릭이벤발생");
             setClickModalEmpCode(original.cdEmp);
+            console.log(original.cdEmp);
+          };
+          const handleDoubleClick = (e) => {
+            console.log("모달안 테이블 안에 더블 클릭 발생");
+            console.log(original.cdEmp);
+            setClickModalEmpCode(original.cdEmp);
+            closeModalAndEmpInsert(e, original.cdEmp);
           };
           return (
             <Input
               value={original?.nmEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              onDoubleClick={handleDoubleClick}
             />
           );
         },
@@ -272,6 +306,7 @@ function HRManagement() {
     const Component = tab.component;
     return <Component cdEmp={clickEmpCode} />;
   };
+
   return (
     <>
       <HrPageHeader
@@ -341,6 +376,8 @@ function HRManagement() {
         onRequestClose={closeModal}
         overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
         contentStyle={{
+          width: "800px",
+          height: "820px",
           backgroundColor: "white",
           border: "1px solid gray",
         }}

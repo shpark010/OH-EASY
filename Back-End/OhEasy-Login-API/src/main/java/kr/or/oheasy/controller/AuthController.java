@@ -1,6 +1,7 @@
 package kr.or.oheasy.controller;
 
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +44,23 @@ public class AuthController {
 			System.out.println("생성된 jwt 토큰 : " + token);
 
 			// Redis에 데이터(아이디, 토큰) 저장
-			//redisService.setData(loginVO.getUserId(), token);
+			redisService.setData(loginVO.getUserId(), token);
 
+			LoginVO userData = authService.userData(loginVO.getUserId());
+			
+			
 			String idToken = loginVO.getUserId() + "." + token;
 			System.out.println(idToken);
-
-			return new ResponseEntity<>(idToken, HttpStatus.OK);
+			
+			Map<String, Object> data = new HashMap<>();
+			
+			data.put("idToken",idToken );
+			data.put("companyName", userData.getCompanyName());
+			data.put("name", userData.getName());
+			System.out.println("최종 데이터 : ");
+			System.out.println(data);
+			
+			return new ResponseEntity<>(data, HttpStatus.OK);
 		} else if (result == 0) {
 			// 아이디 혹은 비밀 번호가 틀릴 경우 401
 			return new ResponseEntity<>(1, HttpStatus.UNAUTHORIZED);

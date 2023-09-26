@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import Table from "../../TablesLib/Table";
 import useApiRequest from "../../Services/ApiRequest";
-import Input from "../../Contents/Input";
+//import Input from "../../Contents/Input";
+import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
 
 const HrFamily = ({ cdEmp }) => {
@@ -171,6 +172,9 @@ const HrFamily = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            console.log("value : " + value);
+            console.log("inputValue : " + inputValue);
+
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(
@@ -195,7 +199,6 @@ const HrFamily = ({ cdEmp }) => {
             <Input
               value={inputValue || ""}
               onChange={handleInputChange}
-              isDoubleClick={true}
               onBlur={handleInputOnBlur}
               className={"doubleLine"}
             />
@@ -213,6 +216,9 @@ const HrFamily = ({ cdEmp }) => {
             setInputValue(e.target.value);
           };
           const handleInputOnBlur = (e) => {
+            console.log("value : " + value);
+            console.log("inputValue : " + inputValue);
+
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(
@@ -236,7 +242,6 @@ const HrFamily = ({ cdEmp }) => {
             <Input
               value={inputValue || ""}
               onChange={handleInputChange}
-              isDoubleClick={true}
               type="resident"
               className={"doubleLine"}
               onBlur={handleInputOnBlur}

@@ -89,6 +89,10 @@ function Input({
       inputElement.selectionStart = endOfInput;
       inputElement.selectionEnd = endOfInput;
     }
+
+    if (otherProps.onDoubleClick) {
+      otherProps.onDoubleClick(e);
+    }
   };
 
   const handleInputChange = (e) => {

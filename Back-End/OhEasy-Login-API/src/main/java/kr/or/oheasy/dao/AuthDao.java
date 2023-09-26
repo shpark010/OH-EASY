@@ -6,5 +6,7 @@ public interface AuthDao {
 
 	public int login(LoginVO loginVO);
 	
+    public LoginVO userData(String userId);
+	
 	
 }

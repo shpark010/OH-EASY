@@ -82,14 +82,22 @@ const TableContainer = styled.div`
 `;
 
 function Table(props) {
-  const [inputValues, setInputValues] = useState({});
-  //const [showInsertRow, setShowInsertRow] = useState(false);
   const tableContainerRef = useRef(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
-  const handleChange = (columnId, value) => {
-    setInputValues((prev) => ({ ...prev, [columnId]: value }));
-  };
+  const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
+  const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
+  useEffect(() => {
+    // rows의 길이가 이전 길이보다 크면
+    if (props.data.length > prevRowsLength) {
+      const lastIndex = props.data.length - 1; // 마지막 행 인덱스
+      setLastAddedRowIndex(lastIndex);
+      setSelectedRowIndex(lastIndex); // 마지막 행을 선택된 행으로 설정
+      setPrevRowsLength(props.data.length); // rows의 길이 업데이트
+    } else {
+      setLastAddedRowIndex(null); // 추가된 행이 없으면 null로 설정
+    }
+  }, [props.data.length]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
@@ -130,7 +138,12 @@ function Table(props) {
               <StyledTr
                 {...row.getRowProps()}
                 className="hrRowStyle"
-                onClick={() => setSelectedRowIndex(index)} // 클릭 이벤트 처리
+                onClick={() => {
+                  if (props.setShowInsertRow) {
+                    props.setShowInsertRow(false);
+                  }
+                  setSelectedRowIndex(index);
+                }}
                 style={
                   index === selectedRowIndex
                     ? { backgroundColor: "var(--color-secondary-blue)" }
@@ -149,7 +162,13 @@ function Table(props) {
             );
           })}
           {props.showInsertRow && (
-            <StyledTr>
+            <StyledTr
+              style={
+                selectedRowIndex === null && props.showInsertRow
+                  ? { backgroundColor: "var(--color-secondary-blue)" }
+                  : {}
+              }
+            >
               {props.columns.map((column) => {
                 const CellContent = column.Cell;
                 return (
@@ -174,6 +193,8 @@ function Table(props) {
               <StyledInsertTh
                 colSpan={props.columns.length}
                 onClick={() => {
+                  props.setShowInsertRow((prevState) => !prevState);
+                  setSelectedRowIndex(null);
                   setTimeout(() => {
                     if (tableContainerRef.current) {
                       tableContainerRef.current.scrollTop =
@@ -181,7 +202,6 @@ function Table(props) {
                         tableContainerRef.current.clientHeight;
                     }
                   }, 0);
-                  props.setShowInsertRow((prevState) => !prevState);
                 }}
               >
                 <StyledBtn>
