@@ -1,4 +1,4 @@
-import React,{ useState, useMemo, useEffect }  from 'react';
+import React,{ useState, useMemo, useEffect,useRef }  from 'react';
 import '../../styles/css/pages/WorkContract.css';
 import CustomCalendar from '../../components/Contents/CustomCalendar';
 import CustomInput from '../../components/Contents/CustomInput';
@@ -11,7 +11,7 @@ import useApiRequest from '../Services/ApiRequest';
 import CustomModal from '../../components/Contents/CustomModal';
 import PageHeaderName from "../../components/PageHeader/PageHeaderName";
 import CustomSelect from '../../components/Contents/CustomSelect';
-import Swal from 'sweetalert2';
+import SweetAlert from '../Contents/SweetAlert';
 
 
 
@@ -62,6 +62,15 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   // const [valitmEndRegularWork,setValitmEndRegularWork] = useState(""); // validation을 위한 근로종료시간 값 tmEndRegularWork
   // const [valitmStartBreak,setValitmStartBreak] = useState(""); // validation을 위한 휴게시간 시작 tmStartBreak
   // const [valitmEndBreak,setValitmEndBreak] = useState(""); // validation을 위한 휴게시간 종료 tmEndBreak
+  const [showAlert, setShowAlert] = React.useState(false); // sweetalret1
+  const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret2
+  const [showAlert3, setShowAlert3] = React.useState(false); // sweetalret2
+  const [showAlert4, setShowAlert4] = React.useState(false); // sweetalret2
+  const [showAlert5, setShowAlert5] = React.useState(false); // sweetalret2
+  const [showAlert6, setShowAlert6] = React.useState(false); // sweetalret2
+  const [showAlert7, setShowAlert7] = React.useState(false); // sweetalret2
+
+
 
   const [validate,setValidate] = useState({
     addrWorkDtl: '',
@@ -70,14 +79,14 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     tmEndRegularWork: '',
     tmStartBreak: '',
     tmEndBreak: '',
-  })
+  }) //get, update후 최초값과 비교하기 위해 사용할 state
 
-  const showContError = (message) => {
-    Swal.fire({
-      icon: 'error',
-      title: message,
-    });
-  };
+  const prevParamGetEmpList1Ref = useRef(paramGetEmpList1);
+
+  useEffect(() => {
+    prevParamGetEmpList1Ref.current = paramGetEmpList1;
+  });
+
   
   const contractPeriodCalendar1 = async(newDate) => {
       newDate = newDate.replace(/-/g, "");
@@ -89,8 +98,8 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   
       // 만약 dtEndCont 값이 있고, dtStartCont가 dtEndCont보다 크다면 오류를 표시합니다.
       if (paramGetEmpList1.dtEndCont && data > paramGetEmpList1.dtEndCont) {
-        showContError('시작 근로계약 기간은 종료 근로계약 기간보다 클 수 없습니다.');
-          return;
+        setShowAlert(true)
+          return; //시작 근로계약 기간은 종료 근로계약 기간보다 빠를 수 없습니다
       }
   
       setParamGetEmpList1({ ...paramGetEmpList1, dtStartCont: data });
@@ -116,8 +125,8 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   
       // 만약 dtStartCont 값이 있고, dtEndCont가 dtStartCont보다 작다면 오류를 표시합니다.
       if (paramGetEmpList1.dtStartCont && data < paramGetEmpList1.dtStartCont) {
-        showContError('종료 근로계약 기간은 시작 근로계약 기간보다 작을 수 없습니다.');
-          return;
+        setShowAlert2(true)
+          return; //종료 근로계약 기간은 시작 근로계약 기간보다 늦을 수 없습니다.
       }
   
       setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: data });
@@ -179,7 +188,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     const data = e.target.value;
     const colum = e.target.id;
 
-    console.log("찍히나");
+    console.log(cdEmp);
    
     if (cdEmp === null || cdEmp === "" || cdEmp === undefined) {
       return;
@@ -274,6 +283,8 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     [e.target.id] : data
       })
 
+    
+
       
 
       if(
@@ -309,12 +320,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
 
 
   
-  const showError = (message) => { //시간관련 sweetalrert
-    Swal.fire({
-      icon: 'error',
-      title: message,
-    });
-  };
+  
   
   //온블러
   const inputOnBlur = async (e) => {
@@ -325,75 +331,136 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   
    
 
-    if (!cdEmp || data === "") return;
+    if (!cdEmp) return; 
+    
      if( validate[colum]===data){ 
       console.log("초기값과 같으면 종료");
       return};
     
- 
-    if (
-      colum === "tmStartRegularWork" ||
-      colum === "tmEndRegularWork" ||
-      colum === "tmStartBreak" ||
-      colum === "tmEndBreak"
-    ) {
+       
 
-      if (data.length !== 4) {
-        showError('시간은 4자리여야 합니다.');
-        return;
-      }
-      // Assure values are available and have correct length
-      const isValuesValid =
-        paramGetEmpList1.tmStartRegularWork &&
-        paramGetEmpList1.tmEndRegularWork &&
-        paramGetEmpList1.tmStartRegularWork.length === 4 &&
-        paramGetEmpList1.tmEndRegularWork.length === 4;
-  
-      if (isValuesValid) {
-        if (paramGetEmpList1.tmStartRegularWork > paramGetEmpList1.tmEndRegularWork) {
-          showError('종료시간은 시작시간보다 느려야 합니다.');
+ 
+      const validateTimeDifference = (startTime, endTime) => {
+        if (startTime && endTime && startTime.length === 4 && endTime.length === 4) {
+          if (startTime > endTime) {
+            return false;
+          }
+        }
+        return true;
+      };
+
+
+      const isValidTime = (timeStr) => {
+        const hour = parseInt(timeStr.substring(0, 2), 10);
+        const minute = parseInt(timeStr.substring(2, 4), 10);
+      
+        return hour < 24 && minute < 60;
+      };
+      
+      if (colum === "tmStartRegularWork" || colum === "tmEndRegularWork") {
+
+        if (data && data.length !== 4) {
+          setShowAlert3(true);
           return;
         }
-        if (paramGetEmpList1.tmStartBreak > paramGetEmpList1.tmEndBreak) {
-          showError('종료시간은 시작시간보다 느려야 합니다.');
+      
+        if (data && !isValidTime(data)) {
+          setShowAlert4(true);
+          return;
+        }
+      
+        // 정기 근무 시간 검증
+        if (!validateTimeDifference(paramGetEmpList1.tmStartRegularWork, paramGetEmpList1.tmEndRegularWork)) {
+          setShowAlert5(true);
+          return;
+        }
+      
+      } else if (colum === "tmStartBreak" || colum === "tmEndBreak") {
+      
+        if (data && data.length !== 4) {
+          setShowAlert3(true);
+          return;
+        }
+      
+        if (data && !isValidTime(data)) {
+          setShowAlert4(true);
+          return;
+        }
+      
+        // 휴식 시간 검증
+        if (!validateTimeDifference(paramGetEmpList1.tmStartBreak, paramGetEmpList1.tmEndBreak)) {
+          setShowAlert6(true);
+          return;
+        }
+      
+        // 휴식 시간이 정기 근무 시간 사이에 있는지 검증
+        if (
+          paramGetEmpList1.tmStartBreak < paramGetEmpList1.tmStartRegularWork ||
+          paramGetEmpList1.tmEndBreak > paramGetEmpList1.tmEndRegularWork
+        ) {
+          setShowAlert7(true);
           return;
         }
       }
-    }
+      
+      
+
   
     try {
       console.log("onBlur진입 put");
       const responseData = await apiRequest({
         method: "PUT",
         url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
-      });
       
+        
+      
+      });
+
+      const responseData2 = await apiRequest({ //update된 값 가져와서 Validatae set하기 위해
+        method: "GET",
+        url: `/api2/wc/getCodeParamEmpList?code=${clickCode}`, 
+      });
+      setValidate(responseData2);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
   };
 
+          
+ 
+
+  //작성년월 이벤트핸들러
+  const handleBelongingDateChange = async (newDate) => {
+    setParamGetEmpList1([]);
+    newDate = newDate.replace(/-/g, "");
+    setBelongingDate(newDate);
+    
+    try {
+        // 첫 번째 API 요청
+        const responseData = await apiRequest({
+            method: "GET",
+            url: `/api2/wc/getEmpList?creDate=${newDate}&orderValue=${searchOrder}`,
+        });
+        setEmployeeData(responseData);
 
 
-          
-          
-          const handleBelongingDateChange = async (newDate) => {
-            setParamGetEmpList1([]);
-            newDate = newDate.replace(/-/g, "");
-            setBelongingDate(newDate);
-            
-            // API 요청 추가
-            try {
-                const responseData = await apiRequest({
-                    method: "GET",
-                    url: `/api2/wc/getEmpList?creDate=${newDate}&orderValue=${searchOrder}`,
-                });
-                setEmployeeData(responseData);
-                
-            } catch (error) {
-                console.error("Failed to fetch emp data:", error);
-            }
-        };
+        // const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+        // setClickCode(firstCdEmp);
+        // if (firstCdEmp) {
+        //     // 두 번째 API 요청
+        //     const responseData2 = await apiRequest({
+        //         method: "GET",
+        //         url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+        //     });
+  
+        //     setParamGetEmpList1(responseData2); // set paramGetEmpList using the new data
+        //     setValidate(responseData2); // store the initial values from the server
+        // }
+
+    } catch (error) {
+        console.error("Failed to fetch emp data:", error);
+    }
+  };
   
   
 
@@ -421,9 +488,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
         method: "GET", //GET으로 가져와서 State set해주면됨.
         url: `/api2/wc/getModalData?cdEmp=${clickModalEmpCode}`,
       });
-      //서버에서 넘어온 데이터
-      // HRManagement.js:68 {cdEmp: 'CD046', nmEmp: '장영호'}
-      //setEmpList(responseData);
+      
       setShowInsertRow(false);
       console.log("서버에서 넘어온 데이터 ");
       console.log(responseData);
@@ -551,7 +616,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
 
 
-//테이블
+//온클릭
   const handleInputClick = async(e) => { //왼쪽 Table 클릭시 호출되는 함수.
     // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
     // 2. e.target으로 찾기.
@@ -572,7 +637,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
       });
      
       setParamGetEmpList1(responseData) //code get emplist
-      setValidate(responseData); //가져와서 set하지만 update에서 set하지않음, 초기값 저장.
+      setValidate(responseData); //server에서 가져온 초기값 저장.
   
       
     } catch (error) {
@@ -580,7 +645,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
     }
   }
   else{
-    console.log("**들어갑니까?**");
+    
     openModal2(e);
     try {
       const responseData = await apiRequest({
@@ -628,6 +693,10 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 // 사원추가 모달 끄고 닫기.
 
 
+const firstRowRef = useRef(null);
+
+
+
   const columns = useMemo(
     () => [
 
@@ -668,9 +737,10 @@ modal 에서 주소눌렀을때 이벤트 핸들러
         accessor: "cdEmp",
         id: "cdEmp",
         width: "20%",
-        Cell: ({ cell: { value }, row :{original} }) => {
+        Cell: ({ cell: { value }, row :{original},   }) => {
           const [inputValue, setInputValue] = useState(value);
           const [modalApper,setModalApper] = useState("")
+          
   
           //console.log(original.cdEmp);console.log(value); 둘이 같다.
           
@@ -693,13 +763,17 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
           /*Code input에서 mouse 올라오면 state 변경하는 함수 */
           const mouseOverModalOn = ()=>{
-            setModalApper("on");
+
+
+            
+
+            // setModalApper("on");
             
           };
 
           /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
           const mouseOutModalOff = ()=>{
-            setModalApper("off");
+            // setModalApper("off");
           };
 
           /*Code input에 code 도우미 render 함수*/ 
@@ -713,6 +787,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
           return (
             <Input
+             
               value={original?.cdEmp||""}
               onClick={handleInputClick }
               onBlur={inputBlur}
@@ -804,6 +879,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
     [checkColumn,handleCheckboxChange] //checkColum 변경시마다 check해제 되도록
   );
 
+  
 
 
 
@@ -1403,6 +1479,120 @@ modal 에서 주소눌렀을때 이벤트 핸들러
           />
         </div>
       </CustomModal>
+
+
+        {/* 공통 sweetalert  */}
+      {showAlert && (
+        <SweetAlert
+          text="시작 근로계약 기간은 종료 근로계약 기간보다 빠를 수 없습니다 ?"
+          
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            
+            setShowAlert(false)
+          }}
+          
+        />
+      )}
+
+        {showAlert2 && (
+        <SweetAlert
+          text="종료 근로계약 기간은 시작 근로계약 기간보다 늦을 수 없습니다.."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert2(false)
+          }}
+          
+        />
+          )}
+        
+        {showAlert3 && (
+        <SweetAlert
+          text="시간은 4자리로 작성해야 합니다."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert3(false)
+          }}
+          
+        />
+          )}
+
+{showAlert4 && (
+        <SweetAlert
+          text="60분을 초과할 수 없습니다."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert4(false)
+          }}
+          
+        />
+          )}
+
+{showAlert5 && (
+        <SweetAlert
+          text="종료시간은 시작시간보다 빠를 수 없습니다."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert5(false)
+          }}
+          
+        />
+          )}
+
+{showAlert6 && (
+        <SweetAlert
+          text="종료시간은 시작시간보다 빠를 수 없습니다."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert6(false)
+          }}
+          
+        />
+          )}
+
+{showAlert7 && (
+        <SweetAlert
+          text="휴식시간은 근무시간 범위에 있어야 합니다."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert7(false)
+          }}
+          
+        />
+          )}
+
+
+
+
+
+
       </>
     );
   }

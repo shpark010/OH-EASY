@@ -113,11 +113,16 @@ public class WcController {
 	@PutMapping("/updateEmpList")
 	public int updateEmpList(@RequestParam String cdEmp,@RequestParam String colum,@RequestParam String data ) {
 		System.out.println("updataeEmpList 진입");
+		String modifyData =null;
 		System.out.println(cdEmp + colum+ data);
-		String modifyData = data.replace(",", "");
-//		if (colum.equals("dtCreated")) { //맨 마지막 달력이 업데이트 될 경우만 insert해라.
-//		    wcService.insertEmpData(cdEmp);
-//		}
+		
+		//공백 값에 대한 validation
+		if (data.equals("")) {
+		    data = null;
+		}
+		if (data != null) {
+			modifyData = data.replace(",", ""); // ,를 ""로 대체
+		}
 	    int result = wcService.updateEmpList(cdEmp,colum,modifyData);
 	    return result;
 	} // 작성 Tab에서 작성완료 눌렀을 경우

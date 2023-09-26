@@ -12,7 +12,7 @@ import PageHeaderTextButton from '../components/PageHeader/PageHeaderTextButton'
 import WorkContractCreate from '../components/WorkContract/WorkContractCreate';
 import WorkContractSelect from '../components/WorkContract/WorkContractSelect';
 import PageHeaderName from '../components/PageHeader/PageHeaderName';
-
+import SweetAlert from "../components/Contents/SweetAlert";
 
 
 
@@ -22,7 +22,10 @@ const WorkContract = () => {
   const [tabState,setTab] = useState("0");
   const [checkColumn,setCheckColumn] = useState([]);  //checkColumn 담는 배열
   const [employeeData, setEmployeeData] = useState([]);
+  const [showAlert, setShowAlert] = React.useState(false); // sweetalret
+  const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret
 
+  
   const tabClick = (e,tabState) =>{
     
     setTab(e.target.value)
@@ -68,6 +71,8 @@ const WorkContract = () => {
 
 
   const deleteEmp = async () => {
+
+    
     console.log("삭제할 항목들:", checkColumn);
 
     try {
@@ -77,6 +82,7 @@ const WorkContract = () => {
             data: checkColumn,  // checkColumn 배열을 직접 전송
         });
 
+        
         //삭제 후 empList 초기화 하는데 2가지 방법 1. 전체API 불러오기, 2. Frontend에서 해결하기.
         const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
         setEmployeeData(updatedEmpList);
@@ -93,8 +99,14 @@ const WorkContract = () => {
     }
 };
 
-
-
+  
+const handleDeleteClick = () => {
+  if (checkColumn.length === 0) {
+    alert("삭제할 사원을 선택해주세요!");
+  } else {
+    setShowAlert(true);
+  }
+};
     
     return (
       
@@ -105,7 +117,7 @@ const WorkContract = () => {
           <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                  
+                <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />
                 <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
               </div>
               <div className="iconBtnWrap">
@@ -118,8 +130,13 @@ const WorkContract = () => {
                 btnName="delete "
                 imageSrc={Delete}
                 altText="삭제"
-                onClick={deleteEmp}
-                
+                onClick={ () => {
+                  if (checkColumn.length === 0) {
+                    setShowAlert2(true);
+                  } else {
+                    setShowAlert(true);
+                  }
+                }}               
               />
               <PageHeaderIconButton
                 btnName="calc wcMouseOver"
@@ -131,6 +148,8 @@ const WorkContract = () => {
                 imageSrc={Setting}
                 altText="세팅"
               />
+
+              
             </div>
             </div>
           </div>
@@ -153,6 +172,37 @@ const WorkContract = () => {
         
         
          <div>{tabComponent()}</div> 
+
+         {showAlert && (
+        <SweetAlert
+          text="정말 삭제하시겠습니까?"
+          showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            deleteEmp()
+            setShowAlert(false)
+          }}
+          onCancel={()=>setShowAlert(false)}
+        />
+      )}
+
+        {showAlert2 && (
+        <SweetAlert
+          text="삭제할 사원을 선택해 주세요."
+          // showCancel={true}
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            setShowAlert2(false)
+          }}
+          onCancel={()=>setShowAlert2(false)}
+        />
+          )}
         
       </>
     );
