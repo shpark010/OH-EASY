@@ -9,7 +9,7 @@ const InputWrapper = styled.div`
   position: relative;
   width: ${(props) => props.width || "100px"};
 
-  input[readonly] + div {
+  input[disabled] + div {
     cursor: not-allowed;
   }
 `;
@@ -31,7 +31,7 @@ const Input = styled.input`
 
   /* 조건부 스타일링 readOnly가 true 일경우 */
   ${(props) =>
-    props.readOnly &&
+    props.disabled &&
     `
     background-color: var(--color-opacity-gray);
     cursor: not-allowed;
@@ -93,6 +93,7 @@ function CustomCalendar({
   value,
   readOnly,
   onClick,
+  disabled,
 }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -162,12 +163,13 @@ function CustomCalendar({
         className={className}
         value={formatDate(value)}
         //onClick={() => setIsOpen(!isOpen)}
-        onClick={() => !readOnly && setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         onChange={onChange}
         readOnly={readOnly}
         name={name}
+        disabled={disabled}
       />
-      <IconWrapper onClick={() => !readOnly && setIsOpen(!isOpen)}>
+      <IconWrapper onClick={() => !disabled && setIsOpen(!isOpen)}>
         <FaRegCalendarAlt size={17} />
       </IconWrapper>
       {isOpen && (
