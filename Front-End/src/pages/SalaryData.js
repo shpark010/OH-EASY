@@ -11,9 +11,11 @@ import PageHeaderIconButton from "../components/PageHeader/PageHeaderIconButton"
 import SearchBarBox from "../components/SearchBar/SearchBarBox";
 import CustomCalendar from "../components/Contents/CustomCalendar";
 import Table from "../components/TablesLib/Table";
-import Input from "../components/Contents/Input";
+import Input from "../components/Contents/InputTest";
 import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
+import CustomButton from "../components/Contents/CustomButton";
+import SweetAlert from "../components/Contents/SweetAlert";
 
 const SalaryData = (props) => {
   // 수정 가능 여부
@@ -24,6 +26,7 @@ const SalaryData = (props) => {
   const [beforePay, setBeforePay] = useState("");
   // 모달 여닫기
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalIsOpen2, setModalIsOpen2] = useState(false);
   // 사원 조회 리스트
   const [empList, setEmpList] = useState([]);
   // 체크 리스트
@@ -68,9 +71,15 @@ const SalaryData = (props) => {
   // 정렬
   const [searchOrder, setSearchOrder] = useState("0");
   // 선택된 값이 변경될 때 호출될 콜백 함수
-  const handleSearchTypeChange = (e) => {
-    setSearchOrder(e.target.value);
+  const handleSearchTypeChange = async (e) => {
+    const newSearchOrder = e.target.value;
+    setSearchOrder(newSearchOrder);
+    await handleFetchEmpData(e);
   };
+  useEffect(() => {
+    // handleFetchEmpData();
+    console.log(searchOrder);
+  }, [searchOrder]);
   // 테이블의 insertRow의 상태
   const [showInsertRow, setShowInsertRow] = useState(false);
   // 현재 클릭한 cdEmp 저장하는 상태
@@ -81,6 +90,11 @@ const SalaryData = (props) => {
       console.log("insert : " + clickEmpCode);
     }
   }, [clickEmpCode]);
+  //클릭한 지급일자 상태
+  const [clickPayDay, setClickPayDay] = useState({
+    mmBelong: "",
+    dtAllowance: "",
+  });
   // 선택 사원 세액
   const [taxAmount, setTaxAmount] = useState({
     nationalPension: "", //국민연금
@@ -160,11 +174,22 @@ const SalaryData = (props) => {
   };
 
   const openModal = () => {
+    resetStates();
     setModalIsOpen(true);
+    handleGetPayDayList();
   };
 
   const closeModal = () => {
     setModalIsOpen(false);
+  };
+
+  const openModal2 = () => {
+    setModalIsOpen2(true);
+    handleGetTaxList();
+  };
+
+  const closeModal2 = () => {
+    setModalIsOpen2(false);
   };
 
   //조회 아래 영역 초기화
@@ -295,12 +320,18 @@ const SalaryData = (props) => {
   };
 
   //조회 버튼 클릭시 사원리스트 불러오기(select)
-  const handleFetchEmpData = async () => {
+  const handleFetchEmpData = async (e) => {
     // data 객체의 속성들이 undefined, null 또는 공백인지 확인
     if (!belongingDate || !payDay) {
       alert("조회 조건 사항을 모두 선택해 주세요");
       return;
     }
+    let confirmOrder = searchOrder;
+
+    if (e.target.tagName === "SELECT") {
+      confirmOrder = e.target.value;
+    }
+
     try {
       const responseData = await apiRequest({
         method: "POST",
@@ -308,13 +339,39 @@ const SalaryData = (props) => {
         data: {
           belongingDate: belongingDate,
           payDay: payDay,
-          searchOrder: searchOrder,
+          searchOrder: confirmOrder,
           searchTaxOrder: searchTaxOrder,
         },
       });
       setEmpList(responseData.empSearch);
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //지급일자 조회
+  const handleFetchEmpData2 = async (original) => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/getEmpList",
+        data: {
+          belongingDate: "2023" + original.mmBelong,
+          payDay: original.dtAllowance,
+          searchOrder: "0",
+          searchTaxOrder: "0",
+        },
+      });
+      setEmpList(responseData.empSearch);
+      const searchTaxInfo = responseData.searchTaxInfo;
+      handleSearchTax(searchTaxInfo);
+      setBelongingDate("2023" + original.mmBelong);
+      setPayDay(original.dtAllowance);
+      setSearchOrder("0");
+      setSearchTaxOrder("0");
+      closeModal();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -392,8 +449,10 @@ const SalaryData = (props) => {
     }
   };
 
+  //조회구분에 따른 세금정보
   const handleChangeSearch = async (e) => {
-    setSearchOrder(e.target.value);
+    // setSearchOrder(e.target.value);
+    // console.log("값 : " + e.target.value);
     const newValue = e.target.value;
     try {
       const responseData = await apiRequest({
@@ -413,7 +472,11 @@ const SalaryData = (props) => {
     }
   };
 
+  //급여 자료 삭제
   const handleDeletePayData = async () => {
+    if (checkedRows.length === 0) {
+      return;
+    }
     try {
       console.log(checkedRows);
       const responseData = await apiRequest({
@@ -430,6 +493,38 @@ const SalaryData = (props) => {
       const searchTaxInfo = responseData.searchTaxInfo;
       handlePersonalTax(empTaxInfo);
       handleSearchTax(searchTaxInfo);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //지급일자 조회
+  const handleGetPayDayList = async () => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/getPayDayList",
+        data: {
+          //추후 입력
+        },
+      });
+      setPayDayList(responseData.payDayList);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //과세 리스트 조회
+  const handleGetTaxList = async () => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/getTaxList",
+        data: {
+          //추후 입력
+        },
+      });
+      setTaxList(responseData.taxList);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -495,9 +590,11 @@ const SalaryData = (props) => {
 
           return (
             <Input
+              className={original.code}
               value={inputValue}
               onClick={handleInputClick}
               onChange={handleInputChange}
+              readOnly={true}
             />
           );
         },
@@ -524,6 +621,7 @@ const SalaryData = (props) => {
               value={inputValue}
               onClick={handleInputClick}
               onChange={handleInputChange}
+              readOnly={true}
             />
           );
         },
@@ -549,6 +647,7 @@ const SalaryData = (props) => {
               value={inputValue}
               onClick={handleInputClick}
               onChange={handleInputChange}
+              readOnly={true}
             />
           );
         },
@@ -573,7 +672,7 @@ const SalaryData = (props) => {
       },
       {
         Header: "금액",
-        width: "60%",
+        width: "55%",
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
@@ -608,15 +707,20 @@ const SalaryData = (props) => {
           };
           return (
             <Input
-              isDoubleClick={true}
               id="price-input"
               value={inputValue}
-              width={100}
               onChange={handleInputChange}
               onBlur={insertPayAmount}
               onEnterPress={insertPayAmount}
               className={"doubleLine"}
               type="price"
+              align="right"
+              readOnly={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+              }
             />
           );
         },
@@ -660,7 +764,7 @@ const SalaryData = (props) => {
       },
       {
         Header: "금액",
-        width: "60%",
+        width: "55%",
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
@@ -675,10 +779,10 @@ const SalaryData = (props) => {
             <Input
               id="price-input"
               value={inputValue}
-              width={100}
               onChange={handleInputChange}
-              className={"doubleLine"}
               type="price"
+              align="right"
+              readOnly={true}
             />
           );
         },
@@ -703,7 +807,7 @@ const SalaryData = (props) => {
       },
       {
         Header: "금액",
-        width: "60%",
+        width: "55%",
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
@@ -716,10 +820,10 @@ const SalaryData = (props) => {
             <Input
               id="price-input"
               value={inputValue}
-              width={100}
-              className={"doubleLine"}
               onChange={handleInputChange}
               type="price"
+              align="right"
+              readOnly={true}
             />
           );
         },
@@ -763,7 +867,7 @@ const SalaryData = (props) => {
       },
       {
         Header: "금액",
-        width: "60%",
+        width: "55%",
         accessor: "amt_allowance",
         id: "amt_allowance",
         Cell: ({ cell: { value } }) => {
@@ -776,10 +880,10 @@ const SalaryData = (props) => {
             <Input
               id="price-input"
               value={inputValue}
-              width={100}
-              className={"doubleLine"}
               onChange={handleInputChange}
               type="price"
+              align="right"
+              readOnly={true}
             />
           );
         },
@@ -788,28 +892,259 @@ const SalaryData = (props) => {
     [searchTax],
   );
 
+  const [payDayList, setPayDayList] = useState([]); // 모달창 지급일 정보
+  const dataModalPayDayList = useMemo(
+    () =>
+      payDayList.map((list) => ({
+        mmBelong: list.mmBelong,
+        dtAllowance: list.dtAllowance,
+        cntPeople: list.cntPeople,
+        amtTotalPay: changeFormat(list.amtTotalPay),
+      })),
+    [payDayList],
+  );
+  const columnsModal = useMemo(
+    () => [
+      {
+        Header: "귀속월",
+        accessor: "mmBelong",
+        width: "15%",
+        id: "mmBelong",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleSearchPayDay = () => {
+            handleFetchEmpData2(original);
+          };
+          return (
+            <Input
+              value={original?.mmBelong}
+              onDoubleClick={handleSearchPayDay}
+              readOnly={true}
+            />
+          );
+        },
+      },
+      {
+        Header: "지급일자",
+        accessor: "dtAllowance",
+        width: "30%",
+        id: "dtAllowance",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleSearchPayDay = () => {
+            handleFetchEmpData2(original);
+          };
+          return (
+            <Input
+              value={(original?.dtAllowance || "").replace(
+                /(\d{4})(\d{2})(\d{2})/,
+                "$1-$2-$3",
+              )}
+              onDoubleClick={handleSearchPayDay}
+              readOnly={true}
+            />
+          );
+        },
+      },
+      {
+        Header: "순인원",
+        accessor: "cntPeople",
+        width: "15%",
+        id: "cntPeople",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleSearchPayDay = () => {
+            handleFetchEmpData2(original);
+          };
+          return (
+            <Input
+              value={original?.cntPeople}
+              onDoubleClick={handleSearchPayDay}
+              readOnly={true}
+            />
+          );
+        },
+      },
+      {
+        Header: "총지급액",
+        accessor: "amtTotalPay",
+        width: "40%",
+        id: "amtTotalPay",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleSearchPayDay = () => {
+            handleFetchEmpData2(original);
+          };
+          const handleSetClickPayDay = () => {
+            handleSetSearchList(original);
+          };
+          return (
+            <Input
+              value={original?.amtTotalPay}
+              onDoubleClick={handleSearchPayDay}
+              onClick={handleSetClickPayDay}
+              type="price"
+              align="right"
+              readOnly={true}
+            />
+          );
+        },
+      },
+    ],
+    [payDayList],
+  );
+
+  const handleSetSearchList = (original) => {
+    setClickPayDay({
+      mmBelong: original.mmBelong,
+      dtAllowance: original.dtAllowance,
+    });
+  };
+
+  // 알림창 표시 상태 관리
+  const [showAlert, setShowAlert] = React.useState(false);
+
+  const handleCloseAlert = () => {
+    setShowAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleOpenAlert = () => {
+    console.log("alert 나오니");
+    setShowAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleConfirm = () => {
+    handleFetchEmpData2(clickPayDay);
+    closeModal();
+    handleCloseAlert();
+  };
+
+  const [taxList, setTaxList] = useState([]); // 모달창 지급일 정보
+  const dataModalTaxList = useMemo(
+    () =>
+      taxList.map((list) => ({
+        cdTaxRate: list.cdTaxRate,
+        nmTaxRate: list.nmTaxRate,
+        rateTax: list.rateTax,
+      })),
+    [taxList],
+  );
+  const columnsModal2 = useMemo(
+    () => [
+      {
+        Header: "Code",
+        accessor: "cdTaxRate",
+        width: "15%",
+        id: "cdTaxRate",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return <Input value={original?.cdTaxRate} readOnly={true} />;
+        },
+      },
+      {
+        Header: "항목명",
+        accessor: "nmTaxRate",
+        width: "30%",
+        id: "nmTaxRate",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return <Input value={original?.nmTaxRate} readOnly={true} />;
+        },
+      },
+      {
+        Header: "적용세율(%)",
+        accessor: "rateTax",
+        width: "15%",
+        id: "rateTax",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return <Input value={original?.rateTax} readOnly={true} />;
+        },
+      },
+    ],
+    [taxList],
+  );
+
   return (
     <>
+      {showAlert && (
+        <SweetAlert
+          text="해당 귀속년월/지급일로 조회하시겠습니까?"
+          showCancel={true}
+          //type="success"
+          // type="warning"
+          //type="error"
+          type="question"
+          onConfirm={handleConfirm}
+          onCancel={handleCloseAlert}
+        />
+      )}
       <div className="pageHeader">
         <div className="innerBox fxSpace">
           <PageHeaderName text="급여자료입력" />
           <div className="fxAlignCenter">
             <div className="btnWrapper textBtnWrap">
-              <PageHeaderTextButton text="세율변경" onClick={openModal} />
+              <PageHeaderTextButton text="지급일자" onClick={openModal} />
               <CustomModal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
                 contentStyle={{
-                  width: "600px",
-                  height: "400px",
                   backgroundColor: "white",
                   border: "1px solid gray",
+                  width: "600px",
+                  height: "500px",
                 }}
               >
-                <h2>커스텀 모달 제목</h2>
-                <p>커스텀 모달 내용</p>
-                <button onClick={closeModal}>닫기</button>
+                <PageHeaderName text="지급일자" />
+                <div className="test2" style={{ height: "380px" }}>
+                  <Table
+                    height="500px"
+                    columns={columnsModal}
+                    data={dataModalPayDayList}
+                  />
+                </div>
+                <div className="test">
+                  <CustomButton
+                    backgroundColor={"var(--color-primary-blue)"}
+                    color={"var(--color-primary-white)"}
+                    onClick={handleOpenAlert}
+                    text={"선택"}
+                  />
+                  <CustomButton
+                    backgroundColor={"var(--color-primary-gray)"}
+                    color={"var(--color-primary-white)"}
+                    onClick={closeModal}
+                    text={"취소"}
+                  />
+                </div>
+              </CustomModal>
+              <PageHeaderTextButton text="세율확인/변경" onClick={openModal2} />
+              <CustomModal
+                isOpen={modalIsOpen2}
+                onRequestClose={closeModal2}
+                overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+                contentStyle={{
+                  backgroundColor: "white",
+                  border: "1px solid gray",
+                  width: "600px",
+                  height: "470px",
+                }}
+              >
+                <PageHeaderName text="세율확인/변경" />
+                <div className="test2" style={{ height: "380px" }}>
+                  <Table
+                    height="500px"
+                    columns={columnsModal2}
+                    data={dataModalTaxList}
+                  />
+                </div>
+                <div className="test">
+                  <CustomButton
+                    backgroundColor={"var(--color-primary-blue)"}
+                    color={"var(--color-primary-white)"}
+                    // onClick={handleOpenAlert}
+                    text={"선택"}
+                  />
+                  <CustomButton
+                    backgroundColor={"var(--color-primary-gray)"}
+                    color={"var(--color-primary-white)"}
+                    onClick={closeModal2}
+                    text={"취소"}
+                  />
+                </div>
               </CustomModal>
               <PageHeaderTextButton text="급여메일보내기" />
               <PageHeaderTextButton text="급여명세 문자보내기" />
@@ -819,6 +1154,7 @@ const SalaryData = (props) => {
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
+                onClick={handleOpenAlert}
               />
               <PageHeaderIconButton
                 btnName="delete"
@@ -853,20 +1189,10 @@ const SalaryData = (props) => {
                     value={belongingDate}
                     onChange={handleBelongingDateChange}
                     onClick={resetStates}
+                    readOnly={true}
                   />
                 </div>
               </div>
-              {/* <SearchBarBox
-                label="구분"
-                id="sd-salary-category"
-                options={[
-                  { value: "0", label: "0. 급여" },
-                  { value: "1", label: "1. 급여 + 상여" },
-                  { value: "2", label: "2. 상여" },
-                  { value: "3", label: "3. 추급" },
-                  { value: "4", label: "4. 추상" },
-                ]}
-              /> */}
               <div className="searchBarName">
                 <div className="searchBarNameCalender">
                   <span>지급일</span>
@@ -876,6 +1202,7 @@ const SalaryData = (props) => {
                     value={payDay}
                     onChange={handlePayDateChange}
                     onClick={resetStates}
+                    readOnly={true}
                   />
                 </div>
               </div>
@@ -888,9 +1215,9 @@ const SalaryData = (props) => {
                   { value: "2", label: "2. 입사일순" },
                   { value: "3", label: "3. 직급순" },
                 ]}
-                value={searchOrder || "0"}
+                value={searchOrder}
                 onChange={handleSearchTypeChange}
-                onClick={resetStates}
+                // onClick={resetStates}
               />
             </div>
             <div className="btnWrapper">
@@ -922,7 +1249,7 @@ const SalaryData = (props) => {
             </table>
           </div>
           <div className="sd-item sd-item2">
-            <Table data={dummyItem2} columns={columnsItem2} page={"sd"} />
+            <Table data={dummyItem2} columns={columnsItem2} />
             <table className="sd-allowance-top-calTable">
               <tbody>
                 <tr>
@@ -960,6 +1287,7 @@ const SalaryData = (props) => {
                 ]}
                 value={searchTaxOrder}
                 onChange={handleSearchTaxTypeChange}
+                fixed={!empList || empList.length === 0}
               />
             </div>
             <div className="sd-tableArea">

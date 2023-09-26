@@ -126,8 +126,8 @@
 .sd-item3 .sd-allowance-bottom,
 .sd-item4 .sd-search-allowance-top,
 .sd-item5 .sd-search-allowance-bottom {
-  width: 100%;
-  text-align: center;
+  /* width: 100%;
+  text-align: center; */
 }
 
 .sd-item1 .sd-empList th,
@@ -175,7 +175,7 @@
   min-width: 18px;
 }
 
-.sd-item2 tr th:first-child,
+/* .sd-item2 tr th:first-child,
 .sd-item2 tr td:first-child {
   width: 40%;
 }
@@ -183,7 +183,7 @@
 .sd-item3 tr th:first-child,
 .sd-item3 tr td:first-child {
   width: 50%;
-}
+} */
 
 .sd-item4 .sd-searchCondition {
   border: 3px solid #d8d8d8;
