@@ -14,21 +14,15 @@ import CustomSelect from '../../components/Contents/CustomSelect';
 
 
 
-const WorkContractCreate = () => {
+const WorkContractSelect = () => {
 
   const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
-  const [openPostcode, setOpenPostcode] = useState(false);
-  const [zonecode, setZonecode] = useState("");
-  const [address, setAddress] = useState("");
-  const [checkColumn,setCheckColumn] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
-  const [codeArr, setCodeArr] = useState([]);
-  // const [optionEmpList,setOptionEmpList] = ([]); // 조건조회로 받아온 data
   const [belongingDate, setBelongingDate] = useState(""); //년월 달력 상태 관리.
   const [belongingDate2,setBelongingDate2]= useState(""); //년월 달력 상태 관리 끝 날짜.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
   const [paramGetEmpList,setParamGetEmpList] = useState([]);// code로 가져온 표준근로계약서 사원
+  const [clickCode,setClickCode]=useState([]);
   //paramgetEmpList1 은 Create Tab
 
 
@@ -66,6 +60,21 @@ const WorkContractCreate = () => {
           url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${formattedDate}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
         });
        
+        const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+        setClickCode(firstCdEmp);
+        if (firstCdEmp) {
+            // 두 번째 API 요청
+           
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+            });
+      
+            setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
+         
+        }
+
+
         const modifiedresponseData = responseData.map(responseData => {
           const originalDate = responseData.dtCreated;
           
@@ -94,39 +103,6 @@ const WorkContractCreate = () => {
 
 
 
-  const addrButtonClick= () => {
-    setOpenPostcode(true);
-  };
-
-  const closeModal = () => {
-    setOpenPostcode(false);
-  };
-
-  
-
-  const handleAddressSelect = (addr) => {
-    console.log(`
-        우편번호: ${addr.zonecode}
-        주소: ${addr.address}
-    `);
-    // // 주소와 우편번호 값을 가져온 데이터로 설정
-    // const address = addr.address;
-    // const zipcode = addr.zipcode;
-  
-    // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
-    // setEmpList((prevEmpList) => [
-    //   ...prevEmpList,
-    //   {
-    //     // 이전 데이터 유지하고 주소와 우편번호 추가
-    //     address: address, // 주소 상태 값 사용
-    //     zipcode: zipcode, // 우편번호 상태 값 사용
-    //   },
-    // ]);
-    setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
-    setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
-    setOpenPostcode(false); // 모달 닫기
-  };
-
 
   const data = useMemo(
     () =>
@@ -142,86 +118,12 @@ const WorkContractCreate = () => {
   
   
 
-  const selectAllCheckBox = (e) =>{
-
-    
-    // const newEmpList = empList.map(emp=>({
-    //   checkbox : e.target.checked,
-    //   cdEmp: emp.cdEmp,
-    //   nmEmp: emp.nmEmp,
-    //   noResident: emp.noResident,
-    // }));
-    // console.log(newEmpList);
-
-    
-
-    const allInputs = e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input');
-  //   // 모든 Table까지 가서 모든 input tag select 하면 배열로 return
-  //   console.log(e.target.checked); // 현재 누른 이벤트 check 값
-    
-    if (e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = true;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
-    setIsChecked(true)
-    
-  }
-
-  else if (!e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = false;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
-    setIsChecked(false)
-    
-  }
-    //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
-    
-    
-  }
-
-  const conditionSearch = async () => { // 작성년월과 조회 날짜를 받아 조회하는 버튼
-    setEmployeeData([]);
-
-    try {
-     
-      const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
-      });
-     
-      const modifiedresponseData = responseData.map(responseData => {
-        const originalDate = responseData.dtCreated;
-        
-        // 문자열에서 뒤에서 두 자리 자르기 
-        // 20231022 -> 202310
-        const year = originalDate.slice(0, 4); // "2023"
-      const month = originalDate.slice(4, 6); // "10"
-
-    const formattedDate = `${year}년 ${month}월`;
-        responseData.dtCreated = formattedDate;
-        
-        return responseData;
-      });
-
-
-      setEmployeeData(modifiedresponseData)
-      console.log(employeeData);
-    
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
-
-    
-
-
-  }//조건조회
-
-
-
+// 사원코드 순 eventhandler
   const searchOrderOption = async (e) => {
     const orderValue = e.target.value;
     setSearchOrder(orderValue);
     
+
     // 두 달력의 상태값이 모두 있을 경우 API 요청을 보냅니다.
     if (belongingDate && belongingDate2) {
         try {
@@ -229,6 +131,20 @@ const WorkContractCreate = () => {
                 method: "GET",
                 url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${orderValue}`,
             });
+            
+            const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+            setClickCode(firstCdEmp);
+            if (firstCdEmp) {
+                // 두 번째 API 요청
+               
+                const responseData2 = await apiRequest({
+                    method: "GET",
+                    url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+                });
+          
+                setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
+             
+            }
 
             const modifiedresponseData = responseData.map(responseData => {
                 const originalDate = responseData.dtCreated;
@@ -253,8 +169,9 @@ const WorkContractCreate = () => {
 
   
   const handleInputClick = async(e) => {
-    console.log(paramGetEmpList);
     
+    console.log(paramGetEmpList);
+    setParamGetEmpList([]);
     // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
     // 2. e.target으로 찾기.
     // 어차피 e.target을 통해 찾아야 함.
@@ -569,7 +486,7 @@ const WorkContractCreate = () => {
                       className="wcRightCellSearchButton"
                       text="주소검색"
                       color="black"
-                      onClick={addrButtonClick}
+                     
                       readOnly
                     />
                   </td>
@@ -636,6 +553,7 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: '1주에 1일' },
                         { value: '2', label: '1주에 2일' },
                         { value: '3', label: '1주에 3일' },
@@ -646,7 +564,7 @@ const WorkContractCreate = () => {
                       ]}
                      className={"wcSelect1"}
                       
-                      value={paramGetEmpList.ddWorking|| "" }
+                      value={paramGetEmpList.ddWorking||0 }
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -657,6 +575,7 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: '매주 월요일' },
                         { value: '2', label: '매주 화요일' },
                         { value: '3', label: '매주 수요일' },
@@ -665,7 +584,7 @@ const WorkContractCreate = () => {
                         { value: '6', label: '매주 토요일' },
                         { value: '7', label: '매주 일요일' },
                       ]}
-                      value={paramGetEmpList.dotw|| "" }
+                      value={paramGetEmpList.dotw|| 0 }
                      className={"wcSelect1"}
                   
 
@@ -679,11 +598,12 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 월급 ' },
                         { value: '2', label: ' 일급 ' },
                         { value: '3', label: ' 시급 ' },
                       ]}
-                      value={paramGetEmpList.tpSal|| "" }
+                      value={paramGetEmpList.tpSal|| 0}
                       className={"wcSelect2"}                    />
                   </td>
                   <td className="wcRightGridTableRightTd2">
@@ -697,11 +617,12 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 매월 ' },
                         { value: '2', label: ' 매주 ' },
                         { value: '3', label: ' 매일 ' },
                       ]}
-                      value={paramGetEmpList.tpPayDtSal|| "" }
+                      value={paramGetEmpList.tpPayDtSal||0 }
                       className={"wcSelect2"}
                     />
                   </td>
@@ -716,10 +637,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 예금통장에 입금 ' },
                         { value: '2', label: ' 직접지급 ' },
                       ]}
-                      value={paramGetEmpList.methodPay|| "" }
+                      value={paramGetEmpList.methodPay|| 0}
                       
                     />
                   </td>
@@ -731,10 +653,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynEmpInsurance|| "" }
+                      value={paramGetEmpList.ynEmpInsurance|| 0 }
                       className="wcSelect3"
 
                     />
@@ -747,10 +670,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynIndustrialAccidentInsurance|| "" }
+                      value={paramGetEmpList.ynIndustrialAccidentInsurance|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -762,10 +686,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynNationalPension|| "" }
+                      value={paramGetEmpList.ynNationalPension|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -777,10 +702,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' }, 
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynHealthInsurance|| "" }
+                      value={paramGetEmpList.ynHealthInsurance|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -792,10 +718,11 @@ const WorkContractCreate = () => {
                     <CustomSelect
                     disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.stSign|| "2" }
+                      value={paramGetEmpList.stSign|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -806,11 +733,11 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar 
                     value={paramGetEmpList.dtCreated||""}
-                     readOnly 
+                     disabled
                      className={'wcCreatedDateCalander'} 
                      width="170" 
                      id="createDate" 
-                     disabled
+                     
                      />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
@@ -830,4 +757,4 @@ const WorkContractCreate = () => {
     );
   }
 
-export default WorkContractCreate;
+export default WorkContractSelect;
