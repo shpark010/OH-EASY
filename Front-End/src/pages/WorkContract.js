@@ -24,7 +24,31 @@ const WorkContract = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [showAlert, setShowAlert] = React.useState(false); // sweetalret
   const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret
-
+  const [paramGetEmpList1,setParamGetEmpList1] = useState({
+    dtStartCont: '',
+    dtEndCont: '',
+    noWorkPost: '',
+    addrWork: '',
+    addrWorkDtl: '',
+    cntnJob: '',
+    tmStartRegularWork: '',
+    tmEndRegularWork: '',
+    tmStartBreak: '',
+    tmEndBreak: '',
+    ddWorking: '',
+    dotw: '',
+    tpSal: '',
+    amtSal: '',
+    tpPayDtSal: '',
+    ddPaySal: '',
+    methodPay: '',
+    ynEmpInsurance: '',
+    ynIndustrialAccidentInsurance: '',
+    ynNationalPension: '',
+    ynHealthInsurance: '',
+    stSign: '',
+    dtCreated: '',
+  })
   
   const tabClick = (e,tabState) =>{
     
@@ -44,6 +68,8 @@ const WorkContract = () => {
           handleCheckboxChange={handleCheckboxChange}  
           employeeData = {employeeData}
           setEmployeeData = {setEmployeeData}
+          paramGetEmpList1 = {paramGetEmpList1}
+          setParamGetEmpList1 = {setParamGetEmpList1}
           />);
 
         // 계약서 작성 Tab Click
@@ -89,7 +115,7 @@ const WorkContract = () => {
 
         // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
         setCheckColumn([]);
-
+        setParamGetEmpList1([]); // delete후 state비우기 위해
         
 
     } 
