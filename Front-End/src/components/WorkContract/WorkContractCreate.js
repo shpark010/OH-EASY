@@ -16,7 +16,7 @@ import SweetAlert from '../Contents/SweetAlert';
 
 
 
-const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,employeeData,setEmployeeData }) => {
+const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,employeeData,setEmployeeData,paramGetEmpList1,setParamGetEmpList1 }) => {
 
   const apiRequest = useApiRequest();
   // const [employeeData, setEmployeeData] = useState([]); //왼쪽table사원 data
@@ -25,31 +25,31 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   const [selectAll, setSelectAll] = useState(false); // checkbox가 모두 check된 상태 관리
   const [belongingDate, setBelongingDate] = useState(""); //조건조회시 년월 달력 상태 관리.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
-  const [paramGetEmpList1,setParamGetEmpList1] = useState({
-    dtStartCont: '',
-    dtEndCont: '',
-    noWorkPost: '',
-    addrWork: '',
-    addrWorkDtl: '',
-    cntnJob: '',
-    tmStartRegularWork: '',
-    tmEndRegularWork: '',
-    tmStartBreak: '',
-    tmEndBreak: '',
-    ddWorking: '',
-    dotw: '',
-    tpSal: '',
-    amtSal: '',
-    tpPayDtSal: '',
-    ddPaySal: '',
-    methodPay: '',
-    ynEmpInsurance: '',
-    ynIndustrialAccidentInsurance: '',
-    ynNationalPension: '',
-    ynHealthInsurance: '',
-    stSign: '',
-    dtCreated: '',
-  }) // 오른쪽 table 상태관리
+  // const [paramGetEmpList1,setParamGetEmpList1] = useState({
+  //   dtStartCont: '',
+  //   dtEndCont: '',
+  //   noWorkPost: '',
+  //   addrWork: '',
+  //   addrWorkDtl: '',
+  //   cntnJob: '',
+  //   tmStartRegularWork: '',
+  //   tmEndRegularWork: '',
+  //   tmStartBreak: '',
+  //   tmEndBreak: '',
+  //   ddWorking: '',
+  //   dotw: '',
+  //   tpSal: '',
+  //   amtSal: '',
+  //   tpPayDtSal: '',
+  //   ddPaySal: '',
+  //   methodPay: '',
+  //   ynEmpInsurance: '',
+  //   ynIndustrialAccidentInsurance: '',
+  //   ynNationalPension: '',
+  //   ynHealthInsurance: '',
+  //   stSign: '',
+  //   dtCreated: '',
+  // }) // 오른쪽 table 상태관리
   const [clickCode,setClickCode] = useState(""); //code click시 값을 저장할 state
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   const [modalEmpList, setModalEmpList] = useState([]); // 모달창에 넣을 사원 정보
@@ -434,9 +434,14 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
 
   //작성년월 이벤트핸들러
   const handleBelongingDateChange = async (newDate) => {
-    setParamGetEmpList1([]);
     newDate = newDate.replace(/-/g, "");
+    if(newDate !== belongingDate){
+      setHighlightFirstRow(true)
+    }
+
+    setParamGetEmpList1([]);
     setBelongingDate(newDate);
+    
     
     try {
         // 첫 번째 API 요청
