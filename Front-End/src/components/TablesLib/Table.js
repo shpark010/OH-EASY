@@ -84,7 +84,7 @@ const TableContainer = styled.div`
 
 function Table(props) {
   const tableContainerRef = useRef(null);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
 
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
@@ -92,12 +92,11 @@ function Table(props) {
     // rows의 길이가 이전 길이보다 크면
     if (props.data.length > prevRowsLength) {
       const lastIndex = props.data.length - 1; // 마지막 행 인덱스
-      setLastAddedRowIndex(lastIndex);
-      setSelectedRowIndex(lastIndex); // 마지막 행을 선택된 행으로 설정
       setPrevRowsLength(props.data.length); // rows의 길이 업데이트
     } else {
       setLastAddedRowIndex(null); // 추가된 행이 없으면 null로 설정
     }
+    setSelectedRowIndex(-1);
   }, [props.data.length]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -146,7 +145,7 @@ function Table(props) {
                   setSelectedRowIndex(index);
                 }}
                 style={
-                  index === selectedRowIndex
+                  index === selectedRowIndex && selectedRowIndex !== "insert"
                     ? { backgroundColor: "var(--color-secondary-blue)" }
                     : {}
                 }
@@ -165,7 +164,7 @@ function Table(props) {
           {props.showInsertRow && (
             <StyledTr
               style={
-                selectedRowIndex === null && props.showInsertRow
+                selectedRowIndex === "insert"
                   ? { backgroundColor: "var(--color-secondary-blue)" }
                   : {}
               }
@@ -195,7 +194,7 @@ function Table(props) {
                 colSpan={props.columns.length}
                 onClick={() => {
                   props.setShowInsertRow((prevState) => !prevState);
-                  setSelectedRowIndex(null);
+                  setSelectedRowIndex("insert"); // 'insert'로 설정
                   setTimeout(() => {
                     if (tableContainerRef.current) {
                       tableContainerRef.current.scrollTop =
