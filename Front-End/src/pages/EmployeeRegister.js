@@ -254,7 +254,13 @@ const EmployeeRegister = () => {
   // 전화번호 하나로 합치기
   const handlePhoneUpdate = () => {
     const fullPhone = `${employeeData.noPhone1}-${employeeData.noPhone2}-${employeeData.noPhone3}`;
-    
+
+    // 전화번호의 모든 세부 요소가 비어 있으면 API 요청 중단
+    if (!employeeData.noPhone1 && !employeeData.noPhone2 && !employeeData.noPhone3) {
+      console.log("전화번호 API 요청 중단*********************");
+      return;
+    }
+
     handleUpdateEmp("noPhone", clickCdEmp, fullPhone);
     setEmployeeData(prevState => ({
         ...prevState,
@@ -265,7 +271,13 @@ const EmployeeRegister = () => {
   // 휴대폰번호 하나로 합치기
   const handleMobilePhoneUpdate = () => {
     const fullMobilePhone = `${employeeData.noMobilePhone1}-${employeeData.noMobilePhone2}-${employeeData.noMobilePhone3}`;
-    
+
+    // 휴대폰 번호의 모든 세부 요소가 비어 있으면 API 요청 중단
+    if (!employeeData.noMobilePhone1 && !employeeData.noMobilePhone2 && !employeeData.noMobilePhone3) {
+      console.log("휴대폰번호 API 요청 중단*********************");
+      return;
+    }
+
     handleUpdateEmp("noMobilePhone", clickCdEmp, fullMobilePhone);
     setEmployeeData(prevState => ({
         ...prevState,
@@ -282,7 +294,6 @@ const EmployeeRegister = () => {
         employee: emp.nmEmp,
         foreign: emp.fgForeign,
         resident: emp.noResident,
-        // onRowClick: () => handleRowClick(emp.cdEmp),
         onRowClick: () => (emp.cdEmp),
       })),
     [empList]
@@ -388,7 +399,7 @@ const EmployeeRegister = () => {
                 value={inputValue || ""}
                 onChange={handleInputChange}
                 onClick={tableEmpCodeClick}
-                isDoubleClick={true}
+                // isDoubleClick={true}
                 className={"doubleLine"}
                 onBlur={handleInputOnBlurCdEmp}
               />
@@ -459,7 +470,7 @@ const EmployeeRegister = () => {
               value={inputValue || ""}
               onChange={handleInputChange}
               onClick={tableEmpNmClick}
-              isDoubleClick={true}
+              // isDoubleClick={true}
               className={"doubleLine"}
               onBlur={handleInputOnBlurNmEmp}
             />
@@ -562,7 +573,7 @@ const EmployeeRegister = () => {
             value={maskedValue}
             onChange={handleInputChange}
             onClick={tableNoResidentClick}
-            isDoubleClick={true}
+            // isDoubleClick={true}
             className={"doubleLine"}
             onBlur={handleInputOnBlurNoResident}
             />
@@ -613,6 +624,7 @@ const EmployeeRegister = () => {
   const handleUpdateEmp = async (columnName, clickCdEmp, inputValue) => {
 
     const initial = initialValues[columnName];
+    console.log("columnName : " + columnName);
     console.log('initial : ' +  initial);
     console.log('inputValue : ' +  inputValue);
     if (
@@ -624,7 +636,7 @@ const EmployeeRegister = () => {
     }
   
     console.log("********************* handleUpdateEmp 실행 *********************");
-    console.log(columnName, clickCdEmp, inputValue);
+    console.log("columnName : " + columnName, "clickCdEmp : " + clickCdEmp, "inputValue : " + inputValue);
   
     const requestData = {
       updateField: {
@@ -676,90 +688,92 @@ const EmployeeRegister = () => {
         method: "GET",
         url: `/api2/er/getEmpData?cdEmp=${cdEmp}`,
       });
-    
-  const updatedData = {
-    ...employeeData, // 기존 데이터 복사
-    cdEmp: responseData.cdEmp || "",
-    nmEmp: responseData.nmEmp || "",
-    noResident: responseData.noResident || "",
-    fgForeign: responseData.fgForeign || "",
-    dtHire: responseData.dtHire || "",
-    noPost: responseData.noPost || "",
-    nmAddress: responseData.nmAddress || "",
-    dcAddress: responseData.dcAddress || "",
-    nmAccountHolder: responseData.nmAccountHolder || "",
-    noDepartment: responseData.noDepartment || "",
-    cdBank: responseData.cdBank || "",
-    noPhone1: (responseData.noPhone || "").split('-')[0] || "",
-    noPhone2: (responseData.noPhone || "").split('-')[1] || "",
-    noPhone3: (responseData.noPhone || "").split('-')[2] || "",
-    noMobilePhone1: (responseData.noMobilePhone || "").split('-')[0] || "",
-    noMobilePhone2: (responseData.noMobilePhone || "").split('-')[1] || "",
-    noMobilePhone3: (responseData.noMobilePhone || "").split('-')[2] || "",
-    nmEmail: responseData.nmEmail || "",
-    username: (responseData.nmEmail || "").split('@')[0] || "",
-    domain: (responseData.nmEmail || "").split('@')[1] || "",
-    selectedOption: "0",
-    dtResign: responseData.dtResign || "",
-    noAccount: responseData.noAccount || "",
-    noPositionUnique: responseData.noPositionUnique || "",
-  };
 
-  // 전화번호 처리
-  const phoneParts = (responseData.noPhone || "").split('-');
-  if (phoneParts.length === 3) {
-    const [noPhone1, noPhone2, noPhone3] = phoneParts;
-    Object.assign(updatedData, {
-      noPhone1,
-      noPhone2,
-      noPhone3,
-    });
-  } else {
-    Object.assign(updatedData, {
-      noPhone1: "",
-      noPhone2: "",
-      noPhone3: "",
-    });
-  }
-  
-  // 휴대폰번호 처리
-  const mobilePhoneParts = (responseData.noMobilePhone || "").split('-');
-  if (mobilePhoneParts.length === 3) {
-    const [noMobilePhone1, noMobilePhone2, noMobilePhone3] = mobilePhoneParts;
-    Object.assign(updatedData, {
-      noMobilePhone1,
-      noMobilePhone2,
-      noMobilePhone3,
-    });
-  } else {
-    Object.assign(updatedData, {
-      noMobilePhone1: "",
-      noMobilePhone2: "",
-      noMobilePhone3: "",
-    });
-  }
-  
-  // 이메일 처리
-  const [username, domain] = (responseData.nmEmail || "").split('@');
-  Object.assign(updatedData, {
-    username: username || "",
-    domain: domain || "",
-  });
+    const updatedData = {
+      ...employeeData, // 기존 데이터 복사
+      cdEmp: responseData.cdEmp || "",
+      nmEmp: responseData.nmEmp || "",
+      noResident: responseData.noResident || "",
+      fgForeign: responseData.fgForeign || "",
+      dtHire: responseData.dtHire || "",
+      noPost: responseData.noPost || "",
+      nmAddress: responseData.nmAddress || "",
+      dcAddress: responseData.dcAddress || "",
+      nmAccountHolder: responseData.nmAccountHolder || "",
+      noDepartment: responseData.noDepartment || "",
+      cdBank: responseData.cdBank || "",
+      noPhone: responseData.noPhone || "",
+      noPhone1: (responseData.noPhone || "").split('-')[0] || "",
+      noPhone2: (responseData.noPhone || "").split('-')[1] || "",
+      noPhone3: (responseData.noPhone || "").split('-')[2] || "",
+      noMobilePhone: responseData.noMobilePhone || "",
+      noMobilePhone1: (responseData.noMobilePhone || "").split('-')[0] || "",
+      noMobilePhone2: (responseData.noMobilePhone || "").split('-')[1] || "",
+      noMobilePhone3: (responseData.noMobilePhone || "").split('-')[2] || "",
+      nmEmail: responseData.nmEmail || "",
+      username: (responseData.nmEmail || "").split('@')[0] || "",
+      domain: (responseData.nmEmail || "").split('@')[1] || "",
+      selectedOption: "0",
+      dtResign: responseData.dtResign || "",
+      noAccount: responseData.noAccount || "",
+      noPositionUnique: responseData.noPositionUnique || "",
+    };
 
-  // 상태 업데이트
-  setEmployeeData(updatedData);
-
-  // 초기값도 같은 데이터로 업데이트
-  setInitialValues(updatedData);
-  
-  updateNmDeptByCode(responseData.noDepartment);
-  updateNmBankByCode(responseData.cdBank);
-
-    } catch (error) {
-      console.error("api 요청 실패:", error);
+    // 전화번호 처리
+    const phoneParts = (responseData.noPhone || "").split('-');
+    if (phoneParts.length === 3) {
+      const [noPhone1, noPhone2, noPhone3] = phoneParts;
+      Object.assign(updatedData, {
+        noPhone1,
+        noPhone2,
+        noPhone3,
+      });
+    } else {
+      Object.assign(updatedData, {
+        noPhone1: "",
+        noPhone2: "",
+        noPhone3: "",
+      });
     }
 
-    setIsReadOnly(false);
+    // 휴대폰번호 처리
+    const mobilePhoneParts = (responseData.noMobilePhone || "").split('-');
+    if (mobilePhoneParts.length === 3) {
+      const [noMobilePhone1, noMobilePhone2, noMobilePhone3] = mobilePhoneParts;
+      Object.assign(updatedData, {
+        noMobilePhone1,
+        noMobilePhone2,
+        noMobilePhone3,
+      });
+    } else {
+      Object.assign(updatedData, {
+        noMobilePhone1: "",
+        noMobilePhone2: "",
+        noMobilePhone3: "",
+      });
+    }
+
+    // 이메일 처리
+    const [username, domain] = (responseData.nmEmail || "").split('@');
+    Object.assign(updatedData, {
+      username: username || "",
+      domain: domain || "",
+    });
+
+    // 상태 업데이트
+    setEmployeeData(updatedData);
+
+    // 초기값도 같은 데이터로 업데이트
+    setInitialValues(updatedData);
+    
+    updateNmDeptByCode(responseData.noDepartment);
+    updateNmBankByCode(responseData.cdBank);
+
+      } catch (error) {
+        console.error("api 요청 실패:", error);
+      }
+
+      setIsReadOnly(false);
   };
 
   // Delete (체크된 모든 행을 삭제)
