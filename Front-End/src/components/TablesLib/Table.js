@@ -64,7 +64,8 @@ const StyledInsertFooter = styled.tfoot`
   }
 `;
 const TableContainer = styled.div`
-  height: 100%;
+  height: ${(props) => (props.height ? props.height : "100%")};
+
   overflow-y: auto;
   position: relative;
   border-top: 2.5px solid var(--color-primary-black);
@@ -110,7 +111,7 @@ function Table(props) {
   };
 
   return (
-    <TableContainer ref={tableContainerRef}>
+    <TableContainer ref={tableContainerRef} height={props.height}>
       <table {...getTableProps()} className="namePickerTable hrGridTable">
         <thead>
           {headerGroups.map((headerGroup) => (

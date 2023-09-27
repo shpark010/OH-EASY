@@ -16,6 +16,7 @@ import CustomModal from "../components/Contents/CustomModal";
 import useApiRequest from "../components/Services/ApiRequest";
 import CustomButton from "../components/Contents/CustomButton";
 import SweetAlert from "../components/Contents/SweetAlert";
+import CustomSelect from "../components/Contents/CustomSelect";
 
 const SalaryData = (props) => {
   // 수정 가능 여부
@@ -1050,7 +1051,8 @@ const SalaryData = (props) => {
         width: "15%",
         id: "rateTax",
         Cell: ({ cell: { value }, row: { original } }) => {
-          return <Input value={original?.rateTax} readOnly={true} />;
+          const [inputValue, setInputValue] = useState(original.rateTax);
+          return <Input value={inputValue} readOnly={true} />;
         },
       },
     ],
@@ -1120,16 +1122,40 @@ const SalaryData = (props) => {
                   backgroundColor: "white",
                   border: "1px solid gray",
                   width: "600px",
-                  height: "470px",
+                  height: "450px",
                 }}
               >
                 <PageHeaderName text="세율확인/변경" />
-                <div className="test2" style={{ height: "380px" }}>
-                  <Table
-                    height="500px"
-                    columns={columnsModal2}
-                    data={dataModalTaxList}
-                  />
+                <div className="test2">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    <span>적용년도</span>
+                    <CustomSelect
+                      label="정렬"
+                      id="sd-order-category"
+                      width={"180px"}
+                      options={[
+                        { value: "0", label: "0. 2023" },
+                        { value: "1", label: "1. 2022" },
+                        { value: "2", label: "2. 2021" },
+                        { value: "3", label: "3. 2020" },
+                      ]}
+                      defaultValue={"0"}
+                    />
+                  </div>
+                  <div>
+                    <Table
+                      height="200px"
+                      columns={columnsModal2}
+                      data={dataModalTaxList}
+                    />
+                  </div>
                 </div>
                 <div className="test">
                   <CustomButton
@@ -1235,6 +1261,7 @@ const SalaryData = (props) => {
               showInsertRow={showInsertRow}
               setShowInsertRow={setShowInsertRow}
               scrollHeight="500"
+              height="96.5%"
             />
             <table className="sd-empList-calTable">
               <tbody>
