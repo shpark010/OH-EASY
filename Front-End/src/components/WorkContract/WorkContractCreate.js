@@ -63,7 +63,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   const [showAlert5, setShowAlert5] = React.useState(false); // sweetalret
   const [showAlert6, setShowAlert6] = React.useState(false); // sweetalret
   const [showAlert7, setShowAlert7] = React.useState(false); // sweetalret
-
+  const [highlightFirstRow, setHighlightFirstRow] = useState(true); //첫번째 행 표시를 위해
 
 
   const [validate,setValidate] = useState({
@@ -166,6 +166,13 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
       
       setEmployeeData(empListResponseData);
 
+
+      const lastTwoCharsNewDate = newDate.slice(-2);
+      const lastTwoCharsBelongingDate = belongingDate.slice(-2);
+      
+      if (lastTwoCharsNewDate !== lastTwoCharsBelongingDate) {
+        setParamGetEmpList1({});
+      } //작성일자의 월과 작성년월의 월이 다르면 오른쪽 테이블 data 초기화
 
     } 
     catch (error) {
@@ -440,27 +447,29 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
         setEmployeeData(responseData);
 
 
-        // const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
-        // setClickCode(firstCdEmp);
-        // if (firstCdEmp) {
-        //     // 두 번째 API 요청
-        //     const responseData2 = await apiRequest({
-        //         method: "GET",
-        //         url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
-        //     });
-  
-        //     setParamGetEmpList1(responseData2); // set paramGetEmpList using the new data
-        //     setValidate(responseData2); // store the initial values from the server
-        // }
+        const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+        setClickCode(firstCdEmp);
+        if (firstCdEmp) {
+            // 두 번째 API 요청
+           
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+            });
+      
+            setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+            setValidate(responseData2); //  초기값과 비교해서 validate에 사용할 data set
+        }
 
-    } catch (error) {
+        
+      } catch (error) {
         console.error("Failed to fetch emp data:", error);
     }
   };
   
   
 
-
+ 
 
  
 
@@ -593,9 +602,23 @@ modal 에서 주소눌렀을때 이벤트 핸들러
                 method: "GET",
                 url: `/api2/wc/getEmpList?creDate=${belongingDate}&orderValue=${e.target.value}`,
             });
+
+            const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+            setClickCode(firstCdEmp);
+            if (firstCdEmp) {
+                // 두 번째 API 요청
+               
+                const responseData2 = await apiRequest({
+                    method: "GET",
+                    url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+                });
+          
+                setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+             
+            }
             setEmployeeData(responseData);
-            console.log(employeeData);
-            setParamGetEmpList1([]);
+            
+            
         } catch (error) {
             console.error("Failed to fetch emp data:", error);
         }
@@ -612,13 +635,25 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
 
 
-//온클릭
+//온클릭 
+// 이렇게 맨위로 하나로 빼면 e.target 써야되고 안에 각각 써주면 original로 접근간능
   const handleInputClick = async(e) => { //왼쪽 Table 클릭시 호출되는 함수.
     // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
     // 2. e.target으로 찾기.
-    // 어차피 e.target을 통해 찾아야 함.
+    
+    // 1. cell에서 library parameter사용하기 -> 값은 제대로 가져오는데 공통 Component에 porp 전달이 안된다던가 하는 문제가 생김
   
     const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+
+    
+
+  //   document.querySelectorAll('td').forEach(td => {
+  //     td.style.backgroundcolor =#92c5ff;
+  // }); 모든 td에 적용
+
+  setHighlightFirstRow(false); //클릭 발생시 highlight 끄기
+
+
 
     if(code.value){
       
@@ -642,7 +677,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   }
   else{
     
-    openModal2(e);
+    openModal2(e); //눌렀는데 cdemp가 값이 없으면 insert 하는 modal opne해라.
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -689,7 +724,6 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 // 사원추가 모달 끄고 닫기.
 
 
-const firstRowRef = useRef(null);
 
 
 
@@ -710,15 +744,15 @@ const firstRowRef = useRef(null);
         accessor: "checkbox",
         id: "checkbox",
         width:"10%",
-        Cell: ({ cell: { value }, row :{original} }) =>{ 
+        Cell: ({ cell: { value }, row :{original,index} }) =>{ 
         return(
           <>
+          
         <input 
         type="checkbox"  
         onChange={e => handleCheckboxChange(e, original.cdEmp)}
         checked={original && original.cdEmp && checkColumn.includes(original.cdEmp)} // 현재 체크박스가 checkColumn 배열에 있는지 확인
         //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
-        className = {"doubleLine"}
         
           />
         
@@ -733,105 +767,30 @@ const firstRowRef = useRef(null);
         accessor: "cdEmp",
         id: "cdEmp",
         width: "20%",
-        Cell: ({ cell: { value }, row :{original},   }) => {
-          const [inputValue, setInputValue] = useState(value);
-          const [modalApper,setModalApper] = useState("")
-          
-  
-          //console.log(original.cdEmp);console.log(value); 둘이 같다.
-          
-
-          const handleInputChange = (e) => {
-            // setInputValue(e.target.value);
-          };
-
-          // const handleInputClick = (e) => {
-          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-          //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-          // };
-
-          const inputBlur = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            //  ele.style.backgroundColor = '';
-            
-          }
-
-
-          /*Code input에서 mouse 올라오면 state 변경하는 함수 */
-          const mouseOverModalOn = ()=>{
-
-
-            
-
-            // setModalApper("on");
-            
-          };
-
-          /*Code input에서 mouse 나갈시 state 변경하는 함수*/ 
-          const mouseOutModalOff = ()=>{
-            // setModalApper("off");
-          };
-
-          /*Code input에 code 도우미 render 함수*/ 
-          const modalApperFunc = () =>{
-            if(modalApper === "on"){
-              return null;
-            }
-            else return null;
-
-          };
-
-          return (
-            <Input
-             
-              value={original?.cdEmp||""}
-              onClick={handleInputClick }
-              onBlur={inputBlur}
-              onChange={handleInputChange}
-              onMouseOver={mouseOverModalOn}
-              onMouseOut= {mouseOutModalOff}
-              modalRender = {modalApperFunc}
-              className = {"doubleLine"}
-              
-            
-            />
-
-          );
-
+        Cell: ({ cell: { value }, row: { original, index } }) => {
+            return (
+                <div className={index === 0 && highlightFirstRow ? 'wcFirstRowHighlight' : ''}>
+                    <Input
+                        value={original?.cdEmp || ""}
+                        onClick={handleInputClick}
+                    />
+                </div>
+            );
         },
-      },
+    },
       {
         Header: "사원명",
         accessor: "nmEmp",
         id: "nmEmp",
         width: "20%",
-        Cell: ({ cell: { value }, row :{original}  }) => {
-          const [inputValue, setInputValue] = React.useState(value);
+        Cell: ({ cell: { value }, row :{original,index}  }) => {
           
-
-          // const handleInputClick = (e) => {
-          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-          //   //  ele.style.backgroundColor = 'var(--color-secondary-blue)';
-        
-          // }; // input tag Click시 발생할 event
-
-          const inputBlur = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            //  ele.style.backgroundColor = '';
-          }
-      
-
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
-
+          
           return (
             <Input
               value={original?.nmEmp||""}
               onClick={handleInputClick}
-              onBlur={inputBlur}
-              onChange={handleInputChange}
-              className = {"doubleLine"}
+              // className = {"doubleLine "}
               
               
             />
@@ -843,31 +802,19 @@ const firstRowRef = useRef(null);
         Header: "주민번호",
         accessor: "noResident",
         id: "noResident",
-        Cell: ({ cell: { value }, row :{original} } ) => {
-          const [inputValue, setInputValue] = React.useState(value);
-
-          // const handleInputClick = (e) => {
-          //   // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-          //   // ele.style.backgroundColor = 'var(--color-secondary-blue)';
-          // };
-
-          const inputBlur = (e) => {
-            // const ele = e.target.parentElement.parentElement.parentElement.querySelector('tr:nth-child(1)');
-            //  ele.style.backgroundColor = '';
-          }
-
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
-          //original?.noResident||""
+        Cell: ({ cell: { value }, row :{original,index} } ) => {
+          
+          
           return (
+            
             <Input
               value={original?.noResident||""}
-              onChange={handleInputChange}
               onClick={handleInputClick}
-              onBlur={inputBlur}
-              className ={"doubleLine"}
+              // className ={"doubleLine"}
+
+              
             />
+            
           );
         },
       },
@@ -978,9 +925,6 @@ const firstRowRef = useRef(null);
 
              
             </div>
-            {/* <div className="btnWrapper">
-            <SearchSubmitButton onClick={conditionSearch} text="조회" />
-            </div> */}
           </div>
         </div>
 
@@ -993,10 +937,13 @@ const firstRowRef = useRef(null);
               <Table
                 columns={columns}
                 data={data}   
-                checkboxWidth={"10%"}
+                
                 insertRow={true} //table 추가하기 on of
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
+                // setSelectedRowIndex={setSelectedRowIndex} 
+                // selectedRowIndex={selectedRowIndex}
+
                 />
               </div>
               <table className="wcBottomTable">
@@ -1006,7 +953,6 @@ const firstRowRef = useRef(null);
                   <td>{data.length}명</td>
                 </tr>
               </tbody>
-          
               </table>
             </div>
 
@@ -1208,7 +1154,7 @@ const firstRowRef = useRef(null);
 
                       id={"dotw"}
                      onChange={inputOnChange}
-                     className={"wcSelect1"}
+                     className={"wcSelect1" }
 
                     
                     />
@@ -1526,7 +1472,7 @@ const firstRowRef = useRef(null);
 
 {showAlert4 && (
         <SweetAlert
-          text="60분을 초과할 수 없습니다."
+          text="59분을 초과할 수 없습니다."
           // showCancel={true}
           //type="success"
           type="warning"
