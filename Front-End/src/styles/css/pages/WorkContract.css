@@ -210,7 +210,40 @@ width:80px;
     }  
 
   
-    .wcFirstRowHighlight{
-      border:5px solid #a9d0f5;
+    .wcFirstRowHighlight {
+      border:10px solid #92c5ff
       /* background-color: #a9d0f5; */
+      /* 7px solid #92c5ff */
+    }
+
+    .wchighlightLastRow{
+      border:10px solid #92c5ff
+      /* background-color: #a9d0f5; */
+      /* 7px solid #92c5ff */
+    }
+
+    .wcMordalBackGround {
+      border:10px solid #92c5ff
+      
+      /* 7px solid #92c5ff */
+    }
+
+    .wcMordalContainer {
+      /* position: absolute;           /* 화면에 고정 */
+      /* left: 0;
+      right: 0;  */
+      /* bottom: 12px;                화면 하단에 위치 */
+      
+      display: flex;
+      justify-content: center;   /* 가로 중앙 정렬 */
+      align-items: center;       /* 세로 중앙 정렬 */
+  }
+    .wcModalInput{
+      margin: 7px 7px 7px 7px;
+      
+    }
+
+    .wcModalButton{
+      position: absolute;
+      right: 0;
     }
