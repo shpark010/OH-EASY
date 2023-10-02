@@ -23,23 +23,13 @@ const WorkContractSelect = () => {
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
   const [paramGetEmpList,setParamGetEmpList] = useState([]);// code로 가져온 표준근로계약서 사원
   const [clickCode,setClickCode]=useState([]);
+  const [highlightFirstRow1, setHighlightFirstRow1] = useState(true); //첫번째 행 표시를 위해
   //paramgetEmpList1 은 Create Tab
 
 
   
 
-  // const schangeCheck2 = (e, originalCode) => {
-  //   const checkedValue = e.target.checked;
-
-  //   if (checkedValue) {
-  //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
-  //   } else {
-  //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
-  //   }
-  // };
-  // useEffect(() => {
-  //   console.log("codeArr 변경됨:", codeArr);
-  // }, [codeArr]); // codeArr이 변경될 때만 실행
+  
   
   const handleBelongingDateChange = (newDate) => {
     
@@ -53,6 +43,7 @@ const WorkContractSelect = () => {
     console.log(belongingDate2);
     if (belongingDate && belongingDate <= formattedDate) {
       setEmployeeData([]);
+      setHighlightFirstRow1(true);
       try {
        
         const responseData = await apiRequest({
@@ -64,14 +55,11 @@ const WorkContractSelect = () => {
         setClickCode(firstCdEmp);
         if (firstCdEmp) {
             // 두 번째 API 요청
-           
             const responseData2 = await apiRequest({
                 method: "GET",
                 url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
             });
-      
             setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
-         
         }
 
 
@@ -88,17 +76,15 @@ const WorkContractSelect = () => {
           
           return responseData;
         });
-  
-  
         setEmployeeData(modifiedresponseData)
-        console.log(employeeData);
-      
+        console.log(employeeData); 
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
       }
-  }
-
-  }; // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
+    }
+  }; 
+  
+  // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
   //e 넣으면 오류뜸 why? 함수하나로 분기처리 하고싶은데 안됨.
 
 
@@ -122,10 +108,10 @@ const WorkContractSelect = () => {
   const searchOrderOption = async (e) => {
     const orderValue = e.target.value;
     setSearchOrder(orderValue);
-    
-
+    setEmployeeData([]); //backgroundcolor 지우기 위한
     // 두 달력의 상태값이 모두 있을 경우 API 요청을 보냅니다.
     if (belongingDate && belongingDate2) {
+      setHighlightFirstRow1(true);
         try {
             const responseData = await apiRequest({
                 method: "GET",
@@ -166,41 +152,41 @@ const WorkContractSelect = () => {
   useEffect(() => {
     console.log(employeeData);
   }, [employeeData]); // 변경될때만 실행.
+ 
+
 
   
-  const handleInputClick = async(e) => {
-    
-    console.log(paramGetEmpList);
+  const handleInputClick = async (e) => {
     setParamGetEmpList([]);
-    // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
-    // 2. e.target으로 찾기.
-    // 어차피 e.target을 통해 찾아야 함.
-    const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
-    const param = code.value
-    console.log(param); //잘가져옴
-    try {
-     
-      const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/wc/getCodeParamEmpList?code=${param}`, 
-      });
-      
 
-      
-      setParamGetEmpList(responseData)
-      
-      
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
+    // 상태 변경을 Promise로 감싸서 상태가 완전히 업데이트된 후 다음 동작을 진행합니다.
 
-  }; //왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
+        setHighlightFirstRow1(false);
+       
+    
+        const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+        const param = code.value;
+
+        try {
+            const responseData = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${param}`,
+            });
+            setParamGetEmpList(responseData);
+        } catch (error) {
+            console.error("Failed to fetch emp data:", error);
+        }
+    
+}; 
+
+//왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
   // 방법 1 : 조건조회할때 미리 다 가져와 뿌리기. 사람이 많아졌을때 고려하면 x
   // 방법 2 : 필요한 VO만 가져온후 왼쪽 Table 누를 경우 api 보내기
 
   useEffect(() => {
     console.log(paramGetEmpList);
   }, [paramGetEmpList]); // 변경될때만 실행.
+  
 
 
  
@@ -211,50 +197,16 @@ const WorkContractSelect = () => {
       id: "dtCreated",
       width: "20%",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = useState(value);
-        const [modalApper, setModalApper] = useState("off");
-  
-        const getCodeArr = (e) => {
-          const codeValue = e.target.parentElement.parentElement.querySelector(
-            'td:nth-child(2) input'
-          );
-          console.log(codeValue);
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
-  
-        const inputBlur = (e) => {
-
-          
-        };
-  
-        const mouseOverModalOn = () => {
-          setModalApper("on");
-        };
-  
-        const mouseOutModalOff = () => {
-          setModalApper("off");
-        };
-  
-        const modalApperFunc = () => {
-          if (modalApper === "on") {
-            return null;
-          } else return null;
-        };
+       
+      
+        
   
         return (
           <>
             <Input
               value={original?.dtCreated||""}
               onClick={handleInputClick}
-              onBlur={inputBlur}
-              onChange={handleInputChange}
-              onMouseOver={mouseOverModalOn}
-              onMouseOut={mouseOutModalOff}
-              modalRender={modalApperFunc}
-              className={"doubleLine"}
+              // className={"doubleLine"}
             />
           </>
         );
@@ -265,42 +217,16 @@ const WorkContractSelect = () => {
       accessor: "cdEmp",
       id: "cdEmp",
       width: "20%",
-      Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = useState(value);
-        const [modalApper, setModalApper] = useState("off");
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
-  
-        const inputBlur = (e) => {};
-  
-        const mouseOverModalOn = () => {
-          setModalApper("on");
-        };
-  
-        const mouseOutModalOff = () => {
-          setModalApper("off");
-        };
-  
-        const modalApperFunc = () => {
-          if (modalApper === "on") {
-            return null;
-          } else return null;
-        };
-  
+      Cell: ({ cell: { value }, row: { original,index } }) => {
+       
         return (
-          <Input
-            value={original?.cdEmp||""}
-            onClick={handleInputClick}
-            onBlur={inputBlur}
-            onChange={handleInputChange}
-            onMouseOver={mouseOverModalOn}
-            onMouseOut={mouseOutModalOff}
-            modalRender={modalApperFunc}
-            className={"doubleLine"}
-          />
-        );
+          <div className={index === 0 && highlightFirstRow1 ? 'wcFirstRowHighlight' : ''}>
+              <Input
+                  value={original?.cdEmp || ""}
+                  onClick={handleInputClick}
+              />
+          </div>
+      );
       },
     },
     {
@@ -309,28 +235,17 @@ const WorkContractSelect = () => {
       id: "nmEmp",
       width: "20%",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = React.useState(value);
+        
   
-        const inputBlur = (e) => {
-          const ele =
-            e.target.parentElement.parentElement.parentElement.querySelector(
-              "tr:nth-child(1)"
-            );
-          ele.style.backgroundColor = "";
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
+        
   
         return (
           <Input
             value={original?.nmEmp||""}
             onClick={handleInputClick}
-            onBlur={inputBlur}
-            onChange={handleInputChange}
+        
             
-            className={"doubleLine"}
+            // className={"doubleLine"}
           />
         );
       },
@@ -340,32 +255,19 @@ const WorkContractSelect = () => {
       accessor: "noResident",
       id: "noResident",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = React.useState(value);
-  
-        const inputBlur = (e) => {
-          const ele =
-            e.target.parentElement.parentElement.parentElement.querySelector(
-              "tr:nth-child(1)"
-            );
-          ele.style.backgroundColor = "";
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
+    
+       
   
         return (
           <Input
             value={original?.noResident||""}
-            onChange={handleInputChange}
             onClick={handleInputClick}
-            onBlur={inputBlur}
-            className={"doubleLine"}
+            // className={"doubleLine"}
           />
         );
       },
     },
-  ],[]
+  ],[highlightFirstRow1] //이 상태가 바뀌기 전까지는 전의 data 유지.
   );
   
   
