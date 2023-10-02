@@ -3,8 +3,9 @@
 
 <mapper namespace="kr.or.oheasy.wc.dao.WcDao">
 
-<!-- 사원의 정보 조건조회 -->
-<select id="getOptionEmpList" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpVO">
+	<!-- 사원의 정보 조건조회 -->
+	<select id="getOptionEmpList" parameterType="String"
+		resultType="kr.or.oheasy.vo.WcGetEmpVO">
 	 <![CDATA[
     SELECT c.cd_emp, e.nm_emp, e.no_resident, c.dt_created 
 FROM hr_contract_info AS c
@@ -12,104 +13,148 @@ JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
 WHERE c.dt_created BETWEEN #{param1} AND #{param2}
 ORDER BY
     ]]>
-    
-    
-  <choose>
-        <when test="param3 == 'e.nm_emp'">e.nm_emp</when>
-       
-        <otherwise>c.cd_emp</otherwise>
-    </choose>
-   
-</select>
 
 
-<select id="getOptionEmpList2" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpVO">
+		<choose>
+			<when test="param3 == 'e.nm_emp'">e.nm_emp</when>
+
+			<otherwise>c.cd_emp</otherwise>
+		</choose>
+
+	</select>
+
+
+	<select id="getOptionEmpList2" parameterType="String"
+		resultType="kr.or.oheasy.vo.WcGetEmpVO">
 	<![CDATA[
 	SELECT c.cd_emp, e.nm_emp, e.no_resident, c.dt_created
 	FROM hr_contract_info AS c
 	JOIN hr_emp_mst AS e ON c.cd_emp = e.cd_emp
 	WHERE dt_created BETWEEN #{param1} AND #{param2}
 	ORDER BY ]]>
-    <choose>
-        <when test="param3 == 'e.nm_emp'">e.nm_emp</when>
-        <when test="param3 == 'e.cd_emp'">e.cd_emp</when>
-        <!-- 다른 열 이름에 대한 검증 로직 추가 -->
-        <otherwise>c.dt_created</otherwise>
-    </choose>
-</select>
-  
-  
-  <select id = "getCodeParam" parameterType="String" resultType="kr.or.oheasy.vo.WcVO">
-	SELECT * FROM hr_contract_info WHERE cd_emp = #{code}
+		<choose>
+			<when test="param3 == 'e.nm_emp'">e.nm_emp</when>
+			<when test="param3 == 'e.cd_emp'">e.cd_emp</when>
+			<!-- 다른 열 이름에 대한 검증 로직 추가 -->
+			<otherwise>c.dt_created</otherwise>
+		</choose>
+	</select>
 
-</select>
-  
-	<!-- wc table  code x 작성년월 o, code 만 x 나머지 colum상관x-->
+
+	<select id="getCodeParam" parameterType="String"
+		resultType="kr.or.oheasy.vo.WcVO">
+		SELECT * FROM hr_contract_info WHERE cd_emp = #{code}
+
+	</select>
+
+	<!-- wc table code x 작성년월 o, code 만 x 나머지 colum상관x -->
 	<!-- SELECT e.cd_emp, e.nm_emp, e.no_resident FROM hr_emp_mst AS e LEFT 
 		JOIN hr_contract_info AS w ON e.cd_emp = w.cd_emp WHERE w.cd_emp IS NULL; -->
-	<select id="getModalEmpList" resultType="kr.or.oheasy.vo.WcGetEmpVO">
-    	
-    	SELECT e.cd_emp, e.nm_emp, e.no_resident
-FROM hr_emp_mst AS e
-LEFT JOIN hr_contract_info AS w ON e.cd_emp = w.cd_emp
-WHERE w.cd_emp IS NULL;
-   			 
+
+
+
+	<select id="getModalEmpList"
+		resultType="kr.or.oheasy.vo.WcGetEmpVO">
+
+		SELECT e.cd_emp, e.nm_emp, e.no_resident
+		FROM hr_emp_mst AS
+		e
+		LEFT JOIN
+		hr_contract_info AS w ON e.cd_emp = w.cd_emp
+		WHERE w.cd_emp
+		IS NULL;
+
+	</select>
+
+	<!-- <select id="getModalEmpListByName" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpVO"> 
+		SELECT e.cd_emp, e.nm_emp, e.no_resident FROM hr_emp_mst AS e LEFT JOIN hr_contract_info 
+		AS w ON e.cd_emp = w.cd_emp WHERE e.nm_emp = #{name}; </select> -->
+
+
+	<select id="getModalEmpListByName" parameterType="String"
+		resultType="kr.or.oheasy.vo.WcGetEmpVO">
+
+		SELECT e.cd_emp, e.nm_emp, e.no_resident
+		FROM hr_emp_mst AS e
+		LEFT JOIN
+		hr_contract_info AS w ON e.cd_emp = w.cd_emp
+		<where>
+			w.cd_emp IS NULL
+			<choose>
+				<when test="param1 == 'e.cd_emp'">
+					AND e.cd_emp LIKE CONCAT('%', #{param2}, '%')
+				</when>
+				<when test="param1 == 'e.nm_emp'">
+					AND e.nm_emp LIKE CONCAT('%', #{param2}, '%')
+				</when>
+				<when test="param1 == 'e.no_resident'">
+					AND e.no_resident LIKE CONCAT('%', #{param2}, '%')
+				</when>
+			</choose>
+		</where>
 	</select>
 
 
-	 <select id="getModalData" parameterType="String" resultType="kr.or.oheasy.vo.WcGetEmpVO">
-  			SELECT	cd_emp, nm_emp, no_resident 
-  			FROM hr_emp_mst
-  			WHERE cd_emp = #{cdEmp}
-	</select>
-  
-  <insert id ="insertEmpData" parameterType="String">
-  <!--  
-  INSERT INTO hr_contract_info (cd_emp, dt_created)  			
-  VALUES (#{param1},#{param2})
-  -->
-  INSERT INTO hr_contract_info (cd_emp,dt_created)  			
-  VALUES (#{param1},#{param2})
-  
-  </insert>
-  
-  
-  
-	<update id="updateEmpList" parameterType="String" >
-    UPDATE hr_contract_info
-    SET 
-    <choose>
-    	<when test="param2 == 'dtStartCont'">DT_START_CONT</when>
-    	<when test="param2 == 'dtEndCont'">DT_END_CONT</when>
-    	<when test="param2 == 'noWorkPost'">NO_WORK_POST</when>
-    	<when test="param2 == 'addrWork'">ADDR_WORK</when>
-        <when test="param2 == 'addrWorkDtl'">ADDR_WORK_DTL</when>
-        <when test="param2 == 'cntnJob'">CNTN_JOB</when>
-        <when test="param2 == 'tmStartRegularWork'">TM_START_REGULAR_WORK</when>
-        <when test="param2 == 'tmEndRegularWork'">TM_END_REGULAR_WORK</when>
-        <when test="param2 == 'tmStartBreak'">TM_START_BREAK</when>
-        <when test="param2 == 'tmEndBreak'">TM_END_BREAK</when>
-        <when test="param2 == 'ddWorking'">DD_WORKING</when>
-        <when test="param2 == 'dotw'">DOTW</when>
-        <when test="param2 == 'tpSal'">TP_SAL</when>
-        <when test="param2 == 'amtSal'">AMT_SAL</when>
-        <when test="param2 == 'tpPayDtSal'">TP_PAY_DT_SAL</when>
-        <when test="param2 == 'ddPaySal'">DD_PAY_SAL</when>
-        <when test="param2 == 'methodPay'">METHOD_PAY</when>
-        <when test="param2 == 'ynEmpInsurance'">YN_EMP_INSURANCE</when>
-        <when test="param2 == 'ynIndustrialAccidentInsurance'">YN_INDUSTRIAL_ACCIDENT_INSURANCE</when>
-        <when test="param2 == 'ynNationalPension'">YN_NATIONAL_PENSION</when>
-        <when test="param2 == 'ynHealthInsurance'">YN_HEALTH_INSURANCE</when>
-        <when test="param2 == 'stSign'">ST_SIGN</when>
-        <when test="param2 == 'dtCreated'">DT_CREATED</when>
-    </choose> = #{param3}
-    WHERE cd_emp = #{param1}
-</update>
 
-	 <delete id="deleteEmp" parameterType="String">
-        DELETE FROM hr_contract_info
-        WHERE cd_Emp = #{cdEmp}
-    </delete>
+
+
+
+
+	<select id="getModalData" parameterType="String"
+		resultType="kr.or.oheasy.vo.WcGetEmpVO">
+		SELECT cd_emp, nm_emp, no_resident
+		FROM hr_emp_mst
+		WHERE
+		cd_emp = #{cdEmp}
+	</select>
+
+	<insert id="insertEmpData" parameterType="String">
+		<!-- INSERT INTO hr_contract_info (cd_emp, dt_created) VALUES (#{param1},#{param2}) -->
+		INSERT INTO hr_contract_info (cd_emp,dt_created)
+		VALUES
+		(#{param1},#{param2})
+
+	</insert>
+
+
+
+	<update id="updateEmpList" parameterType="String">
+		UPDATE hr_contract_info
+		SET
+		<choose>
+			<when test="param2 == 'dtStartCont'">DT_START_CONT</when>
+			<when test="param2 == 'dtEndCont'">DT_END_CONT</when>
+			<when test="param2 == 'noWorkPost'">NO_WORK_POST</when>
+			<when test="param2 == 'addrWork'">ADDR_WORK</when>
+			<when test="param2 == 'addrWorkDtl'">ADDR_WORK_DTL</when>
+			<when test="param2 == 'cntnJob'">CNTN_JOB</when>
+			<when test="param2 == 'tmStartRegularWork'">TM_START_REGULAR_WORK</when>
+			<when test="param2 == 'tmEndRegularWork'">TM_END_REGULAR_WORK</when>
+			<when test="param2 == 'tmStartBreak'">TM_START_BREAK</when>
+			<when test="param2 == 'tmEndBreak'">TM_END_BREAK</when>
+			<when test="param2 == 'ddWorking'">DD_WORKING</when>
+			<when test="param2 == 'dotw'">DOTW</when>
+			<when test="param2 == 'tpSal'">TP_SAL</when>
+			<when test="param2 == 'amtSal'">AMT_SAL</when>
+			<when test="param2 == 'tpPayDtSal'">TP_PAY_DT_SAL</when>
+			<when test="param2 == 'ddPaySal'">DD_PAY_SAL</when>
+			<when test="param2 == 'methodPay'">METHOD_PAY</when>
+			<when test="param2 == 'ynEmpInsurance'">YN_EMP_INSURANCE</when>
+			<when test="param2 == 'ynIndustrialAccidentInsurance'">YN_INDUSTRIAL_ACCIDENT_INSURANCE</when>
+			<when test="param2 == 'ynNationalPension'">YN_NATIONAL_PENSION</when>
+			<when test="param2 == 'ynHealthInsurance'">YN_HEALTH_INSURANCE</when>
+			<when test="param2 == 'stSign'">ST_SIGN</when>
+			<when test="param2 == 'dtCreated'">DT_CREATED</when>
+		</choose>
+		= #{param3}
+		WHERE cd_emp = #{param1}
+	</update>
+
+	<delete id="deleteEmp" parameterType="String">
+		DELETE FROM
+		hr_contract_info
+		WHERE cd_Emp = #{cdEmp}
+	</delete>
 
 
 

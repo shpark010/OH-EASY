@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,10 +74,11 @@ public class WcController {
 		System.out.println("getCodeParam진입");
 		System.out.println(code);
 		WcVO result = wcService.getCodeParam(code);
+		System.out.println("codeParamEmpList진입");
+		System.out.println(code);
 		System.out.println(result);
 		
 		// 금액 , 찍어주기
-		
 		String amount = result.getAmtSal();
 		if(amount !=null) {
 		System.out.println(amount);
@@ -98,6 +100,22 @@ public class WcController {
 		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
+	
+	@PostMapping("/getModalEmpListByName") //객체 보낼거라.
+	public ResponseEntity<?> getModalEmpListByName(@RequestBody Map<String, Object> params){
+		System.out.println("getModalEmpListByName진입");
+		System.out.println(params);
+		List<WcGetEmpVO> result = wcService.getModalEmpListByName(params);
+		System.out.println(result);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	/*
+	 *   @GetMapping("/search")
+    public ResponseEntity<List<WcGetEmpVO>> getModalEmpListByName(@RequestParam Map<String, Object> params) {
+        List<WcGetEmpVO> empList = empService.getModalEmpListByName(params);
+        return new ResponseEntity<>(empList, HttpStatus.OK);
+    }*/
 	
 	
 	@GetMapping("/getModalData")
