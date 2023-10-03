@@ -43,6 +43,9 @@ const EmployeeRegister = () => {
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태 관리
 
+  const [isDataInserted, setIsDataInserted] = useState(false);
+  const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태 관리
+
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
     nmEmp: "",
@@ -177,6 +180,43 @@ const EmployeeRegister = () => {
     return result;
   };
 
+  // 주민번호 유효성 검사 로직
+  const isValidResidentNumber = (number) => {
+    if (number.length !== 14) return false;
+  
+    const birth = number.substring(0, 6);
+    const gender = number[6];
+  
+    // 생년월일 검증
+    const year = parseInt(birth.substring(0, 2), 10);
+    const month = parseInt(birth.substring(2, 4), 10);
+    const day = parseInt(birth.substring(4, 6), 10);
+  
+    if (month < 1 || month > 12) return false;
+  
+    let maxDay;
+    switch (month) {
+      case 2:
+        maxDay = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28;  // 윤년 계산
+        break;
+      case 4:
+      case 6:
+      case 9:
+      case 11:
+        maxDay = 30;
+        break;
+      default:
+        maxDay = 31;
+    }
+  
+    if (day < 1 || day > maxDay) return false;
+  
+    // 성별 번호 검증
+    if (!['1', '2', '3', '4', '5', '6', '7', '8'].includes(gender)) return false;
+  
+    return true;
+  };
+
   // 버튼 클릭시 DaumPostcode 모달 열기
   const handleAddressButtonClick = () => {
     setOpenPostcode(true);
@@ -285,6 +325,16 @@ const EmployeeRegister = () => {
     }));
   };
 
+  // insert useEffect
+  useEffect(() => {
+    if (isDataInserted) {
+        handleInsertEmp(insertData.cdEmp, insertData.nmEmp, insertData.noResident);
+        setIsDataInserted(false);
+        window.location.reload();
+    }
+  }, [isDataInserted]);
+
+
   // erGrid useMemo data
   const data = useMemo(
     () =>
@@ -331,12 +381,13 @@ const EmployeeRegister = () => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
-          const [showAlert, setShowAlert] = useState(false);
-          const [alertMessage, setAlertMessage] = useState('');
+          // const [showAlert, setShowAlert] = useState(false);
+          // const [alertMessage, setAlertMessage] = useState('');
 
-          const handleInputChange = (e) => {
+          const handleInputChangeCdEmp = (e) => {
             setInputValue(e.target.value);
             setChanged(true);
+            setInsertData(prev => ({ ...prev, cdEmp: e.target.value }));
           };
 
           const tableEmpCodeClick = (e) => {
@@ -350,46 +401,40 @@ const EmployeeRegister = () => {
           };
 
           const handleInputOnBlurCdEmp = async (e) => {
-
             console.log("handleInputOnBlurCdEmp 함수가 호출되었습니다.");
-            console.log("inputValue의 값 : ", inputValue);
-
+            console.log("inputValue의 값 : " + inputValue);
+        
             if (original && original.code) {
-              console.log("original.code의 값 : ", original.code);
+                console.log("original.code의 값 : " + original.code);
             }
-
-            // inputValue가 null or undefined or 빈 문자열일 때, 앞뒤 공백을 제거한 문자열이 비어있지 않을 때, onChange 이벤트 발생 x
+        
             if (!inputValue || (original && inputValue === original.code) || !inputValue.trim() || !changed) {
-              console.log("*********************************** onChange 없으니 종료");
-              return;
+                console.log("*********************************** onChange 없으니 종료");
+                return;
             }
-
-            setChanged(false); // onBlur 이벤트가 처리된 후 changed를 다시 false로 설정
-
+        
+            setChanged(false);
+        
             try {
               const exists = await checkCdEmpExists(inputValue);
+      
+              // Code의 중복을 체크
+              if (exists) {
+                console.log("이미 존재하는 Code 입니다. focus 이동합니다~~");
+                const element = document.getElementById(`focusOn_${inputValue}`);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element.focus();
+                }
+                return;
+              }
 
-              if (!original || !original.code) {
-                if (exists) {
-                  setAlertMessage("이미 존재하는 Code 입니다.");
-                  setShowAlert(true);
-                  console.log("(InsertEmp) 이미 존재하는 Code 입니다.")
-                  return;
-                }
-                const noSpaces = inputValue.replace(/\s+/g, '');
-                handleInsertEmp(noSpaces);
-              } else {
-                if (!exists || (exists && original.code === inputValue)) {
-                  handleUpdateEmp("cdEmp", original.code, inputValue);
-                } else {
-                  setAlertMessage("이미 존재하는 Code 입니다.");
-                  setShowAlert(true);
-                  console.log("(UpdateEmp) 이미 존재하는 Code 입니다.")
-                  return;
-                }
+              // 위에서 중복 체크를 통과했다면, 업데이트 처리
+              if (original && original.code) {
+                handleUpdateEmp("cdEmp", original.code, inputValue);
               }
             } catch (error) {
-              console.error("An error occurred:", error);
+            console.error("An error occurred:", error);
             }
           };
 
@@ -397,14 +442,14 @@ const EmployeeRegister = () => {
             <>
               <Input
                 value={inputValue || ""}
-                onChange={handleInputChange}
+                onChange={handleInputChangeCdEmp}
                 onClick={tableEmpCodeClick}
                 // isDoubleClick={true}
                 className={"doubleLine"}
                 onBlur={handleInputOnBlurCdEmp}
               />
 
-              {showAlert && (
+              {/* {showAlert && (
                 <SweetAlert
                   text={alertMessage}
                   type="warning"
@@ -414,7 +459,7 @@ const EmployeeRegister = () => {
                     window.location.reload();
                   }}
                 />
-              )}
+              )} */}
             </>
           );
         },
@@ -428,9 +473,10 @@ const EmployeeRegister = () => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
 
-          const handleInputChange = (e) => {
+          const handleInputChangeNmEmp = (e) => {
             setInputValue(e.target.value);
             setChanged(true);
+            setInsertData(prev => ({ ...prev, nmEmp: e.target.value }));
           };
 
           const tableEmpNmClick = (e) => {
@@ -443,32 +489,31 @@ const EmployeeRegister = () => {
             }
           };
 
-          const handleInputOnBlurNmEmp = (e) => {
+          const handleInputOnBlurNmEmp = async (e) => {
             const inputValue = e.target.value?.trim();
-            
             if (!changed) {
               console.log("*********************************** onChange 없으니 종료");
               return;
             }
-
+          
             setChanged(false);
-
+          
             if (original && original.code) {
-              console.log("Calling handleUpdateEmp with nmEmp, original.code, inputValue: ", "nmEmp", original.code, inputValue);
-
+              // 기존의 데이터일 경우, 업데이트 동작 수행
               handleUpdateEmp("nmEmp", original.code, inputValue);
-              console.log("******************** nmEmp");
-              console.log("******************** code " + original.code);
-              console.log("******************** updated name " + inputValue);
             } else {
-              console.log("original or original.code is null or undefined. Exiting...");
+              // 새로운 데이터일 경우, 상태만 업데이트하고 실제 insert는 주민번호 입력란에서 처리
+              setInsertData(prev => ({
+                ...prev, 
+                nmEmp: inputValue
+              }));
             }
           };
-          
-          return (
+
+        return (
             <Input
               value={inputValue || ""}
-              onChange={handleInputChange}
+              onChange={handleInputChangeNmEmp}
               onClick={tableEmpNmClick}
               // isDoubleClick={true}
               className={"doubleLine"}
@@ -513,7 +558,7 @@ const EmployeeRegister = () => {
                   onChange={handleInputChange}
                   onClick={tableFgForeignClick}
                   className={"doubleLine"}
-                  // onBlur={handleInputOnBluFgForeign}
+                  readOnly={true}
               />
           );
         },
@@ -525,10 +570,13 @@ const EmployeeRegister = () => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
+          const [isValid, setIsValid] = useState(true); // 주민번호 유효성 검사 결과 저장 상태 관리
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
             setChanged(true);
+            setIsValid(isValidResidentNumber(e.target.value)); // 여기서 변경된 주민번호 유효성을 검사
+            setInsertData(prev => ({ ...prev, noResident: e.target.value }));
           };
 
           const tableNoResidentClick = (e) => {
@@ -541,25 +589,37 @@ const EmployeeRegister = () => {
             }
           };
 
-          const handleInputOnBlurNoResident = (e) => {
+
+          const handleInputOnBlurNoResident = async (e) => {
             const inputValue = e.target.value?.trim();
-            
-            if (!changed) {
-              console.log("*********************************** onChange 없으니 종료");
+
+            // 주민번호의 길이 검사
+            if (inputValue.length !== 14) {
+              console.log("주민번호는 13자리여야 합니다.");
+              // setIsValid(false); // 유효하지 않은 주민번호로 간주
               return;
+            }
+
+            if (!changed) {
+                console.log("*********************************** onChange 없으니 종료");
+                return;
             }
 
             setChanged(false);
 
-            if (original && original.code) {
-              console.log("Calling handleUpdateEmp with noResident, original.code, inputValue: ", "noResident", original.code, inputValue);
-          
-              handleUpdateEmp("noResident", original.code, inputValue);
-              console.log("******************** noResident");
-              console.log("******************** code " + original.code);
-              console.log("******************** updated noResident " + inputValue);
-            } else {
-              console.log("original or original.code is null or undefined. Exiting...");
+            try {
+                if (original && original.code) {
+                    handleUpdateEmp("noResident", original.code, inputValue);
+                } else {
+                    setInsertData(prev => {
+                        if (prev.cdEmp && prev.nmEmp && inputValue) {
+                            setIsDataInserted(true);
+                        }
+                        return { ...prev, noResident: inputValue };
+                    });
+                }
+            } catch (error) {
+                console.error("An error occurred:", error);
             }
           };
 
@@ -574,6 +634,7 @@ const EmployeeRegister = () => {
             onChange={handleInputChange}
             onClick={tableNoResidentClick}
             // isDoubleClick={true}
+            style={{ color: isValid ? 'grey' : 'red' }}
             className={"doubleLine"}
             onBlur={handleInputOnBlurNoResident}
             />
@@ -584,7 +645,7 @@ const EmployeeRegister = () => {
   );
 
   // Insert
-  const handleInsertEmp = async (codeValue) => {
+  const handleInsertEmp = async (codeValue, employeeValue, noResidentValue) => {
     console.log("handleInsertEmp 실행 *********************");
     try {
       const responseData = await apiRequest({
@@ -592,6 +653,8 @@ const EmployeeRegister = () => {
         url: "/api2/er/postEmpData",
         data: {
           cdEmp: codeValue,
+          nmEmp: employeeValue,
+          noResident: noResidentValue,
         },
       });
 
@@ -662,8 +725,11 @@ const EmployeeRegister = () => {
 
   // 사용하는 곳에서는 다음과 같이 초기값 설정
   useEffect(() => {
-    setInitialValues((prev) => ({ ...prev, "noResident": employeeData.noResident }));
-  }, [employeeData.noResident]);
+    if (!initialValues.noResident) {
+        setInitialValues((prev) => ({ ...prev, "noResident": employeeData.noResident }));
+    }
+  }, []);
+
 
   // 전체사원 조회
   const handleGetEmpList = async () => {
@@ -873,6 +939,7 @@ const EmployeeRegister = () => {
               value={original?.noDepartment || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              readOnly={true}
             />
           );
         },
@@ -891,6 +958,7 @@ const EmployeeRegister = () => {
               value={original?.nmDepartment || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              readOnly={true}
             />
           );
         },
@@ -1002,6 +1070,7 @@ const EmployeeRegister = () => {
               value={original?.cdBank || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              readOnly={true}
             />
           );
         },
@@ -1020,6 +1089,7 @@ const EmployeeRegister = () => {
               value={original?.nmBank || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              readOnly={true}
             />
           );
         },
@@ -1073,20 +1143,25 @@ const EmployeeRegister = () => {
             <div className="btnWrapper textBtnWrap">
               <div>
                 <PageHeaderTextButton 
-                  text="사원검색" 
+                  text="데이터 정렬" 
+                  // onClick={handleOpenEmpSearch}
+                />
+              </div>
+              {/* <div>
+                <PageHeaderTextButton 
+                  text="코드순" 
                   // onClick={handleOpenEmpSearch}
                 />
               </div>
               <div>
                 <PageHeaderTextButton 
-                  text="조건검색" 
+                  text="성명순" 
                   // onClick={handleOpenConSearch}
                 />
-              </div>
+              </div> */}
               <div>
                 <PageHeaderTextButton 
                   text="별표 사용설정"
-                  // onClick={handleOpenSortSearch}
                   onClick={toggleMaskResident}
                 />
               </div>

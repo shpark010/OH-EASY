@@ -4,8 +4,12 @@
 <mapper namespace="kr.or.oheasy.er.dao.ErDao">
 
     <!--사원등록-->
+<!--    <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">-->
+<!--        INSERT INTO hr_emp_mst (CD_EMP) VALUES (#{cdEmp})-->
+<!--    </insert>-->
+
     <insert id="postEmp" parameterType="kr.or.oheasy.vo.HrEmpMstVO">
-        INSERT INTO hr_emp_mst (CD_EMP) VALUES (#{cdEmp})
+        INSERT INTO hr_emp_mst (CD_EMP, NM_EMP, NO_RESIDENT) VALUES (#{cdEmp}, #{nmEmp}, #{noResident})
     </insert>
 
     <!--사원수정-->
