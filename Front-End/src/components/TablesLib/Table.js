@@ -17,6 +17,9 @@ const StyledTr = styled.tr`
   &:hover {
     background-color: var(--color-opacity-blue);
   }
+  &:focus {
+    background-color: var(--color-secondary-blue);
+  }
 `;
 const StyledTh = styled.th`
   width: ${(props) => props.width || "auto"};
@@ -136,7 +139,9 @@ function Table(props) {
             prepareRow(row);
             return (
               <StyledTr
+                tabIndex="1"
                 {...row.getRowProps()}
+                id={`focusOn_${row.original.code}`}
                 className="hrRowStyle"
                 onClick={() => {
                   if (props.setShowInsertRow) {
