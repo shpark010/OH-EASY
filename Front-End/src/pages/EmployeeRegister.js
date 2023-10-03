@@ -19,7 +19,8 @@ import CustomModalInput from "../components/Contents/CustomModalInput";
 import useApiRequest from "../components/Services/ApiRequest";
 import moment from "moment";
 import SweetAlert from "../components/Contents/SweetAlert";
-// import CustomModal from "../components/Contents/CustomModal";
+import CustomModal from "../components/Contents/CustomModal";
+import CustomRadio from "../components/Contents/CustomRadio";
 
 const EmployeeRegister = () => {
   const apiRequest = useApiRequest();
@@ -27,9 +28,7 @@ const EmployeeRegister = () => {
 
   // 모달창 관련 상태관리
   const [openPostcode, setOpenPostcode] = useState(false); // 카카오 API 모달창 상태관리
-  // const [openEmpSearch, setOpenEmpSearch] = useState(false); // 사원검색 모달창 상태관리
-  // const [openConSearch, setOpenConSearch] = useState(false); // 조건검색 모달창 상태관리
-  // const [openSortSearch, setOpenSortSearch] = useState(false); // 데이터정렬 모달창 상태관리
+  const [openSortSearch, setOpenSortSearch] = useState(false); // 데이터정렬 모달창 상태관리
   // const [openSettingModal, setOpenSettingModal] = useState(false); // 세팅 모달창 상태관리
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false); // 부서 모달창 상태관리
   const [isBankModalOpen, setIsBankModalOpen] = useState(false); // 은행 모달창 상태관리
@@ -42,9 +41,9 @@ const EmployeeRegister = () => {
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태 관리
-
-  const [isDataInserted, setIsDataInserted] = useState(false);
+  
   const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태 관리
+  const [isDataInserted, setIsDataInserted] = useState(false);
 
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
@@ -349,6 +348,9 @@ const EmployeeRegister = () => {
     [empList]
   );
 
+  const [sortOrder, setSortOrder] = useState("code"); // default 정렬 순서
+  const [sortedDataEmp, setSortedDataEmp] = useState(data); // 데이터의 현재 정렬된 버전 상태 관리
+
   // erGrid useMemo columns
   const columns = useMemo(() => [
       {
@@ -381,8 +383,6 @@ const EmployeeRegister = () => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
-          // const [showAlert, setShowAlert] = useState(false);
-          // const [alertMessage, setAlertMessage] = useState('');
 
           const handleInputChangeCdEmp = (e) => {
             setInputValue(e.target.value);
@@ -448,18 +448,6 @@ const EmployeeRegister = () => {
                 className={"doubleLine"}
                 onBlur={handleInputOnBlurCdEmp}
               />
-
-              {/* {showAlert && (
-                <SweetAlert
-                  text={alertMessage}
-                  type="warning"
-                  confirmText="확인"
-                  onConfirm={() => {
-                    setShowAlert(false);
-                    window.location.reload();
-                  }}
-                />
-              )} */}
             </>
           );
         },
@@ -591,6 +579,13 @@ const EmployeeRegister = () => {
 
 
           const handleInputOnBlurNoResident = async (e) => {
+            
+            // 주민번호가 마스킹 상태인 경우 업데이트 및 삽입을 중지
+            if (maskResident) {
+              console.log("주민번호가 마스킹 상태이므로 업데이트 및 삽입을 중지합니다.");
+              return;
+            }
+
             const inputValue = e.target.value?.trim();
 
             // 주민번호의 길이 검사
@@ -1134,6 +1129,35 @@ const EmployeeRegister = () => {
     setClickModalBankCode("");
   };
 
+  // 라디오 버튼 값 변경 함수
+  const handleRadioChange = (event) => {
+    setSortOrder(event.target.value);
+    console.log("(handleRadioChange) 선택된 정렬 방식:", event.target.value);
+  }
+
+  useEffect(() => {
+    if (sortOrder === "code") {
+        setSortedDataEmp([...data].sort((a, b) => a.code.localeCompare(b.code)));
+    } else if (sortOrder === "name") {
+        setSortedDataEmp([...data].sort((a, b) => a.employee.localeCompare(b.employee)));
+    }
+  }, [sortOrder, data]);
+
+  // 데이터 정렬 모달창 함수
+  const toggleSortSearch = () => {
+    setOpenSortSearch(!openSortSearch);
+  }
+
+  // 강제로 컴포넌트를 재마운트 상태 관리
+  const [tableKey, setTableKey] = useState(Date.now());
+
+  // 데이터 정렬 함수
+  const handleSortDataConfirm = () => {
+    setSortOrder(sortOrder);
+    toggleSortSearch();
+    setTableKey(Date.now());
+  };
+
   return (
     <>
       <div className="pageHeader">
@@ -1144,21 +1168,53 @@ const EmployeeRegister = () => {
               <div>
                 <PageHeaderTextButton 
                   text="데이터 정렬" 
-                  // onClick={handleOpenEmpSearch}
+                  onClick={toggleSortSearch}
                 />
+                <CustomModal 
+                  isOpen={openSortSearch} 
+                  onRequestClose={toggleSortSearch} 
+                  contentStyle={{ width: "300px", height: "200px" }}
+                >
+                  <PageHeaderName text="데이터 정렬" />
+                  <div style={{ 
+                    borderTop: '2.5px solid var(--color-primary-black)', 
+                    padding: '3px',
+                  }}></div>
+
+                  <div className="test2" style={{ 
+                    flex: 1, 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    borderTop: '2.5px solid var(--color-primary-black)',
+                    border: '1px solid var(--color-primary-gray)',
+                    padding: '10px',
+                  }}>
+                    <CustomRadio
+                      name="dataSorting"
+                      options={[
+                        ["코드순", "code"],
+                        ["사원명순", "name"]
+                      ]}
+                      value={sortOrder}
+                      onChange={handleRadioChange}
+                    />
+                  </div>
+                  <div className="test" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CustomButton 
+                      backgroundColor={"var(--color-primary-blue)"}
+                      color={"var(--color-primary-white)"}
+                      onClick={handleSortDataConfirm}
+                      text={"확인"}
+                    />
+                    <CustomButton 
+                      backgroundColor={"var(--color-primary-blue)"}
+                      color={"var(--color-primary-white)"}
+                      onClick={toggleSortSearch}
+                      text={"취소"}
+                    />
+                  </div>
+                </CustomModal>
               </div>
-              {/* <div>
-                <PageHeaderTextButton 
-                  text="코드순" 
-                  // onClick={handleOpenEmpSearch}
-                />
-              </div>
-              <div>
-                <PageHeaderTextButton 
-                  text="성명순" 
-                  // onClick={handleOpenConSearch}
-                />
-              </div> */}
               <div>
                 <PageHeaderTextButton 
                   text="별표 사용설정"
@@ -1231,8 +1287,9 @@ const EmployeeRegister = () => {
           <div className="erlistArea">
             <div className="namePickerBox">
               <Table
+                key={tableKey}
                 columns={columns}
-                data={data}
+                data={sortedDataEmp}
                 insertRow={true}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
@@ -1294,12 +1351,20 @@ const EmployeeRegister = () => {
                     value={maskResidentValue(employeeData.noResident)}
                     placeholder="주민번호를 입력해주세요."
                     onChange={(e) => {
+                      if (maskResident) {
+                        console.log("주민번호가 마스킹 상태이므로 값 변경을 중지합니다.");
+                        return;
+                      }
                       setEmployeeData(prevState => ({
                           ...prevState,
                           noResident: e.target.value
                       }));
                     }}
                     onBlur={() => {
+                      if (maskResident) {
+                        console.log("주민번호가 마스킹 상태이므로 업데이트를 중지합니다.");
+                        return;
+                      }
                       handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
                     }}
                     readOnly={isReadOnly}
