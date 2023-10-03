@@ -1,6 +1,7 @@
 package kr.or.oheasy.wc.service;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,26 @@ public List<WcGetEmpVO> getOptionEmpList2(String creDate,String creDate2, String
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);
 		return wcdao.getModalEmpList();
 	}
+	
+	
+	public List<WcGetEmpVO> getModalEmpListByName(Map<String, Object> params){
+		System.out.println(params);
+		 Map.Entry<String, Object> entry = params.entrySet().iterator().next();
+		    String key = entry.getKey();
+		    String value = String.valueOf(entry.getValue());
+		System.out.println(key);
+		System.out.println(value);
+		WcDao wcdao = sqlSession.getMapper(WcDao.class);
+		return wcdao.getModalEmpListByName(key,value);
+	} //모달 조건검색
+	
+	/*
+	  
+	    public List<WcGetEmpVO> getModalEmpListByName(Map<String, Object> params) {
+        return empDAO.getModalEmpListByName(params);
+    }
+	  
+	 */
 	
 	public WcGetEmpVO getModalData(String cdEmp) {
 		WcDao wcdao = sqlSession.getMapper(WcDao.class);

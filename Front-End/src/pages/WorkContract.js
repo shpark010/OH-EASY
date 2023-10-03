@@ -24,13 +24,37 @@ const WorkContract = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [showAlert, setShowAlert] = React.useState(false); // sweetalret
   const [showAlert2, setShowAlert2] = React.useState(false); // sweetalret
-
+  const [paramGetEmpList1,setParamGetEmpList1] = useState({
+    dtStartCont: '',
+    dtEndCont: '',
+    noWorkPost: '',
+    addrWork: '',
+    addrWorkDtl: '',
+    cntnJob: '',
+    tmStartRegularWork: '',
+    tmEndRegularWork: '',
+    tmStartBreak: '',
+    tmEndBreak: '',
+    ddWorking: '',
+    dotw: '',
+    tpSal: '',
+    amtSal: '',
+    tpPayDtSal: '',
+    ddPaySal: '',
+    methodPay: '',
+    ynEmpInsurance: '',
+    ynIndustrialAccidentInsurance: '',
+    ynNationalPension: '',
+    ynHealthInsurance: '',
+    stSign: '',
+    dtCreated: '',
+  })
+  const [highlightFirstRow, setHighlightFirstRow] = useState(true); //첫번째 행 표시를 위해
   
   const tabClick = (e,tabState) =>{
     
     setTab(e.target.value)
-    
-  
+    setEmployeeData([]);  //tab전환시 table 초기화
   };
 
   const tabComponent = () =>{
@@ -45,6 +69,10 @@ const WorkContract = () => {
           handleCheckboxChange={handleCheckboxChange}  
           employeeData = {employeeData}
           setEmployeeData = {setEmployeeData}
+          paramGetEmpList1 = {paramGetEmpList1}
+          setParamGetEmpList1 = {setParamGetEmpList1}
+          highlightFirstRow = {highlightFirstRow}
+          setHighlightFirstRow = {setHighlightFirstRow}
           />);
 
         // 계약서 작성 Tab Click
@@ -90,7 +118,8 @@ const WorkContract = () => {
 
         // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
         setCheckColumn([]);
-
+        setParamGetEmpList1([]); // delete후 state비우기 위해
+        setHighlightFirstRow(true);
         
 
     } 
@@ -117,8 +146,8 @@ const handleDeleteClick = () => {
           <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />
-                <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} />
+                {/* <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />
+                <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} /> */}
               </div>
               <div className="iconBtnWrap">
               <PageHeaderIconButton

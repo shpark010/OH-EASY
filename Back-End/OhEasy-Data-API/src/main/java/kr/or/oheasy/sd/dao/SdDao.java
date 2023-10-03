@@ -3,11 +3,15 @@ package kr.or.oheasy.sd.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import kr.or.oheasy.vo.HrEmpMstVO;
 import kr.or.oheasy.vo.SdDeducationVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
 import kr.or.oheasy.vo.SdEmpMstVO;
+import kr.or.oheasy.vo.SdPayDayListVO;
 import kr.or.oheasy.vo.SdTaxAmountVO;
+import kr.or.oheasy.vo.SdTaxRateVO;
 
 public interface SdDao {
 	//조건 조회(사원 리스트)
@@ -29,6 +33,11 @@ public interface SdDao {
 	public List<Long> getTaxInfo(Map<String, String> empSearch);
 	
 	//급여 자료 삭제
-	public int deletePayData(Map<String, String> deleteData, List<String> codeList);
+	public int deletePayData(Map<String, Object> paramMap);
 
+	//지급일자 조회
+	public List<SdPayDayListVO> getPayDayList();
+	
+	//과세 리스트 조회
+	public List<SdTaxRateVO> getTaxList();
 }

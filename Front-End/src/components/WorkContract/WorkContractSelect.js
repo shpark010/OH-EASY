@@ -14,38 +14,22 @@ import CustomSelect from '../../components/Contents/CustomSelect';
 
 
 
-const WorkContractCreate = () => {
+const WorkContractSelect = () => {
 
   const apiRequest = useApiRequest();
   const [employeeData, setEmployeeData] = useState([]);
-  const [openPostcode, setOpenPostcode] = useState(false);
-  const [zonecode, setZonecode] = useState("");
-  const [address, setAddress] = useState("");
-  const [checkColumn,setCheckColumn] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
-  const [codeArr, setCodeArr] = useState([]);
-  // const [optionEmpList,setOptionEmpList] = ([]); // 조건조회로 받아온 data
   const [belongingDate, setBelongingDate] = useState(""); //년월 달력 상태 관리.
   const [belongingDate2,setBelongingDate2]= useState(""); //년월 달력 상태 관리 끝 날짜.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
   const [paramGetEmpList,setParamGetEmpList] = useState([]);// code로 가져온 표준근로계약서 사원
+  const [clickCode,setClickCode]=useState([]);
+  const [highlightFirstRow1, setHighlightFirstRow1] = useState(true); //첫번째 행 표시를 위해
   //paramgetEmpList1 은 Create Tab
 
 
   
 
-  // const schangeCheck2 = (e, originalCode) => {
-  //   const checkedValue = e.target.checked;
-
-  //   if (checkedValue) {
-  //     setCodeArr(prevCodeArr => [...prevCodeArr, originalCode]);
-  //   } else {
-  //     setCodeArr(prevCodeArr => prevCodeArr.filter(code => code !== originalCode));
-  //   }
-  // };
-  // useEffect(() => {
-  //   console.log("codeArr 변경됨:", codeArr);
-  // }, [codeArr]); // codeArr이 변경될 때만 실행
+  
   
   const handleBelongingDateChange = (newDate) => {
     
@@ -59,6 +43,7 @@ const WorkContractCreate = () => {
     console.log(belongingDate2);
     if (belongingDate && belongingDate <= formattedDate) {
       setEmployeeData([]);
+      setHighlightFirstRow1(true);
       try {
        
         const responseData = await apiRequest({
@@ -66,6 +51,18 @@ const WorkContractCreate = () => {
           url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${formattedDate}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
         });
        
+        const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+        setClickCode(firstCdEmp);
+        if (firstCdEmp) {
+            // 두 번째 API 요청
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+            });
+            setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
+        }
+
+
         const modifiedresponseData = responseData.map(responseData => {
           const originalDate = responseData.dtCreated;
           
@@ -79,53 +76,18 @@ const WorkContractCreate = () => {
           
           return responseData;
         });
-  
-  
         setEmployeeData(modifiedresponseData)
-        console.log(employeeData);
-      
+        console.log(employeeData); 
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
       }
-  }
-
-  }; // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
+    }
+  }; 
+  
+  // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
   //e 넣으면 오류뜸 why? 함수하나로 분기처리 하고싶은데 안됨.
 
 
-
-  const addrButtonClick= () => {
-    setOpenPostcode(true);
-  };
-
-  const closeModal = () => {
-    setOpenPostcode(false);
-  };
-
-  
-
-  const handleAddressSelect = (addr) => {
-    console.log(`
-        우편번호: ${addr.zonecode}
-        주소: ${addr.address}
-    `);
-    // // 주소와 우편번호 값을 가져온 데이터로 설정
-    // const address = addr.address;
-    // const zipcode = addr.zipcode;
-  
-    // // 상태를 업데이트하여 주소와 우편번호를 입력란에 설정
-    // setEmpList((prevEmpList) => [
-    //   ...prevEmpList,
-    //   {
-    //     // 이전 데이터 유지하고 주소와 우편번호 추가
-    //     address: address, // 주소 상태 값 사용
-    //     zipcode: zipcode, // 우편번호 상태 값 사용
-    //   },
-    // ]);
-    setZonecode(addr.zonecode); // 선택된 우편번호로 우편번호 상태 업데이트
-    setAddress(addr.address); // 선택된 주소로 주소 상태 업데이트
-    setOpenPostcode(false); // 모달 닫기
-  };
 
 
   const data = useMemo(
@@ -142,93 +104,33 @@ const WorkContractCreate = () => {
   
   
 
-  const selectAllCheckBox = (e) =>{
-
-    
-    // const newEmpList = empList.map(emp=>({
-    //   checkbox : e.target.checked,
-    //   cdEmp: emp.cdEmp,
-    //   nmEmp: emp.nmEmp,
-    //   noResident: emp.noResident,
-    // }));
-    // console.log(newEmpList);
-
-    
-
-    const allInputs = e.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input');
-  //   // 모든 Table까지 가서 모든 input tag select 하면 배열로 return
-  //   console.log(e.target.checked); // 현재 누른 이벤트 check 값
-    
-    if (e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = true;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
-    setIsChecked(true)
-    
-  }
-
-  else if (!e.target.checked){
-    allInputs.forEach(input => {
-      input.checked = false;
-    }); // 배열로 return 한 input tag checked 값 true 할당. 여기까지만 하면 상태변화가 감지되지 않음.
-    setIsChecked(false)
-    
-  }
-    //useRef 사용이 안됨. Ref가 모든 data를 순회하며 input tag에 걸려야 하는데 그게 안됨.
-    
-    
-  }
-
-  const conditionSearch = async () => { // 작성년월과 조회 날짜를 받아 조회하는 버튼
-    setEmployeeData([]);
-
-    try {
-     
-      const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
-      });
-     
-      const modifiedresponseData = responseData.map(responseData => {
-        const originalDate = responseData.dtCreated;
-        
-        // 문자열에서 뒤에서 두 자리 자르기 
-        // 20231022 -> 202310
-        const year = originalDate.slice(0, 4); // "2023"
-      const month = originalDate.slice(4, 6); // "10"
-
-    const formattedDate = `${year}년 ${month}월`;
-        responseData.dtCreated = formattedDate;
-        
-        return responseData;
-      });
-
-
-      setEmployeeData(modifiedresponseData)
-      console.log(employeeData);
-    
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
-
-    
-
-
-  }//조건조회
-
-
-
+// 사원코드 순 eventhandler
   const searchOrderOption = async (e) => {
     const orderValue = e.target.value;
     setSearchOrder(orderValue);
-    
+    setEmployeeData([]); //backgroundcolor 지우기 위한
     // 두 달력의 상태값이 모두 있을 경우 API 요청을 보냅니다.
     if (belongingDate && belongingDate2) {
+      setHighlightFirstRow1(true);
         try {
             const responseData = await apiRequest({
                 method: "GET",
                 url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${belongingDate2}&orderValue=${orderValue}`,
             });
+            
+            const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+            setClickCode(firstCdEmp);
+            if (firstCdEmp) {
+                // 두 번째 API 요청
+               
+                const responseData2 = await apiRequest({
+                    method: "GET",
+                    url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+                });
+          
+                setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
+             
+            }
 
             const modifiedresponseData = responseData.map(responseData => {
                 const originalDate = responseData.dtCreated;
@@ -250,40 +152,41 @@ const WorkContractCreate = () => {
   useEffect(() => {
     console.log(employeeData);
   }, [employeeData]); // 변경될때만 실행.
+ 
+
 
   
-  const handleInputClick = async(e) => {
-    console.log(paramGetEmpList);
+  const handleInputClick = async (e) => {
+    setParamGetEmpList([]);
+
+    // 상태 변경을 Promise로 감싸서 상태가 완전히 업데이트된 후 다음 동작을 진행합니다.
+
+        setHighlightFirstRow1(false);
+       
     
-    // 1. parametr로 보낼 code state로 관리하기, 모든 cell에서 눌렀을때 code를 가져와야함. 
-    // 2. e.target으로 찾기.
-    // 어차피 e.target을 통해 찾아야 함.
-    const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
-    const param = code.value
-    console.log(param); //잘가져옴
-    try {
-     
-      const responseData = await apiRequest({
-        method: "GET",
-        url: `/api2/wc/getCodeParamEmpList?code=${param}`, 
-      });
-      
+        const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
+        const param = code.value;
 
-      
-      setParamGetEmpList(responseData)
-      
-      
-    } catch (error) {
-      console.error("Failed to fetch emp data:", error);
-    }
+        try {
+            const responseData = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${param}`,
+            });
+            setParamGetEmpList(responseData);
+        } catch (error) {
+            console.error("Failed to fetch emp data:", error);
+        }
+    
+}; 
 
-  }; //왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
+//왼쪽 Table 아무영역 눌렀을때 발생시킬 event 
   // 방법 1 : 조건조회할때 미리 다 가져와 뿌리기. 사람이 많아졌을때 고려하면 x
   // 방법 2 : 필요한 VO만 가져온후 왼쪽 Table 누를 경우 api 보내기
 
   useEffect(() => {
     console.log(paramGetEmpList);
   }, [paramGetEmpList]); // 변경될때만 실행.
+  
 
 
  
@@ -294,50 +197,16 @@ const WorkContractCreate = () => {
       id: "dtCreated",
       width: "20%",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = useState(value);
-        const [modalApper, setModalApper] = useState("off");
-  
-        const getCodeArr = (e) => {
-          const codeValue = e.target.parentElement.parentElement.querySelector(
-            'td:nth-child(2) input'
-          );
-          console.log(codeValue);
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
-  
-        const inputBlur = (e) => {
-
-          
-        };
-  
-        const mouseOverModalOn = () => {
-          setModalApper("on");
-        };
-  
-        const mouseOutModalOff = () => {
-          setModalApper("off");
-        };
-  
-        const modalApperFunc = () => {
-          if (modalApper === "on") {
-            return null;
-          } else return null;
-        };
+       
+      
+        
   
         return (
           <>
             <Input
               value={original?.dtCreated||""}
               onClick={handleInputClick}
-              onBlur={inputBlur}
-              onChange={handleInputChange}
-              onMouseOver={mouseOverModalOn}
-              onMouseOut={mouseOutModalOff}
-              modalRender={modalApperFunc}
-              className={"doubleLine"}
+              // className={"doubleLine"}
             />
           </>
         );
@@ -348,42 +217,16 @@ const WorkContractCreate = () => {
       accessor: "cdEmp",
       id: "cdEmp",
       width: "20%",
-      Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = useState(value);
-        const [modalApper, setModalApper] = useState("off");
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
-  
-        const inputBlur = (e) => {};
-  
-        const mouseOverModalOn = () => {
-          setModalApper("on");
-        };
-  
-        const mouseOutModalOff = () => {
-          setModalApper("off");
-        };
-  
-        const modalApperFunc = () => {
-          if (modalApper === "on") {
-            return null;
-          } else return null;
-        };
-  
+      Cell: ({ cell: { value }, row: { original,index } }) => {
+       
         return (
-          <Input
-            value={original?.cdEmp||""}
-            onClick={handleInputClick}
-            onBlur={inputBlur}
-            onChange={handleInputChange}
-            onMouseOver={mouseOverModalOn}
-            onMouseOut={mouseOutModalOff}
-            modalRender={modalApperFunc}
-            className={"doubleLine"}
-          />
-        );
+          <div className={index === 0 && highlightFirstRow1 ? 'wcFirstRowHighlight' : ''}>
+              <Input
+                  value={original?.cdEmp || ""}
+                  onClick={handleInputClick}
+              />
+          </div>
+      );
       },
     },
     {
@@ -392,28 +235,17 @@ const WorkContractCreate = () => {
       id: "nmEmp",
       width: "20%",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = React.useState(value);
+        
   
-        const inputBlur = (e) => {
-          const ele =
-            e.target.parentElement.parentElement.parentElement.querySelector(
-              "tr:nth-child(1)"
-            );
-          ele.style.backgroundColor = "";
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
+        
   
         return (
           <Input
             value={original?.nmEmp||""}
             onClick={handleInputClick}
-            onBlur={inputBlur}
-            onChange={handleInputChange}
+        
             
-            className={"doubleLine"}
+            // className={"doubleLine"}
           />
         );
       },
@@ -423,32 +255,19 @@ const WorkContractCreate = () => {
       accessor: "noResident",
       id: "noResident",
       Cell: ({ cell: { value }, row: { original } }) => {
-        const [inputValue, setInputValue] = React.useState(value);
-  
-        const inputBlur = (e) => {
-          const ele =
-            e.target.parentElement.parentElement.parentElement.querySelector(
-              "tr:nth-child(1)"
-            );
-          ele.style.backgroundColor = "";
-        };
-  
-        const handleInputChange = (e) => {
-          setInputValue(e.target.value);
-        };
+    
+       
   
         return (
           <Input
             value={original?.noResident||""}
-            onChange={handleInputChange}
             onClick={handleInputClick}
-            onBlur={inputBlur}
-            className={"doubleLine"}
+            // className={"doubleLine"}
           />
         );
       },
     },
-  ],[]
+  ],[highlightFirstRow1] //이 상태가 바뀌기 전까지는 전의 data 유지.
   );
   
   
@@ -473,6 +292,8 @@ const WorkContractCreate = () => {
                     value={belongingDate}
                     onChange={handleBelongingDateChange}
                     id="creDateStart"
+                    readOnly
+                    
                   />
               <b>~</b>
               <CustomCalendar
@@ -481,6 +302,7 @@ const WorkContractCreate = () => {
                     value={belongingDate2}
                     onChange={handleBelongingDateChange2}
                     id="creDateEnd"
+                    readOnly
                   />
                 
 
@@ -537,13 +359,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar width="181" id="startDate" 
-                      readOnly
+                      disabled
                       value={paramGetEmpList.dtStartCont||""}
                     /> 
                   </td>
                   <td className="wcRightGridTableRightTd2">
                     <CustomCalendar width="181" id="endDate"
-                      readOnly
+                      disabled
                       value={paramGetEmpList.dtEndCont||""}
                     />
                   </td>
@@ -566,7 +388,7 @@ const WorkContractCreate = () => {
                       className="wcRightCellSearchButton"
                       text="주소검색"
                       color="black"
-                      onClick={addrButtonClick}
+                     
                       readOnly
                     />
                   </td>
@@ -631,8 +453,9 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">근무일  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: '1주에 1일' },
                         { value: '2', label: '1주에 2일' },
                         { value: '3', label: '1주에 3일' },
@@ -643,7 +466,7 @@ const WorkContractCreate = () => {
                       ]}
                      className={"wcSelect1"}
                       
-                      value={paramGetEmpList.ddWorking|| "" }
+                      value={paramGetEmpList.ddWorking||0 }
                     />
                   </td>
                   <td className="wcRightFirstTableRightTd2"></td>
@@ -652,8 +475,9 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">주휴일 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: '매주 월요일' },
                         { value: '2', label: '매주 화요일' },
                         { value: '3', label: '매주 수요일' },
@@ -662,7 +486,7 @@ const WorkContractCreate = () => {
                         { value: '6', label: '매주 토요일' },
                         { value: '7', label: '매주 일요일' },
                       ]}
-                      value={paramGetEmpList.dotw|| "" }
+                      value={paramGetEmpList.dotw|| 0 }
                      className={"wcSelect1"}
                   
 
@@ -674,13 +498,14 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">임금유형 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 월급 ' },
                         { value: '2', label: ' 일급 ' },
                         { value: '3', label: ' 시급 ' },
                       ]}
-                      value={paramGetEmpList.tpSal|| "" }
+                      value={paramGetEmpList.tpSal|| 0}
                       className={"wcSelect2"}                    />
                   </td>
                   <td className="wcRightGridTableRightTd2">
@@ -692,13 +517,14 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">임금지급일 </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 매월 ' },
                         { value: '2', label: ' 매주 ' },
                         { value: '3', label: ' 매일 ' },
                       ]}
-                      value={paramGetEmpList.tpPayDtSal|| "" }
+                      value={paramGetEmpList.tpPayDtSal||0 }
                       className={"wcSelect2"}
                     />
                   </td>
@@ -711,12 +537,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd">지급방법  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 예금통장에 입금 ' },
                         { value: '2', label: ' 직접지급 ' },
                       ]}
-                      value={paramGetEmpList.methodPay|| "" }
+                      value={paramGetEmpList.methodPay|| 0}
                       
                     />
                   </td>
@@ -726,12 +553,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 고용보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynEmpInsurance|| "" }
+                      value={paramGetEmpList.ynEmpInsurance|| 0 }
                       className="wcSelect3"
 
                     />
@@ -742,12 +570,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 산재보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynIndustrialAccidentInsurance|| "" }
+                      value={paramGetEmpList.ynIndustrialAccidentInsurance|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -757,12 +586,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 국민연금  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynNationalPension|| "" }
+                      value={paramGetEmpList.ynNationalPension|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -772,12 +602,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 건강보험  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' }, 
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.ynHealthInsurance|| "" }
+                      value={paramGetEmpList.ynHealthInsurance|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -787,12 +618,13 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableLeftTd"> 서명여부  </td>
                   <td className="wcRightGridTableRightTd1">
                     <CustomSelect
-                    readOnly
+                    disabled
                       options={[
+                        { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 여 ' },
                         { value: '2', label: ' 부 ' },
                       ]}
-                      value={paramGetEmpList.stSign|| "2" }
+                      value={paramGetEmpList.stSign|| 0 }
                       className="wcSelect3"
                     />
                   </td>
@@ -803,10 +635,12 @@ const WorkContractCreate = () => {
                   <td className="wcRightGridTableRightTd1">
                     <CustomCalendar 
                     value={paramGetEmpList.dtCreated||""}
-                     readOnly 
+                     disabled
                      className={'wcCreatedDateCalander'} 
                      width="170" 
-                     id="createDate" />
+                     id="createDate" 
+                     
+                     />
                   </td>
                   <td className="wcRightGridTableRightTd2"></td>
                 </tr>
@@ -825,4 +659,4 @@ const WorkContractCreate = () => {
     );
   }
 
-export default WorkContractCreate;
+export default WorkContractSelect;

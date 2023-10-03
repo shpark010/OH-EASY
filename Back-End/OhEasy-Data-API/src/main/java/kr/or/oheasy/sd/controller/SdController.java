@@ -29,6 +29,7 @@ public class SdController {
 		System.out.println("조회 컨트롤러 진입");
 		System.out.println(empSearch);
 		Map<String, Object> result = sdService.getAllEmpList(empSearch);
+		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
@@ -71,12 +72,27 @@ public class SdController {
 	}
 	
 	// 급여 삭제
-		@PostMapping("/deletePayData")
-		public ResponseEntity<?> deletePayData(@RequestBody Map<String, Object> deleteData) {
-			System.out.println("삭제 컨트롤러 진입");
-			System.out.println(deleteData.get("code"));
-			Map<String, Object> result = sdService.deletePayData(deleteData);
-			return new ResponseEntity<>(result, HttpStatus.OK);
-		}
+	@PostMapping("/deletePayData")
+	public ResponseEntity<?> deletePayData(@RequestBody Map<String, Object> deleteData) {
+		System.out.println("삭제 컨트롤러 진입");
+		System.out.println(deleteData.get("code"));
+		Map<String, Object> result = sdService.deletePayData(deleteData);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 	
+	//지급일자 조회
+	@PostMapping("/getPayDayList")
+	public ResponseEntity<?> getPayDayList(@RequestBody Map<String, String> payDayData) {
+		System.out.println("지급일자 조회 컨트롤러 진입");
+		Map<String, Object> result = sdService.getPayDayList(payDayData);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	//과세 리스트 조회
+	@PostMapping("/getTaxList")
+	public ResponseEntity<?> getTaxList(@RequestBody Map<String, String> taxListData) {
+		System.out.println("지급일자 조회 컨트롤러 진입");
+		Map<String, Object> result = sdService.getTaxList();
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 }
