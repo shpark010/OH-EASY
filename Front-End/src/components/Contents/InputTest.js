@@ -38,6 +38,7 @@ function Input({
   type,
   readOnly,
   align,
+  style,
   ...otherProps
 }) {
   const handleKeyDown = (e) => {
@@ -111,7 +112,8 @@ function Input({
     <InputTag
       align={align}
       {...otherProps}
-      inputType={type}
+      style={style}
+      type={type}
       spellCheck="false"
       readOnly={readOnly}
       onClick={handleClick}
