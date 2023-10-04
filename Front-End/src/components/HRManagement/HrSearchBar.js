@@ -1,17 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchBarBox from "../SearchBar/SearchBarBox";
 import SearchSubmitButton from "../SearchBar/SearchSubmitButton";
 import useApiRequest from "../Services/ApiRequest";
+import SweetAlert from "../Contents/SweetAlert";
 const HrSearchBar = ({
   conditions,
   setConditions,
   setEmpList,
   setClickEmpCode,
+  setEmpStats,
 }) => {
   const apiRequest = useApiRequest();
 
+  // 알림창 표시 상태 관리
+  const [showAlert, setShowAlert] = useState(false);
   const handleSelectChange = (e, name) => {
     setConditions((prevState) => ({ ...prevState, [name]: e.target.value }));
+    handleSearchBtnClick();
   };
 
   const handleSearchBtnClick = async () => {
@@ -22,15 +27,40 @@ const HrSearchBar = ({
         url: `/api2/hr/getConditionalEmpList?category=${conditions.category}&sort=${conditions.sort}`,
       });
       console.log(responseData);
-      setEmpList(responseData);
+      setEmpList(responseData.result);
+      setEmpStats({
+        total: responseData.total,
+        working: responseData.working,
+        resigned: responseData.resigned,
+      });
       setClickEmpCode();
+      console.log("********************************");
+      console.log(responseData.result);
+      console.log("********************************");
+      if (responseData.result.length === 0) {
+        setShowAlert(true);
+        return;
+      }
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
   };
+  const handleCloseAlert = () => {
+    setShowAlert(false); // 알림창 표시 상태를 false로 설정
+  };
 
   return (
     <div className="searchBar">
+      {showAlert && (
+        <SweetAlert
+          text="조건에 맞는 사원이 존재하지 않습니다."
+          //type="question"
+          type="error"
+          onConfirm={() => {
+            handleCloseAlert();
+          }}
+        />
+      )}
       <div className="innerBox fxSpace">
         <div className="selectWrapper">
           <SearchBarBox

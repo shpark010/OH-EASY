@@ -85,6 +85,12 @@ function HRManagement() {
     sort: 3,
   }); // 검색 조건을 저장하는 상태
 
+  const [empStats, setEmpStats] = useState({
+    total: 0,
+    working: 0,
+    resigned: 0,
+  }); //총인원 , 재직중 , 퇴사
+
   // 테이블의 각 행을 클릭했을 때 동작을 정의하는 함수
   const handleRowClick = useCallback((empCode) => {
     setSelectedEmpCode(empCode);
@@ -127,6 +133,15 @@ function HRManagement() {
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
+  };
+
+  // 사원 삭제
+  const deleteEmp = (empCode) => {
+    setEmpList((prevEmpList) =>
+      prevEmpList.filter((emp) => emp.cdEmp !== empCode),
+    );
+    // 체크된 상태 초기화
+    setCheckedRows([]);
   };
 
   // 첫번째 테이블에 보내야할 data 파라미터
@@ -314,12 +329,15 @@ function HRManagement() {
         setCheckedRows={setCheckedRows}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
+        deleteEmp={deleteEmp}
+        setEmpStats={setEmpStats}
       />
       <HrSearchBar
         conditions={conditions}
         setConditions={setConditions}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
+        setEmpStats={setEmpStats}
       />
       <section className="section hr-section">
         <div className="hrGrid">
@@ -339,13 +357,13 @@ function HRManagement() {
                 <tbody>
                   <tr>
                     <th rowSpan="2">총인원</th>
-                    <td rowSpan="2">7</td>
+                    <td rowSpan="2">{empStats.total}</td>
                     <th>재직</th>
-                    <td>0</td>
+                    <td>{empStats.working}</td>
                   </tr>
                   <tr>
                     <th>퇴사</th>
-                    <td>0</td>
+                    <td>{empStats.resigned}</td>
                   </tr>
                 </tbody>
               </table>

@@ -311,8 +311,8 @@ const HrLicense = ({ cdEmp }) => {
         id: "dtCertified",
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleInputChange = (e) => {
-            const seqseqLicenseValue = original ? original.seqLicense : null;
-            handleDateChange(e, "dtCertified", seqseqLicenseValue);
+            const seqLicenseValue = original ? original.seqLicense : null;
+            handleDateChange(e, "dtCertified", seqLicenseValue);
           };
           return (
             <CustomCalender

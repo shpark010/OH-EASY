@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PageHeaderIconButton from "../PageHeader/PageHeaderIconButton";
 import PageHeaderName from "../PageHeader/PageHeaderName";
 import PageHeaderTextButton from "../PageHeader/PageHeaderTextButton";
@@ -10,14 +10,26 @@ import Delete from "../../images/pages/common/delete.png";
 import useApiRequest from "../Services/ApiRequest";
 import SweetAlert from "../Contents/SweetAlert";
 
-const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
+const HrPageHeader = ({
+  checkedRows,
+  setEmpList,
+  setClickEmpCode,
+  deleteEmp,
+  setEmpStats,
+}) => {
   const apiRequest = useApiRequest();
 
   // 알림창 표시 상태 관리
-  const [showAlert, setShowAlert] = React.useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertDelete, setShowAlertDelete] = useState(false);
+  const [showAlertDeleteError, setShowAlertDeleteError] = useState(false);
 
   // 체크된 사원들을 가져와서 db에서 삭제
   const handleSendCheckedCdEmpListDelete = async () => {
+    if (checkedRows.length === 0) {
+      setShowAlertDeleteError(true);
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "POST",
@@ -27,8 +39,10 @@ const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
         },
       });
       if (responseData === 1) {
-        // 삭제성공
-        alert("삭제성공");
+        checkedRows.forEach((empCode) => {
+          deleteEmp(empCode); // 여기에서 부모의 함수를 호출
+        });
+        setClickEmpCode();
       } else {
         // 삭제 실패
         alert("삭제실패");
@@ -43,9 +57,16 @@ const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: "/api2/hr/getAllEmpList",
+        url: "/api2/hr/insertAllHrEmpData",
       });
-      setEmpList(responseData);
+      console.log(responseData);
+      setEmpList(responseData.result);
+
+      setEmpStats({
+        total: responseData.total,
+        working: responseData.working,
+        resigned: responseData.resigned,
+      });
       setClickEmpCode();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -54,22 +75,51 @@ const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
   const handleCloseAlert = () => {
     setShowAlert(false); // 알림창 표시 상태를 false로 설정
   };
-
+  const handleCloseDeleteAlert = () => {
+    setShowAlertDelete(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleCloseDeleteErrorAlert = () => {
+    setShowAlertDeleteError(false); // 알림창 표시 상태를 false로 설정
+  };
   return (
     <div className="pageHeader">
       {showAlert && (
         <SweetAlert
-          text="인사테이블에 등록되지않은 사원 정보를 불러올까요?"
+          text="인사관리에 등록하지않은 사원을 전부 등록 후 모든 사원을 불러옵니다. 실행하시겠습니까?"
+          showCancel={true}
+          type="question"
+          onConfirm={() => {
+            handleGetEmpList();
+            handleCloseAlert();
+          }}
+          onCancel={handleCloseAlert}
+        />
+      )}
+      {showAlertDelete && (
+        <SweetAlert
+          text="선택한 사원을 전부 삭제합니까?"
           showCancel={true}
           //type="success"
           type="warning"
           //type="error"
           //type="question"
           onConfirm={() => {
-            handleGetEmpList();
-            handleCloseAlert();
+            handleSendCheckedCdEmpListDelete();
+            handleCloseDeleteAlert();
           }}
-          onCancel={handleCloseAlert}
+          onCancel={handleCloseDeleteAlert}
+        />
+      )}
+      {showAlertDeleteError && (
+        <SweetAlert
+          text="선택한 사원이 없습니다."
+          //type="success"
+          //type="warning"
+          type="error"
+          //type="question"
+          onConfirm={() => {
+            handleCloseDeleteErrorAlert();
+          }}
         />
       )}
       <div className="innerBox fxSpace">
@@ -93,7 +143,9 @@ const HrPageHeader = ({ checkedRows, setEmpList, setClickEmpCode }) => {
               btnName="delete"
               imageSrc={Delete}
               altText="삭제"
-              onClick={handleSendCheckedCdEmpListDelete}
+              onClick={(e) => {
+                setShowAlertDelete(true);
+              }}
             />
             <PageHeaderIconButton
               btnName="calc"

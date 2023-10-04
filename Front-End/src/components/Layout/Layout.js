@@ -10,6 +10,7 @@ function Layout({ children }) {
     "/login",
     "/register",
     "/signup",
+    "/mypage",
   ].includes(location.pathname);
 
   return (

@@ -112,7 +112,7 @@ function Input({
       align={align}
       {...otherProps}
       inputType={type}
-      spellCheck="false"
+      //spellCheck="false"
       readOnly={readOnly}
       onClick={handleClick}
       onBlur={handleBlur}

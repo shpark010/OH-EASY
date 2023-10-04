@@ -30,7 +30,7 @@ const Company = (props) => {
   return (
     <CompanyDiv>
       <CompanyNameSpan>{props.companyName}</CompanyNameSpan>
-      <select
+      {/* <select
         name="targetYear"
         id="targetYear"
         className="targetYear companyYear selectBox blue"
@@ -41,7 +41,7 @@ const Company = (props) => {
         <option value="2023">2023</option>
         <option value="2022">2022</option>
         <option value="2021">2021</option>
-      </select>
+      </select> */}
     </CompanyDiv>
   );
 };

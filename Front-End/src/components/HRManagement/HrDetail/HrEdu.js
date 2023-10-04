@@ -36,7 +36,19 @@ const HrEdu = ({ cdEmp }) => {
     accessor,
     inputValue,
   ) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+    console.log("handleSendEmpCodeInsertEduData ***************************");
+    console.log(inputValue);
+    if (inputValue === "" || inputValue === " ") {
+      console.log("**********************");
+    }
+    if (
+      cdEmp == null ||
+      cdEmp === "" ||
+      cdEmp === undefined ||
+      inputValue === "" ||
+      inputValue === " "
+    ) {
+      console.log("값이 없어요 ~~~~~~~~~~~~~~~~~");
       return;
     }
     try {
@@ -174,8 +186,13 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
+              console.log("인서트 이벤트 실행~~~~~~~~~~");
+              console.log(e.target.value);
               handleSendEmpCodeInsertEduData(cdEmp, "nmSchool", e.target.value);
               handleSendEmpCodeGetEduData(cdEmp);
               setInputValue(e.target.value);
@@ -209,15 +226,14 @@ const HrEdu = ({ cdEmp }) => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleInputChange = (e) => {
             const seqEducationValue = original ? original.seqEducation : null;
-            if (original) {
-              handleDateChange(e, "dtEntrance", seqEducationValue);
-            }
+            handleDateChange(e, "dtEntrance", seqEducationValue);
           };
           return (
             <CustomCalender
               className="hrInfoBaseInput"
               value={value || ""}
               name="dtEntrance"
+              readOnly={true}
               onChange={handleInputChange}
             />
           );
@@ -238,6 +254,7 @@ const HrEdu = ({ cdEmp }) => {
               className="hrInfoBaseInput"
               value={value || ""}
               name="dtGraduate"
+              readOnly={true}
               onChange={handleInputChange}
             />
           );
@@ -299,6 +316,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(
@@ -342,6 +362,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(cdEmp, "nmMajor", e.target.value);
@@ -381,6 +404,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(
@@ -424,6 +450,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(cdEmp, "nmDegree", e.target.value);
@@ -463,6 +492,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(
@@ -506,6 +538,9 @@ const HrEdu = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertEduData(
