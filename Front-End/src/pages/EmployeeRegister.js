@@ -41,6 +41,7 @@ const EmployeeRegister = () => {
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태 관리
+  const [isValid, setIsValid] = useState(null); // 주민번호 유효성 검사 결과 저장 상태 관리
   
   const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태 관리
   const [isDataInserted, setIsDataInserted] = useState(false);
@@ -181,10 +182,12 @@ const EmployeeRegister = () => {
 
   // 주민번호 유효성 검사 로직
   const isValidResidentNumber = (number) => {
+    if (!number || typeof number !== "string") return false;
     if (number.length !== 14) return false;
+    if (number[6] !== '-') return false;  // 7번째 문자가 하이픈인지 검증
   
     const birth = number.substring(0, 6);
-    const gender = number[6];
+    const gender = number[7];  // 위치를 7로 변경
   
     // 생년월일 검증
     const year = parseInt(birth.substring(0, 2), 10);
@@ -196,7 +199,7 @@ const EmployeeRegister = () => {
     let maxDay;
     switch (month) {
       case 2:
-        maxDay = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28;  // 윤년 계산
+        maxDay = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28; // 윤년 계산
         break;
       case 4:
       case 6:
@@ -214,7 +217,8 @@ const EmployeeRegister = () => {
     if (!['1', '2', '3', '4', '5', '6', '7', '8'].includes(gender)) return false;
   
     return true;
-  };
+};
+
 
   // 버튼 클릭시 DaumPostcode 모달 열기
   const handleAddressButtonClick = () => {
@@ -426,6 +430,8 @@ const EmployeeRegister = () => {
                   element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   element.focus();
                 }
+                // 원래의 값을 inputValue로 되돌린다.
+                setInputValue(original.code);
                 return;
               }
 
@@ -558,12 +564,11 @@ const EmployeeRegister = () => {
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
-          const [isValid, setIsValid] = useState(true); // 주민번호 유효성 검사 결과 저장 상태 관리
 
           const handleInputChange = (e) => {
             setInputValue(e.target.value);
             setChanged(true);
-            setIsValid(isValidResidentNumber(e.target.value)); // 여기서 변경된 주민번호 유효성을 검사
+            setIsValid(null); // 변경될 때 isValid를 null로 설정
             setInsertData(prev => ({ ...prev, noResident: e.target.value }));
           };
 
@@ -577,21 +582,19 @@ const EmployeeRegister = () => {
             }
           };
 
-
           const handleInputOnBlurNoResident = async (e) => {
             
-            // 주민번호가 마스킹 상태인 경우 업데이트 및 삽입을 중지
-            if (maskResident) {
-              console.log("주민번호가 마스킹 상태이므로 업데이트 및 삽입을 중지합니다.");
-              return;
-            }
+            // // 주민번호가 마스킹 상태인 경우 업데이트 및 삽입을 중지
+            // if (maskResident) {
+            //   console.log("주민번호가 마스킹 상태이므로 업데이트 및 삽입을 중지합니다.");
+            //   return;
+            // }
 
             const inputValue = e.target.value?.trim();
 
             // 주민번호의 길이 검사
             if (inputValue.length !== 14) {
               console.log("주민번호는 13자리여야 합니다.");
-              // setIsValid(false); // 유효하지 않은 주민번호로 간주
               return;
             }
 
@@ -616,11 +619,20 @@ const EmployeeRegister = () => {
             } catch (error) {
                 console.error("An error occurred:", error);
             }
+            // setIsValid(isValidResidentNumber(inputValue));
           };
 
           const maskedValue = inputValue 
           ? inputValue.slice(0, 6) + (maskResident ? '-*******' : inputValue.slice(6))
           : '';
+
+          // // 색상 결정 로직
+          // let color;
+          // if (isValid === null || isValid) {
+          //   color = 'grey';
+          // } else {
+          //   color = 'red';
+          // }
 
           return (
             <Input
@@ -629,9 +641,10 @@ const EmployeeRegister = () => {
             onChange={handleInputChange}
             onClick={tableNoResidentClick}
             // isDoubleClick={true}
-            style={{ color: isValid ? 'grey' : 'red' }}
+            // style={{ color: color }}
             className={"doubleLine"}
             onBlur={handleInputOnBlurNoResident}
+            readOnly={maskResident} // 마스킹 상태일 경우 읽기 전용으로 설정
             />
           );
         },
@@ -734,6 +747,7 @@ const EmployeeRegister = () => {
         method: "GET",
         url: "/api2/er/getAllEmpList",
       });
+
       setEmpList(responseData);
       console.log("api 이벤트 발생");
       console.log("responseData.length : " + responseData.length);
@@ -823,6 +837,11 @@ const EmployeeRegister = () => {
 
     // 상태 업데이트
     setEmployeeData(updatedData);
+
+    // 유효성 검사
+    const residentValid = isValidResidentNumber(updatedData.noResident);
+    setIsValid(residentValid);
+    console.log("(유효 = true / 유효x = false) residentValid : " + residentValid);
 
     // 초기값도 같은 데이터로 업데이트
     setInitialValues(updatedData);
@@ -1290,7 +1309,7 @@ const EmployeeRegister = () => {
                 key={tableKey}
                 columns={columns}
                 data={sortedDataEmp}
-                insertRow={true}
+                insertRow={!maskResident}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
               />
@@ -1351,23 +1370,36 @@ const EmployeeRegister = () => {
                     value={maskResidentValue(employeeData.noResident)}
                     placeholder="주민번호를 입력해주세요."
                     onChange={(e) => {
-                      if (maskResident) {
-                        console.log("주민번호가 마스킹 상태이므로 값 변경을 중지합니다.");
-                        return;
-                      }
+                      // if (maskResident) {
+                      //   console.log("주민번호가 마스킹 상태이므로 값 변경을 중지합니다.");
+                      //   return;
+                      // }
                       setEmployeeData(prevState => ({
                           ...prevState,
                           noResident: e.target.value
                       }));
                     }}
                     onBlur={() => {
-                      if (maskResident) {
-                        console.log("주민번호가 마스킹 상태이므로 업데이트를 중지합니다.");
+                      // if (maskResident) {
+                      //   console.log("주민번호가 마스킹 상태이므로 업데이트를 중지합니다.");
+                      //   return;
+                      // }
+                      
+                      if (employeeData.noResident.length !== 14) {
+                        console.log("주민번호는 13자리여야 합니다.");
+                        setIsValid(false);
                         return;
                       }
+                      const residentValid = isValidResidentNumber(employeeData.noResident);
+                      setIsValid(residentValid);
                       handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
                     }}
-                    readOnly={isReadOnly}
+                    readOnly={isReadOnly || maskResident}
+                    style={{
+                      borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
+                      borderWidth: isValid === false ? '2px' : '1px',
+                      // color: isValid ? 'black' : 'red'
+                    }}
                   />
                 </td>
                 <td className="erCellStyle">
