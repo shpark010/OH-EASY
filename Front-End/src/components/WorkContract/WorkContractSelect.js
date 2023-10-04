@@ -377,6 +377,7 @@ const WorkContractSelect = () => {
                   <td className="wcCellStyle">
                     <CustomInput 
                     value={paramGetEmpList.noWorkPost||""}
+                    width={180}
 
                     readOnly />
                   </td>
@@ -403,7 +404,7 @@ const WorkContractSelect = () => {
                   <th className="wcHeaderStyle">상세주소  </th>
                   <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
-                    width={605} 
+                    width={638} 
                     readOnly
                     value={paramGetEmpList.addrWorkDtl||""}
                     />
@@ -413,7 +414,7 @@ const WorkContractSelect = () => {
                   <th className="wcHeaderStyle">업무의 내용 </th>
 
                   <td className="wcCellStyle" colSpan="2">
-                    <CustomInput width="605" 
+                    <CustomInput width="638" 
                     readOnly
                     value={paramGetEmpList.cntnJob||""}
                     />
@@ -425,13 +426,13 @@ const WorkContractSelect = () => {
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmStartRegularWork||""}
-                    ></CustomInput>
+                    />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmEndRegularWork||""}
-                    ></CustomInput>
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -441,14 +442,14 @@ const WorkContractSelect = () => {
                     readOnly
                     value={paramGetEmpList.tmStartBreak||""}
 
-                    ></CustomInput>
+                    />
                   </td>
                   <td className="wcCellStyle">
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmEndBreak||""}
-
-                     ></CustomInput>
+                      
+                     />
                   </td>
                 </tr>
                 <tr>
@@ -512,7 +513,7 @@ const WorkContractSelect = () => {
                   </td>
                   <td className="wcCellStyle">
                     <CustomInput width={180} readOnly value={paramGetEmpList.amtSal|| "" } /> 
-                    <b>원</b>
+                    <b> 원</b>
                   </td>
                 </tr>
                 <tr>
@@ -532,7 +533,7 @@ const WorkContractSelect = () => {
                   </td>
                   <td className="wcCellStyle">
                     <CustomInput width={180} readOnly value={paramGetEmpList.ddPaySal|| "" } />
-                    <b>일</b>
+                    <b> 일 </b>
                   </td>
                 </tr>
                 <tr>
@@ -546,6 +547,8 @@ const WorkContractSelect = () => {
                         { value: '2', label: ' 직접지급 ' },
                       ]}
                       value={paramGetEmpList.methodPay|| 0}
+                      className="wcSelect3"
+
                       
                     />
                   </td>
@@ -639,7 +642,8 @@ const WorkContractSelect = () => {
                     value={paramGetEmpList.dtCreated||""}
                      disabled
                      className={'wcCreatedDateCalander'} 
-                     width="170" 
+                     width="180" 
+
                      id="createDate" 
                      
                      />

@@ -1158,7 +1158,7 @@ const modalSearch = async(e) => {
                   <th className="wcHeaderStyle">상세주소  </th>
                   <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
-                    width={605} 
+                    width={638} 
                     value={paramGetEmpList1.addrWorkDtl || ""}
                     id={"addrWorkDtl"}
                     onChange={inputOnChange}
@@ -1174,7 +1174,7 @@ const modalSearch = async(e) => {
 
                   <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
-                    width="605"
+                    width="638"
                     value={paramGetEmpList1.cntnJob||""}
                     id={"cntnJob"}
                     onChange={inputOnChange}
@@ -1331,7 +1331,7 @@ const modalSearch = async(e) => {
                     placeholder={"ex) 10000000"}
                     type={"number"}
                      /> 
-                    <b>원</b>
+                    <b> 원 </b>
                   </td>
                 </tr>
                 <tr>
@@ -1365,7 +1365,7 @@ const modalSearch = async(e) => {
                     />
                     <b
                     className={`${payState === "off" ? "wcPayDayOff" : ""} `}
-                    >일</b>
+                    > 일 </b>
                   </td>
                 </tr>
                 <tr>
@@ -1382,7 +1382,8 @@ const modalSearch = async(e) => {
                       id={`methodPay`}
                       
                      onChange={inputOnChange}
-                   
+                     className="wcSelect3"
+
 
                     />
                   </td>
