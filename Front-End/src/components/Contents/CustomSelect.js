@@ -12,7 +12,6 @@ const StyledSelect = styled.select`
   pointer-events: ${(props) => (props.readOnly ? "none" : "auto")}; // 클릭 방지
   cursor: ${(props) => (props.readOnly ? "not-allowed" : "pointer")};
   color: black;
-
   &:disabled {
     cursor: not-allowed;
     background-color: var(--color-opacity-gray);

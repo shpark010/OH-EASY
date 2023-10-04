@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { setCookie, getCookie, removeCookie } from "../../../containers/Cookie";
 import axios from "axios";
+import noProfile from "../../../images/noProfile.jpg";
 
 const ProfileWrapper = styled.div`
   /* profile */
@@ -98,13 +100,15 @@ const Profile = (props) => {
     <ProfileWrapper onClick={toggleProfileBox}>
       <ProfileName>{props.name} 님</ProfileName>
       <ProfileImageWrapper>
-        <img src="https://picsum.photos/50/50" alt="이미지 샘플" />
+        <img src={noProfile} alt="이미지 샘플" />
       </ProfileImageWrapper>
       {isProfileBoxVisible && (
         <ProfileBox>
           <ProfileBoxItem href="">
             <IconWrapper className="ico-person"></IconWrapper>
-            <span>마이페이지</span>
+            <Link to="/mypage">
+              <span>마이페이지</span>
+            </Link>
           </ProfileBoxItem>
           <ProfileBoxItem onClick={logout}>
             <IconWrapper className="ico-logout"></IconWrapper>

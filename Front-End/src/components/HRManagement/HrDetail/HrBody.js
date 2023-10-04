@@ -19,7 +19,7 @@ const defaultBodyData = {
   fgEye: "", // 색신
   leftEyesight: "", // 시력(좌)
   rightEyesight: "", // 시력(우)
-  apiltyHearing: "", // 청력
+  apilityHearing: "", // 청력
   fgObstacle: "", //장애구분
   fgVerterans: "", //보훈구분
   lvObstacle: "", //장애등급
@@ -158,26 +158,31 @@ const HrBody = ({ cdEmp }) => {
             <th>청력</th>
             <td>
               <CustomRadio
-                name="apiltyHearing"
+                name="apilityHearing"
                 classNameBox="hrInfoBaseBox"
                 classNameRadio="classNameRadio"
                 options={[
                   ["이상없음", "0"],
                   ["이상", "1"],
                 ]}
-                value={bodyData.apiltyHearing || "0"}
+                value={bodyData.apilityHearing || "0"}
+                onChange={handleInputBlur}
               />
             </td>
           </tr>
           <tr>
             <th>장애등급</th>
             <td>
-              <CustomInput
-                width={200}
-                name={"lvObstacle"}
-                onBlur={handleInputBlur}
-                onChange={handleInputChange}
-                value={bodyData.lvObstacle || ""}
+              <CustomSelect
+                options={[
+                  { value: "0", label: "없음" },
+                  { value: "1", label: "1등급" },
+                  { value: "2", label: "2등급" },
+                  { value: "3", label: "3등급" },
+                ]}
+                placeholder="선택"
+                value={bodyData.lvObstacle || "0"}
+                onChange={(e) => handleSelectChange(e, "lvObstacle")}
               />
             </td>
           </tr>

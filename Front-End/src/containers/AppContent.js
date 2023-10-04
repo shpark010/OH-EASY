@@ -5,12 +5,12 @@ import PrivateRoute from "../containers/PrivateRoute";
 import MainPage from "../pages/MainPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
-import MemberRegister from "../pages/MemberRegister";
 import EmployeeRegister from "../pages/EmployeeRegister";
 import HRManagement from "../pages/HRManagement";
 import WorkContract from "../pages/WorkContract";
 import SalaryData from "../pages/SalaryData";
 import TableTest from "../pages/SdTableTest";
+import Mypage from "../pages/MyPage";
 
 import { YearProvider } from "../containers/YearContext";
 
@@ -20,7 +20,6 @@ function AppContent() {
     <YearProvider value={{ selectedYear, setSelectedYear }}>
       <Layout>
         <Routes>
-          <Route path="/register" element={<MemberRegister />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
@@ -34,6 +33,7 @@ function AppContent() {
             <Route path="/wc" element={<WorkContract />} />
             <Route path="/sd" element={<SalaryData />} />
             <Route path="/test" element={<TableTest />} />
+            <Route path="/mypage" element={<Mypage />} />
           </Route>
           {/* Catch-all 라우트 */}
           <Route path="*" element={<Navigate to="/main" />} />

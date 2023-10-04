@@ -1,5 +1,6 @@
 package kr.or.oheasy.hrm.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import kr.or.oheasy.hrm.service.HrService;
+import kr.or.oheasy.hrm.service.S3FileUploadTestService;
 import kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO;
 import kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO;
 import kr.or.oheasy.vo.HrBodyDataDtlVO;
@@ -32,25 +35,39 @@ public class HrController {
 	
 	@Autowired
 	private HrService hrService;
+	
+	@Autowired
+	private S3FileUploadTestService s3FileUploadTestService;
 
-	@GetMapping("/getAllEmpList")
-	public ResponseEntity<?> getAllEmpList(){
-		// 인사테이블에 등록되어있는 사원목록 리스트
-		System.out.println("getAllEmpList");
+	@GetMapping("/insertAllHrEmpData")
+	public ResponseEntity<?> insertAllHrEmpData(){
 		
-		List<HrEmpMstVO> result = hrService.getAllEmpList();
+		System.out.println("insertAllHrEmpData 진입 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		
-		return new ResponseEntity<>(result,HttpStatus.OK);
+		List<HrEmpMstVO> result = hrService.insertAllHrEmpData();
+	    int total = result.size(); // 총인원수
+	    int working = (int) result.stream().filter(emp -> emp.getDtResign() == null).count(); // 재직중인원
+	    int resigned = total - working; // 퇴사한인원
+
+	    Map<String, Object> response = new HashMap();
+	    response.put("result", result);
+	    response.put("total", total);
+	    response.put("working", working);
+	    response.put("resigned", resigned);
+
+	    System.out.println(response);
+	    
+		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 	
 	@GetMapping("/getAllModalEmpList")
 	public ResponseEntity<?> getAllModalEmpList(){
-		// 사원테이블에 등록되어있지만 인사테이블에는 없는 사원목록 리스트
-		System.out.println("getAllModalEmpList");
-		
-		List<HrEmpMstVO> result = hrService.getAllModalEmpList();
-		
-		return new ResponseEntity<>(result,HttpStatus.OK);
+	    // 사원테이블에 등록되어있지만 인사테이블에는 없는 사원목록 리스트
+	    System.out.println("getAllModalEmpList");
+	    
+	    List<HrEmpMstVO> result = hrService.getAllModalEmpList();
+
+	    return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	@GetMapping("/getLicenseList")
@@ -103,15 +120,28 @@ public class HrController {
 		System.out.println("category : " + category);
 		System.out.println("sort : " + sort);
 		
-		List<HrEmpMstVO> result = hrService.getConditionalEmpList(category, sort); 
+		List<HrEmpMstVO> result = hrService.getConditionalEmpList(category, sort);
+	    int total = result.size(); // 총인원수
+	    int working = (int) result.stream().filter(emp -> emp.getDtResign() == null).count(); // 재직중인원
+	    int resigned = total - working; // 퇴사한인원
+
+	    Map<String, Object> response = new HashMap();
+	    response.put("result", result);
+	    response.put("total", total);
+	    response.put("working", working);
+	    response.put("resigned", resigned);
 		
-		return new ResponseEntity<>(result,HttpStatus.OK);
+		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 	
 	@PostMapping("/HrEmpDataDelete")
 	public ResponseEntity<?> deleteHrEmpDtlList(@RequestBody Map<String, List<String>> payload){
 		
 	    List<String> cdEmpList = payload.get("selectedEmpCodes");
+	    
+	    System.out.println("*******************************");
+	    System.out.println(cdEmpList);
+	    System.out.println("*******************************");
 	    
 	    // 넘어온 사원리스트 삭제 
 	    hrService.deleteHrEmpDtlList(cdEmpList);
@@ -131,6 +161,73 @@ public class HrController {
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
 	
+	 @PostMapping("/uploadImg")
+	    public ResponseEntity<?> uploadImg(@RequestParam("file") MultipartFile file,@RequestParam("cdEmp") String cdEmp) {
+
+	    	System.out.println("넘어온 cdEmp : " + cdEmp);
+	    	System.out.println("file : " + file);
+	    	
+	    	
+	        if (file.isEmpty()) {
+	        	System.out.println("업로드된 파일이 없습니다.");
+	            return new ResponseEntity<>("업로드된 파일이 없습니다.", HttpStatus.BAD_REQUEST);
+	        }
+
+	        // 이미지 파일 유효성 검사
+	        if (!file.getContentType().startsWith("image/")) {
+	        	System.out.println("이미지 파일만 업로드 가능합니다.");
+	            return new ResponseEntity<>("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST);
+	        }
+
+	        if (file.getSize() > 5 * 1024 * 1024) {
+	        	System.out.println("파일의 크기는 5MB를 초과할 수 없습니다.");
+	            return new ResponseEntity<>("파일의 크기는 5MB를 초과할 수 없습니다.", HttpStatus.BAD_REQUEST);
+	        }
+
+	        try {
+	        	System.out.println("try 1 ***********");
+	        	
+	        	String url = s3FileUploadTestService.uploadFile(file,cdEmp);
+	            
+	        	return new ResponseEntity<>(url,HttpStatus.OK);
+	        } catch (Exception e) {
+	        	System.out.println("파일 업로드 중 오류가 발생했습니다.");
+	            return new ResponseEntity<>("파일 업로드 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	
+	@PostMapping("deleteImg")
+	public ResponseEntity<?> deleteImg(@RequestBody Map<String, String> payload){
+	
+		System.out.println("deleteImg");
+		//{cdEmp=CD002, path=https://leefinal.s3.ap-northeast-2.amazonaws.com/profileImg/9daf7148-35dc-4216-adad-889605301bd3.jpg}
+		System.out.println(payload);
+        String cdEmp = payload.get("cdEmp");
+        String s3Path = payload.get("path");
+		
+		
+		hrService.updateEmpBasicData(cdEmp, "PATH", "null");
+        // 파일명 추출
+        String fileName = s3Path.substring(s3Path.lastIndexOf("/") + 1);
+
+        // S3에서 이미지 삭제
+        s3FileUploadTestService.deleteFileFromS3("profileImg/" + fileName);
+        
+
+		
+		
+		return new ResponseEntity<>("", HttpStatus.OK);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@GetMapping("/updateBasicEmpData")
 	public ResponseEntity<?> updateEmpBasicData(@RequestParam Map<String, String> params){
 		System.out.println("updateBasicEmpdata");
@@ -140,8 +237,6 @@ public class HrController {
 		String column = entry.getKey();
 		String value = entry.getValue();
 		System.out.println("cdEmp : " + cdEmp + ", column : " + column + ", value : " + value);
-		
-	
 		int result = hrService.updateEmpBasicData(cdEmp, column, value);
 		
 		return new ResponseEntity<>(result,HttpStatus.OK);

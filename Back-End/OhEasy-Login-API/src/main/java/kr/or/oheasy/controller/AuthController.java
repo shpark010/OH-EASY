@@ -4,12 +4,16 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.or.oheasy.service.AuthService;
@@ -17,6 +21,7 @@ import kr.or.oheasy.service.RedisService;
 import kr.or.oheasy.utils.JwtUtil;
 import kr.or.oheasy.vo.LoginVO;
 import kr.or.oheasy.vo.LogoutVO;
+import kr.or.oheasy.vo.UsersVO;
 
 @RestController
 @RequestMapping("/api1/auth")
@@ -27,7 +32,30 @@ public class AuthController {
 
 	@Autowired
 	private RedisService redisService;
+	
 
+	
+	@GetMapping("/idCheck")
+	public ResponseEntity<?> signup(@RequestParam("id") String id ){
+		System.out.println("넘어온 아이디 :  " +id);
+		int result = authService.idCheck(id);
+		System.out.println(result);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	
+	
+	@PostMapping("/signup")
+	public ResponseEntity<?> signup(@RequestBody UsersVO usersVO){
+		
+		System.out.println(usersVO);
+		
+		int result = authService.signup(usersVO);
+		
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginVO loginVO) {
 		System.out.println("로그인 진입");
@@ -71,6 +99,32 @@ public class AuthController {
 
 	}
 
+	@GetMapping("/getOneMemberData")
+	public ResponseEntity<?> getOneMemberData(@RequestParam("id") String id) {
+		System.out.println("getOneMemberData");
+		System.out.println(id);
+		
+		UsersVO result = authService.getOneMemberData(id);
+		System.out.println(result);
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
+		
+	}
+	
+	
+	@PostMapping("updateMemberData")
+	public ResponseEntity<?> updateMemberData(@RequestBody UsersVO usersVO) {
+		System.out.println("updateMemberData");
+		System.out.println(usersVO);
+		int result = authService.updateMemberData(usersVO);
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
+		
+	}
+	
+	
+	
+	
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@RequestBody LogoutVO logoutVO) {
 		System.out.println("로그아웃 진입");

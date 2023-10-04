@@ -57,13 +57,21 @@ const useApiRequest = () => {
     }
     console.log("헤더 ********************");
     console.log(headers);
+    let requestData = data;
+    if (data instanceof FormData) {
+      // FormData를 사용하는 경우, Content-Type 헤더를 삭제하여 브라우저가 자동으로 설정하게 합니다.
+      delete headers["Content-Type"];
+    } else {
+      requestData = JSON.stringify(data);
+    }
+
     // 실제로 API를 호출하는 부분
     try {
       const response = await axios({
         method,
         url,
         headers,
-        data: JSON.stringify(data),
+        data: requestData,
       });
       setLoading(false);
       return response.data;

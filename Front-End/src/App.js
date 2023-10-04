@@ -7,16 +7,16 @@ import { LoadingProvider } from "./containers/LoadingProvider";
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <CookiesProvider>
-        <Router>
-          <LoadingProvider>
-            <Head />
-            <AppContent />
-          </LoadingProvider>
-        </Router>
-      </CookiesProvider>
-    </React.StrictMode>
+    // <React.StrictMode>
+    <CookiesProvider>
+      <Router>
+        <LoadingProvider>
+          <Head />
+          <AppContent />
+        </LoadingProvider>
+      </Router>
+    </CookiesProvider>
+    // </React.StrictMode>
   );
 };
 

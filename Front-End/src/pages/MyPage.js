@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/css/pages/SignupPage.css";
 
 import SweetAlert from "../components/Contents/SweetAlert";
 import axios from "axios";
 import { useLoading } from "../containers/LoadingContext";
+import { getCookie } from "../containers/Cookie";
 
 const validateId = (id) => /^[a-z0-9]{4,}$/.test(id);
 const validatePassword = (password) => /^[a-z0-9]{4,}$/.test(password);
 const validateEmail = (email) => /^\S+@\S+\.\S+$/.test(email);
 
-const SignupPage = () => {
+const MyPage = () => {
+  console.log("MyPage 컴포넌트 렌더링"); // 이 로그가 얼마나 많이 찍히는지 확인
   const { setLoading } = useLoading();
   const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ const SignupPage = () => {
   };
 
   const handleSignupBtn = async () => {
-    console.log("회원가입 버튼클릭~~~~~~~~~~~~~~~~~~~~");
+    console.log("정보수정 버튼클릭~~~~~~~~~~~~~~~~~~~~");
 
     if (
       memberData.id === "" ||
@@ -73,12 +75,15 @@ const SignupPage = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("/api1/auth/signup", memberData);
+      const response = await axios.post(
+        "/api1/auth/updateMemberData",
+        memberData,
+      );
       console.log(response.data);
       setLoading(false);
 
       if (response.data === 1) {
-        setAlertMessage("가입성공");
+        setAlertMessage("수정성공");
         setAlertType("success");
         setShowAlert(true);
       } else {
@@ -93,42 +98,30 @@ const SignupPage = () => {
       setShowAlert(true);
     }
   };
-  const handleIdCheck = async (event) => {
-    //const idValue = event.target.value;
-    console.log(memberData.id);
-    console.log("아이디 중복체크 ~~~~~~~~~~~~~~~~~");
-    console.log(validateId(memberData.id));
-    // 1. 아이디 유효성 검사
-    if (!validateId(memberData.id)) {
-      setAlertMessage("아이디는 4자리이상 영소문자, 숫자만 입력가능합니다.");
-      setAlertType("error");
-      setShowAlert(true);
-      event.target.focus(); // 포커스를 다시 아이디 입력창에 주기
-      return;
-    }
-    console.log("api 요청~~~~~~~~~~~~~~~~~~~~");
+
+  const getUsersData = async () => {
+    const loginInfo = getCookie("loginInfo");
+    const loginInfoParts = loginInfo.split(".");
+    const id = loginInfoParts[0];
+
     try {
-      const response = await axios.get("/api1/auth/idCheck", {
-        params: {
-          id: memberData.id,
-        },
-      });
-      // 2. 서버 응답 처리
-      if (response.data === 0) {
-        setAlertMessage("가입가능한 아이디 입니다.");
-        setAlertType("success");
-        setShowAlert(true);
-      } else if (response.data === 1) {
-        setAlertMessage("중복된 아이디입니다.");
-        setAlertType("warning");
-        setShowAlert(true);
-        event.target.focus(); // 포커스를 다시 아이디 입력창에 주기
+      const response = await axios.get(`/api1/auth/getOneMemberData?id=${id}`);
+      if (response.status === 200 && response.data) {
+        setMemberData(response.data);
       }
-      setLoading(false);
     } catch (error) {
-      console.error("api 요청 실패:", error);
+      console.error("API 호출 중 오류 발생:", error);
     }
   };
+
+  useEffect(() => {
+    console.log("MyPage 컴포넌트가 마운트됨");
+    getUsersData();
+    return () => {
+      console.log("MyPage 컴포넌트가 언마운트됨");
+    };
+  }, []);
+
   return (
     <div className="signupMainDiv">
       {showAlert && (
@@ -141,29 +134,30 @@ const SignupPage = () => {
             setShowAlert(false);
             setAlertMessage();
             setAlertType();
-            if (alertType === "success" && alertMessage === "가입성공") {
-              navigate("/login");
+            if (alertType === "success" && alertMessage === "수정성공") {
+              navigate("/main");
             }
           }}
         />
       )}
       <div className="signupBox">
-        <p className="signupTxt">회원가입</p>
+        <p className="signupTxt">회원정보수정</p>
         <p className="signupInfoTxt">
-          Oh easy 에서 제공하는 다양한 서비스로
-          <br /> 더 스마트해진 업무환경을 경험하세요
+          {memberData.name} 님의 정보를 수정합니다.
+          <br />
+          <br />
+          {/* Oh easy 에서 제공하는 다양한 서비스로
+          <br /> 더 스마트해진 업무환경을 경험하세요 */}
         </p>
         <div className="signupForm">
           <div className="inputWithLabel">
             <input
               type="text"
-              className="signupInput"
-              id="id"
-              value={memberData.id}
+              className="signupInput id"
+              id="updateMemberId"
               onChange={handleChange}
-              onBlur={(e) => {
-                handleIdCheck(e);
-              }} // onBlur 이벤트를 handleIdCheck로 변경
+              value={memberData.id || ""}
+              readOnly
             />
             <label htmlFor="id" className="floatingLabel">
               아이디
@@ -221,11 +215,11 @@ const SignupPage = () => {
             </label>
           </div>
           <button className="signupOkBtn" onClick={handleSignupBtn}>
-            <p className="signupBtnTxt">회원가입</p>
+            <p className="signupBtnTxt">정보수정</p>
           </button>
-          <Link to="/login">
+          <Link to="/main">
             <button className="signupCancleBtn">
-              <p className="signupCalcleBtnTxt">취소</p>
+              <p className="signupCalcleBtnTxt">메인으로</p>
             </button>
           </Link>
         </div>
@@ -234,4 +228,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default MyPage;

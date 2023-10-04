@@ -11,6 +11,7 @@ public class HrEmpDtlVO {
     private Integer fgWorkcontract;		// 근로계약서 작성여부
     private Integer fgMarriage;			// 결혼 여부 
     private String dtBirth;				// 생년월일
-
+    private String path;				// 이미지 경로
+   
 
 }

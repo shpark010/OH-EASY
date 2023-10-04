@@ -104,7 +104,7 @@ function LoginPage() {
               비밀번호
             </label>
           </div>
-          <div className="checkboxContainer">
+          {/* <div className="checkboxContainer">
             <input
               type="checkbox"
               className="loginCheckBox"
@@ -112,7 +112,7 @@ function LoginPage() {
               onChange={handleCheckboxChange}
             />
             <p className="loginCheckBoxTxt">아이디저장</p>
-          </div>
+          </div> */}
           <button className="btn loginBtn" onClick={login}>
             로그인
           </button>
@@ -120,14 +120,14 @@ function LoginPage() {
             <button className="btn signupBtn">회원가입</button>
           </Link>
         </div>
-        <div className="accountRecoveryContainer">
+        {/* <div className="accountRecoveryContainer">
           <p className="lostAccountTxt">계정을 잃어버리셨나요?</p>
           <div className="recoveryOptions">
             <p className="recoveryOption">아이디 찾기</p>
             <span className="separator">|</span>
             <p className="recoveryOption">비밀번호 찾기</p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import useApiRequest from "../../Services/ApiRequest";
 //import Input from "../../Contents/Input";
 import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
+import CustomCalender from "../../Contents/CustomCalendar";
 
 const HrFamily = ({ cdEmp }) => {
   console.log("가족 페이지 ******");
@@ -16,6 +17,9 @@ const HrFamily = ({ cdEmp }) => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (cdEmp === undefined) {
+      setfamilyList([]);
+    }
     // 첫 렌더링인지 체크
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -81,6 +85,9 @@ const HrFamily = ({ cdEmp }) => {
     if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
+    if (inputValue == null || inputValue === "" || inputValue === undefined) {
+      return;
+    }
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -90,6 +97,55 @@ const HrFamily = ({ cdEmp }) => {
       console.error("api 요청 실패:", error);
     }
     handleSendEmpCodeGetFamilyData(cdEmp);
+  };
+
+  const handleDateChange = async (value, name, seqFamily) => {
+    console.log("handleDateChange ******************");
+
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+      return;
+    }
+    value = value.replace(/-/g, "");
+
+    if (seqFamily === null || seqFamily === undefined || seqFamily === "") {
+      // 학력고유 번호가 없을땐 insert
+      try {
+        const responseData = await apiRequest({
+          method: "GET",
+          url: `/api2/hr/insertFamilyData?cdEmp=${cdEmp}&${name}=${value}`,
+        });
+        console.log("요청성공!!!!!!!!!!!!!!!!");
+      } catch (error) {
+        console.error("api 요청 실패:", error);
+      }
+      handleSendEmpCodeGetFamilyData(cdEmp);
+    } else {
+      // 학력고유 번호가 있을땐 update
+      console.log("요청 전!!!!!!!!!!!!!!!!!!!!!!");
+      try {
+        const responseData = await apiRequest({
+          method: "GET",
+          url: `/api2/hr/updateFamilyData?seqFamily=${seqFamily}&${name}=${value}`,
+        });
+        console.log("요청성공!!!!!!!!!!!!!!!!");
+      } catch (error) {
+        console.error("Failed to fetch emp data:", error);
+      }
+      updateFamilyListItem(seqFamily, name, value);
+    }
+  };
+
+  const updateFamilyListItem = (seqFamily, name, value) => {
+    const updatedFamilyList = familyList.map((family) => {
+      if (family.seqFamily === seqFamily) {
+        return {
+          ...family,
+          [name]: value,
+        };
+      }
+      return family;
+    });
+    setfamilyList(updatedFamilyList);
   };
 
   // 테이블에 보내야할 데이터
@@ -175,8 +231,12 @@ const HrFamily = ({ cdEmp }) => {
             console.log("value : " + value);
             console.log("inputValue : " + inputValue);
 
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
+              console.log("*********************************");
               handleSendEmpCodeInsertFamilyData(
                 cdEmp,
                 "nmEmpFam",
@@ -219,6 +279,9 @@ const HrFamily = ({ cdEmp }) => {
             console.log("value : " + value);
             console.log("inputValue : " + inputValue);
 
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(
@@ -258,13 +321,26 @@ const HrFamily = ({ cdEmp }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-            if (original) {
+            if (original == null) {
+              // insert
+              console.log("****************");
+              handleSendEmpCodeInsertFamilyData(
+                cdEmp,
+                "fgFamily",
+                e.target.value,
+              );
+              console.log("수정요청");
+              handleSendEmpCodeGetFamilyData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "fgFamily",
                 e.target.value,
               );
+              console.log("수정요청");
+              setInputValue(e.target.value);
             }
           };
 
@@ -290,15 +366,27 @@ const HrFamily = ({ cdEmp }) => {
         width: "15%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
-
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-            if (original) {
+            if (original == null) {
+              // insert
+              console.log("****************");
+              handleSendEmpCodeInsertFamilyData(
+                cdEmp,
+                "fgEducation",
+                e.target.value,
+              );
+              console.log("수정요청");
+              handleSendEmpCodeGetFamilyData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "fgEducation",
                 e.target.value,
               );
+              console.log("수정요청");
+              setInputValue(e.target.value);
             }
           };
 
@@ -328,13 +416,26 @@ const HrFamily = ({ cdEmp }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-            if (original) {
+            if (original == null) {
+              // insert
+              console.log("****************");
+              handleSendEmpCodeInsertFamilyData(
+                cdEmp,
+                "fgGraduate",
+                e.target.value,
+              );
+              console.log("수정요청");
+              handleSendEmpCodeGetFamilyData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "fgGraduate",
                 e.target.value,
               );
+              console.log("수정요청");
+              setInputValue(e.target.value);
             }
           };
 
@@ -362,13 +463,26 @@ const HrFamily = ({ cdEmp }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-            if (original) {
+            if (original == null) {
+              // insert
+              console.log("****************");
+              handleSendEmpCodeInsertFamilyData(
+                cdEmp,
+                "fgCohabitation",
+                e.target.value,
+              );
+              console.log("수정요청");
+              handleSendEmpCodeGetFamilyData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "fgCohabitation",
                 e.target.value,
               );
+              console.log("수정요청");
+              setInputValue(e.target.value);
             }
           };
 
@@ -422,39 +536,19 @@ const HrFamily = ({ cdEmp }) => {
         Header: "생년월일",
         accessor: "dtBirth",
         id: "dtBirth",
-        width: "9%",
+        width: "10%",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-          };
-          const handleInputOnBlur = (e) => {
-            if (original == null) {
-              // insert
-              handleSendEmpCodeInsertFamilyData(
-                cdEmp,
-                "dtBirth",
-                e.target.value,
-              );
-              handleSendEmpCodeGetFamilyData(cdEmp);
-              setInputValue(e.target.value);
-            } else {
-              // update
-              handleSendEmpCodeUpdateFamilyData(
-                original.seqFamily,
-                "dtBirth",
-                e.target.value,
-              );
-              setInputValue(e.target.value);
-            }
+            const seqFamilyValue = original ? original.seqFamily : null;
+            handleDateChange(e, "dtBirth", seqFamilyValue);
           };
           return (
-            <Input
-              value={inputValue || ""}
+            <CustomCalender
+              readOnly={true}
+              className="hrInfoBaseInput"
+              value={value || ""}
+              name="dtBirth"
               onChange={handleInputChange}
-              isDoubleClick={true}
-              className={"doubleLine"}
-              onBlur={handleInputOnBlur}
             />
           );
         },
@@ -470,6 +564,9 @@ const HrFamily = ({ cdEmp }) => {
             setInputValue(e.target.value);
           };
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(cdEmp, "nmJob", e.target.value);
@@ -507,6 +604,9 @@ const HrFamily = ({ cdEmp }) => {
             setInputValue(e.target.value);
           };
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(
@@ -548,6 +648,9 @@ const HrFamily = ({ cdEmp }) => {
             setInputValue(e.target.value);
           };
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
               handleSendEmpCodeInsertFamilyData(
