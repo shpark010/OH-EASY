@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import Table from "../../TablesLib/Table";
 import CustomCalender from "../../Contents/CustomCalendar";
 import useApiRequest from "../../Services/ApiRequest";
-import Input from "../../Contents/Input";
+import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
 
 const HrCareer = ({ cdEmp }) => {
@@ -248,6 +248,7 @@ const HrCareer = ({ cdEmp }) => {
               className="hrInfoBaseInput"
               value={value || ""}
               name="dtHire"
+              readOnly={true}
               onChange={handleInputChange}
             />
           );
@@ -266,6 +267,7 @@ const HrCareer = ({ cdEmp }) => {
             <CustomCalender
               className="hrInfoBaseInput"
               value={value || ""}
+              readOnly={true}
               name="dtResign"
               onChange={handleInputChange}
             />

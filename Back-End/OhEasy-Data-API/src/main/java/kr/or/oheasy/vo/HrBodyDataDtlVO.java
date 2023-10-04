@@ -14,7 +14,7 @@ public class HrBodyDataDtlVO {
     private String fgEye;
     private Float leftEyesight;
     private Float rightEyesight;
-    private Integer apilityHearing;
+    private String apilityHearing;
     private String fgObstacle;
     private String fgVerteans;
     private Integer lvObstacle;

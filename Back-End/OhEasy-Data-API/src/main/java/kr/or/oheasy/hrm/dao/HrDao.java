@@ -25,8 +25,18 @@ public interface HrDao {
 	public HrEmpMstCdEmpNmNameVO getOneHrEmpData(String cdEmp);
 	// 사원테이블엔 존재하지만 인사테이블엔 존재하지 않는 사원 리스트
 	public List<HrEmpMstVO> getAllModalEmpList();
+	
+	// 여러명의 사원 전체 등록
+	public int insertIntoHrEmpDtl();
+	public int insertIntoHrFamilyDtl();
+	public int insertIntoHrMilitaryInfoDtl();
+	public int insertIntoHrBodyDataDtl();
+
 	// 인사테이블 삭제
-	 public void deleteHrEmpDtl(String cdEmp);
+	public void deleteHrEmpDtl(String cdEmp);
+	// 인사테이블에 사진까지 삭제
+	public List<String> getEmpImagePaths(@Param("list") List<String> cdEmpList);
+	 
 	// 자격증 리스트
 	public List<HrLicenseSdtlVO> getLicenseList();
 	// 조건 검색 사원 리스트 category = 0 재직자
@@ -39,7 +49,10 @@ public interface HrDao {
 	public List<HrEmpMstVO> getConditionalEmpListCategory3(@Param("category") int category,@Param("sort") int sort);
 	
 	// 기초정보 (mst + dtl)
-	public HrEmpMstJoinDtlVO getOneEmpBasicData(String cdEmp); 
+	public HrEmpMstJoinDtlVO getOneEmpBasicData(String cdEmp);
+	
+
+	
 	
 	// 사원 테이블 업데이트 (mst)
 	public int updateHrEmpMst(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);

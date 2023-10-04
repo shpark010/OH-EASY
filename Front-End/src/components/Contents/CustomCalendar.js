@@ -57,6 +57,8 @@ const StyledCalendar = styled(Calendar)`
     color: var(--color-primary-black);
     font-size: 15px;
     font-weight: 600;
+    text-align: center;
+    margin: 0;
   }
 
   .react-calendar__month-view__days__day--weekend:nth-child(7n-1) {

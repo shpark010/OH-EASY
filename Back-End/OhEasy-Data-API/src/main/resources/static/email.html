@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>급여자료</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #e5f2ff;">
+    <div style="max-width: 600px; margin: 40px auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <header style="background-color: #87ceeb; padding: 10px 20px; border-radius: 5px; text-align: center;">
+            <h1>급여자료 안내</h1>
+        </header>
+        <section style="margin-top: 20px;">
+            <p>안녕하세요, {{nmEmp}}님,</p>
+            <p>{{yyAllowance}}년 {{mmBelong}}월 급여 자료를 전달드립니다.</p>
+            <h3>보수</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #e5f2ff;">
+                    <th style="border: 1px solid #e0e0e0; width: 40%; padding: 10px; text-align: left; text-align: center;">항목</th>
+                    <th style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">금액</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">기본급</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{amtAllowance}} 원</td>
+                </tr>
+                </tbody>
+                <tfoot style="background-color: #b6b6b6;">
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">총액</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{amtAllowance}} 원</td>
+                </tr>
+                </tfoot>
+            </table>
+            <h3>공제</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                <tr style="background-color: #e5f2ff;">
+                    <th style="border: 1px solid #e0e0e0; width: 40%; padding: 10px; text-align: left; text-align: center;">항목</th>
+                    <th style="border: 1px solid #e0e0e0; padding: 10px; text-align: left;">금액</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">국민연금</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{nationalPension}} 원</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">건강보험</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{healthInsurance}} 원</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">장기요양보험</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{longtermNursingInsurance}} 원</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">고용보험</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{employmentInsurance}} 원</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">소득세</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{incomeTax}} 원</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">지방소득세</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{localIncomeTax}} 원</td>
+                </tr>
+                </tbody>
+                <tfoot style="background-color: #b6b6b6;">
+                <tr>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: center;">총 공제액</td>
+                    <td style="border: 1px solid #e0e0e0; padding: 10px; text-align: left; text-align: right;">{{totalTax}} 원</td>
+                </tr>
+                </tfoot>
+            </table>
+        </section>
+        <footer>
+            <p>실수령액 : {{actualSalary}} 원</p>
+            <p>인사팀 드림</p>
+        </footer>
+    </div>
+</body>
+</html>

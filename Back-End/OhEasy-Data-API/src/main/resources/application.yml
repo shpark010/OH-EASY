@@ -38,6 +38,24 @@ spring:
       idleTimeout: 10000
       maxLifetime: 1800000
       connectionTimeout: 30000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: parksungh97@gmail.com
+    password: fgrgkenbhmjshexq
+    properties:
+      mail:
+        debug: true
+        mime:
+          charset: UTF-8
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          starttls:
+            enable: true
+            required: true
 mybatis:
   mapper-locations: mapper/*.xml
   configuration:
@@ -48,3 +66,17 @@ spring.redis:
   port: 50012 # Redis 포트
   # 패스워드가 필요한 경우 아래 설정을 사용
   # password: your-password
+  
+cloud:
+  aws:
+    s3:
+      bucket: leefinal
+    credentials:
+      access-key: AKIAT3ZIG6Q7KGW66R7Y
+      secret-key: Pqo+2VwJp5imc2B7OuU2l3AkHpkklXA2xT+h3Elx
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+          

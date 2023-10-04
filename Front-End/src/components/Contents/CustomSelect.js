@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 
 const SelectContainer = styled.div`
-  &.searchBarBox {
-    /* 여기에 .searchBarBox 스타일을 추가하세요 */
+  &.customSelect {
+    /* 여기에 .customSelect 스타일을 추가하세요 */
   }
 `;
 
@@ -12,7 +12,6 @@ const StyledSelect = styled.select`
   pointer-events: ${(props) => (props.readOnly ? "none" : "auto")}; // 클릭 방지
   cursor: ${(props) => (props.readOnly ? "not-allowed" : "pointer")};
   color: black;
-
   &:disabled {
     cursor: not-allowed;
     background-color: var(--color-opacity-gray);
@@ -33,7 +32,7 @@ function CustomSelect({
   const showPlaceholder = value === ""; // value가 ""이면 true, 아니면 false
 
   return (
-    <SelectContainer className={`searchBarBox ${className}`}>
+    <SelectContainer className={`customSelect ${className}`}>
       <StyledSelect
         id={id}
         className="selectBox"

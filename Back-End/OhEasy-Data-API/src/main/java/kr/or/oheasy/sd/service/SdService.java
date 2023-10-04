@@ -9,6 +9,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import kr.or.oheasy.sd.dao.SdDao;
 import kr.or.oheasy.vo.SdDeducationVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
@@ -169,40 +171,42 @@ public class SdService {
 		empData.put("dtAllowance", dtAllowance);
 		empData.put("searchTaxOrder", searchTaxOrder);
 		Map<String, Object> resultData = new HashMap<>();
-		List<SdDeducationVO> taxList = new ArrayList<>();
-		// 기본급 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "101", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 501 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "501", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 502 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "502", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 503 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "503", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 504 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "504", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 505 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "505", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 506 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "506", pay, 0, yyAllowance, mmBelong, dtAllowance));
+		List<SdTaxRateVO> taxRateList = new ArrayList<>();
+		try {
+			taxRateList = dao.getAllTaxList(empData);
+			System.out.println(taxRateList);
+		} catch (Exception e) {
+			System.out.println("과세 리스트 오류");
+			System.out.println(e.getMessage());
+		}
+		Map<String, Object> searchData = new HashMap<>();
+		searchData.put("taxRateList", taxRateList);
+		searchData.put("cdEmp", cd_Emp);
+		searchData.put("amtAllowance", pay);
+		searchData.put("yyAllowance", yyAllowance);
+		searchData.put("mmBelong", mmBelong);
+		searchData.put("dtAllowance", dtAllowance);
+		searchData.put("searchTaxOrder", searchTaxOrder);
 		// 삽입
-		int insertResult = dao.setEmpPay(taxList);
+		System.out.println("서치데이터 : " + searchData);
+		int insertResult = dao.setEmpPay(searchData);
 		// 계산 결과 조회
 		SdTaxAmountVO emptaxInfo = new SdTaxAmountVO();
-		SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
 		try {
 			List<SdDeducationVO> empTaxInfoList = dao.getEmpTax(empData);
 			emptaxInfo = new SdTaxAmountVO(empTaxInfoList.get(0).getAmtAllowance(),
 					empTaxInfoList.get(1).getAmtAllowance(), empTaxInfoList.get(2).getAmtAllowance(),
-					empTaxInfoList.get(4).getAmtAllowance(), empTaxInfoList.get(3).getAmtAllowance(),
+					empTaxInfoList.get(3).getAmtAllowance(), empTaxInfoList.get(4).getAmtAllowance(),
 					empTaxInfoList.get(5).getAmtAllowance(), empTaxInfoList.get(6).getAmtAllowance());
 		} catch (Exception e) {
 			System.out.println("사원 급여 오류");
 			System.out.println(e.getMessage());
 		}
+		SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
 		try {
 			List<Long> searchTaxInfoList = dao.getTaxInfo(empData);
 			searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
-					searchTaxInfoList.get(2), searchTaxInfoList.get(4), searchTaxInfoList.get(3),
+					searchTaxInfoList.get(2), searchTaxInfoList.get(3), searchTaxInfoList.get(4),
 					searchTaxInfoList.get(5), searchTaxInfoList.get(6));
 		} catch (Exception e) {
 			System.out.println("조회구분 오류");
@@ -236,25 +240,26 @@ public class SdService {
 		empData.put("dtAllowance", dtAllowance);
 		empData.put("searchTaxOrder", searchTaxOrder);
 		Map<String, Object> resultData = new HashMap<>();
-		List<SdDeducationVO> taxList = new ArrayList<>();
-		// 기본급 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "101", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 501 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "501", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 502 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "502", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 503 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "503", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 504 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "504", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 505 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "505", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 506 리스트 추가
-		taxList.add(new SdDeducationVO(cd_Emp, "506", pay, 0, yyAllowance, mmBelong, dtAllowance));
-		// 수정
-		for (SdDeducationVO deducation : taxList) {
-			dao.updateEmpPay(deducation);
+		List<SdTaxRateVO> taxRateList = new ArrayList<>();
+		try {
+			taxRateList = dao.getAllTaxList(empData);
+			System.out.println(taxRateList);
+		} catch (Exception e) {
+			System.out.println("과세 리스트 오류");
+			System.out.println(e.getMessage());
 		}
+		for (SdTaxRateVO sdTaxRateVO : taxRateList) {
+			Map<String, Object> searchData = new HashMap<>();
+			searchData.put("taxRateList", sdTaxRateVO);
+			searchData.put("cdEmp", cd_Emp);
+			searchData.put("amtAllowance", pay);
+			searchData.put("yyAllowance", yyAllowance);
+			searchData.put("mmBelong", mmBelong);
+			searchData.put("dtAllowance", dtAllowance);
+			// 수정
+			int updateResult = dao.updateEmpPay(searchData);			
+		}
+		
 		// 계산 결과 조회
 		SdTaxAmountVO emptaxInfo = new SdTaxAmountVO();
 		SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
@@ -262,7 +267,7 @@ public class SdService {
 			List<SdDeducationVO> empTaxInfoList = dao.getEmpTax(empData);
 			emptaxInfo = new SdTaxAmountVO(empTaxInfoList.get(0).getAmtAllowance(),
 					empTaxInfoList.get(1).getAmtAllowance(), empTaxInfoList.get(2).getAmtAllowance(),
-					empTaxInfoList.get(4).getAmtAllowance(), empTaxInfoList.get(3).getAmtAllowance(),
+					empTaxInfoList.get(3).getAmtAllowance(), empTaxInfoList.get(4).getAmtAllowance(),
 					empTaxInfoList.get(5).getAmtAllowance(), empTaxInfoList.get(6).getAmtAllowance());
 		} catch (Exception e) {
 			System.out.println("사원 급여 오류");
@@ -271,7 +276,7 @@ public class SdService {
 		try {
 			List<Long> searchTaxInfoList = dao.getTaxInfo(empData);
 			searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
-					searchTaxInfoList.get(2), searchTaxInfoList.get(4), searchTaxInfoList.get(3),
+					searchTaxInfoList.get(2), searchTaxInfoList.get(3), searchTaxInfoList.get(4),
 					searchTaxInfoList.get(5), searchTaxInfoList.get(6));
 		} catch (Exception e) {
 			System.out.println("조회구분 오류");
@@ -321,7 +326,7 @@ public class SdService {
 			List<SdDeducationVO> empTaxInfoList = dao.getEmpTax(empData);
 			emptaxInfo = new SdTaxAmountVO(empTaxInfoList.get(0).getAmtAllowance(),
 					empTaxInfoList.get(1).getAmtAllowance(), empTaxInfoList.get(2).getAmtAllowance(),
-					empTaxInfoList.get(4).getAmtAllowance(), empTaxInfoList.get(3).getAmtAllowance(),
+					empTaxInfoList.get(3).getAmtAllowance(), empTaxInfoList.get(4).getAmtAllowance(),
 					empTaxInfoList.get(5).getAmtAllowance(), empTaxInfoList.get(6).getAmtAllowance());
 		} catch (Exception e) {
 			System.out.println("사원 급여 오류");
@@ -330,7 +335,7 @@ public class SdService {
 		try {
 			List<Long> searchTaxInfoList = dao.getTaxInfo(empData);
 			searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
-					searchTaxInfoList.get(2), searchTaxInfoList.get(4), searchTaxInfoList.get(3),
+					searchTaxInfoList.get(2), searchTaxInfoList.get(3), searchTaxInfoList.get(4),
 					searchTaxInfoList.get(5), searchTaxInfoList.get(6));
 		} catch (Exception e) {
 			System.out.println("조회구분 오류");
@@ -358,18 +363,74 @@ public class SdService {
 	}
 	
 	//과세 리스트 조회
-	public Map<String, Object> getTaxList() {
+	public Map<String, Object> getTaxList(Map<String, String> taxListData) {
 		SdDao dao = sqlSession.getMapper(SdDao.class);
 		Map<String, Object> resultData = new HashMap<>();
 		List<SdTaxRateVO> taxList = new ArrayList<>();
 		try {
-			taxList = dao.getTaxList();
+			taxList = dao.getTaxList(taxListData);
 			System.out.println(taxList);
 		} catch (Exception e) {
 			System.out.println("과세 리스트 오류");
 			System.out.println(e.getMessage());
 		}
 		resultData.put("taxList", taxList);
+		return resultData;
+	}
+	
+	//과세 리스트 수정
+	public Map<String, Object> updateTaxList(Map<String, Object> updateTaxListData) {
+		SdDao dao = sqlSession.getMapper(SdDao.class);
+	    Map<String, Object> resultData = new HashMap<>();
+	    Map<String, Object> updateData = new HashMap<>();
+
+	    List<Map<String, Object>> editTaxListData = (List<Map<String, Object>>) updateTaxListData.get("editTaxList");
+
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    List<SdTaxRateVO> taxList = new ArrayList<>();
+	    for (Map<String, Object> item : editTaxListData) {
+	        SdTaxRateVO sdTaxRateVO = objectMapper.convertValue(item, SdTaxRateVO.class);
+	        taxList.add(sdTaxRateVO);
+	    }
+
+	    for (SdTaxRateVO sdTaxRateVO : taxList) {
+	        int updateResult = dao.updateTaxList(sdTaxRateVO);
+	    }
+
+		Map<String, String> yearData = new HashMap<>();
+		List<SdTaxRateVO> taxRateList = new ArrayList<>();
+		yearData.put("yyAllowance", (String)updateTaxListData.get("applyYear"));
+		try {
+			taxRateList = dao.getAllTaxList(yearData);
+			System.out.println(taxRateList);
+		} catch (Exception e) {
+			System.out.println("과세 리스트 오류");
+			System.out.println(e.getMessage());
+		}
+		Map<String, Object> payListData = new HashMap<>();
+		payListData.put("yyAllowance", (String)updateTaxListData.get("applyYear"));
+		payListData.put("checkList", (List<String>)updateTaxListData.get("checkList"));
+		List<SdDeducationVO> payList = new ArrayList<>();
+		try {
+			payList = dao.getAllPayListForEdit(payListData);
+			System.out.println(payList);
+		} catch (Exception e) {
+			System.out.println("전체 사원 정보 수정을 위한 급여 및 일자 조회 오류");
+			System.out.println(e.getMessage());
+		}
+		for (SdDeducationVO sdDeducationVO : payList) {
+			for (SdTaxRateVO sdTaxRateVO : taxRateList) {
+				Map<String, Object> searchData = new HashMap<>();
+				searchData.put("taxRateList", sdTaxRateVO);
+				searchData.put("cdEmp", sdDeducationVO.getCdEmp());
+				searchData.put("amtAllowance", sdDeducationVO.getAmtAllowance());
+				searchData.put("yyAllowance", updateTaxListData.get("applyYear"));
+				searchData.put("mmBelong", sdDeducationVO.getMmBelong());
+				searchData.put("dtAllowance", sdDeducationVO.getDtAllowance());
+				// 수정
+				int updateResult = dao.updateEmpPay(searchData);			
+			}			
+		}
 		return resultData;
 	}
 }

@@ -20,6 +20,7 @@ function SearchBarBox({
         onChange={onChange}
         value={value}
         disabled={fixed}
+        style={{ cursor: fixed ? "default" : "pointer" }}
       >
         {options.map((option, index) => (
           <option key={index} value={option.value}>

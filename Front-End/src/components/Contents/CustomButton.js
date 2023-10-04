@@ -4,6 +4,8 @@ import styled from "styled-components";
 const StyledButton = styled.button.withConfig({
   shouldForwardProp: (prop) => !["color", "backgroundColor"].includes(prop),
 })`
+  font-family: "NanumSquare", sans-serif;
+  font-weight: 400;
   height: 32px;
   padding: 6px 12px;
   font-size: 14px;

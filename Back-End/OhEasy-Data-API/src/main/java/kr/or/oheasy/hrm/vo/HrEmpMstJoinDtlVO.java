@@ -12,6 +12,7 @@ public class HrEmpMstJoinDtlVO {
 	private Integer fgWorkcontract; // 근로계약서작성여부
 	private Integer fgMarriage; // 결혼여부
 	private String dtBirth; // 생년월일
+	private String path;		// 이미지 경로
 
 	// mst
 	private String noResident; // 주민번호 읽기전용

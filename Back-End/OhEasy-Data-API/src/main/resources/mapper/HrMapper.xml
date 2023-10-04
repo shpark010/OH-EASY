@@ -7,7 +7,7 @@
 <select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
 SELECT m.*
 FROM hr_emp_mst m
-INNER JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP;
+INNER JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
 </select>
 
 
@@ -16,8 +16,32 @@ INNER JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP;
 SELECT m.*
 FROM hr_emp_mst m
 LEFT JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
-WHERE d.CD_EMP IS NULL;
+WHERE d.CD_EMP IS NULL
 </select>
+
+<insert id="insertIntoHrEmpDtl">
+    INSERT INTO hr_emp_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_emp_dtl)
+</insert>
+
+<insert id="insertIntoHrFamilyDtl">
+    INSERT INTO hr_family_dtl (CD_EMP, FG_YEAR_END_TAX,NM_EMP_FAM,NO_RESIDENT ,FG_FAMILY)
+    SELECT m.CD_EMP, 0 AS FG_YEAR_END_TAX,m.NM_EMP,m.NO_RESIDENT, 0 AS FG_FAMILY FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_family_dtl)
+</insert>
+
+<insert id="insertIntoHrBodyDataDtl">
+    INSERT INTO hr_body_data_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_body_data_dtl)
+</insert>
+
+<insert id="insertIntoHrMilitaryInfoDtl">
+    INSERT INTO hr_military_info_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_military_info_dtl)
+</insert>
 
 <!-- 인사테이블 insert -->
 <insert id="insertHrEmpData">
@@ -28,6 +52,15 @@ WHERE d.CD_EMP IS NULL;
     DELETE FROM hr_emp_dtl
     WHERE CD_EMP = #{cdEmp}
 </delete>
+
+<!-- 인사테이블의 사진경로 리스트로 반환 (삭제할때 사용) -->
+<select id="getEmpImagePaths" resultType="string">
+    SELECT PATH FROM hr_emp_dtl WHERE CD_EMP IN
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
 
 <!-- 인사테이블 한명 정보 가져오기 -->
 <select id="getOneHrEmpData" parameterType="string" resultType="kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO">
@@ -53,7 +86,8 @@ WHERE d.CD_EMP IS NULL;
         d.NM_HANJA_EMP as nm_hanja_emp, 
         d.FG_WORKCONTRACT as fg_workcontract, 
         d.FG_MARRIAGE as fg_marriage, 
-        d.DT_BIRTH as dt_birth 
+        d.DT_BIRTH as dt_birth,
+        d.PATH 
     from 
         hr_emp_mst m
     left join 
@@ -68,12 +102,30 @@ WHERE d.CD_EMP IS NULL;
     set ${column} = #{value} 
     where cd_emp = #{cdEmp}
 </update>
-<!-- 한 사원의 인사테이블 update-->
+<!-- 한 사원의 인사테이블 update
 <update id="updateHrEmpDtl">
     update hr_emp_dtl
     set ${column} = #{value} 
     where cd_emp = #{cdEmp}
 </update>
+-->
+<update id="updateHrEmpDtl">
+    update hr_emp_dtl
+    <set>
+        <choose>
+            <!-- value 값이 null이면 해당 컬럼을 NULL로 설정 -->
+            <when test="value == 'null'">
+                ${column} = NULL
+            </when>
+            <!-- 그렇지 않으면 일반적으로 값을 설정 -->
+            <otherwise>
+                ${column} = #{value}
+            </otherwise>
+        </choose>
+    </set>
+    where cd_emp = #{cdEmp}
+</update>
+
 
 <!-- 한 사원의 가족정보 -->
 <select id="getFamilyDataList" resultType="kr.or.oheasy.vo.HrFamilyDtlVO">
@@ -133,7 +185,7 @@ WHERE d.CD_EMP IS NULL;
 
 <!-- 한사원의 신체 정보 insert-->
 <insert id="insertBodyData">
-	insert into hr_Body_data_dtl(cd_emp) values(#{cdEmp}) 
+	insert into hr_body_data_dtl(cd_emp) values(#{cdEmp}) 
 </insert>
 <!-- 한 사원의 신체 정보 update-->
 <update id="updateBodyData">
@@ -185,8 +237,7 @@ WHERE d.CD_EMP IS NULL;
 
 <!-- 조건 검색 카테고리 0 재직자 -->
 <select id="getConditionalEmpListCategory0" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT m.cd_emp as cd_emp
-    ,m.nm_emp as nm_emp
+    SELECT m.*
     from 
         hr_emp_mst m
     right join 
@@ -229,8 +280,7 @@ WHERE d.CD_EMP IS NULL;
 </select>
 <!-- 조건 검색 카테고리 1 퇴사자 -->
 <select id="getConditionalEmpListCategory1" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT m.cd_emp as cd_emp
-    ,m.nm_emp as nm_emp
+    SELECT m.*
     from 
         hr_emp_mst m
     right join 
@@ -274,8 +324,7 @@ WHERE d.CD_EMP IS NULL;
 
 <!-- 조건 검색 카테고리 2 재직자 + 당해년도 퇴사자 -->
 <select id="getConditionalEmpListCategory2" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT m.cd_emp as cd_emp
-    ,m.nm_emp as nm_emp
+    SELECT m.*
     from 
         hr_emp_mst m
     right join 
@@ -319,7 +368,7 @@ WHERE d.CD_EMP IS NULL;
 
 <!-- 조건 검색 카테고리 3 작년 퇴사자 + 당해년도 퇴사자 -->
 <select id="getConditionalEmpListCategory3" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
-    SELECT cd_emp, nm_emp 
+    SELECT *
     FROM hr_emp_mst
     WHERE LEFT(DT_RESIGN, 4) IN (YEAR(NOW()), YEAR(NOW()) - 1)
     <choose>

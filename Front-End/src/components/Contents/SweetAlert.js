@@ -39,7 +39,6 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel {
     
   }
 
-
   .div:where(.swal2-container) {
 
     overflow: initial !important;
@@ -52,7 +51,7 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel {
 
 const SweetAlert = ({
   text,
-  type = "info", // 기본
+  type = "info",
   showCancel = false,
   confirmText = "확인",
   cancelText = "취소",
@@ -66,8 +65,9 @@ const SweetAlert = ({
       showCancelButton: showCancel,
       confirmButtonText: confirmText,
       cancelButtonText: cancelText,
-      allowOutsideClick: true, // 외부 클릭을 통한 모달 닫기
-      heightAuto: false, // 자동 높이 조절 방지
+      allowOutsideClick: true,
+      heightAuto: false,
+      focusConfirm: true,
     }).then((result) => {
       if (result.isConfirmed) {
         onConfirm();
@@ -76,7 +76,6 @@ const SweetAlert = ({
       }
     });
   }, [text, type, showCancel, confirmText, cancelText, onConfirm, onCancel]);
-
   return <GlobalStyle />;
 };
 export default SweetAlert;
