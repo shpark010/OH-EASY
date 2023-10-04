@@ -30,6 +30,16 @@ const SalaryData = (props) => {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   // 사원 조회 리스트
   const [empList, setEmpList] = useState([]);
+  useEffect(() => {
+    if (empList.length > 0) {
+      const cdEmp = empList[0].cdEmp;
+      const element = document.querySelector(`.${cdEmp}`); // className으로 요소를 찾음
+
+      if (element) {
+        element.click(); // 요소를 클릭
+      }
+    }
+  }, [empList]);
   // 체크 리스트
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   //헤더 체크박스를 클릭할 때 호출되어, 모든 체크박스를 체크하거나 체크를 해제
@@ -573,6 +583,26 @@ const SalaryData = (props) => {
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
+  };
+
+  //이메일 발송
+  const handleSendEmail = async () => {
+    let sendResult = 0;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/util/sendSalaryEmail",
+        data: {
+          codeList: checkedRows,
+          belongingDate: belongingDate,
+          dtAllowance: payDay,
+        },
+      });
+      sendResult = responseData.sendResult;
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    return sendResult;
   };
 
   const EmpData = React.useMemo(
@@ -1195,6 +1225,26 @@ const SalaryData = (props) => {
     [taxList],
   );
 
+  // 이메일 발송 alert
+  const [emailAlert, setEmailAlert] = React.useState(false);
+
+  const handleEmailCloseAlert = () => {
+    setEmailAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleEmailOpenAlert = () => {
+    setEmailAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleEmailConfirm = () => {
+    if (checkedRows.length > 0) {
+      const sendResult = handleSendEmail();
+      console.log(sendResult);
+      setCheckedRows([]);
+    }
+    handleEmailCloseAlert();
+    setCheckedRows([]);
+  };
+
   return (
     <>
       {showAlert && (
@@ -1229,6 +1279,19 @@ const SalaryData = (props) => {
           type="warning"
           onConfirm={handleTaxConfirm}
           onCancel={handleTaxCloseAlert}
+        />
+      )}
+      {emailAlert && (
+        <SweetAlert
+          text={
+            checkedRows.length > 0
+              ? `선택한 ${checkedRows.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
+              : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
+          }
+          showCancel={true}
+          type={checkedRows.length > 0 ? "question" : "warning"}
+          onConfirm={handleEmailConfirm}
+          onCancel={handleEmailCloseAlert}
         />
       )}
 
@@ -1332,25 +1395,24 @@ const SalaryData = (props) => {
                   />
                 </div>
               </CustomModal>
-              <PageHeaderTextButton text="급여메일보내기" />
+              <PageHeaderTextButton
+                text="급여메일보내기"
+                onClick={handleEmailOpenAlert}
+              />
             </div>
             <div className="iconBtnWrap">
               <PageHeaderIconButton
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
-                onClick={handleOpenAlert}
+                disabled={true}
               />
               <PageHeaderIconButton
                 btnName="delete"
                 imageSrc={Delete}
                 altText="삭제"
                 onClick={handleDeleteOpenAlert}
-              />
-              <PageHeaderIconButton
-                btnName="calc"
-                imageSrc={Calc}
-                altText="계산기"
+                disabled={!checkedRows ? false : true}
               />
               <PageHeaderIconButton
                 btnName="setting"
@@ -1420,7 +1482,7 @@ const SalaryData = (props) => {
               showInsertRow={showInsertRow}
               setShowInsertRow={setShowInsertRow}
               scrollHeight="500"
-              height="96.5%"
+              height="97%"
             />
             <table className="sd-empList-calTable">
               <tbody>

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.or.oheasy.sd.dao.SdDao;
 import kr.or.oheasy.vo.SdDeducationVO;
+import kr.or.oheasy.vo.SdEmailInfoVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
 import kr.or.oheasy.vo.SdEmpMstVO;
 import kr.or.oheasy.vo.SdPayDayListVO;
@@ -432,5 +433,17 @@ public class SdService {
 			}			
 		}
 		return resultData;
+	}
+	
+	//이메일 발송을 위한 조회
+	public List<SdEmailInfoVO> seletForMail(Map<String, Object> emailData) {
+		SdDao dao = sqlSession.getMapper(SdDao.class);
+		List<SdEmailInfoVO> emailInfoList = new ArrayList<>();
+		try {
+			emailInfoList = dao.selectForMail(emailData);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		return emailInfoList;
 	}
 }

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import kr.or.oheasy.vo.HrEmpMstVO;
 import kr.or.oheasy.vo.SdDeducationVO;
+import kr.or.oheasy.vo.SdEmailInfoVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
 import kr.or.oheasy.vo.SdEmpMstVO;
 import kr.or.oheasy.vo.SdPayDayListVO;
@@ -49,4 +50,7 @@ public interface SdDao {
 	
 	//전체 사원 정보 수정을 위한 급여 및 일자 조회 
 	public List<SdDeducationVO> getAllPayListForEdit(Map<String, Object> searchData);
+	
+	//이매일 발송을 위한 사원 급여 정보
+	public List<SdEmailInfoVO> selectForMail(Map<String, Object> emailData);
 }
