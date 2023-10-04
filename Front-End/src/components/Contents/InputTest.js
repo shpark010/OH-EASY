@@ -128,7 +128,6 @@ function Input({
       $inputType={type}
       //spellCheck="false"
       style={style}
-      spellCheck="false"
       readOnly={readOnly}
       onClick={handleClick}
       onBlur={handleBlur}
