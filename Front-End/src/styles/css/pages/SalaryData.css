@@ -238,3 +238,8 @@
   border: 2px solid #dfdfdf;
   font-weight: 600;
 }
+
+.sd-price {
+  text-align: right;
+  padding-right: 10px;
+}

@@ -107,6 +107,7 @@ const SalaryData = (props) => {
   }); //단일 세금 금액
 
   //포멧 함수
+  //금액
   const changeFormat = (changeValue) => {
     let newValue = String(changeValue);
     // 쉼표(,) 제거 후 숫자만 남김
@@ -118,6 +119,30 @@ const SalaryData = (props) => {
     // 3자리마다 쉼표 추가
     newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     // newValue = Number(newValue).toLocaleString("ko-KR");
+    return newValue;
+  };
+
+  //수치
+  const figureFormat = (changeValue) => {
+    let newValue = changeValue;
+    // 정수 또는 소수만 허용하는 정규 표현식
+    newValue = newValue.replace(/[^0-9.]/g, "");
+
+    // 소수점이 두 번 이상 등장하지 않도록 처리
+    const decimalPoints = newValue.split(".").length - 1;
+    if (decimalPoints > 1) {
+      newValue = newValue.substr(0, newValue.lastIndexOf("."));
+    }
+
+    // 소수점이 있는데, 소수 부분이 0이라면 정수로 변환
+    if (newValue.includes(".") && parseFloat(newValue) === parseInt(newValue)) {
+      newValue = parseInt(newValue).toString();
+    }
+
+    // 소수 부분의 끝이 0이라면 0을 제거
+    if (newValue.includes(".")) {
+      newValue = parseFloat(newValue).toString();
+    }
     return newValue;
   };
 
@@ -186,7 +211,7 @@ const SalaryData = (props) => {
 
   const openModal2 = () => {
     setModalIsOpen2(true);
-    handleGetTaxList();
+    handleGetTaxList(applyYear);
   };
 
   const closeModal2 = () => {
@@ -209,6 +234,7 @@ const SalaryData = (props) => {
       incomeTax: "",
       localIncomeTax: "",
     });
+    setCheckedRows([]);
     setPersonalTax({
       deduction: "",
       differencePayment: "",
@@ -516,16 +542,34 @@ const SalaryData = (props) => {
   };
 
   //과세 리스트 조회
-  const handleGetTaxList = async () => {
+  const handleGetTaxList = async (applyYear) => {
     try {
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/sd/getTaxList",
         data: {
-          //추후 입력
+          applyYear: applyYear,
         },
       });
       setTaxList(responseData.taxList);
+      setEditTaxList(responseData.taxList);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+  };
+
+  //과세 리스트 업데이트
+  const handleUpdateTaxList = async () => {
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/updateTaxList",
+        data: {
+          checkList: checkedRows,
+          applyYear: applyYear,
+          editTaxList: editTaxList,
+        },
+      });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -574,6 +618,7 @@ const SalaryData = (props) => {
       {
         Header: "Code",
         accessor: "code",
+        width: "30%",
         id: "code",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
@@ -603,6 +648,7 @@ const SalaryData = (props) => {
       {
         Header: "사원",
         accessor: "employee",
+        width: "30%",
         id: "employee",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
@@ -630,6 +676,7 @@ const SalaryData = (props) => {
       {
         Header: "직급",
         accessor: "position",
+        width: "30%",
         id: "position",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(value);
@@ -685,10 +732,6 @@ const SalaryData = (props) => {
             console.log("바뀜");
           };
           const insertPayAmount = (e) => {
-            // console.log("입력 급여 : " + inputValue.replaceAll(",", ""));
-            // console.log("가져온 급여 : " + beforePay);
-            console.log("입력 급여 : " + inputValue);
-            console.log("가져온 급여 : " + beforePay);
             const insertPay = e.target.value; //입력한 금액
             const clickedCode = clickEmpCode; //클릭한 사원 코드
             if (
@@ -711,8 +754,8 @@ const SalaryData = (props) => {
               id="price-input"
               value={inputValue}
               onChange={handleInputChange}
-              onBlur={insertPayAmount}
-              onEnterPress={insertPayAmount}
+              onKeyDown={(e) => insertPayAmount(e)}
+              onTabPress={insertPayAmount}
               className={"doubleLine"}
               type="price"
               align="right"
@@ -915,10 +958,14 @@ const SalaryData = (props) => {
           const handleSearchPayDay = () => {
             handleFetchEmpData2(original);
           };
+          const handleSetClickPayDay = () => {
+            handleSetSearchList(original);
+          };
           return (
             <Input
               value={original?.mmBelong}
               onDoubleClick={handleSearchPayDay}
+              onClick={handleSetClickPayDay}
               readOnly={true}
             />
           );
@@ -933,6 +980,9 @@ const SalaryData = (props) => {
           const handleSearchPayDay = () => {
             handleFetchEmpData2(original);
           };
+          const handleSetClickPayDay = () => {
+            handleSetSearchList(original);
+          };
           return (
             <Input
               value={(original?.dtAllowance || "").replace(
@@ -940,6 +990,7 @@ const SalaryData = (props) => {
                 "$1-$2-$3",
               )}
               onDoubleClick={handleSearchPayDay}
+              onClick={handleSetClickPayDay}
               readOnly={true}
             />
           );
@@ -954,10 +1005,14 @@ const SalaryData = (props) => {
           const handleSearchPayDay = () => {
             handleFetchEmpData2(original);
           };
+          const handleSetClickPayDay = () => {
+            handleSetSearchList(original);
+          };
           return (
             <Input
               value={original?.cntPeople}
               onDoubleClick={handleSearchPayDay}
+              onClick={handleSetClickPayDay}
               readOnly={true}
             />
           );
@@ -992,13 +1047,14 @@ const SalaryData = (props) => {
   );
 
   const handleSetSearchList = (original) => {
+    console.log("payDay : " + original.dtAllowance);
     setClickPayDay({
       mmBelong: original.mmBelong,
       dtAllowance: original.dtAllowance,
     });
   };
 
-  // 알림창 표시 상태 관리
+  // 알림창 표시 상태 관리(지급일자)
   const [showAlert, setShowAlert] = React.useState(false);
 
   const handleCloseAlert = () => {
@@ -1015,16 +1071,61 @@ const SalaryData = (props) => {
     handleCloseAlert();
   };
 
+  // 알림창 표시 상태 관리(급여자료 삭제)
+  const [deleteAlert, setDeleteAlert] = React.useState(false);
+
+  const handleDeleteCloseAlert = () => {
+    setDeleteAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleDeleteOpenAlert = () => {
+    if (checkedRows.length === 0) {
+      return;
+    }
+    setDeleteAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleDeleteConfirm = () => {
+    handleDeletePayData();
+    handleDeleteCloseAlert();
+  };
+
+  // 알림창 표시 상태 관리(세율변경)
+  const [taxAlert, setTaxAlert] = React.useState(false);
+
+  const handleTaxCloseAlert = () => {
+    setTaxAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleTaxOpenAlert = () => {
+    setTaxAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleTaxConfirm = () => {
+    handleUpdateTaxList();
+    handleTaxCloseAlert();
+    closeModal2();
+  };
+  //적용년도
+  const [applyYear, setApplyYear] = useState("2023");
+
+  const changeTaxList = (e) => {
+    const newApplyYear = e.target.value;
+    console.log(newApplyYear);
+    setApplyYear(newApplyYear);
+    handleGetTaxList(newApplyYear);
+  };
+
   const [taxList, setTaxList] = useState([]); // 모달창 지급일 정보
   const dataModalTaxList = useMemo(
     () =>
       taxList.map((list) => ({
+        seqTaxRate: list.seqTaxRate,
         cdTaxRate: list.cdTaxRate,
         nmTaxRate: list.nmTaxRate,
-        rateTax: list.rateTax,
+        rateTax: figureFormat(list.rateTax),
       })),
     [taxList],
   );
+  const [editTaxList, setEditTaxList] = useState({});
   const columnsModal2 = useMemo(
     () => [
       {
@@ -1039,7 +1140,7 @@ const SalaryData = (props) => {
       {
         Header: "항목명",
         accessor: "nmTaxRate",
-        width: "30%",
+        width: "45%",
         id: "nmTaxRate",
         Cell: ({ cell: { value }, row: { original } }) => {
           return <Input value={original?.nmTaxRate} readOnly={true} />;
@@ -1048,11 +1149,46 @@ const SalaryData = (props) => {
       {
         Header: "적용세율(%)",
         accessor: "rateTax",
-        width: "15%",
+        width: "25%",
         id: "rateTax",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = useState(original.rateTax);
-          return <Input value={inputValue} readOnly={true} />;
+          const handleInputChange = (e) => {
+            let changeValue = e.target.value;
+            setInputValue(changeValue);
+          };
+          const handleBlur = (e) => {
+            let newValue = e.target.value;
+            // 소수점이 있는데, 소수 부분이 0이라면 정수로 변환
+            if (
+              newValue.includes(".") &&
+              parseFloat(newValue) === parseInt(newValue)
+            ) {
+              newValue = parseInt(newValue).toString();
+            }
+            // 소수 부분의 끝이 0이라면 0을 제거
+            if (newValue.includes(".")) {
+              newValue = parseFloat(newValue).toString();
+            }
+            setInputValue(newValue);
+            setEditTaxList(
+              editTaxList.map((item) =>
+                item.seqTaxRate === original.seqTaxRate
+                  ? { ...item, rateTax: newValue }
+                  : item,
+              ),
+            );
+          };
+          return (
+            <Input
+              type="figure"
+              onChange={handleInputChange}
+              value={inputValue}
+              className={"doubleLine"}
+              onBlur={handleBlur}
+              onKeyDown={handleBlur}
+            />
+          );
         },
       },
     ],
@@ -1073,6 +1209,29 @@ const SalaryData = (props) => {
           onCancel={handleCloseAlert}
         />
       )}
+      {deleteAlert && (
+        <SweetAlert
+          text="선택한 사원(들)의 급여정보를 삭제하시겠습니까?"
+          showCancel={true}
+          type="error"
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCloseAlert}
+        />
+      )}
+      {taxAlert && (
+        <SweetAlert
+          text={
+            checkedRows.length > 0
+              ? `선택한 ${checkedRows.length}명의 사원만 변경한 세율을 반영하시겠습니까?`
+              : "전체 사원에 변경한 세율을 반영하시겠습니까?"
+          }
+          showCancel={true}
+          type="warning"
+          onConfirm={handleTaxConfirm}
+          onCancel={handleTaxCloseAlert}
+        />
+      )}
+
       <div className="pageHeader">
         <div className="innerBox fxSpace">
           <PageHeaderName text="급여자료입력" />
@@ -1130,28 +1289,29 @@ const SalaryData = (props) => {
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
+                      justifyContent: "end",
                       alignItems: "center",
                       marginBottom: "5px",
                     }}
                   >
-                    <span>적용년도</span>
+                    <span style={{ marginRight: "10px" }}>적용년도</span>
                     <CustomSelect
                       label="정렬"
                       id="sd-order-category"
                       width={"180px"}
                       options={[
-                        { value: "0", label: "0. 2023" },
-                        { value: "1", label: "1. 2022" },
-                        { value: "2", label: "2. 2021" },
-                        { value: "3", label: "3. 2020" },
+                        { value: "2023", label: "2023년" },
+                        { value: "2022", label: "2022년" },
+                        { value: "2021", label: "2021년" },
+                        { value: "2020", label: "2020년" },
                       ]}
-                      defaultValue={"0"}
+                      value={applyYear}
+                      onChange={changeTaxList}
                     />
                   </div>
                   <div>
                     <Table
-                      height="200px"
+                      height="250px"
                       columns={columnsModal2}
                       data={dataModalTaxList}
                     />
@@ -1161,8 +1321,8 @@ const SalaryData = (props) => {
                   <CustomButton
                     backgroundColor={"var(--color-primary-blue)"}
                     color={"var(--color-primary-white)"}
-                    // onClick={handleOpenAlert}
-                    text={"선택"}
+                    onClick={handleTaxOpenAlert}
+                    text={"적용"}
                   />
                   <CustomButton
                     backgroundColor={"var(--color-primary-gray)"}
@@ -1173,7 +1333,6 @@ const SalaryData = (props) => {
                 </div>
               </CustomModal>
               <PageHeaderTextButton text="급여메일보내기" />
-              <PageHeaderTextButton text="급여명세 문자보내기" />
             </div>
             <div className="iconBtnWrap">
               <PageHeaderIconButton
@@ -1186,7 +1345,7 @@ const SalaryData = (props) => {
                 btnName="delete"
                 imageSrc={Delete}
                 altText="삭제"
-                onClick={handleDeletePayData}
+                onClick={handleDeleteOpenAlert}
               />
               <PageHeaderIconButton
                 btnName="calc"
@@ -1266,11 +1425,10 @@ const SalaryData = (props) => {
             <table className="sd-empList-calTable">
               <tbody>
                 <tr>
-                  <td></td>
-                  <td colSpan={2}>인 원 ( 퇴 직 )</td>
-                  <td>{empList.length}</td>
-                  <td></td>
-                  <td></td>
+                  <td style={{ width: "10.5%" }}></td>
+                  <td style={{ width: "58%" }}>인 원 ( 퇴 직 )</td>
+                  <td style={{ width: "15%" }}>{empList.length}</td>
+                  <td style={{ width: "15%" }}></td>
                 </tr>
               </tbody>
             </table>
@@ -1281,7 +1439,9 @@ const SalaryData = (props) => {
               <tbody>
                 <tr>
                   <td>지급액 계</td>
-                  <td>{pay}</td>
+                  <td style={{ width: "55%" }}>
+                    <p className="sd-price">{pay}</p>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1292,11 +1452,15 @@ const SalaryData = (props) => {
               <tbody>
                 <tr>
                   <td>공제액 계</td>
-                  <td>{personalTax.deduction}</td>
+                  <td style={{ width: "55%" }}>
+                    <p className="sd-price">{personalTax.deduction}</p>
+                  </td>
                 </tr>
                 <tr>
                   <td>차인지급액</td>
-                  <td>{personalTax.differencePayment}</td>
+                  <td style={{ width: "55%" }}>
+                    <p className="sd-price">{personalTax.differencePayment}</p>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1323,7 +1487,9 @@ const SalaryData = (props) => {
                 <tbody>
                   <tr>
                     <td>지급액 계</td>
-                    <td>{searchTax.amtAllowance}</td>
+                    <td style={{ width: "55%" }}>
+                      <p className="sd-price">{searchTax.amtAllowance}</p>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1335,11 +1501,15 @@ const SalaryData = (props) => {
               <tbody>
                 <tr>
                   <td>공제액 계</td>
-                  <td>{totalTax.deduction}</td>
+                  <td style={{ width: "55%" }}>
+                    <p className="sd-price">{totalTax.deduction}</p>
+                  </td>
                 </tr>
                 <tr>
                   <td>차인지급액</td>
-                  <td>{totalTax.differencePayment}</td>
+                  <td style={{ width: "55%" }}>
+                    <p className="sd-price">{totalTax.differencePayment}</p>
+                  </td>
                 </tr>
               </tbody>
             </table>

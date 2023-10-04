@@ -91,8 +91,16 @@ public class SdController {
 	//과세 리스트 조회
 	@PostMapping("/getTaxList")
 	public ResponseEntity<?> getTaxList(@RequestBody Map<String, String> taxListData) {
-		System.out.println("지급일자 조회 컨트롤러 진입");
-		Map<String, Object> result = sdService.getTaxList();
+		System.out.println("세율확인/변경 조회 컨트롤러 진입");
+		Map<String, Object> result = sdService.getTaxList(taxListData);
 		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	//과세 리스트 수정
+	@PostMapping("/updateTaxList")
+	public ResponseEntity<?> updateTaxList(@RequestBody Map<String, Object> updateTaxListData) {
+		System.out.println("세율확인/변경 수정 컨트롤러 진입");
+		Map<String, Object> result = sdService.updateTaxList(updateTaxListData);
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 }
