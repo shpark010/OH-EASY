@@ -8,7 +8,7 @@ import Table from '../../components/TablesLib/Table';
 import Input from '../Contents/Input';
 import useApiRequest from '../Services/ApiRequest';
 import CustomSelect from '../../components/Contents/CustomSelect';
-
+import SweetAlert from '../Contents/SweetAlert';
 
 
 
@@ -25,64 +25,105 @@ const WorkContractSelect = () => {
   const [clickCode,setClickCode]=useState([]);
   const [highlightFirstRow1, setHighlightFirstRow1] = useState(true); //첫번째 행 표시를 위해
   //paramgetEmpList1 은 Create Tab
-
-
-  
+  const [showAlert, setShowAlert] = React.useState(false); // sweetalret
 
   
+
   
-  const handleBelongingDateChange = (newDate) => {
+  
+  // const handleBelongingDateChange = (newDate) => {
     
-    newDate = newDate.replace(/-/g, "");
-    setBelongingDate(newDate);
-  }; // 년월 달력 변경 이벤트시 작동하는 함수. 시작날짜
-  
-  const handleBelongingDateChange2 = async(newDate) => {
+  //   newDate = newDate.replace(/-/g, "");
+  //   setBelongingDate(newDate);
+
+    
+  // }; // 년월 달력 변경 이벤트시 작동하는 함수. 시작날짜
+  const handleBelongingDateChange = async (newDate) => {
     const formattedDate = newDate.replace(/-/g, "");
-    setBelongingDate2(formattedDate); //set을해도 useState는 비동기적으로 작동해서 요청을 보내기전에 set이 안될 수 있음
-    console.log(belongingDate2);
-    if (belongingDate && belongingDate <= formattedDate) {
-      setEmployeeData([]);
-      setHighlightFirstRow1(true);
-      try {
-       
-        const responseData = await apiRequest({
-          method: "GET",
-          url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${formattedDate}&orderValue=${searchOrder}`, //내 Table에서 가져올 것들, update 및 삭제용
-        });
-       
-        const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
-        setClickCode(firstCdEmp);
-        if (firstCdEmp) {
-            // 두 번째 API 요청
-            const responseData2 = await apiRequest({
-                method: "GET",
-                url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
-            });
-            setParamGetEmpList(responseData2); // 오른쪽 table 보여줄 data set
+    setBelongingDate(formattedDate);
+
+    if (belongingDate2) {
+        if (formattedDate <= belongingDate2) {
+            setEmployeeData([]);
+            setHighlightFirstRow1(true);
+            try {
+                const responseData = await apiRequest({
+                    method: "GET",
+                    url: `/api2/wc/getEmpList?creDate=${formattedDate}&creDate2=${belongingDate2}&orderValue=${searchOrder}`,
+                });
+
+                const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;
+                setClickCode(firstCdEmp);
+                if (firstCdEmp) {
+                    const responseData2 = await apiRequest({
+                        method: "GET",
+                        url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`,
+                    });
+                    setParamGetEmpList(responseData2);
+                }
+
+                const modifiedresponseData = responseData.map(responseData => {
+                    const originalDate = responseData.dtCreated;
+                    const year = originalDate.slice(0, 4);
+                    const month = originalDate.slice(4, 6);
+                    const formattedDate = `${year}년 ${month}월`;
+                    responseData.dtCreated = formattedDate;
+                    return responseData;
+                });
+                setEmployeeData(modifiedresponseData);
+            } catch (error) {
+                console.error("Failed to fetch emp data:", error);
+            }
+        } else {
+            setShowAlert(true);
+            return
         }
+    } 
+};
 
+const handleBelongingDateChange2 = async(newDate) => {
+    const formattedDate = newDate.replace(/-/g, "");
+    setBelongingDate2(formattedDate); 
 
-        const modifiedresponseData = responseData.map(responseData => {
-          const originalDate = responseData.dtCreated;
-          
-          // 문자열에서 뒤에서 두 자리 자르기 
-          // 20231022 -> 202310
-          const year = originalDate.slice(0, 4); // "2023"
-        const month = originalDate.slice(4, 6); // "10"
-  
-      const formattedDate = `${year}년 ${month}월`;
-          responseData.dtCreated = formattedDate;
-          
-          return responseData;
-        });
-        setEmployeeData(modifiedresponseData)
-        console.log(employeeData); 
-      } catch (error) {
-        console.error("Failed to fetch emp data:", error);
-      }
-    }
-  }; 
+    if (belongingDate) {
+        if (belongingDate <= formattedDate) {
+            setEmployeeData([]);
+            setHighlightFirstRow1(true);
+            try {
+                const responseData = await apiRequest({
+                    method: "GET",
+                    url: `/api2/wc/getEmpList?creDate=${belongingDate}&creDate2=${formattedDate}&orderValue=${searchOrder}`,
+                });
+
+                const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;
+                setClickCode(firstCdEmp);
+                if (firstCdEmp) {
+                    const responseData2 = await apiRequest({
+                        method: "GET",
+                        url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`,
+                    });
+                    setParamGetEmpList(responseData2);
+                }
+
+                const modifiedresponseData = responseData.map(responseData => {
+                    const originalDate = responseData.dtCreated;
+                    const year = originalDate.slice(0, 4);
+                    const month = originalDate.slice(4, 6);
+                    const formattedDate = `${year}년 ${month}월`;
+                    responseData.dtCreated = formattedDate;
+                    return responseData;
+                });
+                setEmployeeData(modifiedresponseData);
+                console.log(employeeData); 
+            } catch (error) {
+                console.error("Failed to fetch emp data:", error);
+            }
+        } else {
+            setShowAlert(true);
+            return
+        }
+    } 
+};
   
   // 년월 달력 변경 이벤트시 작동하는 함수. 끝 날짜
   //e 넣으면 오류뜸 why? 함수하나로 분기처리 하고싶은데 안됨.
@@ -196,18 +237,22 @@ const WorkContractSelect = () => {
       accessor: "dtCreated",
       id: "dtCreated",
       width: "20%",
-      Cell: ({ cell: { value }, row: { original } }) => {
+      Cell: ({ cell: { value }, row: { original,index } }) => {
        
       
         
   
         return (
           <>
-            <Input
-              value={original?.dtCreated||""}
-              onClick={handleInputClick}
-              // className={"doubleLine"}
-            />
+
+<Input
+    style={{
+      background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+    }}
+    value={original?.dtCreated||""}
+    onClick={handleInputClick}
+/>
+           
           </>
         );
       },
@@ -220,12 +265,13 @@ const WorkContractSelect = () => {
       Cell: ({ cell: { value }, row: { original,index } }) => {
        
         return (
-          <div className={index === 0 && highlightFirstRow1 ? 'wcFirstRowHighlight' : ''}>
-              <Input
-                  value={original?.cdEmp || ""}
-                  onClick={handleInputClick}
-              />
-          </div>
+          <Input
+    style={{
+      background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+    }}
+    value={original?.cdEmp || ""}
+    onClick={handleInputClick}
+/>
       );
       },
     },
@@ -234,19 +280,21 @@ const WorkContractSelect = () => {
       accessor: "nmEmp",
       id: "nmEmp",
       width: "20%",
-      Cell: ({ cell: { value }, row: { original } }) => {
+      Cell: ({ cell: { value }, row: { original,index } }) => {
         
   
         
   
         return (
           <Input
-            value={original?.nmEmp||""}
-            onClick={handleInputClick}
-        
-            
-            // className={"doubleLine"}
-          />
+          style={{
+            background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+          }}
+          value={original?.nmEmp||""}
+          onClick={handleInputClick}
+      />
+          
+          
         );
       },
     },
@@ -254,16 +302,18 @@ const WorkContractSelect = () => {
       Header: "주민번호",
       accessor: "noResident",
       id: "noResident",
-      Cell: ({ cell: { value }, row: { original } }) => {
+      Cell: ({ cell: { value }, row: { original,index } }) => {
     
        
   
         return (
           <Input
-            value={original?.noResident||""}
-            onClick={handleInputClick}
-            // className={"doubleLine"}
-          />
+          style={{
+            background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+          }}
+          value={original?.noResident||""}
+          onClick={handleInputClick}
+      />
         );
       },
     },
@@ -661,6 +711,22 @@ const WorkContractSelect = () => {
 
 
         </section>
+
+        {showAlert && (
+        <SweetAlert
+          text=" 조회기간을 정확히 입력해주세요. "
+          
+          //type="success"
+          type="warning"
+          //type="error"
+          //type="question"
+          onConfirm={() => {
+            
+            setShowAlert(false)
+          }}
+          
+        />
+      )}
       </>
     );
   }
