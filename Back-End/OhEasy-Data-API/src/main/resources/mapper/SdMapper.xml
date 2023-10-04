@@ -783,28 +783,38 @@
 	</update>
 
 	<!-- 이메일 발송을 위한 조회 -->
-	<select id="selectForMail" parameterType="Map">
+	<select id="selectForMail" parameterType="Map" resultType="kr.or.oheasy.vo.SdEmailInfoVO">
 		SELECT
-		s.CD_EMP AS cdEmp,
-		t.NM_TAX_RATE as cdTaxRate,
-		s.AMT_ALLOWANCE as
-		amtAllowance,
+		s.CD_EMP as cdEmp,
+		h.NM_EMAIL as nmEmail,
 		s.YY_ALLOWANCE as yyAllowance,
-		s.MM_BELONG as mmBelong,
-		s.DT_ALLOWANCE as dtAllowance
+    	s.MM_BELONG as mmBelong,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) AS amtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '국민연금' THEN s.AMT_ALLOWANCE END) AS nationalPension,
+		MAX(CASE WHEN t.NM_TAX_RATE = '건강보험' THEN s.AMT_ALLOWANCE END) AS healthInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '장기요양보험료' THEN s.AMT_ALLOWANCE END) AS longtermNursingInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '고용보험' THEN s.AMT_ALLOWANCE END) AS employmentInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '소득세' THEN s.AMT_ALLOWANCE END) AS incomeTax,
+		MAX(CASE WHEN t.NM_TAX_RATE = '지방소득세' THEN s.AMT_ALLOWANCE END) AS localIncomeTax,
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS totalDeduct,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) -
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS netPay
 		FROM
-		salary_deduction_info s
+		SALARY_DEDUCTION_INFO s
 		INNER JOIN
-		tax_rate t
-		ON s.SEQ_TAX_RATE =
-		t.SEQ_TAX_RATE
-		WHERE CD_EMP IN
-		('CD001','ATEST4')
-		AND YY_ALLOWANCE='2023'
-		AND
-		MM_BELONG='10'
-		AND
-		DT_ALLOWANCE='20231004';
+		TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE AND t.YY_APPLY = #{yyAllowance}
+		INNER JOIN
+		HR_EMP_MST h ON s.CD_EMP = h.CD_EMP
+		WHERE
+        s.DT_ALLOWANCE=#{dtAllowance} AND 
+        s.YY_ALLOWANCE = #{yyAllowance} AND 
+        s.MM_BELONG = #{mmBelong} AND
+        s.CD_EMP IN 
+        <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    	GROUP BY
+        s.CD_EMP, h.NM_EMAIL
 	</select>
 </mapper>
 

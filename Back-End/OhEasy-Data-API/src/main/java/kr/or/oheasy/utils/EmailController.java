@@ -1,11 +1,20 @@
 package kr.or.oheasy.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.or.oheasy.sd.service.SdService;
+import kr.or.oheasy.vo.SdEmailInfoVO;
 
 @RestController
 @RequestMapping("/api2/util")
@@ -18,30 +27,59 @@ public class EmailController {
     private SdService sdService;
 
     @PostMapping("/sendSalaryEmail")
-    public String sendEmail() {
-    	System.out.println("오니??");
+    public ResponseEntity<?> sendEmail(@RequestBody Map<String, Object> emailData) {
+    	Map<String, Object> resultData = new HashMap<>();
+		// 사원코드
+		List<String> codeList = (List<String>) emailData.get("codeList");
+		// 연도
+		String yyAllowance = emailData.get("belongingDate").toString().substring(0, 4);
+		// 귀속월
+		String mmBelong = emailData.get("belongingDate").toString().substring(4, 6);
+		// 지급일
+		String dtAllowance = emailData.get("dtAllowance").toString();
+		List<SdEmailInfoVO> emailInfoList = new ArrayList<>();
+		try {
+			Map<String, Object> searchData = new HashMap<>();
+			searchData.put("yyAllowance", yyAllowance);
+			searchData.put("mmBelong", mmBelong);
+			searchData.put("dtAllowance", dtAllowance);
+			searchData.put("codeList", codeList);
+			// 사원정보 가져오기
+			emailInfoList = sdService.seletForMail(searchData);
+			System.out.println(emailInfoList);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		int sendResult = 0;
+		EmailValidator emailValidator = new EmailValidator();
         try {
-            String html = FileUtil.readHtmlFile("src/main/resources/static/email.html");
-
-            // 여기서 파라미터 대체
-            html = html.replace("{{nmEmp}}", "홍길동")
-                    .replace("{{yyAllowance}}", "2023")
-                    .replace("{{mmBelong}}", "10")
-                    .replace("{{amtAllowance}}", "2000000")
-                    .replace("{{nationalPension}}", "200000")
-                    .replace("{{healthInsurance}}", "150000")
-                    .replace("{{longtermNursingInsurance}}", "50000")
-                    .replace("{{employmentInsurance}}", "50000")
-                    .replace("{{incomeTax}}", "100000")
-                    .replace("{{localIncomeTax}}", "50000")
-                    .replace("{{totalTax}}", "650000")
-                    .replace("{{actualSalary}}", "1350000");
-
-            emailService.sendMail("parksungh12@naver.com", "급여명세서", html);
-            return "Email sent successfully!";
+        	for (SdEmailInfoVO emailInfo : emailInfoList) {
+        		String html = FileUtil.readHtmlFile("src/main/resources/static/email.html");
+        		if(emailValidator.validate(emailInfo.getNmEmail())) {
+        			
+        		
+        		// 여기서 파라미터 대체
+        		html = html.replace("{{nmEmp}}", emailInfo.getCdEmp())
+        				.replace("{{yyAllowance}}", emailInfo.getYyAllowance())
+        				.replace("{{mmBelong}}", emailInfo.getMmBelong())
+        				.replace("{{amtAllowance}}", emailInfo.getAmtAllowance())
+        				.replace("{{nationalPension}}", emailInfo.getNationalPension())
+        				.replace("{{healthInsurance}}", emailInfo.getHealthInsurance())
+        				.replace("{{longtermNursingInsurance}}", emailInfo.getLongtermNursingInsurance())
+        				.replace("{{employmentInsurance}}", emailInfo.getEmploymentInsurance())
+        				.replace("{{incomeTax}}", emailInfo.getIncomeTax())
+        				.replace("{{localIncomeTax}}", emailInfo.getLocalIncomeTax())
+        				.replace("{{totalTax}}", emailInfo.getTotalDeduct())
+        				.replace("{{netPay}}", emailInfo.getNetPay());
+        		
+        		emailService.sendMail(emailInfo.getNmEmail(), "급여명세서", html);				
+        		sendResult++;
+        		}
+			}
         } catch (Exception e) {
             e.printStackTrace();
-            return "Failed to send email.";
         }
+        resultData.put("sendResult", sendResult);
+		return new ResponseEntity<>(resultData, HttpStatus.OK);
     }
 }
