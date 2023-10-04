@@ -38,6 +38,24 @@ spring:
       idleTimeout: 10000
       maxLifetime: 1800000
       connectionTimeout: 30000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: parksungh97@gmail.com
+    password: fgrgkenbhmjshexq
+    properties:
+      mail:
+        debug: true
+        mime:
+          charset: UTF-8
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          starttls:
+            enable: true
+            required: true
 mybatis:
   mapper-locations: mapper/*.xml
   configuration:

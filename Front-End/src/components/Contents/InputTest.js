@@ -7,8 +7,8 @@ const InputTag = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  text-align: ${(props) => (props.align === "right" ? "right" : "center")};
-  padding-right: ${(props) => (props.align === "right" ? "10px" : "0")};
+  text-align: ${(props) => (props.$align === "right" ? "right" : "center")};
+  padding-right: ${(props) => (props.$align === "right" ? "10px" : "0")};
   font-size: 15px;
   font-weight: 600;
   font-family: "NanumSquare", sans-serif;
@@ -41,11 +41,15 @@ function Input({
   ...otherProps
 }) {
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      console.log("엔터키 확인~");
-      if (otherProps.onBlur) {
-        otherProps.onBlur(e);
-      }
+    if (e.key === "Enter" && otherProps.onKeyDown) {
+      console.log("enter");
+      otherProps.onKeyDown(e);
+      e.target.blur();
+    }
+
+    if (e.key === "Tab" && otherProps.onKeyDown) {
+      otherProps.onKeyDown(e);
+      e.target.blur();
     }
   };
 
@@ -99,6 +103,15 @@ function Input({
       if (newValue.length > 14) {
         newValue = newValue.substring(0, 14);
       }
+    } else if (type === "figure") {
+      // 정수 또는 소수만 허용하는 정규 표현식
+      newValue = newValue.replace(/[^0-9.]/g, "");
+
+      // 소수점이 두 번 이상 등장하지 않도록 처리
+      const decimalPoints = newValue.split(".").length - 1;
+      if (decimalPoints > 1) {
+        newValue = newValue.substr(0, newValue.lastIndexOf("."));
+      }
     }
 
     if (onChange) {
@@ -109,7 +122,7 @@ function Input({
 
   return (
     <InputTag
-      align={align}
+      $align={align}
       {...otherProps}
       inputType={type}
       //spellCheck="false"

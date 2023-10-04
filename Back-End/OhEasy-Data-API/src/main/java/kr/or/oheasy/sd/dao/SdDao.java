@@ -24,10 +24,10 @@ public interface SdDao {
 	public List<SdDeducationVO> getEmpTax(Map<String, String> empData);
 	
 	//신규 급여 입력
-	public int setEmpPay(List<SdDeducationVO> taxList);
+	public int setEmpPay(Map<String, Object> searchData);
 	
 	//급여 정보 수정
-	public int updateEmpPay(SdDeducationVO taxList);
+	public int updateEmpPay(Map<String, Object> searchData);
 	
 	//세액 조건 조회
 	public List<Long> getTaxInfo(Map<String, String> empSearch);
@@ -39,5 +39,14 @@ public interface SdDao {
 	public List<SdPayDayListVO> getPayDayList();
 	
 	//과세 리스트 조회
-	public List<SdTaxRateVO> getTaxList();
+	public List<SdTaxRateVO> getTaxList(Map<String, String> listData);
+	
+	//과세 리스트 조회
+	public List<SdTaxRateVO> getAllTaxList(Map<String, String> searchData);
+	
+	//과세 리스트 수정
+	public int updateTaxList(SdTaxRateVO updateTaxRate);
+	
+	//전체 사원 정보 수정을 위한 급여 및 일자 조회 
+	public List<SdDeducationVO> getAllPayListForEdit(Map<String, Object> searchData);
 }
