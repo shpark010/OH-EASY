@@ -127,7 +127,7 @@
   }
   /*오른쪽 상단 Icon hovering시 css*/
 
-  .wcSelect1{
+  .wcSelect1,.wcSelect3 {
     width: 180px;
 
   }
@@ -138,31 +138,20 @@
 
   }
 
-  .wcSelect3{
-    width:180px;
-
-  }
+  
 
   .wcPayDayOff{
     visibility: hidden;
     }  
 
   
-    .wcFirstRowHighlight {
-      border:10px solid #92c5ff
-  
+    .wcFirstRowHighlight, .wchighlightLastRow, .wcMordalBackGround {
+      
+      background-color:#92c5ff ;
+      border:10px solid #92c5ff;
     }
 
-    .wchighlightLastRow{
-      border:10px solid #92c5ff
-      
-    }
-
-    .wcMordalBackGround {
-      border:10px solid #92c5ff
-      
-      /* 7px solid #92c5ff */
-    }
+   
 
     .wcMordalContainer {
       display: flex;
