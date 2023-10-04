@@ -125,10 +125,9 @@ function Input({
     <InputTag
       $align={align}
       {...otherProps}
-      inputType={type}
+      $inputType={type}
       //spellCheck="false"
       style={style}
-      type={type}
       spellCheck="false"
       readOnly={readOnly}
       onClick={handleClick}
