@@ -237,9 +237,10 @@
   background-color: #fafafa;
   border: 2px solid #dfdfdf;
   font-weight: 600;
+  height: 42px;
 }
 
 .sd-price {
   text-align: right;
-  padding-right: 10px;
+  padding-right: 15px;
 }

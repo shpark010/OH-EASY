@@ -8,7 +8,7 @@ const InputTag = styled.input`
   outline: none;
   background: transparent;
   text-align: ${(props) => (props.$align === "right" ? "right" : "center")};
-  padding-right: ${(props) => (props.$align === "right" ? "10px" : "0")};
+  padding-right: ${(props) => (props.$align === "right" ? "15px" : "0")};
   font-size: 15px;
   font-weight: 600;
   font-family: "NanumSquare", sans-serif;

@@ -173,7 +173,7 @@ const handleDeleteClick = () => {
                 altText="계산기"
               />
               <PageHeaderIconButton
-                btnName="setting "
+                btnName="setting wcMouseOver"
                 imageSrc={Setting}
                 altText="세팅"
               />

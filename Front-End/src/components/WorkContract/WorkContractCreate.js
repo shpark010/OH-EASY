@@ -5,7 +5,7 @@ import CustomInput from '../../components/Contents/CustomInput';
 import CustomButton from '../../components/Contents/CustomButton';
 import SearchBarBox from '../../components/SearchBar/SearchBarBox';
 import Table from '../../components/TablesLib/Table';
-import Input from '../Contents/Input';
+import Input from '../Contents/InputTest';
 import DaumPostcode from 'react-daum-postcode';
 import useApiRequest from '../Services/ApiRequest';
 import CustomModal from '../../components/Contents/CustomModal';
@@ -773,7 +773,10 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   };
 // 사원추가 모달 끄고 닫기.
 
-
+const chekcBoxHighLigth = () =>{
+  setHighlightFirstRow(false); 
+  setHighlightLastRow(false);
+} //checkbox 클릭시 background 없애기 위한 EventHandler
 
 
 const dataLength = data.length; //마지막 행의 code에 테두리 넣기위해.
@@ -798,13 +801,21 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
         return(
           <>
           
-        <input 
-        type="checkbox"  
-        onChange={e => handleCheckboxChange(e, original?.cdEmp)}
-        checked={original && original.cdEmp && checkColumn.includes(original?.cdEmp)} // 현재 체크박스가 checkColumn 배열에 있는지 확인
-        //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
-        
-          />
+          <div className={
+  index === 0 && highlightFirstRow 
+      ? 'wcFirstRowHighlight' 
+      : index === dataLength-1 && highlightLastRow 
+          ? 'wchighlightLastRow' 
+          :  ''
+}>
+  <input 
+      type="checkbox"          
+      onChange={e => handleCheckboxChange(e, original?.cdEmp)}
+      checked={original && original.cdEmp && checkColumn.includes(original?.cdEmp)} 
+//props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
+      onClick={chekcBoxHighLigth}
+  />
+</div>
         
         </>
         );
@@ -822,15 +833,27 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
           
           
             return (
-                <div className={index === 0 && highlightFirstRow ? 'wcFirstRowHighlight' : 
-                                index === dataLength-1 && highlightLastRow ? 'wchighlightLastRow' : 
-                ''}>
-                    <Input
+                // <div className={index === 0 && highlightFirstRow ? 'wcFirstRowHighlight' : 
+                //                 index === dataLength-1 && highlightLastRow ? 'wchighlightLastRow' : 
+                // ''}>
+                //     <Input
+                //         value={original?.cdEmp || ""}
+                //          onClick={handleInputClick}
+                     
+                //     />
+                // </div>
+                <Input
+                style={{
+                  background: index === 0 && highlightFirstRow 
+                      ? '#92c5ff' 
+                      : index === dataLength-1 && highlightLastRow 
+                          ? '#92c5ff' 
+                          : 'transparent'
+              }}
                         value={original?.cdEmp || ""}
                          onClick={handleInputClick}
                      
                     />
-                </div>
             );
         },
     },
@@ -843,13 +866,20 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
           
           
           return (
+            
+
             <Input
-              value={original?.nmEmp||""}
-              onClick={handleInputClick}
-              // className = {"doubleLine "}
-              
-              
-            />
+                style={{
+                  background: index === 0 && highlightFirstRow 
+                      ? '#92c5ff' 
+                      : index === dataLength-1 && highlightLastRow 
+                          ? '#92c5ff' 
+                          : 'transparent'
+              }}
+                        value={original?.nmEmp||""}
+                         onClick={handleInputClick}
+                     
+                    />
           );
         },
       },
@@ -864,12 +894,18 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
           return (
             
             <Input
-              value={original?.noResident||""}
-              onClick={handleInputClick}
-              // className ={"doubleLine"}
-
-              
-            />
+            style={{
+              background: index === 0 && highlightFirstRow 
+                  ? '#92c5ff' 
+                  : index === dataLength-1 && highlightLastRow 
+                      ? '#92c5ff' 
+                      : 'transparent'
+          }}
+                    value={original?.noResident||""}
+                     onClick={handleInputClick}
+                 
+                />
+           
             
           );
         },
@@ -971,6 +1007,7 @@ const modalSearch = async(e) => {
               value={original?.cdEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              
             />
           );
         },
@@ -1584,7 +1621,7 @@ const modalSearch = async(e) => {
         {/* 공통 sweetalert  */}
       {showAlert && (
         <SweetAlert
-          text="시작 근로계약 기간은 종료 근로계약 기간보다 빠를 수 없습니다 ?"
+          text=" 기간을 정확하게  입력해주세요. "
           
           //type="success"
           type="warning"
@@ -1600,7 +1637,7 @@ const modalSearch = async(e) => {
 
         {showAlert2 && (
         <SweetAlert
-          text="종료 근로계약 기간은 시작 근로계약 기간보다 늦을 수 없습니다.."
+          text=" 기간을 정확하게  입력해주세요. "
           // showCancel={true}
           //type="success"
           type="warning"
