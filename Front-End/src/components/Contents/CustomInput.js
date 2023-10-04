@@ -38,6 +38,7 @@ function CustomInput({
   readOnly,
   placeholder,
   maxLength,
+  style,
 }) {
   const handleInputChange = (e) => {
     let newValue = e.target.value;
@@ -91,6 +92,7 @@ function CustomInput({
       readOnly={readOnly}
       placeholder={placeholder}
       maxLength={maxLength}
+      style={style}
     />
   );
 }

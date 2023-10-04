@@ -38,6 +38,7 @@ function Input({
   type,
   readOnly,
   align,
+  style,
   ...otherProps
 }) {
   const handleKeyDown = (e) => {
@@ -124,8 +125,9 @@ function Input({
     <InputTag
       $align={align}
       {...otherProps}
-      inputType={type}
+      $inputType={type}
       //spellCheck="false"
+      style={style}
       readOnly={readOnly}
       onClick={handleClick}
       onBlur={handleBlur}
