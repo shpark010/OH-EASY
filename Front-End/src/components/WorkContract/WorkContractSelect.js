@@ -330,9 +330,9 @@ const WorkContractSelect = () => {
 
 
         
-        <section className="section">
-          <div className="wcGridContainer">
-            <div className="wcGridCellItem1">
+        <section className="section wcSection">
+          <div className="wcGrid">
+            <div className="wclistArea">
             <div className="namePickerBox">
               <Table
                 columns={columns}
@@ -341,7 +341,7 @@ const WorkContractSelect = () => {
          
                 />
               </div>
-              <table className="wcBottomTable">
+              <table className="wcGridBottomTable">
               <tbody>
                 <tr>
                   <td>조회된 사원</td>
@@ -351,19 +351,21 @@ const WorkContractSelect = () => {
           
               </table>
             </div>
+            </div>
 
-            <div className="wcGridCellItem2">
+            <div className="wcGrid2">
               <h1 className="wcRightHead">근로계약서</h1>
-              <table className="wcRightGridTable">
+              <table className='borderTopBold'>
+                <tbody>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 근로계약기간  </th>
+                  <td className="wcCellStyle">
                     <CustomCalendar width="181" id="startDate" 
                       disabled
                       value={paramGetEmpList.dtStartCont||""}
                     /> 
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomCalendar width="181" id="endDate"
                       disabled
                       value={paramGetEmpList.dtEndCont||""}
@@ -371,14 +373,14 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">근무장소  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">근무장소  </th>
+                  <td className="wcCellStyle">
                     <CustomInput 
                     value={paramGetEmpList.noWorkPost||""}
 
                     readOnly />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     readOnly 
                     width={415} 
@@ -398,8 +400,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">상세주소  </td>
-                  <td className="wcRightGridTableRightTd1" colSpan="2">
+                  <th className="wcHeaderStyle">상세주소  </th>
+                  <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
                     width={605} 
                     readOnly
@@ -408,9 +410,9 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">업무의 내용 </td>
+                  <th className="wcHeaderStyle">업무의 내용 </th>
 
-                  <td className="wcRightGridTableRightTd1" colSpan="2">
+                  <td className="wcCellStyle" colSpan="2">
                     <CustomInput width="605" 
                     readOnly
                     value={paramGetEmpList.cntnJob||""}
@@ -418,8 +420,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">소정근로시간 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">소정근로시간 </th>
+                  <td className="wcCellStyle">
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmStartRegularWork||""}
@@ -433,15 +435,15 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">휴게시간 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">휴게시간 </th>
+                  <td className="wcCellStyle">
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmStartBreak||""}
 
                     ></CustomInput>
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     readOnly
                     value={paramGetEmpList.tmEndBreak||""}
@@ -450,8 +452,8 @@ const WorkContractSelect = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">근무일  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">근무일  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -469,11 +471,11 @@ const WorkContractSelect = () => {
                       value={paramGetEmpList.ddWorking||0 }
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">주휴일 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">주휴일 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -492,11 +494,11 @@ const WorkContractSelect = () => {
 
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">임금유형 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">임금유형 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -508,14 +510,14 @@ const WorkContractSelect = () => {
                       value={paramGetEmpList.tpSal|| 0}
                       className={"wcSelect2"}                    />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput width={180} readOnly value={paramGetEmpList.amtSal|| "" } /> 
                     <b>원</b>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">임금지급일 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">임금지급일 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -528,14 +530,14 @@ const WorkContractSelect = () => {
                       className={"wcSelect2"}
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput width={180} readOnly value={paramGetEmpList.ddPaySal|| "" } />
                     <b>일</b>
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">지급방법  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">지급방법  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -547,11 +549,11 @@ const WorkContractSelect = () => {
                       
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 고용보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 고용보험  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -564,11 +566,11 @@ const WorkContractSelect = () => {
 
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 산재보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <td className="wcHeaderStyle"> 산재보험  </td>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -580,11 +582,11 @@ const WorkContractSelect = () => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 국민연금  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 국민연금  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -596,11 +598,11 @@ const WorkContractSelect = () => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 건강보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 건강보험  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -612,11 +614,11 @@ const WorkContractSelect = () => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 서명여부  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 서명여부  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                     disabled
                       options={[
@@ -628,11 +630,11 @@ const WorkContractSelect = () => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">작성일자 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">작성일자 </th>
+                  <td className="wcCellStyle">
                     <CustomCalendar 
                     value={paramGetEmpList.dtCreated||""}
                      disabled
@@ -642,13 +644,13 @@ const WorkContractSelect = () => {
                      
                      />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
-                
+                </tbody>
               </table>
               
             </div>
-          </div>
+          
 
         
 

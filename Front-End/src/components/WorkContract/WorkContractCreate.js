@@ -512,6 +512,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   // 모달창에서 추가하기 하면 꺼지면서 사원 인서트
   const closeModalAndEmpInsert = async () => {
     closeModal2();
+    
     setParamGetEmpList1([]);
     setClickCode(clickModalEmpCode)
     try {
@@ -762,6 +763,9 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
   const openModal2 = () => {
     setModalIsOpen2(true);
+    setHighLightModal(false);
+    setHighLightModal2(false);
+    setHighLightModal3(false);
   };
 
   const closeModal2 = () => {
@@ -1060,22 +1064,23 @@ const modalSearch = async(e) => {
         </div>
 
 
-        
-        <section className="section">
-          <div className="wcGridContainer">
-            <div className="wcGridCellItem1">
+        {/* 섹션 */}
+        <section className="section wcSection">
+          {/* 1번째 그리드 */}
+          <div className="wcGrid">
+            {/* 데이터 테이블 */}
+            <div className="wclistArea">
               <div className="namePickerBox">
               <Table
                 columns={columns}
                 data={data}   
-                
                 insertRow={true} //table 추가하기 on of
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
-
                 />
               </div>
-              <table className="wcBottomTable">
+              {/* 두번째 테이블 사원 표시 */}
+              <table className="wcGridBottomTable">
               <tbody>
                 <tr>
                   <td>조회된 사원</td>
@@ -1084,13 +1089,18 @@ const modalSearch = async(e) => {
               </tbody>
               </table>
             </div>
-
-            <div className="wcGridCellItem2">
+            </div>
+            
+            {/* 두번째 그리드 */}
+            <div className="wcGrid2">
               <h1 className="wcRightHead">근로계약서</h1>
-              <table className="wcRightGridTable">
+
+              {/* 탭 내용 테이블 */}
+              <table >
+                <tbody className='borderTopBold'>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 근로계약기간  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 근로계약기간  </th>
+                  <td className="wcCellStyle">
                     <CustomCalendar 
                     width="180" 
                     id={"dtStartCont"}
@@ -1100,7 +1110,7 @@ const modalSearch = async(e) => {
                     
                      /> 
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomCalendar 
                     width="180" 
                     id={"dtEndCont"}
@@ -1111,8 +1121,8 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">근무장소  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">근무장소  </th>
+                  <td className="wcCellStyle">
                     <CustomInput 
                     placeholder={" 주소검색을 눌러주세요 "}
                     value={paramGetEmpList1.noWorkPost|| ""}
@@ -1122,7 +1132,7 @@ const modalSearch = async(e) => {
                     width={180}
                      />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     width={415}
                     id={"addrWork"}
@@ -1140,13 +1150,13 @@ const modalSearch = async(e) => {
 
                   </td>
 
-                  <td className="wcRightGridTableRightTd3">
+                  <td className="wcCellStyle">
                     
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">상세주소  </td>
-                  <td className="wcRightGridTableRightTd1" colSpan="2">
+                  <th className="wcHeaderStyle">상세주소  </th>
+                  <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
                     width={605} 
                     value={paramGetEmpList1.addrWorkDtl || ""}
@@ -1160,9 +1170,9 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">업무의 내용 </td>
+                  <th className="wcHeaderStyle">업무의 내용 </th>
 
-                  <td className="wcRightGridTableRightTd1" colSpan="2">
+                  <td className="wcCellStyle" colSpan="2">
                     <CustomInput 
                     width="605"
                     value={paramGetEmpList1.cntnJob||""}
@@ -1177,8 +1187,8 @@ const modalSearch = async(e) => {
                 </tr>
                
                 <tr>
-                  <td className="wcRightGridTableLeftTd">소정근로시간 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">소정근로시간 </th>
+                  <td className="wcCellStyle">
                     <CustomInput 
                     value={paramGetEmpList1.tmStartRegularWork||""}
                     id={"tmStartRegularWork"}
@@ -1193,7 +1203,7 @@ const modalSearch = async(e) => {
                       
                     </CustomInput>
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput
                     value={paramGetEmpList1.tmEndRegularWork || "" }
                     id={"tmEndRegularWork"}
@@ -1208,8 +1218,8 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">휴게시간 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">휴게시간 </th>
+                  <td className="wcCellStyle">
                     <CustomInput
                      value={paramGetEmpList1.tmStartBreak || "" }
                      id={"tmStartBreak"}
@@ -1226,7 +1236,7 @@ const modalSearch = async(e) => {
                     </CustomInput>
                   </td>
 
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput
                      value={paramGetEmpList1.tmEndBreak || "" }
                     id={"tmEndBreak"}
@@ -1241,10 +1251,11 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">근무일  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">근무일  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
-                      
+                                            
+
                       options={[
                         { value: '0', label: ' 미작성 ' },
                         { value: '1', label: '1주에 1일' },
@@ -1263,11 +1274,11 @@ const modalSearch = async(e) => {
                       
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">주휴일 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">주휴일 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1288,11 +1299,11 @@ const modalSearch = async(e) => {
                     
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">임금유형 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">임금유형 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1309,7 +1320,7 @@ const modalSearch = async(e) => {
         
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     className={"wcSelect2"}
                     value={paramGetEmpList1.amtSal || "" }
@@ -1324,8 +1335,8 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">임금지급일 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">임금지급일 </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1341,7 +1352,7 @@ const modalSearch = async(e) => {
                     />
                   </td>
 
-                  <td className="wcRightGridTableRightTd2">
+                  <td className="wcCellStyle">
                     <CustomInput 
                     value={paramGetEmpList1.ddPaySal || "" }
                     id ={"ddPaySal"}
@@ -1358,8 +1369,8 @@ const modalSearch = async(e) => {
                   </td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">지급방법  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">지급방법  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
 
                       options={[
@@ -1375,11 +1386,11 @@ const modalSearch = async(e) => {
 
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 고용보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 고용보험  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1395,11 +1406,11 @@ const modalSearch = async(e) => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 산재보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 산재보험  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1418,8 +1429,8 @@ const modalSearch = async(e) => {
                   <td className="wcRightGridTableRightTd2"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 국민연금  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 국민연금  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1434,11 +1445,11 @@ const modalSearch = async(e) => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 건강보험  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 건강보험  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1454,11 +1465,11 @@ const modalSearch = async(e) => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd"> 서명여부  </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle"> 서명여부  </th>
+                  <td className="wcCellStyle">
                     <CustomSelect
                       options={[
                         { value: '0', label: ' 미작성 ' },
@@ -1473,11 +1484,11 @@ const modalSearch = async(e) => {
                       className="wcSelect3"
                     />
                   </td>
-                  <td className="wcRightFirstTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
                 <tr>
-                  <td className="wcRightGridTableLeftTd">작성일자 </td>
-                  <td className="wcRightGridTableRightTd1">
+                  <th className="wcHeaderStyle">작성일자 </th>
+                  <td className="wcCellStyle">
                     <CustomCalendar
                     
                     width="180" 
@@ -1490,15 +1501,18 @@ const modalSearch = async(e) => {
 
                     />
                   </td>
-                  <td className="wcRightGridTableRightTd2"></td>
+                  <td className="wcCellStyle"></td>
                 </tr>
-                
+                </tbody>
               </table>
               
             </div>
-          </div>
-
-  
+            
+          
+        
+            </section>
+          
+        
          
          {openPostcode && (
           <div className="wcModal1" onClick={closeModal}>
@@ -1514,12 +1528,11 @@ const modalSearch = async(e) => {
         )}
 
 
+    
 
-
-        </section>
+       
 
         <CustomModal
-        
         isOpen={modalIsOpen2}
         onRequestClose={closeModal2}
         overlayStyle={{
@@ -1534,11 +1547,7 @@ const modalSearch = async(e) => {
           height:"600px"
       }}
 
-        // overlayStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        // contentStyle={{
-        //   backgroundColor: "white",
-        //   border: "1px solid gray",
-        // }}
+  
       >
         <PageHeaderName text="추가목록" />
         <div className="test2">
