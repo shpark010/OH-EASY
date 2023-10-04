@@ -23,6 +23,7 @@ import CustomModal from "../components/Contents/CustomModal";
 import CustomRadio from "../components/Contents/CustomRadio";
 
 const EmployeeRegister = () => {
+  
   const apiRequest = useApiRequest();
   const [isReadOnly, setIsReadOnly] = useState(true); // 모든 입력 필드가 readOnly 상태인지 아닌지 확인
 
@@ -36,7 +37,12 @@ const EmployeeRegister = () => {
 
   const [empList, setEmpList] = useState([]); // 첫번째 테이블의 사원정보들 관리
   const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
-  const [showAlert, setShowAlert] = useState(false); // sweetAlert 상태 관리
+  const [showAlert, setShowAlert] = useState(false); // 삭제 버튼 sweetAlert 상태 관리
+
+   // 삭제시 에러에 관한 sweetAlert 상태 관리
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
@@ -751,8 +757,10 @@ const EmployeeRegister = () => {
       setEmpList(responseData);
       console.log("api 이벤트 발생");
       console.log("responseData.length : " + responseData.length);
+      return responseData;
     } catch (error) {
       console.error("api 요청 실패:", error);
+      return [];
     }
   }
 
@@ -858,22 +866,38 @@ const EmployeeRegister = () => {
 
   // Delete (체크된 모든 행을 삭제)
   const handleDeleteEmp = async () => {
-    // 여러 Promise를 동시에 실행하기 위한 배열
-    const deletePromises = checkedRows.map((cdEmp) =>
-      apiRequest({
-        method: "DELETE",
-        url: `/api2/er/deleteEmpData?cdEmp=${cdEmp}`,
-      })
-    );
+    if (checkedRows.length === 0) {
+      setErrorMessage("선택된 사원이 없습니다.");
+      setShowErrorAlert(true);
+      return;
+  }
 
     try {
-      // 모든 DELETE 요청을 병렬로 실행
-      await Promise.all(deletePromises);
-      console.log("Successfully deleted all selected rows");
-      handleGetEmpList(); // 삭제 후, 목록을 다시 가져옵니다.
-      setCheckedRows([]); // 삭제 후 checkedRows 초기화
+        const responseData = await apiRequest({
+            method: "POST",
+            url: "/api2/er/deleteEmpData",
+            data: {
+                selectedEmpCodes: checkedRows,
+            },
+        });
+
+        if (responseData && responseData.deleted) {
+            console.log("삭제 성공임다******************************");
+            // 삭제 성공한 사원 코드를 제외하고 업데이트
+            const updatedEmpList = empList.filter(emp => !checkedRows.includes(emp.cdEmp));
+            console.log(empList);
+            console.log(updatedEmpList);
+            setEmpList(updatedEmpList);
+            setCheckedRows([]);
+        } else {
+            alert("삭제 실패");
+        }
     } catch (error) {
-      console.log("api 요청 실패:", error);
+      console.error("API 요청 실패:", error);
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("이미 사용 중인 사원코드이므로 삭제할 수 없습니다. 사용 중인 메뉴명 : " + Object.keys(error.response.data).join(", "));
+        setShowErrorAlert(true);
+      }
     }
   };
 
@@ -1397,8 +1421,8 @@ const EmployeeRegister = () => {
                     readOnly={isReadOnly || maskResident}
                     style={{
                       borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
-                      borderWidth: isValid === false ? '2px' : '1px',
-                      // color: isValid ? 'black' : 'red'
+                      borderWidth: isValid === false ? '3px' : '1px',
+                      color: isValid ? 'black' : 'red'
                     }}
                   />
                 </td>
@@ -1808,6 +1832,17 @@ const EmployeeRegister = () => {
           </div>
         )}
 
+        {showErrorAlert && (
+          <SweetAlert
+            text={errorMessage}
+            confirmText="확인"
+            type="error"
+            onConfirm={() => {
+              setShowErrorAlert(false);
+            }}
+          />
+        )}
+        
       </section>
     </>
   );

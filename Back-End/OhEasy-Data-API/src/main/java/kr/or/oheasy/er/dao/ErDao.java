@@ -4,6 +4,7 @@ import kr.or.oheasy.vo.HrEmpMstVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ErDao {
 
@@ -21,7 +22,10 @@ public interface ErDao {
 
     public int deleteEmp(String cdEmp); // 사원삭제
 
+    public Map<String, Object> checkReferences(String cdEmp); // FK 참조하는 테이블 확인
+
     public List<HrEmpMstVO> getDeptList(); // 부서전체조회
 
     public List<HrEmpMstVO> getBankList(); // 은행전체조회
+
 }
