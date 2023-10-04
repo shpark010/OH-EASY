@@ -773,7 +773,10 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   };
 // 사원추가 모달 끄고 닫기.
 
-
+const chekcBoxHighLigth = () =>{
+  setHighlightFirstRow(false); 
+  setHighlightLastRow(false);
+} //checkbox 클릭시 background 없애기 위한 EventHandler
 
 
 const dataLength = data.length; //마지막 행의 code에 테두리 넣기위해.
@@ -810,6 +813,7 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
       onChange={e => handleCheckboxChange(e, original?.cdEmp)}
       checked={original && original.cdEmp && checkColumn.includes(original?.cdEmp)} 
 //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
+      onClick={chekcBoxHighLigth}
   />
 </div>
         
@@ -1003,6 +1007,7 @@ const modalSearch = async(e) => {
               value={original?.cdEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              
             />
           );
         },
