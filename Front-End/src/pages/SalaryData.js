@@ -360,7 +360,7 @@ const SalaryData = (props) => {
   const handleFetchEmpData = async (e) => {
     // data 객체의 속성들이 undefined, null 또는 공백인지 확인
     if (!belongingDate || !payDay) {
-      alert("조회 조건 사항을 모두 선택해 주세요");
+      handleSearchOpenAlert();
       return;
     }
     let confirmOrder = searchOrder;
@@ -785,7 +785,7 @@ const SalaryData = (props) => {
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={(e) => insertPayAmount(e)}
-              onTabPress={insertPayAmount}
+              // onTabPress={insertPayAmount}
               className={"doubleLine"}
               type="price"
               align="right"
@@ -1245,6 +1245,20 @@ const SalaryData = (props) => {
     setCheckedRows([]);
   };
 
+  // 조회 조건 alert
+  const [searchAlert, setSearchAlert] = React.useState(false);
+
+  const handleSearchCloseAlert = () => {
+    setSearchAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleSearchOpenAlert = () => {
+    setSearchAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleSearchConfirm = () => {
+    handleSearchCloseAlert();
+  };
+
   return (
     <>
       {showAlert && (
@@ -1292,6 +1306,15 @@ const SalaryData = (props) => {
           type={checkedRows.length > 0 ? "question" : "warning"}
           onConfirm={handleEmailConfirm}
           onCancel={handleEmailCloseAlert}
+        />
+      )}
+      {searchAlert && (
+        <SweetAlert
+          text={"조회 조건 사항을 모두 선택해 주세요"}
+          type="warning"
+          onConfirm={handleSearchConfirm}
+          showCancel={false}
+          confirmText="확인"
         />
       )}
 
