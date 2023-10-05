@@ -53,4 +53,7 @@ public interface SdDao {
 	
 	//이매일 발송을 위한 사원 급여 정보
 	public List<SdEmailInfoVO> selectForMail(Map<String, Object> emailData);
+	
+	//각 공제 항목 별 업데이트
+	public int updateEachDeduction(Map<String, Object> updateEachDeductionData);
 }

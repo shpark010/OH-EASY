@@ -44,7 +44,7 @@ const useApiRequest = () => {
 
     // loginInfo 쿠키에서 토큰 정보를 추출
     const tokenParts = loginInfo.split(".");
-    const token = `${tokenParts[1]}.${tokenParts[2]}.${tokenParts[3]}`;
+    const token = `${tokenParts[0]}.${tokenParts[1]}.${tokenParts[2]}.${tokenParts[3]}`;
     console.log("토큰 추출~~~~~~~~");
     console.log(token);
     const headers = {
@@ -75,34 +75,34 @@ const useApiRequest = () => {
       });
       setLoading(false);
       return response.data;
-    } 
-    // catch (error) {
-    //   // API 요청 중 오류가 발생
-    //   console.error("API 요청 실패 :", error);
-    //   // "loginInfo" 쿠키 삭제
-    //   document.cookie =
-    //     "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    //   setLoading(false);
-    //   navigate("/login");
-      
-    //   if (error.response && error.response.status === 409) {
-    //     throw error; // 409 에러일 때만 에러를 다시 발생
-    //   } else {
-    //       return null; // 그 외의 경우에는 null을 반환
-    //   }
+    } catch (error) {
+      // catch (error) {
+      //   // API 요청 중 오류가 발생
+      //   console.error("API 요청 실패 :", error);
+      //   // "loginInfo" 쿠키 삭제
+      //   document.cookie =
+      //     "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      //   setLoading(false);
+      //   navigate("/login");
 
-    // }
-    catch (error) {
+      //   if (error.response && error.response.status === 409) {
+      //     throw error; // 409 에러일 때만 에러를 다시 발생
+      //   } else {
+      //       return null; // 그 외의 경우에는 null을 반환
+      //   }
+
+      // }
       setLoading(false);
       console.error("API 요청 실패 :", error);
-  
+
       if (error.response && error.response.status === 409) {
-          throw error; // 409 에러일 때만 에러를 다시 발생
+        throw error; // 409 에러일 때만 에러를 다시 발생
       } else {
-          // "loginInfo" 쿠키 삭제
-          document.cookie = "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          navigate("/login"); // 그 외의 경우에는 로그인 페이지로 리디렉션
-          return null;
+        // "loginInfo" 쿠키 삭제
+        document.cookie =
+          "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        navigate("/login"); // 그 외의 경우에는 로그인 페이지로 리디렉션
+        return null;
       }
     }
   };
