@@ -19,9 +19,7 @@ import SweetAlert from '../Contents/SweetAlert';
 const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,employeeData,setEmployeeData,paramGetEmpList1,setParamGetEmpList1,highlightFirstRow,setHighlightFirstRow }) => {
 
   const apiRequest = useApiRequest();
-  // const [employeeData, setEmployeeData] = useState([]); //왼쪽table사원 data
   const [openPostcode, setOpenPostcode] = useState(false); // 주소모달 상태
-  // const [CheckColumn2,setCheckColumn2] = useState(checkColumn);  //pops로 받은 checkcoulmn복사하기
   const [selectAll, setSelectAll] = useState(false); // checkbox가 모두 check된 상태 관리
   const [belongingDate, setBelongingDate] = useState(""); //조건조회시 년월 달력 상태 관리.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
@@ -462,7 +460,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
 
     setParamGetEmpList1([]);
     setBelongingDate(newDate);
-    
+    setCheckColumn([]);
     
     try {
         // 첫 번째 API 요청
@@ -553,12 +551,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
 
   };
 
-{/*
-modal 에서 주소눌렀을때 이벤트 핸들러
 
-
-
-*/}
   const handleAddressSelect = async(addr) => {
   
 
@@ -640,9 +633,10 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
   const searchOrderOption = async (e) => {
     setSearchOrder(e.target.value);
-    setEmployeeData([])
-    setHighlightFirstRow(true)
-    setHighlightLastRow(false)
+    setEmployeeData([]);
+    setHighlightFirstRow(true);
+    setHighlightLastRow(false);
+    setCheckColumn([]) ; //정렬 바꿀때 check 비우기
     if (belongingDate) { // 달력에 값이 있는지 확인
         try {
             const responseData = await apiRequest({
@@ -773,7 +767,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   };
 // 사원추가 모달 끄고 닫기.
 
-const chekcBoxHighLigth = () =>{
+const chekcBoxHighLigt = () =>{
   setHighlightFirstRow(false); 
   setHighlightLastRow(false);
 } //checkbox 클릭시 background 없애기 위한 EventHandler
@@ -813,7 +807,7 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
       onChange={e => handleCheckboxChange(e, original?.cdEmp)}
       checked={original && original.cdEmp && checkColumn.includes(original?.cdEmp)} 
 //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
-      onClick={chekcBoxHighLigth}
+      onClick={chekcBoxHighLigt}
   />
 </div>
         
