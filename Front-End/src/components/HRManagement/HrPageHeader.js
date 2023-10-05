@@ -147,11 +147,11 @@ const HrPageHeader = ({
                 setShowAlertDelete(true);
               }}
             />
-            <PageHeaderIconButton
+            {/* <PageHeaderIconButton
               btnName="calc"
               imageSrc={Calc}
               altText="계산기"
-            />
+            /> */}
             <PageHeaderIconButton
               btnName="setting"
               imageSrc={Setting}

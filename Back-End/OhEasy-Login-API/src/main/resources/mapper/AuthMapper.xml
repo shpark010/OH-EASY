@@ -10,7 +10,7 @@
 
 <!-- 회원가입 -->
 <insert id="signup" parameterType="kr.or.oheasy.vo.UsersVO">
-	insert into users values(#{id},#{name},#{password},#{companyName})
+	insert into users values(#{id},#{name},#{password},#{companyName},#{email})
 </insert>
 
 
