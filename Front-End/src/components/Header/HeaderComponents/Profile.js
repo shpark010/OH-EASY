@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { setCookie, getCookie, removeCookie } from "../../../containers/Cookie";
 import axios from "axios";
 import noProfile from "../../../images/noProfile.jpg";
+import { useLoading } from "../../../containers/LoadingContext";
 
 const ProfileWrapper = styled.div`
   /* profile */
@@ -68,30 +69,33 @@ const IconWrapper = styled.div`
   margin-right: 5px;
 `;
 
-const logout = async (event) => {
-  event.preventDefault();
-  const cookieData = getCookie("loginInfo").split(".");
-  const logoutId = cookieData[0];
-  const token = cookieData.slice(1).join(".");
-  console.log("분리한 토큰값 : " + token);
-  removeCookie("loginInfo");
-  try {
-    const response = await axios.post("/api1/auth/logout", {
-      logoutId,
-      token,
-    });
-    if (response.data) {
-      console.log("삭제");
-      window.location.reload();
-    }
-  } catch (error) {
-    console.error("오류 : ", error);
-  }
-};
-
 const Profile = (props) => {
-  const [isProfileBoxVisible, setIsProfileBoxVisible] = useState(false);
+  const { setLoading } = useLoading();
+  const logout = async (event) => {
+    event.preventDefault();
 
+    const cookieData = getCookie("loginInfo").split(".");
+    const logoutId = cookieData[0];
+    const token = cookieData.slice(1).join(".");
+    console.log("분리한 토큰값 : " + token);
+    removeCookie("loginInfo");
+    setLoading(true);
+    try {
+      const response = await axios.post("/api1/auth/logout", {
+        logoutId,
+        token,
+      });
+      if (response.data) {
+        console.log("삭제");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("오류 : ", error);
+    }
+    setLoading(false);
+  };
+
+  const [isProfileBoxVisible, setIsProfileBoxVisible] = useState(false);
   const toggleProfileBox = () => {
     setIsProfileBoxVisible((prev) => !prev);
   };

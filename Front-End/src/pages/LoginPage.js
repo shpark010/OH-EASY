@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setCookie, getCookie } from "../containers/Cookie";
+import { useLoading } from "../containers/LoadingContext";
 
 import "../styles/css/pages/LoginPage.css";
 
@@ -9,6 +10,7 @@ function LoginPage() {
   const [isChecked, setIsChecked] = useState(false);
   const [userId, setUserId] = useState("");
   const [userPwd, setUserPwd] = useState("");
+  const { setLoading } = useLoading();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -31,6 +33,7 @@ function LoginPage() {
 
   const login = async (event) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post("/api1/auth/login", {
         userId,
@@ -66,6 +69,7 @@ function LoginPage() {
     } catch (error) {
       console.error("오류 : ", error);
     }
+    setLoading(false);
   };
   return (
     <div className="loginMainDiv">

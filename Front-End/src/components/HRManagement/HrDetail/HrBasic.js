@@ -157,7 +157,7 @@ const HrBasic = ({ cdEmp }) => {
     const file = e.target.files[0];
     console.log("handleFileChange *****************");
     if (!file) {
-      file = null;
+      //file = null;
       return;
     }
     console.log("handleFileChange *****************");
