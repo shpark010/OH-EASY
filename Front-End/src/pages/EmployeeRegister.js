@@ -889,6 +889,7 @@ const EmployeeRegister = () => {
             console.log(updatedEmpList);
             setEmpList(updatedEmpList);
             setCheckedRows([]);
+            window.location.reload();
         } else {
             alert("삭제 실패");
         }
@@ -1296,7 +1297,6 @@ const EmployeeRegister = () => {
                     onConfirm={async () => {
                       setShowAlert(false);
                       await handleDeleteEmp();
-                      window.location.reload();
                     }}
                     onCancel={() => {
                       setShowAlert(false);
