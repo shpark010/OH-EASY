@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +19,7 @@ public class ErController {
     @Autowired
     private ErService erService;
 
+    // 사원등록
     @PostMapping("/postEmpData")
     public ResponseEntity<Integer> postEmp(@RequestBody HrEmpMstVO hrEmpMstVO) {
 
@@ -36,6 +39,7 @@ public class ErController {
         }
     }
 
+    // 사원코드 존재여부검사
     @GetMapping("/checkCdEmpExists")
     public ResponseEntity<Boolean> checkCdEmpExists(@RequestParam("cdEmp") String cdEmp) {
         try {
@@ -47,6 +51,7 @@ public class ErController {
         }
     }
 
+    // 사원수정
     @PostMapping("updateEmpData")
     public ResponseEntity<?> updateEmp(@RequestBody Map<String, Object> params) {
 
@@ -77,6 +82,7 @@ public class ErController {
         return new ResponseEntity<>("1", HttpStatus.OK);
     }
 
+    // 사원전체조회
     @GetMapping("/getAllEmpList")
     public ResponseEntity<?> getAllEmpList() {
         List<HrEmpMstVO> result = erService.getAllEmpList();
@@ -87,6 +93,7 @@ public class ErController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // 사원조회
     @GetMapping("/getEmpData")
     public ResponseEntity<?> getCdEmp(@RequestParam("cdEmp") String cdEmp) {
         System.out.println("사원코드 한명 가져오기 ***********************************");
@@ -100,21 +107,30 @@ public class ErController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // FK 참조하는 테이블 확인 후 사원삭제
+    @PostMapping("/deleteEmpData")
+    public ResponseEntity<?> deleteEmp(@RequestBody Map<String, List<String>> payload) {
+        System.out.println("삭제 메소드 진입 ***********************************");
 
-    @DeleteMapping("/deleteEmpData")
-    public ResponseEntity<Integer> deleteEmp(@RequestParam("cdEmp") String cdEmp) {
-        try {
-            int result = erService.deleteEmp(cdEmp);
-            System.out.println("사원코드 deleteEmpData ******************************");
-            System.out.println(cdEmp);
-            if (result > 0) {
-                return new ResponseEntity<>(result, HttpStatus.OK);
+        List<String> empCodes = payload.get("selectedEmpCodes");
+        Map<String, Object> response = new HashMap<>();
+
+        for (String cdEmp : empCodes) {
+            Map<String, Object> individualResponse = erService.deleteEmp(cdEmp);
+            if (individualResponse.containsKey("deleted")) {
+                if ((int) individualResponse.get("deleted") <= 0) {
+                    response.put(cdEmp, "not_deleted");
+                }
             } else {
-                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+                response.putAll(individualResponse);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (response.isEmpty() || response.values().stream().allMatch(val -> "not_deleted".equals(val))) {
+            return new ResponseEntity<>(Collections.singletonMap("deleted", true), HttpStatus.OK);
+        } else {
+            System.out.println("Response Data: " + response);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
     }
 
