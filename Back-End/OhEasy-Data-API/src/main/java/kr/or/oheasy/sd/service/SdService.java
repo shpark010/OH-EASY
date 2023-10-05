@@ -71,16 +71,12 @@ public class SdService {
 		
 		// 연도
 		String yyAllowance = empInfo.get("belongingDate").substring(0, 4);
-		System.out.println("검색 년도 : " + yyAllowance);
 		// 귀속월
 		String mmBelong = empInfo.get("belongingDate").substring(4, 6);
-		System.out.println("검색 월 : " + mmBelong);
 		// 지급일
 		String dtAllowance = empInfo.get("payDay");
-		System.out.println("검색 지급일 : " + dtAllowance);
 		// 조회 구분
 		String searchTaxOrder = empInfo.get("searchTaxOrder");
-		System.out.println("조회구분 : " + searchTaxOrder);
 		HashMap<String, String> empData = new HashMap<>();
 		empData.put("cdEmp", cd_Emp);
 		empData.put("yyAllowance", yyAllowance);
@@ -445,5 +441,57 @@ public class SdService {
 			e.getMessage();
 		}
 		return emailInfoList;
+	}
+	
+	// 각 공제 항목별 업데이트
+	public Map<String, Object> updateEachDeduction(Map<String, String> updateEachDeductionData) {
+		SdDao dao = sqlSession.getMapper(SdDao.class);
+		// 사원코드
+		String cdEmp = updateEachDeductionData.get("clickEmpCode");
+		// 입력 급여
+		long amtTax = Long.parseLong(updateEachDeductionData.get("amtTax").replaceAll(",", ""));
+		// 공제 항목명
+		String nmTax = updateEachDeductionData.get("nmTax");
+		// 연도
+		String yyAllowance = updateEachDeductionData.get("belongingDate").toString().substring(0, 4);
+		// 귀속월
+		String mmBelong = updateEachDeductionData.get("belongingDate").toString().substring(4, 6);
+		// 지급일
+		String dtAllowance = updateEachDeductionData.get("payDay").toString();
+		// 조회 구분
+		String searchTaxOrder = updateEachDeductionData.get("searchTaxOrder");
+		Map<String, Object> resultData = new HashMap<>();
+		Map<String, Object> updateData = new HashMap<>();
+		updateData.put("cdEmp", cdEmp);
+		updateData.put("amtTax", amtTax);
+		updateData.put("nmTax", nmTax);
+		updateData.put("yyAllowance", yyAllowance);
+		updateData.put("mmBelong", mmBelong);
+		updateData.put("dtAllowance", dtAllowance);
+		updateData.put("searchTaxOrder", searchTaxOrder);
+		try {
+			int updateResult = dao.updateEachDeduction(updateData);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		Map<String, String> searchData = new HashMap<>();
+		searchData.put("cdEmp", cdEmp);
+		searchData.put("yyAllowance", yyAllowance);
+		searchData.put("mmBelong", mmBelong);
+		searchData.put("dtAllowance", dtAllowance);
+		searchData.put("searchTaxOrder", searchTaxOrder);
+		SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
+		try {
+			List<Long> searchTaxInfoList = dao.getTaxInfo(searchData);
+			searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
+					searchTaxInfoList.get(2), searchTaxInfoList.get(3), searchTaxInfoList.get(4),
+					searchTaxInfoList.get(5), searchTaxInfoList.get(6));
+		} catch (Exception e) {
+			System.out.println("조회구분 오류");
+			System.out.println(e.getMessage());
+		}
+		System.out.println(searchTaxInfo);
+		resultData.put("searchTaxInfo", searchTaxInfo);
+		return resultData;
 	}
 }

@@ -57,20 +57,20 @@ public class EmailController {
         		String html = FileUtil.readHtmlFile("src/main/resources/static/email.html");
         		if(emailValidator.validate(emailInfo.getNmEmail())) {
         			
-        		
+        		FormatPrice formatPrice = new FormatPrice();
         		// 여기서 파라미터 대체
         		html = html.replace("{{nmEmp}}", emailInfo.getCdEmp())
         				.replace("{{yyAllowance}}", emailInfo.getYyAllowance())
         				.replace("{{mmBelong}}", emailInfo.getMmBelong())
-        				.replace("{{amtAllowance}}", emailInfo.getAmtAllowance())
-        				.replace("{{nationalPension}}", emailInfo.getNationalPension())
-        				.replace("{{healthInsurance}}", emailInfo.getHealthInsurance())
-        				.replace("{{longtermNursingInsurance}}", emailInfo.getLongtermNursingInsurance())
-        				.replace("{{employmentInsurance}}", emailInfo.getEmploymentInsurance())
-        				.replace("{{incomeTax}}", emailInfo.getIncomeTax())
-        				.replace("{{localIncomeTax}}", emailInfo.getLocalIncomeTax())
-        				.replace("{{totalTax}}", emailInfo.getTotalDeduct())
-        				.replace("{{netPay}}", emailInfo.getNetPay());
+        				.replace("{{amtAllowance}}", formatPrice.formatMoney(emailInfo.getAmtAllowance()))
+        				.replace("{{nationalPension}}", formatPrice.formatMoney(emailInfo.getNationalPension()))
+        				.replace("{{healthInsurance}}", formatPrice.formatMoney(emailInfo.getHealthInsurance()))
+        				.replace("{{longtermNursingInsurance}}", formatPrice.formatMoney(emailInfo.getLongtermNursingInsurance()))
+        				.replace("{{employmentInsurance}}", formatPrice.formatMoney(emailInfo.getEmploymentInsurance()))
+        				.replace("{{incomeTax}}", formatPrice.formatMoney(emailInfo.getIncomeTax()))
+        				.replace("{{localIncomeTax}}", formatPrice.formatMoney(emailInfo.getLocalIncomeTax()))
+        				.replace("{{totalTax}}", formatPrice.formatMoney(emailInfo.getTotalDeduct()))
+        				.replace("{{netPay}}", formatPrice.formatMoney(emailInfo.getNetPay()));
         		
         		emailService.sendMail(emailInfo.getNmEmail(), "급여명세서", html);				
         		sendResult++;
