@@ -64,6 +64,7 @@ public class HrService {
 	@Transactional(rollbackFor = Exception.class)
 	public void deleteHrEmpDtlList(List<String> cdEmpList) {
 		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
 		try {
 
 			List<String> validImagePaths = getEmpImagePaths(cdEmpList).stream().filter(Objects::nonNull)
@@ -73,7 +74,7 @@ public class HrService {
 				List<String> fileNames = validImagePaths.stream()
 						.map(path -> "profileImg/" + path.substring(path.lastIndexOf("/") + 1))
 						.collect(Collectors.toList());
-
+				System.out.println(fileNames);
 				s3FileUploadTestService.deleteFilesFromS3(fileNames);
 			}
 		} catch (Exception e) {

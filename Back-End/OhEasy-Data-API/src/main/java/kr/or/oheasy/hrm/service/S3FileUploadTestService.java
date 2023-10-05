@@ -72,6 +72,7 @@ public class S3FileUploadTestService {
     }
 
     public void deleteFilesFromS3(List<String> fileNames) {
+    	System.out.println(fileNames);
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName)
             .withKeys(fileNames.toArray(new String[0]));
         amazonS3.deleteObjects(deleteObjectsRequest);
