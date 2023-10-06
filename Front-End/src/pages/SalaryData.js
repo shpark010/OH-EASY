@@ -156,6 +156,21 @@ const SalaryData = (props) => {
     return newValue;
   };
 
+  //날짜
+  const dateFormat = (rawDate) => {
+    if (rawDate.length !== 8 || isNaN(rawDate)) {
+      return "";
+    }
+
+    const year = rawDate.substring(0, 4);
+    const month = rawDate.substring(4, 6);
+    const day = rawDate.substring(6, 8);
+
+    const newDate = `${year}-${month}-${day}`;
+
+    return newDate;
+  };
+
   //개인 종합 세액
   const [personalTax, setPersonalTax] = useState({
     deduction: "",
@@ -197,7 +212,8 @@ const SalaryData = (props) => {
     department: "", //부서
     domesticForeign: "", //내외국인
     family: "", //가족수
-    military: "", //병역
+    milDischarge: "", //제대구분
+    milService: "", //병역구분
     obstacle: "", //장애
     certificate: "", //자격증
   }); //사원 상세 정보
@@ -274,7 +290,8 @@ const SalaryData = (props) => {
       department: "",
       domesticForeign: "",
       family: "",
-      military: "",
+      milDischarge: "",
+      milService: "",
       obstacle: "",
       certificate: "",
     });
@@ -511,12 +528,11 @@ const SalaryData = (props) => {
   };
 
   //급여 자료 삭제
-  const handleDeletePayData = async () => {
+  const handleDeletePayData = async (checkedRows) => {
     if (checkedRows.length === 0) {
       return;
     }
     try {
-      console.log(checkedRows);
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/sd/deletePayData",
@@ -531,6 +547,7 @@ const SalaryData = (props) => {
       const searchTaxInfo = responseData.searchTaxInfo;
       handlePersonalTax(empTaxInfo);
       handleSearchTax(searchTaxInfo);
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -603,6 +620,44 @@ const SalaryData = (props) => {
       if (sendResult > 0) {
         handleEmailSendOpenAlert();
       }
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    return sendResult;
+  };
+
+  //PDF 출력
+  const handlePrintPdf = async () => {
+    let sendResult = 0;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/util/salaryPdf",
+        data: {
+          code: clickEmpCode,
+          belongingDate: belongingDate,
+          dtAllowance: payDay,
+        },
+        responseType: "blob",
+      });
+      // Create a new Blob from the response data
+      const blob = new Blob([responseData], { type: "application/pdf" });
+
+      // Create a link element
+      const link = document.createElement("a");
+
+      // Set the download attribute with a filename
+      link.download = "salary.pdf";
+
+      // Create a URL to the blob and set it as the href attribute
+      link.href = window.URL.createObjectURL(blob);
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Trigger a click event on the link to download the file
+      link.click();
+      console.log(blob);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -786,13 +841,14 @@ const SalaryData = (props) => {
           const handleInputChange = (e) => {
             console.log(clickEmpCode);
             setInputValue(e.target.value);
-            console.log(inputValue);
+            console.log("inputValue" + typeof e.target.value);
             console.log("바뀜");
           };
           const insertPayAmount = (e) => {
             const insertPay = e.target.value; //입력한 금액
             const clickedCode = clickEmpCode; //클릭한 사원 코드
             if (
+              inputValue !== "" &&
               inputValue !== Number(beforePay).toLocaleString() &&
               inputValue != beforePay
             ) {
@@ -805,6 +861,11 @@ const SalaryData = (props) => {
                 handleUpdateData(clickEmpCode, insertPay);
                 console.log("급여 수정 조건");
               }
+            }
+
+            if (inputValue === "") {
+              console.log("삭제해야해~");
+              handleDeletePayData([clickEmpCode]);
             }
           };
           return (
@@ -1151,7 +1212,7 @@ const SalaryData = (props) => {
   };
 
   const handleDeleteConfirm = () => {
-    handleDeletePayData();
+    handleDeletePayData(checkedRows);
     handleDeleteCloseAlert();
   };
 
@@ -1488,7 +1549,8 @@ const SalaryData = (props) => {
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
-                disabled={true}
+                onClick={handlePrintPdf}
+                disabled={!clickEmpCode ? true : false}
               />
               <PageHeaderIconButton
                 btnName="delete"
@@ -1671,7 +1733,11 @@ const SalaryData = (props) => {
               </div>
               <div className="sd-empInfo-detail">
                 <label htmlFor="">입사일</label>
-                <p>{empDetailInfo.hireDate}</p>
+                <p>
+                  {empDetailInfo.hireDate
+                    ? dateFormat(empDetailInfo.hireDate)
+                    : ""}
+                </p>
                 <label htmlFor="">성별</label>
                 <p>{empDetailInfo.gender}</p>
                 <label htmlFor="">주소</label>
@@ -1683,18 +1749,24 @@ const SalaryData = (props) => {
                 <label htmlFor="">이메일</label>
                 <p>{empDetailInfo.email}</p>
                 <label htmlFor="">퇴사일</label>
-                <p>{empDetailInfo.leavingDate}</p>
+                <p>
+                  {empDetailInfo.leavingDate
+                    ? dateFormat(empDetailInfo.leavingDate)
+                    : ""}
+                </p>
                 <label htmlFor="">부서</label>
                 <p>{empDetailInfo.department}</p>
-                <label htmlFor="">내외국인</label>
+                <label htmlFor="">내/외국인</label>
                 <p>{empDetailInfo.domesticForeign}</p>
-                <label htmlFor="">가족수</label>
+                <label htmlFor="">가족수(명)</label>
                 <p>{empDetailInfo.family}</p>
-                <label htmlFor="">병역</label>
-                <p>{empDetailInfo.military}</p>
+                <label htmlFor="">병역/전역</label>
+                <p>
+                  {empDetailInfo.milService}/{empDetailInfo.milDischarge}
+                </p>
                 <label htmlFor="">장애구분</label>
                 <p>{empDetailInfo.obstacle}</p>
-                <label htmlFor="">자격증</label>
+                <label htmlFor="">자격증(개)</label>
                 <p>{empDetailInfo.certificate}</p>
               </div>
             </div>

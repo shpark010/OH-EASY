@@ -72,6 +72,7 @@ const useApiRequest = () => {
         url,
         headers,
         data: requestData,
+        responseType: props.responseType || "json", // responseType을 props에서 받아오거나 기본값으로 'json'을 사용
       });
       setLoading(false);
       return response.data;
