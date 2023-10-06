@@ -16,12 +16,14 @@ import SweetAlert from '../Contents/SweetAlert';
 
 
 
-const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,employeeData,setEmployeeData,paramGetEmpList1,setParamGetEmpList1,highlightFirstRow,setHighlightFirstRow }) => {
+const WorkContractCreate = ({
+  clickCode,setClickCode,checkColumn,setCheckColumn, handleCheckboxChange,employeeData,
+  setEmployeeData,paramGetEmpList1,setParamGetEmpList1,highlightFirstRow,setHighlightFirstRow,showInsertRow,setShowInsertRow
+
+}) => {
 
   const apiRequest = useApiRequest();
-  // const [employeeData, setEmployeeData] = useState([]); //왼쪽table사원 data
   const [openPostcode, setOpenPostcode] = useState(false); // 주소모달 상태
-  // const [CheckColumn2,setCheckColumn2] = useState(checkColumn);  //pops로 받은 checkcoulmn복사하기
   const [selectAll, setSelectAll] = useState(false); // checkbox가 모두 check된 상태 관리
   const [belongingDate, setBelongingDate] = useState(""); //조건조회시 년월 달력 상태 관리.
   const [searchOrder,setSearchOrder] = useState("1"); // 정렬 방법 관리 State
@@ -50,8 +52,8 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
   //   stSign: '',
   //   dtCreated: '',
   // }) // 오른쪽 table 상태관리
-  const [clickCode,setClickCode] = useState(""); //code click시 값을 저장할 state
-  const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
+  // const [clickCode,setClickCode] = useState(""); //code click시 값을 저장할 state
+  // const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
   const [modalEmpList, setModalEmpList] = useState([]); // 모달창에 넣을 사원 정보
   const [modalIsOpen2, setModalIsOpen2] = useState(false); // 추가 모달 on off 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
@@ -130,6 +132,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
       }
   
       setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: data });
+      
   
       try {
         const responseData = await apiRequest({
@@ -147,8 +150,13 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     const cdEmp = clickCode
     const data = newDate
     const colum = "dtCreated"
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "") {
+    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "" ) {
       return;
+    }
+    if(belongingDate===null || belongingDate ===""){
+
+      setEmployeeData([])
+      return
     }
     console.log(cdEmp);
     console.log(data);
@@ -162,6 +170,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
         url: `/api2/wc/updateEmpList?cdEmp=${cdEmp}&colum=${colum}&data=${data}`,
       });
 
+      
       const empListResponseData = await apiRequest({
         method: "GET",
         url: `/api2/wc/getEmpList?creDate=${belongingDate}&orderValue=${searchOrder}`, 
@@ -190,6 +199,7 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
             setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
             setHighlightFirstRow(true);
             setHighlightLastRow(false);
+            setShowInsertRow(false);
         }
 
       } //작성일자의 월과 작성년월의 월이 다르면 empList 또한 update 됨. 그래서 맨위의 cdEmp 바로 표시
@@ -267,16 +277,16 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
           return
     }
 
-    if(colum === "tpPayDtSal"){ //임금지급일 미지급 매주 매일 일경우 off
-      if(e.target.value ==="0" ||
-      e.target.value ==="2" ||
-      e.target.value ==="3" ){
-        setPayState("off")
-      }
-      else{
-        setPayState("on")
-      }
-    }
+    // if(colum === "tpPayDtSal"){ //임금지급일 미지급 매주 매일 일경우 off
+    //   if(e.target.value ==="0" ||
+    //   e.target.value ==="2" ||
+    //   e.target.value ==="3" ){
+    //     setPayState("off")
+    //   }
+    //   else{
+    //     setPayState("on")
+    //   }
+    // }
 
 
       if(colum ==="ddPaySal"&& payState === "on" ){ // 32일이 넘으면 변경x
@@ -287,16 +297,22 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
    
       }
 
-      if(colum ==="addrWorkDtl" ||
-      colum ==="cntnJob"){
-        const forbiddenCharacters = /[!@#$%^&*]/;
-    // 입력값이 특수문자를 포함하고 있으면 변경하지 않음
-    if (forbiddenCharacters.test(data)) {
-      return;
-    }
+    //   if(colum ==="addrWorkDtl" ||
+    //   colum ==="cntnJob"){
+    //     const forbiddenCharacters = /[!@#$%^&*]/;
+    // // 입력값이 특수문자를 포함하고 있으면 변경하지 않음
+    // if (forbiddenCharacters.test(data)) {
+    //   return;
+    // }
+    //   }
+
+    if (colum === "addrWorkDtl" || colum === "cntnJob") {
+      const forbiddenCharacters = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
+  
+      if (!forbiddenCharacters.test(data)) {
+          return;
       }
-
-
+  }
       
 
       
@@ -350,14 +366,21 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
     
     const cdEmp = clickCode;
     const colum = e.target.id;
-    const data = e.target.value;
+    const data = e.target.value.trim();
   
-   
+    
 
-    if (!cdEmp) return; 
+    
+    
+    if (!cdEmp || !data) return;
+
+
+    
     
      if( validate[colum]===data){ 
       console.log("초기값과 같으면 종료");
+      console.log(validate[colum]);
+      console.log(data);
       return};
     
        
@@ -462,7 +485,9 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
 
     setParamGetEmpList1([]);
     setBelongingDate(newDate);
-    
+    setCheckColumn([]);
+    setShowInsertRow(false);
+
     
     try {
         // 첫 번째 API 요청
@@ -522,19 +547,17 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
       });
       
       setShowInsertRow(false);
-
       setEmployeeData((prevEmployeeData) => [...prevEmployeeData, responseData]);
-      setHighlightLastRow(true);
+    
       
-      //마지막 인덱스의 cdEmp출력.
-      // const lastCdEmp = responseData && responseData.length > 0 ? responseData[responseData.length].cdEmp : null; //마지막 cdEmp
-      // console.log("******************lastcdEmp");
+      
+      
       if (clickModalEmpCode) {
-          // 두 번째 API 요청
+          // 두 번째 API 요청 Table.js에 의해서 무조건 맨위의 code를 오른쪽 Table에 표시해야함.
          
           const responseData2 = await apiRequest({
               method: "GET",
-              url: `/api2/wc/getCodeParamEmpList?code=${clickModalEmpCode}`, 
+              url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
           });
           console.log(responseData2);
           setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
@@ -547,18 +570,49 @@ const WorkContractCreate = ({checkColumn,setCheckColumn, handleCheckboxChange,em
       console.error("Failed to fetch emp data:", error);
     }
 
+  };
 
 
+  // 더블클릭시 모달창에서 추가하기 하면 꺼지면서 사원 인서트
+  const closeModalAndEmpInsert2 = async (cdEmp) => {
+    closeModal2();
+    
+    setParamGetEmpList1([]);
+    setClickCode(cdEmp) //더블클릭한 code set
+    try {
+      const responseData = await apiRequest({
+        method: "GET", //get이지만 insert
+        url: `/api2/wc/getModalData?cdEmp=${cdEmp}`,
+      });
+      
+      setShowInsertRow(false);
 
+      setEmployeeData((prevEmployeeData) => [...prevEmployeeData, responseData]);
+      setHighlightLastRow(true);
+      
+      
+      if (cdEmp) {
+          // 두 번째 API 요청
+         
+          const responseData2 = await apiRequest({
+            method: "GET",
+            url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
+        });
+        console.log(responseData2);
+        setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+        setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
+      }
+      
+
+
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
 
   };
 
-{/*
-modal 에서 주소눌렀을때 이벤트 핸들러
 
 
-
-*/}
   const handleAddressSelect = async(addr) => {
   
 
@@ -640,9 +694,11 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
   const searchOrderOption = async (e) => {
     setSearchOrder(e.target.value);
-    setEmployeeData([])
-    setHighlightFirstRow(true)
-    setHighlightLastRow(false)
+    setEmployeeData([]);
+    setHighlightFirstRow(true);
+    setHighlightLastRow(false);
+    setShowInsertRow(false);
+    setCheckColumn([]) ; //정렬 바꿀때 check 비우기
     if (belongingDate) { // 달력에 값이 있는지 확인
         try {
             const responseData = await apiRequest({
@@ -700,7 +756,7 @@ modal 에서 주소눌렀을때 이벤트 핸들러
 
   setHighlightFirstRow(false); //클릭 발생시 highlight 끄기
   setHighlightLastRow(false); // 클릭 발생시 마지막 행 highlight 끄기
-
+  
 
     if(code.value){
       
@@ -773,13 +829,13 @@ modal 에서 주소눌렀을때 이벤트 핸들러
   };
 // 사원추가 모달 끄고 닫기.
 
-const chekcBoxHighLigth = () =>{
+const chekcBoxHighLigt = () =>{
   setHighlightFirstRow(false); 
   setHighlightLastRow(false);
 } //checkbox 클릭시 background 없애기 위한 EventHandler
 
 
-const dataLength = data.length; //마지막 행의 code에 테두리 넣기위해.
+const dataLength = data.length; //마지막 행의 code 
   const columns = useMemo(
     () => [
 
@@ -790,7 +846,12 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
             <input 
           type='checkbox'
           onChange={selectAllCheckBox}
-          checked={data.length===checkColumn.length}
+          // belongingDate && clickCode && data.length===checkColumn.length
+          checked={
+            clickCode ? (data.length === checkColumn.length) : 
+            (belongingDate && data.length === checkColumn.length && 
+             (belongingDate !== null || data.length > 0 || checkColumn.length > 0))
+          }
           />)
           }
         ,
@@ -801,21 +862,22 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
         return(
           <>
           
-          <div className={
+           {/* <div className={
   index === 0 && highlightFirstRow 
       ? 'wcFirstRowHighlight' 
       : index === dataLength-1 && highlightLastRow 
           ? 'wchighlightLastRow' 
           :  ''
-}>
+}> 
+</div> */}
   <input 
       type="checkbox"          
       onChange={e => handleCheckboxChange(e, original?.cdEmp)}
       checked={original && original.cdEmp && checkColumn.includes(original?.cdEmp)} 
 //props로 checkColumn을 넘겨받은 뒤 checkColumn.includes(origianl.cdEmp)평가시점이 달라져 null을 자꾸 가져와서  그것을 방지하기 위해 작성한 code
-      onClick={chekcBoxHighLigth}
+      onClick={chekcBoxHighLigt}
   />
-</div>
+
         
         </>
         );
@@ -843,13 +905,13 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
                 //     />
                 // </div>
                 <Input
-                style={{
-                  background: index === 0 && highlightFirstRow 
-                      ? '#92c5ff' 
-                      : index === dataLength-1 && highlightLastRow 
-                          ? '#92c5ff' 
-                          : 'transparent'
-              }}
+              //   style={{
+              //     background: index === 0 && highlightFirstRow 
+              //         ? '#92c5ff' 
+              //         : index === dataLength-1 && highlightLastRow 
+              //             ? '#92c5ff' 
+              //             : 'transparent'
+              // }}
                         value={original?.cdEmp || ""}
                          onClick={handleInputClick}
                      
@@ -869,13 +931,13 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
             
 
             <Input
-                style={{
-                  background: index === 0 && highlightFirstRow 
-                      ? '#92c5ff' 
-                      : index === dataLength-1 && highlightLastRow 
-                          ? '#92c5ff' 
-                          : 'transparent'
-              }}
+              //   style={{
+              //     background: index === 0 && highlightFirstRow 
+              //         ? '#92c5ff' 
+              //         : index === dataLength-1 && highlightLastRow 
+              //             ? '#92c5ff' 
+              //             : 'transparent'
+              // }}
                         value={original?.nmEmp||""}
                          onClick={handleInputClick}
                      
@@ -894,13 +956,13 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
           return (
             
             <Input
-            style={{
-              background: index === 0 && highlightFirstRow 
-                  ? '#92c5ff' 
-                  : index === dataLength-1 && highlightLastRow 
-                      ? '#92c5ff' 
-                      : 'transparent'
-          }}
+          //   style={{
+          //     background: index === 0 && highlightFirstRow 
+          //         ? '#92c5ff' 
+          //         : index === dataLength-1 && highlightLastRow 
+          //             ? '#92c5ff' 
+          //             : 'transparent'
+          // }}
                     value={original?.noResident||""}
                      onClick={handleInputClick}
                  
@@ -916,26 +978,40 @@ const dataLength = data.length; //마지막 행의 code에 테두리 넣기위�
 
 
 
-//모달 조건 검색 이벤트 핸들러
+// 모달 조건 검색 이벤트 핸들러
 const modalSearch = async(e) => {
   setHighLightModal(false);
   setHighLightModal2(false);
   setHighLightModal3(false);
   const searchValue = e.target.value.trim(); // 공백을 제거해줍니다.
   
+  const allowedChars = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
+    
+    if (!allowedChars.test(searchValue)) {
+        // 값이 허용되지 않는 경우 원래의 값을 유지
+       setShowAlert8(true);
+        return;
+
+    }
+
+
   // 정규 표현식을 사용하여 문자열 판별
   const hasEnglish = /[a-zA-Z]/.test(searchValue);
   const hasNumbers = /\d/.test(searchValue);
-  const hasKoreanSpelling= /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(searchValue);
-  const hasKorean = /^[가-힣]+$/.test(searchValue);
-  const hasKorean2 = /[가-힣]/.test(searchValue);
-  const hasSpecialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(searchValue);
+  const hasKoreanSpelling= /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(searchValue); //한글을 ㄱ도 인식하게
+  const hasKorean = /^[가-힣]+$/.test(searchValue); // 한글 한글자 인식
+  const hasKorean2 = /[가-힣]/.test(searchValue); // 완성된 한글
+  const hasWhitespace = /\s/.test(searchValue);
+  // const hasSpecialChars =  /[\u4E00-\u9FFF!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?＃＆＊＠§※☆★○]+/.test(searchValue);
+  
+  
+  // if (!hasNumbers && !hasEnglish && !hasKoreanSpelling && !hasKorean && !hasKorean2 && !hasWhitespace){
+  //   return;
+  // }
+  
 
-  // 특수문자만 입력되었을 경우 return
-  if(hasSpecialChars && !hasNumbers && !hasEnglish) {
-    setShowAlert8(true);
-      return;
-  }
+  
+
 
   let data = {};
 
@@ -954,7 +1030,10 @@ const modalSearch = async(e) => {
     setHighLightModal2(true);
   }
   
-  if (!searchValue) {
+  if (!searchValue || searchValue.length===0) {
+    setHighLightModal(false);
+  setHighLightModal2(false);
+  setHighLightModal3(false);
       try {
           const responseData = await apiRequest({
               method: "GET",
@@ -977,9 +1056,8 @@ const modalSearch = async(e) => {
   } catch (error) {
       console.error("Failed to fetch emp data:", error);
   }
-}
 
-  
+}
 
 
 
@@ -1002,12 +1080,18 @@ const modalSearch = async(e) => {
             console.log(e.target.value);
             setClickModalEmpCode(original.cdEmp);
           };
+          const handleDoubleClick = (e) => {
+            console.log("모달안 테이블 안에 더블 클릭 발생");
+            console.log(original.cdEmp);
+            setClickModalEmpCode(original.cdEmp);
+            closeModalAndEmpInsert2( original.cdEmp);
+          };
           return (
             <Input
               value={original?.cdEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
-              
+              onDoubleClick={handleDoubleClick}
             />
           );
         },
@@ -1025,11 +1109,18 @@ const modalSearch = async(e) => {
             console.log(e.target.value);
             setClickModalEmpCode(original.cdEmp);
           };
+          const handleDoubleClick = (e) => {
+            console.log("모달안 테이블 안에 더블 클릭 발생");
+            console.log(original.cdEmp);
+            setClickModalEmpCode(original.cdEmp);
+            closeModalAndEmpInsert2( original.cdEmp);
+          };
           return (
             <Input
               value={original?.nmEmp || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              onDoubleClick={handleDoubleClick}
             />
           );
         },
@@ -1047,11 +1138,18 @@ const modalSearch = async(e) => {
             console.log(e.target.value);
             setClickModalEmpCode(original.cdEmp);
           };
+          const handleDoubleClick = (e) => {
+            console.log("모달안 테이블 안에 더블 클릭 발생");
+            console.log(original.cdEmp);
+            setClickModalEmpCode(original.cdEmp);
+            closeModalAndEmpInsert2( original.cdEmp);
+          };
           return (
             <Input
               value={original?.noResident || ""}
               onClick={handleInputClick}
               className={"doubleLine"}
+              onDoubleClick={handleDoubleClick}
             />
           );
         },
@@ -1061,9 +1159,87 @@ const modalSearch = async(e) => {
   );
   
   
+  const enterPress = (e) =>{
+    if (e.key === 'Enter' || e.key ==='Tab' ) {
+      inputOnBlur(e); // 'Enter' 키가 눌렸을 때 inputOnBlur 함수를 호출합니다.
+      console.log("enter가 눌려요");
+  }
+  console.log("enter가 안 눌려요");
+  }
+
+
+  // const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 confirm alert
+  // const [emailSendAlert, setEmailSendAlert] = React.useState(false);  // 이메일 발송 성공 alert
+  
+
+
+  // // 이메일 관련 alret set 이벤트 핸들러
+  // const handleEmailCloseAlert = () => {
+  //   setEmailAlert(false); 
+  // };
+  // const handleEmailOpenAlert = () => { // 메일보내기 Button event Handler
+  //   setEmailAlert(true);
+  // };
+
+  // const handleEmailConfirm = () => {
+  //   if (checkColumn.length > 0) {
+  //     const sendResult = handleSendEmail();
+  //     console.log(sendResult);
+  //     setCheckColumn([]);
+  //   }
+  //   handleEmailCloseAlert();
+  //   setCheckColumn([]);
+  // };
+
+  // const handleEmailSendCloseAlert = () => {
+  //   setEmailSendAlert(false); 
+  // };
+  // const handleEmailSendOpenAlert = () => {
+  //   setEmailSendAlert(true); 
+  // };
+
+  // const handleEmailSendConfirm = () => {
+  //   handleEmailSendCloseAlert();
+  // };
 
 
 
+  // const handleSendEmail = async () => {
+  //   let sendResult = 0;
+  //   try {
+  //     // checkColumn을 기반으로 employeeData 필터링
+  //     const selectedEmployees = employeeData.filter(emp => checkColumn.includes(emp.cdEmp));
+  
+  //     // 각 직원 데이터와 paramGetEmpList1을 조합
+  //     const emailData = selectedEmployees.map(emp => ({
+  //       cdEmp: emp.cdEmp,
+  //       nmEmp: emp.nmEmp,
+  //       noResident: emp.noResident,
+  //       ...paramGetEmpList1,
+  //     }));
+  
+  //     // API 요청
+  //     const responseData = await apiRequest({
+  //       method: "POST",
+  //       url: "/api2/util/workContractEmail",
+  //       data: {
+  //         emailDataList: emailData,
+         
+  //       },
+  //     });
+      
+  //     sendResult = responseData.sendResult;
+  //     if (sendResult > 0) {
+  //       handleEmailSendOpenAlert();
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch emp data:", error);
+  //   }
+  //   return sendResult;
+  // };
+
+  
+  
 
     return (
       <>
@@ -1129,10 +1305,11 @@ const modalSearch = async(e) => {
             </div>
             
             {/* 두번째 그리드 */}
-            <div className="wcGrid2">
+            
+              <div className="wcGrid2">
               <h1 className="wcRightHead">근로계약서</h1>
-
               {/* 탭 내용 테이블 */}
+              <div className='wcScroll'>
               <table >
                 <tbody className='borderTopBold'>
                 <tr>
@@ -1199,10 +1376,11 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.addrWorkDtl || ""}
                     id={"addrWorkDtl"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    
                     maxLength="100"
                     placeholder={"ex) 더존 APT 1동 101호 "}
-
+                    onKeyDown={enterPress}
+                    
                      />
                   </td>
                 </tr>
@@ -1215,7 +1393,7 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.cntnJob||""}
                     id={"cntnJob"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
                     maxLength="100"
                     placeholder={"ex) Platform 부서 refactoring 업무 "}
 
@@ -1230,7 +1408,7 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.tmStartRegularWork||""}
                     id={"tmStartRegularWork"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
                     maxLength="4"
                     placeholder={"ex) 0900 "}
                     width={180}
@@ -1245,7 +1423,7 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.tmEndRegularWork || "" }
                     id={"tmEndRegularWork"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
                     maxLength="4"
                     placeholder={"ex) 1800 "}
                    
@@ -1261,7 +1439,7 @@ const modalSearch = async(e) => {
                      value={paramGetEmpList1.tmStartBreak || "" }
                      id={"tmStartBreak"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
                     maxLength="4"
                     placeholder={"ex) 1200 "}
                     width={180}
@@ -1280,7 +1458,7 @@ const modalSearch = async(e) => {
                     placeholder={"ex) 1300 "}
 
                      onChange={inputOnChange}
-                     onBlur={inputOnBlur}
+                     onKeyDown={enterPress}
                      maxLength="4"
 
 
@@ -1378,8 +1556,7 @@ const modalSearch = async(e) => {
                       options={[
                         { value: '0', label: ' 미작성 ' },
                         { value: '1', label: ' 매월 ' },
-                        { value: '2', label: ' 매주 ' },
-                        { value: '3', label: ' 매일 ' },
+                       
                       ]}
                       value={paramGetEmpList1.tpPayDtSal || "0" }
                      className={"wcSelect2"}
@@ -1543,7 +1720,7 @@ const modalSearch = async(e) => {
                 </tr>
                 </tbody>
               </table>
-              
+              </div>
             </div>
             
           
@@ -1727,7 +1904,7 @@ const modalSearch = async(e) => {
 
 {showAlert8 && (
         <SweetAlert
-          text="특수문자는 주민등록번호 검색시에만 입력가능합니다."
+          text="특수문자는 입력하실 수 없습니다."
           // showCancel={true}
           //type="success"
           type="warning"
@@ -1739,6 +1916,7 @@ const modalSearch = async(e) => {
           
         />
           )}
+
 
 
 

@@ -50,7 +50,9 @@ const WorkContract = () => {
     dtCreated: '',
   })
   const [highlightFirstRow, setHighlightFirstRow] = useState(true); //첫번째 행 표시를 위해
-  
+  const [clickCode,setClickCode] = useState("");
+  const [showInsertRow, setShowInsertRow] = useState(false);
+
   const tabClick = (e,tabState) =>{
     
     setTab(e.target.value)
@@ -63,7 +65,10 @@ const WorkContract = () => {
       case "0" :
 
         return (<WorkContractCreate  
-          // deleteEvent={deleteEmp} 
+          
+          
+          clickCode={clickCode}
+          setClickCode={setClickCode}
           checkColumn={checkColumn}
           setCheckColumn = {setCheckColumn}
           handleCheckboxChange={handleCheckboxChange}  
@@ -73,6 +78,8 @@ const WorkContract = () => {
           setParamGetEmpList1 = {setParamGetEmpList1}
           highlightFirstRow = {highlightFirstRow}
           setHighlightFirstRow = {setHighlightFirstRow}
+          showInsertRow = {showInsertRow}
+          setShowInsertRow = {setShowInsertRow}
           />);
 
         // 계약서 작성 Tab Click
@@ -107,20 +114,23 @@ const WorkContract = () => {
         const responseData = await apiRequest({
             method: "DELETE",
             url: `/api2/wc/deleteEmpList`,
-            data: checkColumn,  // checkColumn 배열을 직접 전송
+            data: checkColumn,  // checkColumn 배열을 직접 전송a
         });
 
         
         //삭제 후 empList 초기화 하는데 2가지 방법 1. 전체API 불러오기, 2. Frontend에서 해결하기.
         const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
         setEmployeeData(updatedEmpList);
-
-
+        const responseData2 = await apiRequest({
+          method: "GET",
+          url: `/api2/wc/getCodeParamEmpList?code=${updatedEmpList[0].cdEmp}`, 
+      });
         // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
         setCheckColumn([]);
-        setParamGetEmpList1([]); // delete후 state비우기 위해
+        setParamGetEmpList1(responseData2); // delete후 맨위의 사원 data 가져오기 위해
         setHighlightFirstRow(true);
-        
+        setClickCode();
+        setShowInsertRow(false);
 
     } 
     catch (error) {
@@ -136,6 +146,76 @@ const handleDeleteClick = () => {
     setShowAlert(true);
   }
 };
+
+const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 confirm alert
+  const [emailSendAlert, setEmailSendAlert] = React.useState(false);  // 이메일 발송 성공 alert
+  const [emailSendAlert2, setEmailSendAlert2] = React.useState(false);  // 이메일 발송 성공 alert
+
+
+  // 이메일 관련 alret set 이벤트 핸들러
+  const handleEmailCloseAlert = () => {
+    setEmailAlert(false); 
+  };
+  const handleEmailOpenAlert = () => { // 메일보내기 Button event Handler
+    setEmailAlert(true);
+  };
+
+  const handleEmailConfirm = () => {
+    if (checkColumn.length > 0) {
+      const sendResult = handleSendEmail();
+      console.log(sendResult);
+      setCheckColumn([]);
+    }
+    handleEmailCloseAlert();
+    setCheckColumn([]);
+  };
+
+  const handleEmailSendCloseAlert = () => {
+    setEmailSendAlert(false); 
+  };
+  const handleEmailSendOpenAlert = () => {
+    setEmailSendAlert(true); 
+  };
+
+  const handleEmailSendConfirm = () => {
+    handleEmailSendCloseAlert();
+  };
+
+const handleSendEmail = async () => {
+  let sendResult = 0;
+  try {
+    // checkColumn을 기반으로 employeeData 필터링
+    const selectedEmployees = employeeData.filter(emp => checkColumn.includes(emp.cdEmp));
+
+    // 각 직원 데이터와 paramGetEmpList1을 조합
+    const emailData = selectedEmployees.map(emp => ({
+      cdEmp: emp.cdEmp,
+      nmEmp: emp.nmEmp,
+      // noResident: emp.noResident,
+      
+    }));
+
+    // API 요청
+    const responseData = await apiRequest({
+      method: "POST",
+      url: "/api2/util/workContractEmail",
+      data: {
+        emailDataList: emailData,
+      },
+    });
+    console.log(responseData);
+  
+    if (responseData === "Emails sent successfully") {
+      handleEmailSendOpenAlert();
+    } else {
+      setEmailSendAlert2(false);
+    }
+  } catch (error) {
+    console.error("Failed to fetch emp data:", error);
+  }
+  return;
+};
+
     
     return (
       
@@ -146,8 +226,18 @@ const handleDeleteClick = () => {
           <PageHeaderName text="표준근로계약서" />
             <div className="fxAlignCenter">
               <div className="btnWrapper textBtnWrap">
-                {/* <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />
-                <PageHeaderTextButton text="전자서명 메일 보내기" onClick={""} /> */}
+                {/* <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />*/}
+                <PageHeaderTextButton 
+    text="전자서명 메일 보내기" 
+    onClick={() => {
+        if (checkColumn.length === 0) {
+            // 체크된 사원이 없으면 emailAlert를 true로 설정하여 경고 알림을 보여줍니다.
+            setEmailAlert(true);
+        } else {            
+            setEmailAlert(true);  // 이 경우에도 emailAlert를 true로 설정하여 질문 형태의 알림을 보여줍니다.
+        }
+    }}
+/>
               </div>
               <div className="iconBtnWrap">
               <PageHeaderIconButton
@@ -232,6 +322,39 @@ const handleDeleteClick = () => {
           onCancel={()=>setShowAlert2(false)}
         />
           )}
+
+{emailAlert && (
+        <SweetAlert
+        text={
+            checkColumn.length > 0
+            ? `선택한 ${checkColumn.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
+            : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
+        }
+        type={checkColumn.length > 0 ? "question" : "warning"}
+        showCancel={checkColumn.length > 0} // 이 부분을 수정하여 조건에 따라 취소 버튼을 표시
+        onConfirm={handleEmailConfirm}
+        onCancel={handleEmailCloseAlert}
+    />
+      )}
+      {emailSendAlert && (
+        <SweetAlert
+          text={"메일을 성공적으로 발송했습니다."}
+          type="success"
+          onConfirm={handleEmailSendConfirm}
+          showCancel={false}
+          confirmText="확인"
+        />
+      )}
+      
+      {emailSendAlert2 && (
+        <SweetAlert
+          text={"메일 발송에 실패했습니다."}
+          type="fail"
+          onConfirm={handleEmailSendConfirm}
+          showCancel={false}
+          confirmText="확인"
+        />
+      )}
         
       </>
     );

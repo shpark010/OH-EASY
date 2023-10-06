@@ -103,4 +103,13 @@ public class SdController {
 		Map<String, Object> result = sdService.updateTaxList(updateTaxListData);
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
+	
+	//각 과세 항목 별 수정
+	@PostMapping("/updateEachDeduction")
+	public ResponseEntity<?> updateEachDeduction(@RequestBody Map<String, String> updateEachDeductionData) {
+		System.out.println("각 항목 정보 수정 컨트롤러 진입");
+		System.out.println(updateEachDeductionData);
+		Map<String, Object> result = sdService.updateEachDeduction(updateEachDeductionData);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 }
