@@ -504,6 +504,7 @@ const SalaryData = (props) => {
       });
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
+      setSearchOrder(newValue);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -599,6 +600,33 @@ const SalaryData = (props) => {
         },
       });
       sendResult = responseData.sendResult;
+      if (sendResult > 0) {
+        handleEmailSendOpenAlert();
+      }
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    return sendResult;
+  };
+
+  //각 공제 항목 별 수정
+  const handleUpdateEachDeduction = async (nmTax, amtTax) => {
+    let sendResult = 0;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/sd/updateEachDeduction",
+        data: {
+          clickEmpCode: clickEmpCode,
+          nmTax: nmTax,
+          amtTax: amtTax,
+          belongingDate: belongingDate,
+          payDay: payDay,
+          searchTaxOrder: searchTaxOrder,
+        },
+      });
+      const searchTaxInfo = responseData.searchTaxInfo;
+      handleSearchTax(searchTaxInfo);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -785,7 +813,6 @@ const SalaryData = (props) => {
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={(e) => insertPayAmount(e)}
-              // onTabPress={insertPayAmount}
               className={"doubleLine"}
               type="price"
               align="right"
@@ -832,7 +859,7 @@ const SalaryData = (props) => {
   const columnsItem3 = React.useMemo(
     () => [
       {
-        Header: "급여항목",
+        Header: "공제항목",
         accessor: "nm_tax",
         id: "nm_tax",
       },
@@ -841,7 +868,7 @@ const SalaryData = (props) => {
         width: "55%",
         accessor: "amt_allowance",
         id: "amt_allowance",
-        Cell: ({ cell: { value } }) => {
+        Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value);
           const handleInputChange = (e) => {
             console.log(clickEmpCode);
@@ -854,9 +881,18 @@ const SalaryData = (props) => {
               id="price-input"
               value={inputValue}
               onChange={handleInputChange}
+              className={"doubleLine"}
               type="price"
               align="right"
-              readOnly={true}
+              readOnly={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+              }
+              onKeyDown={(e) =>
+                handleUpdateEachDeduction(original.nm_tax, e.target.value)
+              }
             />
           );
         },
@@ -935,7 +971,7 @@ const SalaryData = (props) => {
   const columnsItem5 = React.useMemo(
     () => [
       {
-        Header: "급여항목",
+        Header: "공제항목",
         accessor: "nm_tax",
         id: "nm_tax",
       },
@@ -1245,6 +1281,20 @@ const SalaryData = (props) => {
     setCheckedRows([]);
   };
 
+  // 이메일 발송 성공 alert
+  const [emailSendAlert, setEmailSendAlert] = React.useState(false);
+
+  const handleEmailSendCloseAlert = () => {
+    setEmailSendAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleEmailSendOpenAlert = () => {
+    setEmailSendAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleEmailSendConfirm = () => {
+    handleEmailSendCloseAlert();
+  };
+
   // 조회 조건 alert
   const [searchAlert, setSearchAlert] = React.useState(false);
 
@@ -1313,6 +1363,16 @@ const SalaryData = (props) => {
           text={"조회 조건 사항을 모두 선택해 주세요"}
           type="warning"
           onConfirm={handleSearchConfirm}
+          showCancel={false}
+          confirmText="확인"
+        />
+      )}
+
+      {emailSendAlert && (
+        <SweetAlert
+          text={"메일을 성공적으로 발송했습니다."}
+          type="success"
+          onConfirm={handleEmailSendConfirm}
           showCancel={false}
           confirmText="확인"
         />
@@ -1435,7 +1495,7 @@ const SalaryData = (props) => {
                 imageSrc={Delete}
                 altText="삭제"
                 onClick={handleDeleteOpenAlert}
-                disabled={!checkedRows ? false : true}
+                disabled={checkedRows.length > 0 ? false : true}
               />
               <PageHeaderIconButton
                 btnName="setting"

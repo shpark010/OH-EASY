@@ -16,7 +16,7 @@ const Input = styled.input`
     outline: 1px solid var(--color-primary-black);
   }
 
-    ${(props) =>
+  ${(props) =>
     props.readOnly &&
     `
     background-color: var(--color-opacity-gray);
@@ -39,6 +39,7 @@ function CustomInput({
   placeholder,
   maxLength,
   style,
+  onKeyDown,
 }) {
   const handleInputChange = (e) => {
     let newValue = e.target.value;
@@ -78,6 +79,14 @@ function CustomInput({
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab" || e.key === "Enter") {
+      if (onKeyDown) {
+        onKeyDown(e);
+      }
+    }
+  };
+
   return (
     <Input
       type="text"
@@ -93,6 +102,7 @@ function CustomInput({
       placeholder={placeholder}
       maxLength={maxLength}
       style={style}
+      onKeyDown={handleKeyDown}
     />
   );
 }

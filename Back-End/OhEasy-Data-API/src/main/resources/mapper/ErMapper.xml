@@ -48,6 +48,14 @@
         DELETE FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
     </delete>
 
+    <!-- 각 테이블에서 참조하는 행의 여부를 확인 -->
+    <select id="checkReferences" resultType="map">
+        SELECT
+        (CASE WHEN EXISTS (SELECT 1 FROM salary_deduction_info WHERE CD_EMP = #{cdEmp}) THEN 'salary_deduction_info' ELSE NULL END) AS "급여등록",
+        (CASE WHEN EXISTS (SELECT 1 FROM hr_emp_dtl WHERE CD_EMP = #{cdEmp}) THEN 'hr_emp_dtl' ELSE NULL END) AS "인사등록",
+        (CASE WHEN EXISTS (SELECT 1 FROM hr_contract_info WHERE CD_EMP = #{cdEmp}) THEN 'hr_contract_info' ELSE NULL END) AS "근로계약서"
+    </select>
+
     <!--부서전체조회-->
     <select id="getDeptList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
         SELECT * FROM department_dtl

@@ -103,6 +103,7 @@ function CustomCalendar({
   onClick,
   disabled,
   position,
+  setValue,
 }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);

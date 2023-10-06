@@ -816,6 +816,19 @@
     	GROUP BY
         s.CD_EMP, h.NM_EMAIL
 	</select>
+	
+		<!-- 각 공제 항목 별 업데이트 -->
+	<update id="updateEachDeduction" parameterType="Map">
+		UPDATE
+		SALARY_DEDUCTION_INFO s
+		JOIN TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE
+		SET s.AMT_ALLOWANCE = #{amtTax}
+		WHERE s.CD_EMP = #{cdEmp}
+		and t.NM_TAX_RATE = #{nmTax}
+		AND s.YY_ALLOWANCE = #{yyAllowance}
+		AND s.MM_BELONG = #{mmBelong}
+		AND s.DT_ALLOWANCE = #{dtAllowance}
+	</update>
 </mapper>
 
 

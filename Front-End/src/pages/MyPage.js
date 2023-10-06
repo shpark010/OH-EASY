@@ -5,7 +5,7 @@ import "../styles/css/pages/SignupPage.css";
 import SweetAlert from "../components/Contents/SweetAlert";
 import axios from "axios";
 import { useLoading } from "../containers/LoadingContext";
-import { getCookie } from "../containers/Cookie";
+import { getCookie, removeCookie } from "../containers/Cookie";
 
 const validateId = (id) => /^[a-z0-9]{4,}$/.test(id);
 const validatePassword = (password) => /^[a-z0-9]{4,}$/.test(password);
@@ -83,9 +83,10 @@ const MyPage = () => {
       setLoading(false);
 
       if (response.data === 1) {
-        setAlertMessage("수정성공");
+        setAlertMessage("수정성공 다시 로그인 해주세요");
         setAlertType("success");
         setShowAlert(true);
+        removeCookie("loginInfo");
       } else {
         setAlertMessage("알수없는 오류(담당자에게 문의해주세요.)");
         setAlertType("warning");
@@ -134,8 +135,11 @@ const MyPage = () => {
             setShowAlert(false);
             setAlertMessage();
             setAlertType();
-            if (alertType === "success" && alertMessage === "수정성공") {
-              navigate("/main");
+            if (
+              alertType === "success" &&
+              alertMessage === "수정성공 다시 로그인 해주세요"
+            ) {
+              navigate("/login");
             }
           }}
         />

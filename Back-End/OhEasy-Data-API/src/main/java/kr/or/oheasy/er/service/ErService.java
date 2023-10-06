@@ -8,7 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ErService {
@@ -43,9 +43,23 @@ public class ErService {
         return dao.getCdEmp(cdEmp);
     }
 
-    public int deleteEmp(String cdEmp) {
+    // FK 참조하는 테이블 확인 후 사원삭제
+    public Map<String, Object> deleteEmp(String cdEmp) {
         ErDao dao = sqlSession.getMapper(ErDao.class);
-        return dao.deleteEmp(cdEmp);
+
+        Map<String, Object> references = dao.checkReferences(cdEmp);
+        System.out.println("참조 테이블 확인: " + references);
+
+        if (references == null) {
+            references = new HashMap<>();
+        }
+
+        if (references.values().stream().anyMatch(Objects::nonNull)) {
+            return references; // 참조하는 테이블이 존재하면 참조 정보 반환
+        }
+
+        int result = dao.deleteEmp(cdEmp);
+        return Collections.singletonMap("deleted", result);
     }
 
     // 부서전체조회
