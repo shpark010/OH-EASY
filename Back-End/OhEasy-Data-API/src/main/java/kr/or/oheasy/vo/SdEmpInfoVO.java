@@ -17,7 +17,8 @@ public class SdEmpInfoVO {
 	private String department;			//부서
 	private String domesticForeign;		//내외국인
 	private String family;				//가족수
-	private String military;			//병역구분
+	private String milDischarge;		//제대구분
+	private String milService;			//병역구분
 	private String obstacle;			//장애구분
 	private String certificate;			//자격증수
 	

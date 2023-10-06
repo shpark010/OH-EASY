@@ -54,6 +54,9 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     
+    //Pdf
+    implementation 'com.itextpdf:itext7-core:7.1.16'
+    
 	
 	
 	

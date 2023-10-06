@@ -17,6 +17,7 @@ import kr.or.oheasy.vo.SdEmailInfoVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
 import kr.or.oheasy.vo.SdEmpMstVO;
 import kr.or.oheasy.vo.SdPayDayListVO;
+import kr.or.oheasy.vo.SdPdfInfoVO;
 import kr.or.oheasy.vo.SdTaxAmountVO;
 import kr.or.oheasy.vo.SdTaxRateVO;
 
@@ -441,6 +442,19 @@ public class SdService {
 			e.getMessage();
 		}
 		return emailInfoList;
+	}
+	
+	// PDF 출력을 위한 조회
+	public SdPdfInfoVO seletForPdf(Map<String, String> pdfData) {
+		SdDao dao = sqlSession.getMapper(SdDao.class);
+		SdPdfInfoVO pdfInfo = new SdPdfInfoVO();
+		try {
+			pdfInfo = dao.selectForPdf(pdfData);
+		} catch (Exception e) {
+			e.getMessage();
+			
+		}
+		return pdfInfo;
 	}
 	
 	// 각 공제 항목별 업데이트
