@@ -3,6 +3,7 @@ package kr.or.oheasy.wc.dao;
 import java.util.List;
 import java.util.Map;
 
+import kr.or.oheasy.vo.WcEmailVO;
 import kr.or.oheasy.vo.WcGetEmpVO;
 import kr.or.oheasy.vo.WcVO;
 
@@ -19,6 +20,7 @@ public interface WcDao {
 		public int insertEmpData(String cdEmp,String formattedDate ); // 모달에서 추가시 insert
 		public int updateEmpList(String cdEmp, String colum, String data);
 		public int deleteEmp(String cdEmp);
+		public  List<WcEmailVO> getEmployeeEmailData(Map<String, Object> emailData);// email
 
 	
 }

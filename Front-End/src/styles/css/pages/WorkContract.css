@@ -46,9 +46,22 @@
 .wcGrid2 {
   background-color: #ffffff;
   box-sizing: border-box;
-  overflow: auto;
   width: 100%;
+ 
 }
+
+
+.wcRightHead{
+/* position: fixed; */
+}
+/*오른쪽 근로계약서 h1 tag에 적용*/
+
+.wcScroll{
+  overflow: auto; 
+  height: 800px;
+  
+}
+
 
 .wcHeaderStyle {
   background-color: #e6e6e6;
@@ -148,7 +161,7 @@
     .wcFirstRowHighlight, .wchighlightLastRow, .wcMordalBackGround {
       
       background-color:#92c5ff ;
-      border:10px solid #92c5ff;
+      
     }
 
    

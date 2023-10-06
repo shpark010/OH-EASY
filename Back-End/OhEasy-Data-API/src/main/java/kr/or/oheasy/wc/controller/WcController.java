@@ -101,7 +101,7 @@ public class WcController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@PostMapping("/getModalEmpListByName") //객체 보낼거라.
+	@PostMapping("/getModalEmpListByName") //객체 보낼거라. 이름만 Name
 	public ResponseEntity<?> getModalEmpListByName(@RequestBody Map<String, Object> params){
 		System.out.println("getModalEmpListByName진입");
 		System.out.println(params);
@@ -118,9 +118,10 @@ public class WcController {
     }*/
 	
 	
-	@GetMapping("/getModalData")
+	@GetMapping("/getModalData") //모달에서 클릭하거나 더블클릭시 
 	public WcGetEmpVO getModalData(@RequestParam String cdEmp){
 		System.out.println("getModalData진입");
+		System.out.println(cdEmp);
 		// modal 에띄워진 data db에서 가져오면서 code insert
 		wcService.insertEmpData(cdEmp);
 		WcGetEmpVO result = wcService.getModalData(cdEmp);

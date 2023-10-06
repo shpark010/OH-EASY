@@ -159,7 +159,22 @@ ORDER BY
 
 
 
+   <select id="getEmployeeEmailData" parameterType="Map" resultType="kr.or.oheasy.vo.WcEmailVO">
+    SELECT 
+        e.nm_email,
+        e.nm_emp,  <!-- 이 부분은 예시입니다. 실제 컬럼 이름에 맞게 수정해야 합니다. -->
+        c.* 
+    FROM hr_emp_mst e
+    JOIN hr_contract_info c ON e.cd_Emp = c.cd_Emp
+    WHERE e.cd_Emp IN 
+    <foreach item="item" index="index" collection="emailDataList" open="(" separator="," close=")">
+        #{item.cdEmp}
+    </foreach>
+</select>
 </mapper>
+
+
+
 
 
 
