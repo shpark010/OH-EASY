@@ -80,6 +80,22 @@ function HRManagement() {
   const [clickEmpCode, setClickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
 
+  //const [firstCdEmp, setFirstCdEmp] = useState();
+  //const firstCdEmp = data && data[0] ? data[0].cdEmp : null;
+
+  useEffect(() => {
+    if (showInsertRow) {
+      setClickEmpCode();
+    }
+  }, [showInsertRow]);
+
+  // empList가 변경시에 무조건 첫번째행을 cdEmp를 가져와서 clickEmp에 넣기
+  useEffect(() => {
+    if (!empList) {
+      setClickEmpCode(empList[0].cdEmp);
+    }
+  }, [empList]);
+
   const [conditions, setConditions] = useState({
     category: 0,
     sort: 3,
@@ -329,11 +345,14 @@ function HRManagement() {
         setCheckedRows={setCheckedRows}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
+        clickEmpCode={clickEmpCode}
         deleteEmp={deleteEmp}
+        empList={empList}
         setEmpStats={setEmpStats}
       />
       <HrSearchBar
         conditions={conditions}
+        setCheckedRows={setCheckedRows}
         setConditions={setConditions}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}

@@ -45,8 +45,8 @@ const useApiRequest = () => {
     // loginInfo 쿠키에서 토큰 정보를 추출
     const tokenParts = loginInfo.split(".");
     const token = `${tokenParts[0]}.${tokenParts[1]}.${tokenParts[2]}.${tokenParts[3]}`;
-    console.log("토큰 추출~~~~~~~~");
-    console.log(token);
+    //console.log("토큰 추출~~~~~~~~");
+    //console.log(token);
     const headers = {
       "Content-Type": "application/json",
     };
@@ -55,8 +55,8 @@ const useApiRequest = () => {
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
-    console.log("헤더 ********************");
-    console.log(headers);
+    // console.log("헤더 ********************");
+    // console.log(headers);
     let requestData = data;
     if (data instanceof FormData) {
       // FormData를 사용하는 경우, Content-Type 헤더를 삭제하여 브라우저가 자동으로 설정하게 합니다.

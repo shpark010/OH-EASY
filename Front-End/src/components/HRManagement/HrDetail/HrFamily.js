@@ -5,30 +5,27 @@ import useApiRequest from "../../Services/ApiRequest";
 import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
 import CustomCalender from "../../Contents/CustomCalendar";
-
+import CustomButton from "../../Contents/CustomButton";
 const HrFamily = ({ cdEmp }) => {
   console.log("가족 페이지 ******");
   console.log(cdEmp);
   // prop 이름 변경
   const apiRequest = useApiRequest();
-  const [familyList, setfamilyList] = useState([]);
+  const [familyList, setFamilyList] = useState([]);
   const [showInsertRow, setShowInsertRow] = useState(false);
 
   const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (cdEmp === undefined) {
-      setfamilyList([]);
+    if (cdEmp === undefined || cdEmp === "" || cdEmp === null) {
+      setFamilyList([]);
     }
     // 첫 렌더링인지 체크
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return;
+    // }
     // cdEmp가 undefined일 때는 아무것도 하지 않고 리턴
-    if (cdEmp === undefined) {
-      return;
-    }
 
     setShowInsertRow(false);
     handleSendEmpCodeGetFamilyData(cdEmp); // 함수 호출시 인자로 empCode 전달
@@ -43,7 +40,7 @@ const HrFamily = ({ cdEmp }) => {
         method: "GET",
         url: `/api2/hr/getFamilyDataList?cdEmp=${cdEmp}`,
       });
-      setfamilyList(Array.isArray(responseData) ? responseData : []); // 배열 확인
+      setFamilyList(Array.isArray(responseData) ? responseData : []); // 배열 확인
       setShowInsertRow(false);
     } catch (error) {
       console.error("api 요청 실패:", error);
@@ -54,19 +51,11 @@ const HrFamily = ({ cdEmp }) => {
     seqFamily,
     accessor,
     inputValue,
+    value,
   ) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+    if (!cdEmp || !seqFamily || value === inputValue) {
       return;
     }
-    if (seqFamily == null || seqFamily === "" || seqFamily === undefined) {
-      return;
-    }
-    console.log("현재 inputValue : " + inputValue);
-    if (inputValue == null || inputValue === "" || inputValue === undefined) {
-      console.log("값의 변화가 없음 api요청 안감");
-      return;
-    }
-
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -76,16 +65,14 @@ const HrFamily = ({ cdEmp }) => {
       console.error("api 요청 실패:", error);
     }
     //handleSendEmpCodeGetFamilyData(cdEmp);
+    updateFamilyListItem(seqFamily, accessor, inputValue);
   };
   const handleSendEmpCodeInsertFamilyData = async (
     cdEmp,
     accessor,
     inputValue,
   ) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
-      return;
-    }
-    if (inputValue == null || inputValue === "" || inputValue === undefined) {
+    if (!cdEmp || !inputValue) {
       return;
     }
     try {
@@ -136,6 +123,8 @@ const HrFamily = ({ cdEmp }) => {
   };
 
   const updateFamilyListItem = (seqFamily, name, value) => {
+    console.log(seqFamily, name, value);
+
     const updatedFamilyList = familyList.map((family) => {
       if (family.seqFamily === seqFamily) {
         return {
@@ -145,7 +134,30 @@ const HrFamily = ({ cdEmp }) => {
       }
       return family;
     });
-    setfamilyList(updatedFamilyList);
+    setFamilyList(updatedFamilyList);
+  };
+
+  const handleDeleteFamily = async (seqFamily) => {
+    if (!seqFamily) {
+      return;
+    }
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        //url: `/api2/hr/deleteFamilyData?seqFamily=${seqFamily}`,
+        url: `/api2/hr/deleteFamilyData`,
+        data: {
+          seqFamily: seqFamily,
+        },
+      });
+      console.log("요청성공!!!!!!!!!!!!!!!!");
+      // API 요청이 성공하면, familyList 상태를 업데이트하여 뷰를 갱신합니다.
+      setFamilyList((prevFamilyList) =>
+        prevFamilyList.filter((family) => family.seqFamily !== seqFamily),
+      );
+    } catch (error) {
+      console.error("api 요청 실패:", error);
+    }
   };
 
   // 테이블에 보내야할 데이터
@@ -177,7 +189,7 @@ const HrFamily = ({ cdEmp }) => {
         id: "fgYearEndTax",
         width: "8%",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
+          const [inputValue, setInputValue] = React.useState(value || "");
           const handleInputChange = (e) => {
             if (original == null) {
               // insert
@@ -209,7 +221,7 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "1", label: "배우자" },
                 { value: "2", label: "자녀" },
               ]}
-              placeholder="선택"
+              placeholder={"선택"}
               value={inputValue}
               onChange={handleInputChange}
             />
@@ -220,6 +232,7 @@ const HrFamily = ({ cdEmp }) => {
         Header: "성명",
         accessor: "nmEmpFam",
         id: "nmEmpFam",
+        width: "5%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
@@ -250,6 +263,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "nmEmpFam",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -259,7 +273,8 @@ const HrFamily = ({ cdEmp }) => {
             <Input
               value={inputValue || ""}
               onChange={handleInputChange}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
               className={"doubleLine"}
             />
           );
@@ -293,10 +308,12 @@ const HrFamily = ({ cdEmp }) => {
               setInputValue(e.target.value);
             } else {
               // update
+              console.log(original);
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "noResident",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -307,7 +324,8 @@ const HrFamily = ({ cdEmp }) => {
               onChange={handleInputChange}
               type="resident"
               className={"doubleLine"}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -315,7 +333,7 @@ const HrFamily = ({ cdEmp }) => {
       {
         Header: "가족관계",
         accessor: "fgFamily",
-        width: "9%",
+        width: "8%",
         id: "fgFamily",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
@@ -348,12 +366,12 @@ const HrFamily = ({ cdEmp }) => {
             <CustomSelect
               className={"hrDetailSelect"}
               options={[
-                { value: 0, label: "본인" },
-                { value: 1, label: "배우자" },
-                { value: 2, label: "자녀" },
+                { value: "0", label: "본인" },
+                { value: "1", label: "배우자" },
+                { value: "2", label: "자녀" },
               ]}
               value={inputValue}
-              placeholder="선택"
+              placeholder={"선택"}
               onChange={handleInputChange}
             />
           );
@@ -363,7 +381,7 @@ const HrFamily = ({ cdEmp }) => {
         Header: "학력",
         accessor: "fgEducation",
         id: "fgEducation",
-        width: "15%",
+        width: "9%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
           const handleInputChange = (e) => {
@@ -384,6 +402,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "fgEducation",
                 e.target.value,
+                value,
               );
               console.log("수정요청");
               setInputValue(e.target.value);
@@ -394,14 +413,14 @@ const HrFamily = ({ cdEmp }) => {
             <CustomSelect
               className={"hrDetailSelect"}
               options={[
-                { value: 0, label: "중학교" },
-                { value: 1, label: "고등학교" },
-                { value: 3, label: "2년제" },
-                { value: 4, label: "3년제" },
-                { value: 5, label: "4년제" },
+                { value: "0", label: "중학교" },
+                { value: "1", label: "고등학교" },
+                { value: "3", label: "2년제" },
+                { value: "4", label: "3년제" },
+                { value: "5", label: "4년제" },
               ]}
               value={inputValue}
-              placeholder="선택"
+              placeholder={"선택"}
               onChange={handleInputChange}
             />
           );
@@ -413,7 +432,7 @@ const HrFamily = ({ cdEmp }) => {
         id: "fgGraduate",
         width: "8%",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
+          const [inputValue, setInputValue] = React.useState(value || "");
 
           const handleInputChange = (e) => {
             if (original == null) {
@@ -433,6 +452,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "fgGraduate",
                 e.target.value,
+                value,
               );
               console.log("수정요청");
               setInputValue(e.target.value);
@@ -447,8 +467,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "1", label: "중퇴" },
                 { value: "2", label: "휴학" },
               ]}
-              placeholder="선택"
               value={inputValue}
+              placeholder={"선택"}
               onChange={handleInputChange}
             />
           );
@@ -480,6 +500,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "fgCohabitation",
                 e.target.value,
+                value,
               );
               console.log("수정요청");
               setInputValue(e.target.value);
@@ -493,8 +514,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "0", label: "여" },
                 { value: "1", label: "부" },
               ]}
-              placeholder="선택"
               value={inputValue}
+              placeholder={"선택"}
               onChange={handleInputChange}
             />
           );
@@ -509,13 +530,28 @@ const HrFamily = ({ cdEmp }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
           const handleInputChange = (e) => {
-            setInputValue(e.target.value);
-            if (original) {
+            if (original == null) {
+              // insert
+              console.log("****************");
+              handleSendEmpCodeInsertFamilyData(
+                cdEmp,
+                "fgSolarLunar",
+                e.target.value,
+              );
+              console.log("수정요청");
+              handleSendEmpCodeGetFamilyData(cdEmp);
+              setInputValue(e.target.value);
+            } else {
+              // update
+              console.log("양음 업데이트 ~~~~~~~~~");
               handleSendEmpCodeUpdateFamilyData(
                 original.seqFamily,
                 "fgSolarLunar",
                 e.target.value,
+                value,
               );
+              console.log("수정요청");
+              setInputValue(e.target.value);
             }
           };
           return (
@@ -525,8 +561,8 @@ const HrFamily = ({ cdEmp }) => {
                 { value: "0", label: "양" },
                 { value: "1", label: "음" },
               ]}
-              placeholder="선택"
               value={inputValue}
+              placeholder={"선택"}
               onChange={handleInputChange}
             />
           );
@@ -544,10 +580,10 @@ const HrFamily = ({ cdEmp }) => {
           };
           return (
             <CustomCalender
-              readOnly={true}
               className="hrInfoBaseInput"
               value={value || ""}
               name="dtBirth"
+              readOnly={true}
               onChange={handleInputChange}
             />
           );
@@ -557,6 +593,7 @@ const HrFamily = ({ cdEmp }) => {
         Header: "직업",
         accessor: "nmJob",
         id: "nmJob",
+        width: "5%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
@@ -578,6 +615,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "nmJob",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -588,7 +626,8 @@ const HrFamily = ({ cdEmp }) => {
               onChange={handleInputChange}
               isDoubleClick={true}
               className={"doubleLine"}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -597,6 +636,7 @@ const HrFamily = ({ cdEmp }) => {
         Header: "직장명",
         accessor: "nmCompany",
         id: "nmCompany",
+        width: "9%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
@@ -622,6 +662,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "nmCompany",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -633,6 +674,7 @@ const HrFamily = ({ cdEmp }) => {
               isDoubleClick={true}
               className={"doubleLine"}
               onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -641,6 +683,7 @@ const HrFamily = ({ cdEmp }) => {
         Header: "직급",
         accessor: "nmPosition",
         id: "nmPosition",
+        width: "5%",
         Cell: ({ cell: { value }, row: { original } }) => {
           const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
 
@@ -666,6 +709,7 @@ const HrFamily = ({ cdEmp }) => {
                 original.seqFamily,
                 "nmPosition",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -678,6 +722,27 @@ const HrFamily = ({ cdEmp }) => {
               isDoubleClick={true}
               className={"doubleLine"}
               onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
+            />
+          );
+        },
+      },
+      {
+        Header: "삭제",
+        accessor: "",
+        width: "5%",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return (
+            <CustomButton
+              text="삭제"
+              color="white"
+              backgroundColor="var(--color-primary-gray)"
+              className="hrInfoBaseProfileImgBtn"
+              onClick={() => {
+                if (original) {
+                  handleDeleteFamily(original.seqFamily);
+                }
+              }}
             />
           );
         },

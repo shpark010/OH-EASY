@@ -31,6 +31,17 @@ WHERE d.CD_EMP IS NULL
     WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_family_dtl)
 </insert>
 
+<!-- 
+<insert id="insertOneHrFamilyDtl">
+    INSERT INTO hr_family_dtl (CD_EMP, FG_YEAR_END_TAX,NM_EMP_FAM,NO_RESIDENT ,FG_FAMILY) VALUE(#{CD_EMP},)
+</insert>
+ -->
+<!-- 사원 테이블 사원 한명의 정보  
+<select id="getOneHrEmpData">
+	select * from 
+</select>
+-->
+
 <insert id="insertIntoHrBodyDataDtl">
     INSERT INTO hr_body_data_dtl (CD_EMP)
     SELECT m.CD_EMP FROM hr_emp_mst m
@@ -233,6 +244,23 @@ WHERE d.CD_EMP IS NULL
 <select id="getLicenseList" resultType="kr.or.oheasy.vo.HrLicenseSdtlVO">
 	select * from hr_License_Sdtl
 </select>
+
+<!-- 삭제 가족 한명 -->
+<delete id="deleteFamilyData">
+	DELETE FROM hr_family_dtl WHERE SEQ_FAMILY = #{seqFamily}
+</delete>
+<!-- 삭제 가족 한명 -->
+<delete id="deleteEduData">
+	DELETE FROM hr_education_dtl WHERE SEQ_EDUCATION = #{seqEducation}
+</delete>
+<!-- 삭제 경력 한명 -->
+<delete id="deleteCareerData">
+	DELETE FROM hr_career_dtl WHERE SEQ_CAREER = #{seqCareer}
+</delete>
+<!-- 삭제 자격 한명 -->
+<delete id="deleteLicenseData">
+	DELETE FROM hr_license_dtl WHERE SEQ_License = #{seqLicense}
+</delete>
 
 
 <!-- 조건 검색 카테고리 0 재직자 -->

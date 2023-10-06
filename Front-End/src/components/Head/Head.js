@@ -9,7 +9,7 @@ const Head = () => {
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
         />
-        <title>Document</title>
+        <title>오이지</title>
       </Helmet>
     </HelmetProvider>
   );

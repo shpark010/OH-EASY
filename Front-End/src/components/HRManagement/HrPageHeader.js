@@ -13,9 +13,12 @@ import SweetAlert from "../Contents/SweetAlert";
 const HrPageHeader = ({
   checkedRows,
   setEmpList,
+  clickEmpCode,
   setClickEmpCode,
   deleteEmp,
   setEmpStats,
+  setCheckedRows,
+  empList,
 }) => {
   const apiRequest = useApiRequest();
 
@@ -42,7 +45,12 @@ const HrPageHeader = ({
         checkedRows.forEach((empCode) => {
           deleteEmp(empCode); // 여기에서 부모의 함수를 호출
         });
-        setClickEmpCode();
+        console.log("************************");
+        console.log("************************");
+        console.log("************************");
+        console.log(empList[0].cdEmp);
+        setClickEmpCode(empList[0].cdEmp);
+        console.log(clickEmpCode);
       } else {
         // 삭제 실패
         alert("삭제실패");
@@ -67,10 +75,11 @@ const HrPageHeader = ({
         working: responseData.working,
         resigned: responseData.resigned,
       });
-      setClickEmpCode();
+      setClickEmpCode(responseData.result[0].cdEmp);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
+    setCheckedRows([]);
   };
   const handleCloseAlert = () => {
     setShowAlert(false); // 알림창 표시 상태를 false로 설정
@@ -144,7 +153,11 @@ const HrPageHeader = ({
               imageSrc={Delete}
               altText="삭제"
               onClick={(e) => {
-                setShowAlertDelete(true);
+                if (checkedRows.length === 0) {
+                  setShowAlertDeleteError(true);
+                } else {
+                  setShowAlertDelete(true);
+                }
               }}
             />
             {/* <PageHeaderIconButton
