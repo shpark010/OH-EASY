@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -323,7 +324,7 @@ public class HrController {
 		return new ResponseEntity<>("",HttpStatus.OK);
 	}
 	
-	@GetMapping("/getCarrerDataList")
+	@GetMapping("/getCareerDataList")
 	public ResponseEntity<?> getCarrerDataList(@RequestParam String cdEmp){
 		System.out.println("getCarrerDataList");
 		
@@ -451,6 +452,58 @@ public class HrController {
 	    
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
+	
+	
+	@PostMapping("deleteFamilyData")
+	public ResponseEntity<?> deleteFamilyData(@RequestBody Map<String,String> payload){
+		
+		String seqFamily = payload.get("seqFamily");
+		System.out.println("deleteFamilyData");
+		System.out.println(seqFamily);
+		int result = hrService.deleteFamilyData(seqFamily);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("deleteEduData")
+	public ResponseEntity<?> deleteEduData(@RequestBody Map<String,String> payload){
+		
+		String seqEducation = payload.get("seqEducation");
+		System.out.println("deleteEduData");
+		System.out.println(seqEducation);
+		int result = hrService.deleteEduData(seqEducation);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	@PostMapping("deleteCareerData")
+	public ResponseEntity<?> deleteCareerData(@RequestBody Map<String,String> payload){
+		
+		String seqCareer = payload.get("seqCareer");
+		System.out.println("deleteCareerData");
+		System.out.println(seqCareer);
+		int result = hrService.deleteCareerData(seqCareer);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("deleteLicenseData")
+	public ResponseEntity<?> deleteLicenseData(@RequestBody Map<String,String> payload){
+		
+		String seqLicense = payload.get("seqLicense");
+		System.out.println("deleteLicenseData");
+		System.out.println(seqLicense);
+		int result = hrService.deleteLicenseData(seqLicense);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	
+	
+	
 	
 	
 }

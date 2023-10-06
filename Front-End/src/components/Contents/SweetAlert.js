@@ -68,6 +68,7 @@ const SweetAlert = ({
       allowOutsideClick: true,
       heightAuto: false,
       focusConfirm: true,
+      allowEscapeKey: true,
     }).then((result) => {
       if (result.isConfirmed) {
         onConfirm();

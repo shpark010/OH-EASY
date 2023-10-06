@@ -30,11 +30,19 @@ const defaultBodyData = {
 const HrBody = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [bodyData, setBodyData] = useState({ ...defaultBodyData });
+  const [bodyDataCopy, setBodyDataCopy] = useState({ ...defaultBodyData });
 
   const handleInputBlur = async (e) => {
     console.log("블러이벤 ****************************");
     const { name, value } = e.target;
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || value === "") {
+
+    console.log(name);
+
+    if (!cdEmp || value === "") {
+      return;
+    }
+    console.log(bodyDataCopy[name]);
+    if (value === bodyDataCopy[name]) {
       return;
     }
 
@@ -48,6 +56,10 @@ const HrBody = ({ cdEmp }) => {
       console.error("Failed to fetch emp data:", error);
     }
     setBodyData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    setBodyDataCopy((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -85,7 +97,7 @@ const HrBody = ({ cdEmp }) => {
       return;
     }
 
-    const handleGetEmpBasicData = async (cdEmp) => {
+    const handleGetBodyData = async (cdEmp) => {
       try {
         const responseData = await apiRequest({
           method: "GET",
@@ -95,17 +107,19 @@ const HrBody = ({ cdEmp }) => {
           ...defaultBodyData,
           ...responseData,
         });
+        setBodyDataCopy({
+          ...defaultBodyData,
+          ...responseData,
+        });
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
       }
     };
 
-    handleGetEmpBasicData(cdEmp);
+    handleGetBodyData(cdEmp);
   }, [cdEmp]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("인풋값변경~~~~~~~~~~~~~~~~~");
-    console.log(value);
     setBodyData((prevState) => ({
       ...prevState,
       [name]: value,

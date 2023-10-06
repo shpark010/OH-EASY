@@ -100,8 +100,10 @@ public class HrService {
 		return dao.getLicenseList();
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public int insertHrEmpData(String cdEmp) {
 		HrDao dao = sqlSession.getMapper(HrDao.class);
+		//dao.insertOneHrFamilyDtl(cdEmp);
 
 		return dao.insertHrEmpData(cdEmp);
 	}
@@ -275,5 +277,29 @@ public class HrService {
 		column = Camel.camelToSnake(column);
 		return dao.insertLicenseData(cdEmp, column, value);
 	}
+	
+	// 삭제 
+	public int deleteFamilyData(String seqFamily) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		return dao.deleteFamilyData(seqFamily);
+	}	
+	
+	public int deleteEduData(String seqEducation) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		return dao.deleteEduData(seqEducation);
+	}	
+	
+	public int deleteCareerData(String seqCareer) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		return dao.deleteCareerData(seqCareer);
+	}	
+	public int deleteLicenseData(String seqLicense) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		return dao.deleteLicenseData(seqLicense);
+	}	
 
 }

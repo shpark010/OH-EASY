@@ -32,6 +32,9 @@ public interface HrDao {
 	public int insertIntoHrMilitaryInfoDtl();
 	public int insertIntoHrBodyDataDtl();
 
+	
+	// 사원 한명만 등록시 가족테이블에 본인 넣기 
+	public int insertOneHrFamilyDtl(String cdEmp);	
 	// 인사테이블 삭제
 	public void deleteHrEmpDtl(String cdEmp);
 	// 인사테이블에 사진까지 삭제
@@ -108,5 +111,11 @@ public interface HrDao {
     public int updateLicenseData(@Param("seqLicense") String seqLicense, @Param("column") String column, @Param("value") String value);
 	
    
+    // 삭제 
+    public int deleteFamilyData(@Param("seqFamily") String seqFamily);
+    public int deleteEduData(@Param("seqEducation") String seqEducation);
+    public int deleteCareerData(@Param("seqCareer") String seqCareer);
+    public int deleteLicenseData(@Param("seqLicense") String seqLicense);
+    
     
 }

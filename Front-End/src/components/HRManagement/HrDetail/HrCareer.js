@@ -4,6 +4,7 @@ import CustomCalender from "../../Contents/CustomCalendar";
 import useApiRequest from "../../Services/ApiRequest";
 import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
+import CustomButton from "../../Contents/CustomButton";
 
 const HrCareer = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
@@ -12,31 +13,29 @@ const HrCareer = ({ cdEmp }) => {
 
   const isFirstRender = useRef(true);
 
-  console.log("경력 페이지 ******");
-  console.log(cdEmp);
   useEffect(() => {
     // 첫 렌더링인지 체크
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return;
+    // }
     // cdEmp가 undefined일 때는 아무것도 하지 않고 리턴
-    if (cdEmp === undefined) {
+    if (cdEmp === undefined || cdEmp === "" || cdEmp === null) {
+      setCareerList([]);
       return;
     }
-
     setShowInsertRow(false);
-    handleSendEmpCodeGetCarrerData(cdEmp);
+    handleSendEmpCodeGetCareerData(cdEmp);
   }, [cdEmp]);
 
-  const handleSendEmpCodeGetCarrerData = async (cdEmp) => {
+  const handleSendEmpCodeGetCareerData = async (cdEmp) => {
     if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
       return;
     }
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/getCarrerDataList?cdEmp=${cdEmp}`,
+        url: `/api2/hr/getCareerDataList?cdEmp=${cdEmp}`,
       });
       setCareerList(Array.isArray(responseData) ? responseData : []); // 배열 확인
       setShowInsertRow(false);
@@ -96,7 +95,6 @@ const HrCareer = ({ cdEmp }) => {
     setCareerList(updatedCareerList);
 
     if (seqCareer === null || seqCareer === undefined || seqCareer === "") {
-      // 학력고유 번호가 없을땐 insert
       try {
         const responseData = await apiRequest({
           method: "GET",
@@ -106,9 +104,8 @@ const HrCareer = ({ cdEmp }) => {
       } catch (error) {
         console.error("api 요청 실패:", error);
       }
-      handleSendEmpCodeGetCarrerData(cdEmp);
+      handleSendEmpCodeGetCareerData(cdEmp);
     } else {
-      // 학력고유 번호가 있을땐 update
       console.log("요청 전!!!!!!!!!!!!!!!!!!!!!!");
       try {
         const responseData = await apiRequest({
@@ -127,21 +124,9 @@ const HrCareer = ({ cdEmp }) => {
     seqCareer,
     accessor,
     inputValue,
-    beforeValue,
+    value,
   ) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
-      return;
-    }
-    console.log("현재 inputValue : " + inputValue);
-    console.log("현재 inputValue : " + inputValue);
-    console.log("현재 inputValue : " + inputValue);
-
-    if (
-      inputValue == null ||
-      inputValue === "" ||
-      inputValue === undefined ||
-      beforeValue === inputValue
-    ) {
+    if (!cdEmp || !seqCareer || !inputValue || inputValue === value) {
       return;
     }
 
@@ -153,7 +138,7 @@ const HrCareer = ({ cdEmp }) => {
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
-    //handleSendEmpCodeGetFamilyData(cdEmp);
+    updateCareerListItem(seqCareer, accessor, inputValue);
   };
   // 1. `careerList`의 특정 항목을 업데이트하는 helper 함수
   const updateCareerListItem = (seqCareer, name, value) => {
@@ -176,17 +161,12 @@ const HrCareer = ({ cdEmp }) => {
     });
     setCareerList(updatedCarrerList);
   };
-  const handleSendEmpCodeInsertEduData = async (
+  const handleSendEmpCodeInsertCareerData = async (
     cdEmp,
     accessor,
     inputValue,
   ) => {
-    if (
-      cdEmp == null ||
-      cdEmp === "" ||
-      cdEmp === undefined ||
-      inputValue === ""
-    ) {
+    if (!cdEmp || !inputValue) {
       return;
     }
     try {
@@ -200,16 +180,40 @@ const HrCareer = ({ cdEmp }) => {
     handleSendEmpCodeCareerData(cdEmp);
   };
   const handleSendEmpCodeCareerData = async (cdEmp) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+    if (!cdEmp) {
       return;
     }
+    console.log(cdEmp);
     try {
       const responseData = await apiRequest({
         method: "GET",
-        url: `/api2/hr/getEduDataList?cdEmp=${cdEmp}`,
+        url: `/api2/hr/getCareerDataList?cdEmp=${cdEmp}`,
       });
+      console.log(responseData);
       setCareerList(Array.isArray(responseData) ? responseData : []); // 배열 확인
       setShowInsertRow(false);
+    } catch (error) {
+      console.error("api 요청 실패:", error);
+    }
+  };
+
+  const handleDeleteCareer = async (seqCareer) => {
+    if (!seqCareer) {
+      return;
+    }
+
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: `/api2/hr/deleteCareerData`,
+        data: {
+          seqCareer: seqCareer,
+        },
+      });
+      console.log("요청성공!!!!!!!!!!!!!!!!");
+      setCareerList((prevCareerList) =>
+        prevCareerList.filter((Career) => Career.seqCareer !== seqCareer),
+      );
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
@@ -279,7 +283,7 @@ const HrCareer = ({ cdEmp }) => {
         accessor: "monthWork",
         id: "monthWork",
         Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
+          //const [inputValue, setInputValue] = React.useState(value || ""); // value가 null일 경우 빈 문자열로 초기화
           const generateOptions = () => {
             let options = [];
 
@@ -323,9 +327,12 @@ const HrCareer = ({ cdEmp }) => {
           };
 
           const handleInputOnBlur = (e) => {
+            if (inputValue === "") {
+              return;
+            }
             if (original == null) {
               // insert
-              handleSendEmpCodeInsertEduData(
+              handleSendEmpCodeInsertCareerData(
                 cdEmp,
                 "nmCompany",
                 e.target.value,
@@ -333,14 +340,13 @@ const HrCareer = ({ cdEmp }) => {
               handleSendEmpCodeCareerData(cdEmp);
               setInputValue(e.target.value);
             } else {
-              if (original.nmCompany !== inputValue)
-                // update
-                handleSendEmpCodeUpdateCareerData(
-                  original.seqCareer,
-                  "nmCompany",
-                  e.target.value,
-                  original.nmCompany,
-                );
+              // update
+              handleSendEmpCodeUpdateCareerData(
+                original.seqCareer,
+                "nmCompany",
+                e.target.value,
+                value,
+              );
               setInputValue(e.target.value);
             }
           };
@@ -350,7 +356,8 @@ const HrCareer = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
               className={"doubleLine"}
             />
           );
@@ -370,7 +377,11 @@ const HrCareer = ({ cdEmp }) => {
           const handleInputOnBlur = (e) => {
             if (original == null) {
               // insert
-              handleSendEmpCodeInsertEduData(cdEmp, "dcDuty", e.target.value);
+              handleSendEmpCodeInsertCareerData(
+                cdEmp,
+                "dcDuty",
+                e.target.value,
+              );
               handleSendEmpCodeCareerData(cdEmp);
               setInputValue(e.target.value);
             } else {
@@ -380,6 +391,7 @@ const HrCareer = ({ cdEmp }) => {
                   original.seqCareer,
                   "dcDuty",
                   e.target.value,
+                  value,
                 );
                 setInputValue(e.target.value);
               }
@@ -391,7 +403,8 @@ const HrCareer = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
               className={"doubleLine"}
             />
           );
@@ -411,7 +424,7 @@ const HrCareer = ({ cdEmp }) => {
           const handleInputOnBlur = (e) => {
             if (original == null) {
               // insert
-              handleSendEmpCodeInsertEduData(
+              handleSendEmpCodeInsertCareerData(
                 cdEmp,
                 "nmPosition",
                 e.target.value,
@@ -425,6 +438,7 @@ const HrCareer = ({ cdEmp }) => {
                   original.seqCareer,
                   "nmPosition",
                   e.target.value,
+                  value,
                 );
                 setInputValue(e.target.value);
               }
@@ -436,7 +450,8 @@ const HrCareer = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
               className={"doubleLine"}
             />
           );
@@ -459,7 +474,11 @@ const HrCareer = ({ cdEmp }) => {
             }
             if (original == null) {
               // insert
-              handleSendEmpCodeInsertEduData(cdEmp, "amtPay", e.target.value);
+              handleSendEmpCodeInsertCareerData(
+                cdEmp,
+                "amtPay",
+                e.target.value,
+              );
               handleSendEmpCodeCareerData(cdEmp);
               setInputValue(e.target.value);
             } else {
@@ -469,6 +488,7 @@ const HrCareer = ({ cdEmp }) => {
                   original.seqCareer,
                   "amtPay",
                   e.target.value,
+                  value,
                 );
                 setInputValue(e.target.value);
               }
@@ -482,7 +502,8 @@ const HrCareer = ({ cdEmp }) => {
                 value={inputValue || ""}
                 onChange={handleInputChange}
                 isDoubleClick={true}
-                onBlur={handleInputOnBlur}
+                //onBlur={handleInputOnBlur}
+                onKeyDown={handleInputOnBlur}
                 className={"doubleLine"}
                 width={"50%"}
               />
@@ -505,7 +526,11 @@ const HrCareer = ({ cdEmp }) => {
           const handleInputOnBlur = (e) => {
             if (original == null) {
               // insert
-              handleSendEmpCodeInsertEduData(cdEmp, "dcRetr", e.target.value);
+              handleSendEmpCodeInsertCareerData(
+                cdEmp,
+                "dcRetr",
+                e.target.value,
+              );
               handleSendEmpCodeCareerData(cdEmp);
               setInputValue(e.target.value);
             } else {
@@ -515,6 +540,7 @@ const HrCareer = ({ cdEmp }) => {
                   original.seqCareer,
                   "dcRetr",
                   e.target.value,
+                  value,
                 );
                 setInputValue(e.target.value);
               }
@@ -527,10 +553,31 @@ const HrCareer = ({ cdEmp }) => {
                 value={inputValue || ""}
                 onChange={handleInputChange}
                 isDoubleClick={true}
-                onBlur={handleInputOnBlur}
+                //onBlur={handleInputOnBlur}
+                onKeyDown={handleInputOnBlur}
                 className={"doubleLine"}
               />
             </>
+          );
+        },
+      },
+      {
+        Header: "삭제",
+        accessor: "",
+        width: "5%",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return (
+            <CustomButton
+              text="삭제"
+              color="white"
+              backgroundColor="var(--color-primary-gray)"
+              className="hrInfoBaseProfileImgBtn"
+              onClick={() => {
+                if (original) {
+                  handleDeleteCareer(original.seqCareer);
+                }
+              }}
+            />
           );
         },
       },

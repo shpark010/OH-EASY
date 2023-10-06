@@ -24,6 +24,7 @@ const SignupPage = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [nextInputTag, setNextInputTag] = useState();
 
   const alertExit = () => {
     setShowAlert(false);
@@ -33,10 +34,56 @@ const SignupPage = () => {
     const { id, value } = event.target;
     setMemberData((prevData) => ({
       ...prevData,
-      [id]: value,
+      [id]: value.replace(/\s+/g, ""),
     }));
   };
 
+  const handleKeyDown = (event) => {
+    console.log(event.target.id);
+
+    const idTag = event.target.id;
+    if (idTag === "id" && event.key === "Enter") {
+      console.log("아이디 태그 이면서 엔터누름");
+
+      // 'Tab' 키가 눌린 것처럼 다음 입력 요소로 포커스 이동
+      const nextInputElement = findNextInputElement(event.target);
+      console.log(nextInputElement);
+      setNextInputTag(nextInputElement);
+      // if (nextInputElement && nextInputElement.focus) {
+      //   nextInputElement.focus();
+      // }
+
+      handleIdCheck(event);
+    }
+
+    if (event.key === "Enter") {
+      const nextInputElement = findNextInputElement(event.target);
+      console.log(nextInputElement);
+      if (nextInputElement && nextInputElement.focus) {
+        nextInputElement.focus();
+      }
+    }
+  };
+
+  const findNextInputElement = (element) => {
+    // 현재 요소의 부모인 .inputWithLabel div를 찾습니다.
+    let parentDiv = element.parentElement;
+
+    // 그 다음 형제 요소를 찾습니다.
+    let nextDiv = parentDiv.nextSibling;
+
+    // 다음 형제 요소가 없다면 (즉, 마지막 .inputWithLabel이면) 다음 div를 찾습니다.
+    while (nextDiv && nextDiv.className !== "inputWithLabel") {
+      nextDiv = nextDiv.nextSibling;
+    }
+
+    // 찾아진 다음 .inputWithLabel div의 첫번째 input 태그를 반환합니다.
+    if (nextDiv) {
+      return nextDiv.querySelector("input");
+    }
+
+    return null;
+  };
   const handleSignupBtn = async () => {
     console.log("회원가입 버튼클릭~~~~~~~~~~~~~~~~~~~~");
 
@@ -100,10 +147,10 @@ const SignupPage = () => {
     console.log(validateId(memberData.id));
     // 1. 아이디 유효성 검사
     if (!validateId(memberData.id)) {
+      event.target.focus(); // 포커스를 다시 아이디 입력창에 주기
       setAlertMessage("아이디는 4자리이상 영소문자, 숫자만 입력가능합니다.");
       setAlertType("error");
       setShowAlert(true);
-      event.target.focus(); // 포커스를 다시 아이디 입력창에 주기
       return;
     }
     console.log("api 요청~~~~~~~~~~~~~~~~~~~~");
@@ -164,6 +211,7 @@ const SignupPage = () => {
               onBlur={(e) => {
                 handleIdCheck(e);
               }} // onBlur 이벤트를 handleIdCheck로 변경
+              onKeyDown={handleKeyDown}
             />
             <label htmlFor="id" className="floatingLabel">
               아이디
@@ -176,6 +224,7 @@ const SignupPage = () => {
               id="password"
               onChange={handleChange}
               value={memberData.password || ""}
+              onKeyDown={handleKeyDown}
               required
             />
             <label htmlFor="password" className="floatingLabel">
@@ -201,6 +250,7 @@ const SignupPage = () => {
               id="name"
               onChange={handleChange}
               value={memberData.name || ""}
+              onKeyDown={handleKeyDown}
               required
             />
             <label htmlFor="name" className="floatingLabel">
@@ -215,6 +265,7 @@ const SignupPage = () => {
               onChange={handleChange}
               value={memberData.email || ""}
               required
+              onKeyDown={handleKeyDown}
             />
             <label htmlFor="email" className="floatingLabel">
               이메일

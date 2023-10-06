@@ -87,7 +87,8 @@ const TableContainer = styled.div`
 
 function Table(props) {
   const tableContainerRef = useRef(null);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  //const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(0);
 
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
@@ -99,9 +100,10 @@ function Table(props) {
     } else {
       setLastAddedRowIndex(null); // 추가된 행이 없으면 null로 설정
     }
-    setSelectedRowIndex(-1);
-  }, [props.data.length]);
 
+    // 첫 번째 행이 선택되도록 수정
+    setSelectedRowIndex(0);
+  }, [props.data.length]);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
 
@@ -195,21 +197,20 @@ function Table(props) {
         {props.insertRow && (
           <StyledInsertFooter>
             <StyledTr>
-              <StyledInsertTh
-                colSpan={props.columns.length}
-                onClick={() => {
-                  props.setShowInsertRow((prevState) => !prevState);
-                  setSelectedRowIndex("insert"); // 'insert'로 설정
-                  setTimeout(() => {
-                    if (tableContainerRef.current) {
-                      tableContainerRef.current.scrollTop =
-                        tableContainerRef.current.scrollHeight -
-                        tableContainerRef.current.clientHeight;
-                    }
-                  }, 0);
-                }}
-              >
-                <StyledBtn>
+              <StyledInsertTh colSpan={props.columns.length}>
+                <StyledBtn
+                  onClick={() => {
+                    props.setShowInsertRow((prevState) => !prevState);
+                    setSelectedRowIndex("insert"); // 'insert'로 설정
+                    setTimeout(() => {
+                      if (tableContainerRef.current) {
+                        tableContainerRef.current.scrollTop =
+                          tableContainerRef.current.scrollHeight -
+                          tableContainerRef.current.clientHeight;
+                      }
+                    }, 0);
+                  }}
+                >
                   <span>추가하기</span>
                 </StyledBtn>
               </StyledInsertTh>

@@ -5,6 +5,7 @@ import useApiRequest from "../../Services/ApiRequest";
 //import Input from "../../Contents/Input";
 import Input from "../../Contents/InputTest";
 import CustomSelect from "../../Contents/CustomSelect";
+import CustomButton from "../../Contents/CustomButton";
 
 const HrEdu = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
@@ -18,15 +19,15 @@ const HrEdu = ({ cdEmp }) => {
 
   useEffect(() => {
     // 첫 렌더링인지 체크
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return;
+    // }
     // cdEmp가 undefined일 때는 아무것도 하지 않고 리턴
-    if (cdEmp === undefined) {
-      return;
-    }
 
+    if (cdEmp === undefined || cdEmp === "" || cdEmp === null) {
+      setEduList([]);
+    }
     setShowInsertRow(false);
     handleSendEmpCodeGetEduData(cdEmp);
   }, [cdEmp]);
@@ -40,14 +41,9 @@ const HrEdu = ({ cdEmp }) => {
     console.log(inputValue);
     if (inputValue === "" || inputValue === " ") {
       console.log("**********************");
+      return;
     }
-    if (
-      cdEmp == null ||
-      cdEmp === "" ||
-      cdEmp === undefined ||
-      inputValue === "" ||
-      inputValue === " "
-    ) {
+    if (!cdEmp) {
       console.log("값이 없어요 ~~~~~~~~~~~~~~~~~");
       return;
     }
@@ -63,7 +59,7 @@ const HrEdu = ({ cdEmp }) => {
   };
 
   const handleSendEmpCodeGetEduData = async (cdEmp) => {
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined) {
+    if (!cdEmp) {
       return;
     }
     try {
@@ -81,11 +77,9 @@ const HrEdu = ({ cdEmp }) => {
     seqEducation,
     accessor,
     inputValue,
+    value,
   ) => {
-    console.log("현재 inputValue : " + inputValue);
-    console.log("현재 inputValue : " + inputValue);
-    console.log("현재 inputValue : " + inputValue);
-    if (inputValue == null || inputValue === "" || inputValue === undefined) {
+    if (!inputValue || value === inputValue) {
       console.log("값의 변화가 없음 api요청 안감");
       return;
     }
@@ -99,6 +93,7 @@ const HrEdu = ({ cdEmp }) => {
       console.error("api 요청 실패:", error);
     }
     //handleSendEmpCodeGetFamilyData(cdEmp);
+    updateEduListItem(seqEducation, accessor, inputValue);
   };
 
   const handleDateChange = async (value, name, seqEducation) => {
@@ -153,6 +148,27 @@ const HrEdu = ({ cdEmp }) => {
     });
     setEduList(updatedEduList);
   };
+  const handleDeleteEdu = async (seqEducation) => {
+    if (!seqEducation) {
+      return;
+    }
+
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: `/api2/hr/deleteEduData`,
+        data: {
+          seqEducation: seqEducation,
+        },
+      });
+      console.log("요청성공!!!!!!!!!!!!!!!!");
+      setEduList((prevEduList) =>
+        prevEduList.filter((edu) => edu.seqEducation !== seqEducation),
+      );
+    } catch (error) {
+      console.error("api 요청 실패:", error);
+    }
+  };
 
   const data = React.useMemo(
     () =>
@@ -202,6 +218,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "nmSchool",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -212,8 +229,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -285,6 +303,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "fgAcademic",
                 e.target.value,
+                value,
               );
               console.log("수정요청");
               setInputValue(e.target.value);
@@ -334,6 +353,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "addrSchool",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -344,8 +364,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -376,6 +397,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "nmMajor",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -386,8 +408,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -422,6 +445,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "nmSubMajor",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -432,8 +456,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -464,6 +489,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "nmDegree",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -474,8 +500,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -510,6 +537,7 @@ const HrEdu = ({ cdEmp }) => {
                 original.seqEducation,
                 "fgDaynight",
                 e.target.value,
+                value,
               );
               setInputValue(e.target.value);
             }
@@ -520,8 +548,9 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
             />
           );
         },
@@ -547,6 +576,7 @@ const HrEdu = ({ cdEmp }) => {
                 cdEmp,
                 "nmBranchSchool",
                 e.target.value,
+                value,
               );
               handleSendEmpCodeGetEduData(cdEmp);
               setInputValue(e.target.value);
@@ -566,8 +596,29 @@ const HrEdu = ({ cdEmp }) => {
               value={inputValue || ""}
               onChange={handleInputChange}
               isDoubleClick={true}
-              onBlur={handleInputOnBlur}
               className={"doubleLine"}
+              //onBlur={handleInputOnBlur}
+              onKeyDown={handleInputOnBlur}
+            />
+          );
+        },
+      },
+      {
+        Header: "삭제",
+        accessor: "",
+        width: "5%",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          return (
+            <CustomButton
+              text="삭제"
+              color="white"
+              backgroundColor="var(--color-primary-gray)"
+              className="hrInfoBaseProfileImgBtn"
+              onClick={() => {
+                if (original) {
+                  handleDeleteEdu(original.seqEducation);
+                }
+              }}
             />
           );
         },
