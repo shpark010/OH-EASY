@@ -1460,6 +1460,35 @@ const EmployeeRegister = () => {
     setTableKey(Date.now());
   };
 
+  // 입사일자 리셋함수
+  const handleBackspaceDtHire = (e) => {
+    if (e.key === 'Backspace') {
+        const field = "dtHire";
+        setEmployeeData(prevState => ({
+            ...prevState,
+            [field]: ""
+        }));
+        handleUpdateEmp(field, clickCdEmp, "");
+        console.log("백스페이스 키 눌림");
+        e.preventDefault();
+    }
+  };
+
+  // 퇴사일자 리셋함수
+  const handleBackspaceDtResign = (e) => {
+    if (e.key === 'Backspace') {
+        const field = "dtResign";
+        setEmployeeData(prevState => ({
+            ...prevState,
+            [field]: ""
+        }));
+        handleUpdateEmp(field, clickCdEmp, "");
+        console.log("백스페이스 키 눌림");
+        e.preventDefault();
+    }
+  };
+
+
   return (
     <>
       <div className="pageHeader">
@@ -1689,10 +1718,10 @@ const EmployeeRegister = () => {
                   <CustomCalendar 
                     width={180} 
                     value={employeeData.dtHire} 
-                    // setValue={employeeData.dtHire set 하는 함수 삽입}
                     onChange={(newDate) => handleDateChange("dtHire", newDate)}
                     disabled={isReadOnly}
                     readOnly={true}
+                    onKeyDown={handleBackspaceDtHire}
                   />
                 </td>
               </tr>
@@ -2059,6 +2088,7 @@ const EmployeeRegister = () => {
                     width={180} 
                     value={employeeData.dtResign} 
                     onChange={(newDate) => handleDateChange("dtResign", newDate)}
+                    onKeyDown={handleBackspaceDtResign}
                     disabled={isReadOnly}
                     readOnly={true}
                     position="up"
