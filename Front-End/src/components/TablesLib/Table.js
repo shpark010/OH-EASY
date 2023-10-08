@@ -207,6 +207,11 @@ function Table(props) {
                         tableContainerRef.current.clientHeight;
                     }
                   }, 0);
+                  
+                  if (props.onAddButtonClick) {
+                    props.onAddButtonClick();
+                  }
+                  
                 }}
               >
                 <StyledBtn>
