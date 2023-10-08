@@ -39,10 +39,10 @@ const EmployeeRegister = () => {
   const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
 
   // sweetAlert 상태 관리
-  const [showAlert, setShowAlert] = useState(false); // 삭제 버튼 sweetAlert 상태 관리
+  const [showAlert, setShowAlert] = useState(false); // 삭제 버튼 sweetAlert 상태관리
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
-  const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태 관리
-  const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태 관리
+  const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태관리
+  const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태관리
 
    // 삭제시 에러에 관한 sweetAlert 상태 관리
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -51,13 +51,15 @@ const EmployeeRegister = () => {
 
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-  const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태 관리
-  const [isValid, setIsValid] = useState(null); // 주민번호 유효성 검사 결과 저장 상태 관리
+  const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태관리
+  const [isValid, setIsValid] = useState(null); // 주민번호 유효성 검사 결과 저장 상태관리
   
   // 강제로 컴포넌트를 재마운트
   const [tableKey, setTableKey] = useState(Date.now());
   
-  const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태 관리
+  const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태관리
+  const [latestCdEmp, setLatestCdEmp] = useState(""); // insert 동작시 cdEmp값 저장
+  const [inserted, setInserted] = useState(false); // insert 함수 한 번 실행하게 해주는 상태관리
 
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
@@ -466,10 +468,12 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeCdEmp = (e) => {
-            if (e.target.value.length <= 8) {
-              setInputValue(e.target.value);
+            const cleanedValue = e.target.value.replace(/\s+/g, '').toUpperCase();
+
+            if (cleanedValue.length <= 8) {
+              setInputValue(cleanedValue);
               setChanged(true);
-              setInsertData(prev => ({ ...prev, cdEmp: e.target.value }));
+              setInsertData(prev => ({ ...prev, cdEmp: cleanedValue }));
             }
           };
 
@@ -517,7 +521,7 @@ const EmployeeRegister = () => {
                   element.focus();
                   
                   // cdEmp 값을 사용하여 사원의 정보 가져오기
-                  handleGetSingleEmp(upperCaseInputValue); // 수정된 부분
+                  handleGetSingleEmp(upperCaseInputValue);
                 }
 
                 // 원래의 값을 inputValue로 되돌린다.
@@ -532,6 +536,17 @@ const EmployeeRegister = () => {
             } catch (error) {
             console.error("An error occurred:", error);
             }
+            
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, cdEmp: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
+
           };
 
           const handleKeyDown = (e) => {
@@ -573,10 +588,12 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeNmEmp = (e) => {
-            if (e.target.value.length <= 10) {
-              setInputValue(e.target.value);
+            const cleanedValue = e.target.value.replace(/\s+/g, '');
+
+            if (cleanedValue.length <= 10) {
+              setInputValue(cleanedValue);
               setChanged(true);
-              setInsertData(prev => ({ ...prev, nmEmp: e.target.value }));
+              setInsertData(prev => ({ ...prev, nmEmp: cleanedValue }));
             }
           };
 
@@ -596,11 +613,8 @@ const EmployeeRegister = () => {
 
           const handleInputOnBlurNmEmp = async (e) => {
             const inputValue = e.target.value?.trim();
-            const { cdEmp, noResident } = insertData;
-      
-            if (cdEmp && inputValue && noResident.length === 14) {
-              handleInsertEmp(cdEmp, inputValue, noResident);
-            }
+
+            setInsertData((prevData) => ({ ...prevData, nmEmp: inputValue }));
 
             if (!changed) {
               console.log("*********************************** onChange 없으니 종료");
@@ -619,6 +633,16 @@ const EmployeeRegister = () => {
                 nmEmp: inputValue
               }));
             }
+
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, nmEmp: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
           };
 
           const handleKeyDown = (e) => {
@@ -657,11 +681,19 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeNoResident = (e) => {
-            setInputValue(e.target.value);
+            const newInputValue = e.target.value;
+        
+            // 주민번호의 길이 검사. 14자리를 초과하면 입력을 무시합니다.
+            if (newInputValue.length > 14) {
+                console.log("주민번호는 14자리를 초과할 수 없습니다.");
+                return;
+            }
+        
+            setInputValue(newInputValue);
             setChanged(true);
             setIsValid(null);
-          
-            setInsertData(prevState => ({ ...prevState, noResident: e.target.value }));
+            
+            setInsertData(prevState => ({ ...prevState, noResident: newInputValue }));
           };
 
           const tableNoResidentClick = (e) => {
@@ -705,6 +737,16 @@ const EmployeeRegister = () => {
             if (original && original.code) {
               handleUpdateEmp("noResident", original.code, inputValue);
             }
+
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, noResident: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
           };
 
           const maskedValue = inputValue 
@@ -743,13 +785,13 @@ const EmployeeRegister = () => {
     ], [checkedRows, maskResident]
   );
 
-  // useEffect를 사용하여 insertData가 변경되었을 때만 handleInsertEmp를 호출
-  useEffect(() => {
-    const { cdEmp, nmEmp, noResident } = insertData;
-    if (cdEmp && nmEmp && noResident.length === 14) {
-      handleInsertEmp(cdEmp, nmEmp, noResident);
-    }
-  }, [insertData]);
+  // // useEffect를 사용하여 insertData가 변경되었을 때만 handleInsertEmp를 호출
+  // useEffect(() => {
+  //   const { cdEmp, nmEmp, noResident } = insertData;
+  //   if (!inserted && cdEmp && nmEmp && noResident.length === 14) {
+  //       handleInsertEmp(cdEmp, nmEmp, noResident);
+  //   }
+  // }, [insertData]);
   
   // Insert
   const handleInsertEmp = async (codeValue, employeeValue, noResidentValue) => {
@@ -774,9 +816,14 @@ const EmployeeRegister = () => {
 
       console.log("****************************** handleInsertEmp");
       console.log(responseData);
-      setShowInsertSuccessAlert(true);
-      setInsertData({ cdEmp: "", nmEmp: "", noResident: "" });
       await handleGetEmpList();
+      setInserted(true);
+      setShowInsertSuccessAlert(true);
+      setLatestCdEmp(codeValue);
+      setInsertData({ cdEmp: "", nmEmp: "", noResident: "" });
+      setInserted(false);
+
+      setShowInsertRow(false);
     } catch (error) {
       console.log("api 요청 실패:", error);
     }
@@ -868,10 +915,20 @@ const EmployeeRegister = () => {
       console.log("API Response:", responseData);
       console.log("Updated empList after setEmpList:", empList);
       console.log("responseData.length : " + responseData.length);
-      // return responseData;
+
+      // 데이터 로딩 후 첫 번째 항목에 포커스 주기
+      if (responseData && responseData.length > 0) {
+        setTimeout(() => {
+            const firstRowElement = document.querySelector("[id^='focusOn_']");
+            if (firstRowElement) {
+                firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstRowElement.focus();
+            }
+        }, 10);
+      }
+
     } catch (error) {
       console.error("api 요청 실패:", error);
-      // return [];
     }
   }
 
@@ -982,7 +1039,6 @@ const EmployeeRegister = () => {
 
       setIsReadOnly(false);
   };
-
 
   const empListRef = useRef(empList);
 
@@ -1499,8 +1555,15 @@ const EmployeeRegister = () => {
                       confirmText="확인"
                       type="success"
                       onConfirm={async () => {
-                          setShowInsertSuccessAlert(false);
-                          setTableKey(Date.now());
+                        setShowInsertSuccessAlert(false);
+                        setTableKey(Date.now());
+                        await handleGetSingleEmp(latestCdEmp);
+
+                        const element = document.getElementById(`focusOn_${latestCdEmp}`);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          element.focus();
+                        }
                       }}
                     />
                   )
@@ -1531,7 +1594,19 @@ const EmployeeRegister = () => {
                         type="success"
                         onConfirm={async () => {
                             setShowDeleteSuccessAlert(false);
+                            resetEmployeeData();
                             setTableKey(Date.now());
+                            
+                            // 여기서 맨 위 항목으로 포커스 이동
+                            if (empList && empList.length > 0) {
+                            setTimeout(() => {
+                                const firstRowElement = document.querySelector("[id^='focusOn_']");
+                                if (firstRowElement) {
+                                    firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    firstRowElement.focus();
+                                }
+                            }, 310);
+                          }
                         }}
                     />
                 )}
