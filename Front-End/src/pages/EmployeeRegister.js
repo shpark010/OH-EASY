@@ -21,6 +21,7 @@ import moment from "moment";
 import SweetAlert from "../components/Contents/SweetAlert";
 import CustomModal from "../components/Contents/CustomModal";
 import CustomRadio from "../components/Contents/CustomRadio";
+import QuickMenu from "../components/PageHeader/QuickMenu";
 
 const EmployeeRegister = () => {
   
@@ -662,12 +663,8 @@ const EmployeeRegister = () => {
             if (original && original.code) {
               // 기존의 데이터일 경우, 업데이트 동작 수행
               handleUpdateEmp("nmEmp", original.code, inputValue);
-            } else {
-              // 새로운 데이터일 경우, 상태만 업데이트하고 실제 insert는 주민번호 입력란에서 처리
-              setInsertData(prev => ({
-                ...prev, 
-                nmEmp: inputValue
-              }));
+            
+              setEmployeeData(prevState => ({ ...prevState, nmEmp: inputValue }));
             }
 
             setInsertData(prevState => {
@@ -949,16 +946,16 @@ const EmployeeRegister = () => {
       console.log("Updated empList after setEmpList:", empList);
       console.log("responseData.length : " + responseData.length);
 
-      // 데이터 로딩 후 첫 번째 항목에 포커스 주기
-      if (responseData && responseData.length > 0) {
-        setTimeout(() => {
-            const firstRowElement = document.querySelector("[id^='focusOn_']");
-            if (firstRowElement) {
-                firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstRowElement.focus();
-            }
-        }, 10);
-      }
+      // // 데이터 로딩 후 첫 번째 항목에 포커스 주기
+      // if (responseData && responseData.length > 0) {
+      //   setTimeout(() => {
+      //       const firstRowElement = document.querySelector("[id^='focusOn_']");
+      //       if (firstRowElement) {
+      //           firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      //           firstRowElement.focus();
+      //       }
+      //   }, 10);
+      // }
 
     } catch (error) {
       console.error("api 요청 실패:", error);
@@ -1479,7 +1476,7 @@ const EmployeeRegister = () => {
 
   useEffect(() => {
     if (sortOrder === "code") {
-        setSortedDataEmp([...data].sort((a, b) => a.code.localeCompare(b.code)));
+      setSortedDataEmp([...data].sort((a, b) => parseInt(a.code, 10) - parseInt(b.code, 10)));
     } else if (sortOrder === "name") {
         setSortedDataEmp([...data].sort((a, b) => a.employee.localeCompare(b.employee)));
     }
@@ -1728,12 +1725,8 @@ const EmployeeRegister = () => {
                   />
                 )}
 
-              <PageHeaderIconButton
-                btnName="setting"
-                imageSrc={Setting}
-                altText="세팅"
-                // onClick={handleOpenSetting}
-              />
+              <QuickMenu />
+
             </div>
           </div>
         </div>
@@ -1753,6 +1746,7 @@ const EmployeeRegister = () => {
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
                 onAddButtonClick={resetEmployeeData}
+                index={-1}
               />
             </div>
 
@@ -1844,6 +1838,7 @@ const EmployeeRegister = () => {
                           if (isUpdated) {
                             await handleGetEmpList();
                             setIsEmpListUpdated(true);
+                            setCdEmpUpdated(clickCdEmp);
                           }
                         }}
                         readOnly={isReadOnly || maskResident}
