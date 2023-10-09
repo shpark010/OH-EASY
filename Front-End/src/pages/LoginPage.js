@@ -105,6 +105,10 @@ function LoginPage() {
         setAlertText("아이디 및 비밀번호를 다시 확인해주세요");
         setAlertType("error");
         setShowAlert(true);
+      } else if (error.response.status === 409) {
+        setAlertText("현재 접속중인 아이디 입니다.");
+        setAlertType("error");
+        setShowAlert(true);
       }
     }
     setLoading(false);
