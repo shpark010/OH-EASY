@@ -26,14 +26,13 @@ const HrPageHeader = ({
   const [alertState, setAlertState] = useState({
     show: false,
     text: "",
-    type: "question",
+    type: "",
     onConfirm: null,
-    showCancel: false,
+    showCancel: "",
   });
 
   const showAlertWithSettings = (settings) => {
     setAlertState({
-      ...alertState,
       ...settings,
       show: true,
     });
@@ -169,6 +168,7 @@ const HrPageHeader = ({
               text="사원불러오기"
               onClick={(e) => {
                 showAlertWithSettings({
+                  type: "question",
                   text: "인사관리에 등록하지않은 사원을 전부 등록 후 모든 사원을 불러옵니다. 실행하시겠습니까?",
                   onConfirm: handleGetEmpList,
                   showCancel: true,
@@ -186,13 +186,13 @@ const HrPageHeader = ({
                   if (checkedRows.length !== 0) {
                     showAlertWithSettings({
                       text: `선택한 사원 ${checkedRows.length}명의 PDF를 다운로드 하시겠습니까?`,
+                      type: "question",
                       onConfirm: handlePrintPdf,
                       showCancel: true,
                     });
                   } else {
                     showAlertWithSettings({
                       text: `선택한 사원이 없습니다.`,
-                      //showCancel: true,
                       type: "error",
                     });
                   }
@@ -215,6 +215,7 @@ const HrPageHeader = ({
                     text: `선택한 사원 ${checkedRows.length}명을 전부 삭제합니까?`,
                     type: "warning",
                     onConfirm: handleSendCheckedCdEmpListDelete,
+                    showCancel: true,
                   });
                 }
               }}
