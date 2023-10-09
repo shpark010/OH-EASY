@@ -11,9 +11,9 @@ const defaultMilitaryData = {
   dcExemption: "", // 면제사유
   dtMilitaryStart: "", // 복무시작일
   dtMilitaryEnd: "", // 복무종료일
-  yyMilitary: "", //  병역기간 (년)
+  //yyMilitary: "", //  병역기간 (년)
   mmMilitary: "", //   병역기간 (월)
-  ddMilitary: "", // 병역기간 (일)
+  //ddMilitary: "", // 병역기간 (일)
   fgMilitaryType: "", // 군별 육군/해군
   dcClassMilitary: "", // 병과
   fgMilitaryRank: "", // 계급
@@ -22,11 +22,17 @@ const defaultMilitaryData = {
 const HrMilitary = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [militaryData, setMilitaryData] = useState({ ...defaultMilitaryData });
+  const [militaryDataCopy, setMilitaryDataCopy] = useState({
+    ...defaultMilitaryData,
+  });
 
   const handleInputBlur = async (e) => {
-    console.log("블러이벤 ****************************");
     const { name, value } = e.target;
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || value === "") {
+    if (!cdEmp || value === "") {
+      return;
+    }
+    console.log(militaryDataCopy[name]);
+    if (value === militaryDataCopy[name]) {
       return;
     }
 
@@ -43,13 +49,16 @@ const HrMilitary = ({ cdEmp }) => {
       ...prevState,
       [name]: value,
     }));
+    setMilitaryDataCopy((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleSelectChange = async (e, columns) => {
     if (cdEmp === undefined || cdEmp == null || cdEmp === "") {
       return;
     }
-    console.log("handleSelectChange 이벤 ***********");
     const { name, value } = e.target;
     console.log(name);
     console.log(value);
@@ -73,7 +82,7 @@ const HrMilitary = ({ cdEmp }) => {
   };
 
   const handleDateChange = async (value, name) => {
-    if (cdEmp === undefined) {
+    if (!cdEmp) {
       return;
     }
     value = value.replace(/-/g, "");
@@ -107,6 +116,10 @@ const HrMilitary = ({ cdEmp }) => {
           ...defaultMilitaryData,
           ...responseData,
         });
+        setMilitaryDataCopy({
+          ...defaultMilitaryData,
+          ...responseData,
+        });
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
       }
@@ -116,8 +129,6 @@ const HrMilitary = ({ cdEmp }) => {
   }, [cdEmp]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("인풋값변경~~~~~~~~~~~~~~~~~");
-    console.log(value);
     setMilitaryData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -153,6 +164,7 @@ const HrMilitary = ({ cdEmp }) => {
                 className="hrInfoBaseInput"
                 value={militaryData.dtMilitaryStart}
                 name="dtMilitaryStart"
+                readOnly={true}
                 onChange={(e) => handleDateChange(e, "dtMilitaryStart")}
               />
             </td>
@@ -203,6 +215,7 @@ const HrMilitary = ({ cdEmp }) => {
                 className="hrInfoBaseInput"
                 value={militaryData.dtMilitaryEnd}
                 name="dtMilitaryEnd"
+                readOnly={true}
                 onChange={(e) => handleDateChange(e, "dtMilitaryEnd")}
               />
             </td>
@@ -214,6 +227,7 @@ const HrMilitary = ({ cdEmp }) => {
                 width={212}
                 name={"dcClassMilitary"}
                 value={militaryData.dcClassMilitary || ""}
+                onKeyDown={handleInputBlur}
                 onBlur={handleInputBlur}
                 onChange={handleInputChange}
               />
@@ -228,6 +242,7 @@ const HrMilitary = ({ cdEmp }) => {
                 width={212}
                 name={"dcExemption"}
                 value={militaryData.dcExemption || ""}
+                onKeyDown={handleInputBlur}
                 onBlur={handleInputBlur}
                 onChange={handleInputChange}
               />
@@ -236,34 +251,11 @@ const HrMilitary = ({ cdEmp }) => {
           <tr>
             <th>병역기간</th>
             <td>
-              {/* <CustomInput
-                width={"40"}
-                name={"yyMilitary"}
-                value={militaryData.yyMilitary || ""}
-                onBlur={handleInputBlur}
-                onChange={handleInputChange}
-              />
-              <span> 년 </span>
               <CustomInput
-                width={"40"}
+                width={"50"}
                 name={"mmMilitary"}
                 value={militaryData.mmMilitary || ""}
-                onBlur={handleInputBlur}
-                onChange={handleInputChange}
-              />
-              <span> 개월 </span>
-              <CustomInput
-                width={"40"}
-                name={"ddMilitary"}
-                value={militaryData.ddMilitary || ""}
-                onBlur={handleInputBlur}
-                onChange={handleInputChange}
-              />
-              <span> 일 </span> */}
-              <CustomInput
-                width={"40"}
-                name={"mmMilitary"}
-                value={militaryData.mmMilitary || ""}
+                onKeyDown={handleInputBlur}
                 onBlur={handleInputBlur}
                 onChange={handleInputChange}
               />

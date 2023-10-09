@@ -17,6 +17,7 @@ import useApiRequest from "../components/Services/ApiRequest";
 import CustomButton from "../components/Contents/CustomButton";
 import SweetAlert from "../components/Contents/SweetAlert";
 import CustomSelect from "../components/Contents/CustomSelect";
+import QuickMenu from "../components/PageHeader/QuickMenu";
 
 const SalaryData = (props) => {
   // 수정 가능 여부
@@ -119,16 +120,24 @@ const SalaryData = (props) => {
   //포멧 함수
   //금액
   const changeFormat = (changeValue) => {
+    let isNegative = false; // 음수 여부를 판단하는 변수를 추가합니다.
+    if (changeValue < 0) {
+      // changeValue가 0보다 작으면 음수로 판단합니다.
+      isNegative = true; // 음수 여부를 true로 설정합니다.
+      changeValue = -changeValue; // changeValue를 양수로 변환합니다.
+    }
+
     let newValue = String(changeValue);
-    // 쉼표(,) 제거 후 숫자만 남김
     newValue = newValue.replace(/,/g, "");
-    // 숫자만 허용
     newValue = newValue.replace(/[^0-9]/g, "");
-    // 앞에 0을 제거
     newValue = newValue.replace(/^0+/, "");
-    // 3자리마다 쉼표 추가
     newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // newValue = Number(newValue).toLocaleString("ko-KR");
+
+    if (isNegative) {
+      // 만약 값이 음수였다면 결과 문자열 앞에 '-'를 붙입니다.
+      newValue = "-" + newValue;
+    }
+
     return newValue;
   };
 
@@ -156,6 +165,21 @@ const SalaryData = (props) => {
     return newValue;
   };
 
+  //날짜
+  const dateFormat = (rawDate) => {
+    if (rawDate.length !== 8 || isNaN(rawDate)) {
+      return "";
+    }
+
+    const year = rawDate.substring(0, 4);
+    const month = rawDate.substring(4, 6);
+    const day = rawDate.substring(6, 8);
+
+    const newDate = `${year}-${month}-${day}`;
+
+    return newDate;
+  };
+
   //개인 종합 세액
   const [personalTax, setPersonalTax] = useState({
     deduction: "",
@@ -170,7 +194,7 @@ const SalaryData = (props) => {
     handleChangeSearch(e);
   };
 
-  //
+  // 조회구분 세액
   const [searchTax, setSearchTax] = useState({
     amtAllowance: "", //기본급 총액
     nationalPension: "", //국민연금 총액
@@ -197,7 +221,8 @@ const SalaryData = (props) => {
     department: "", //부서
     domesticForeign: "", //내외국인
     family: "", //가족수
-    military: "", //병역
+    milDischarge: "", //제대구분
+    milService: "", //병역구분
     obstacle: "", //장애
     certificate: "", //자격증
   }); //사원 상세 정보
@@ -274,7 +299,8 @@ const SalaryData = (props) => {
       department: "",
       domesticForeign: "",
       family: "",
-      military: "",
+      milDischarge: "",
+      milService: "",
       obstacle: "",
       certificate: "",
     });
@@ -383,6 +409,7 @@ const SalaryData = (props) => {
       setEmpList(responseData.empSearch);
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -511,16 +538,16 @@ const SalaryData = (props) => {
   };
 
   //급여 자료 삭제
-  const handleDeletePayData = async () => {
+  const handleDeletePayData = async (checkedRows) => {
     if (checkedRows.length === 0) {
       return;
     }
     try {
-      console.log(checkedRows);
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/sd/deletePayData",
         data: {
+          clickEmpCode: clickEmpCode,
           code: checkedRows,
           belongingDate: belongingDate,
           payDay: payDay,
@@ -531,6 +558,7 @@ const SalaryData = (props) => {
       const searchTaxInfo = responseData.searchTaxInfo;
       handlePersonalTax(empTaxInfo);
       handleSearchTax(searchTaxInfo);
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -581,6 +609,7 @@ const SalaryData = (props) => {
           editTaxList: editTaxList,
         },
       });
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -603,6 +632,54 @@ const SalaryData = (props) => {
       if (sendResult > 0) {
         handleEmailSendOpenAlert();
       }
+      setCheckedRows([]);
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    return sendResult;
+  };
+
+  //PDF 출력
+  const handlePrintPdf = async () => {
+    let sendResult = 0;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/util/salaryPdf",
+        data: {
+          code: clickEmpCode,
+          belongingDate: belongingDate,
+          dtAllowance: payDay,
+        },
+        responseType: "json",
+      });
+      // EmpInfo 처리
+      const cdEmp = responseData.empInfo.cdEmp;
+      const nmEmp = responseData.empInfo.nmEmp;
+      const yyAllowance = responseData.empInfo.yyAllowance;
+      const mmBelong = responseData.empInfo.mmBelong;
+
+      // Base64로 인코딩된 PDF 처리
+      const base64Pdf = responseData.pdf;
+      const pdfBlob = new Blob(
+        [Uint8Array.from(atob(base64Pdf), (c) => c.charCodeAt(0))],
+        { type: "application/pdf" },
+      );
+
+      // Create a link element
+      const link = document.createElement("a");
+
+      // Set the download attribute with a filename
+      link.download = `급여자료(${yyAllowance}년${mmBelong}월)_${nmEmp}(${cdEmp}).pdf`;
+
+      // Create a URL to the blob and set it as the href attribute
+      link.href = window.URL.createObjectURL(pdfBlob);
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Trigger a click event on the link to download the file
+      link.click();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -625,7 +702,9 @@ const SalaryData = (props) => {
           searchTaxOrder: searchTaxOrder,
         },
       });
+      const empTaxInfo = responseData.empTaxInfo;
       const searchTaxInfo = responseData.searchTaxInfo;
+      handlePersonalTax(empTaxInfo);
       handleSearchTax(searchTaxInfo);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -786,13 +865,14 @@ const SalaryData = (props) => {
           const handleInputChange = (e) => {
             console.log(clickEmpCode);
             setInputValue(e.target.value);
-            console.log(inputValue);
+            console.log("inputValue" + typeof e.target.value);
             console.log("바뀜");
           };
           const insertPayAmount = (e) => {
             const insertPay = e.target.value; //입력한 금액
             const clickedCode = clickEmpCode; //클릭한 사원 코드
             if (
+              inputValue !== "" &&
               inputValue !== Number(beforePay).toLocaleString() &&
               inputValue != beforePay
             ) {
@@ -806,6 +886,11 @@ const SalaryData = (props) => {
                 console.log("급여 수정 조건");
               }
             }
+
+            if (inputValue === "") {
+              console.log("삭제해야해~");
+              handleDeletePayData([clickEmpCode]);
+            }
           };
           return (
             <Input
@@ -813,7 +898,14 @@ const SalaryData = (props) => {
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={(e) => insertPayAmount(e)}
-              className={"doubleLine"}
+              className={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+                  ? ""
+                  : "doubleLine"
+              }
               type="price"
               align="right"
               readOnly={
@@ -881,7 +973,14 @@ const SalaryData = (props) => {
               id="price-input"
               value={inputValue}
               onChange={handleInputChange}
-              className={"doubleLine"}
+              className={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+                  ? ""
+                  : "doubleLine"
+              }
               type="price"
               align="right"
               readOnly={
@@ -1151,7 +1250,7 @@ const SalaryData = (props) => {
   };
 
   const handleDeleteConfirm = () => {
-    handleDeletePayData();
+    handleDeletePayData(checkedRows);
     handleDeleteCloseAlert();
   };
 
@@ -1273,10 +1372,15 @@ const SalaryData = (props) => {
 
   const handleEmailConfirm = () => {
     if (checkedRows.length > 0) {
-      const sendResult = handleSendEmail();
-      console.log(sendResult);
-      setCheckedRows([]);
+      if (!empDetailInfo.email) {
+        handleNoEmailOpenAlert();
+      } else {
+        const sendResult = handleSendEmail();
+        console.log(sendResult);
+        setCheckedRows([]);
+      }
     }
+
     handleEmailCloseAlert();
     setCheckedRows([]);
   };
@@ -1295,6 +1399,20 @@ const SalaryData = (props) => {
     handleEmailSendCloseAlert();
   };
 
+  // 이메일 없음 alert
+  const [noEmailAlert, setNoEmailAlert] = React.useState(false);
+
+  const handleNoEmailCloseAlert = () => {
+    setNoEmailAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleNoEmailOpenAlert = () => {
+    setNoEmailAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleNoEmailConfirm = () => {
+    handleNoEmailCloseAlert();
+  };
+
   // 조회 조건 alert
   const [searchAlert, setSearchAlert] = React.useState(false);
 
@@ -1307,6 +1425,21 @@ const SalaryData = (props) => {
 
   const handleSearchConfirm = () => {
     handleSearchCloseAlert();
+  };
+
+  //pdf 출력 alert
+  const [pdfAlert, setPdfAlert] = React.useState(false);
+
+  const handlePdfCloseAlert = () => {
+    setPdfAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handlePdfOpenAlert = () => {
+    setPdfAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handlePdfConfirm = () => {
+    handlePrintPdf();
+    handlePdfCloseAlert();
   };
 
   return (
@@ -1325,7 +1458,7 @@ const SalaryData = (props) => {
       )}
       {deleteAlert && (
         <SweetAlert
-          text="선택한 사원(들)의 급여정보를 삭제하시겠습니까?"
+          text={`선택한 사원 ${checkedRows.length}명의 현재 급여정보를 전부 삭제하시겠습니까?`}
           showCancel={true}
           type="error"
           onConfirm={handleDeleteConfirm}
@@ -1352,10 +1485,28 @@ const SalaryData = (props) => {
               ? `선택한 ${checkedRows.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
               : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
           }
-          showCancel={true}
+          showCancel={false}
           type={checkedRows.length > 0 ? "question" : "warning"}
           onConfirm={handleEmailConfirm}
-          onCancel={handleEmailCloseAlert}
+        />
+      )}
+      {noEmailAlert && (
+        <SweetAlert
+          text={"사원정보에 등록된 메일이 없습니다."}
+          showCancel={true}
+          type="error"
+          onConfirm={handleNoEmailConfirm}
+          onCancel={handleNoEmailCloseAlert}
+        />
+      )}
+      {pdfAlert && (
+        <SweetAlert
+          // text={"선택한 사원의 현재 급여정보를 PDF로 다운로드 하시겠습니까?"}
+          html={`현재 사원의 당월 급여정보를 <br> PDF로 다운로드 하시겠습니까?`}
+          showCancel={true}
+          type="question"
+          onConfirm={handlePdfConfirm}
+          onCancel={handlePdfCloseAlert}
         />
       )}
       {searchAlert && (
@@ -1488,7 +1639,8 @@ const SalaryData = (props) => {
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
-                disabled={true}
+                onClick={handlePdfOpenAlert}
+                disabled={!clickEmpCode || !pay ? true : false}
               />
               <PageHeaderIconButton
                 btnName="delete"
@@ -1497,11 +1649,12 @@ const SalaryData = (props) => {
                 onClick={handleDeleteOpenAlert}
                 disabled={checkedRows.length > 0 ? false : true}
               />
-              <PageHeaderIconButton
+              {/* <PageHeaderIconButton
                 btnName="setting"
                 imageSrc={Setting}
                 altText="세팅"
-              />
+              /> */}
+              <QuickMenu />
             </div>
           </div>
         </div>
@@ -1671,7 +1824,11 @@ const SalaryData = (props) => {
               </div>
               <div className="sd-empInfo-detail">
                 <label htmlFor="">입사일</label>
-                <p>{empDetailInfo.hireDate}</p>
+                <p>
+                  {empDetailInfo.hireDate
+                    ? dateFormat(empDetailInfo.hireDate)
+                    : ""}
+                </p>
                 <label htmlFor="">성별</label>
                 <p>{empDetailInfo.gender}</p>
                 <label htmlFor="">주소</label>
@@ -1683,18 +1840,24 @@ const SalaryData = (props) => {
                 <label htmlFor="">이메일</label>
                 <p>{empDetailInfo.email}</p>
                 <label htmlFor="">퇴사일</label>
-                <p>{empDetailInfo.leavingDate}</p>
+                <p>
+                  {empDetailInfo.leavingDate
+                    ? dateFormat(empDetailInfo.leavingDate)
+                    : ""}
+                </p>
                 <label htmlFor="">부서</label>
                 <p>{empDetailInfo.department}</p>
-                <label htmlFor="">내외국인</label>
+                <label htmlFor="">내/외국인</label>
                 <p>{empDetailInfo.domesticForeign}</p>
-                <label htmlFor="">가족수</label>
+                <label htmlFor="">가족수(명)</label>
                 <p>{empDetailInfo.family}</p>
-                <label htmlFor="">병역</label>
-                <p>{empDetailInfo.military}</p>
+                <label htmlFor="">병역/전역</label>
+                <p>
+                  {empDetailInfo.milService}/{empDetailInfo.milDischarge}
+                </p>
                 <label htmlFor="">장애구분</label>
                 <p>{empDetailInfo.obstacle}</p>
-                <label htmlFor="">자격증</label>
+                <label htmlFor="">자격증(개)</label>
                 <p>{empDetailInfo.certificate}</p>
               </div>
             </div>

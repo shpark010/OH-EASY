@@ -6,9 +6,11 @@ import SweetAlert from "../Contents/SweetAlert";
 const HrSearchBar = ({
   conditions,
   setConditions,
+  empList,
   setEmpList,
   setClickEmpCode,
   setEmpStats,
+  setCheckedRows,
 }) => {
   const apiRequest = useApiRequest();
 
@@ -21,6 +23,7 @@ const HrSearchBar = ({
 
   const handleSearchBtnClick = async () => {
     console.log("클릭 시점");
+    setEmpList([]);
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -33,7 +36,10 @@ const HrSearchBar = ({
         working: responseData.working,
         resigned: responseData.resigned,
       });
-      setClickEmpCode();
+      console.log(responseData.result[responseData.result.length - 1].cdEmp);
+      setClickEmpCode(
+        responseData.result[responseData.result.length - 1].cdEmp,
+      );
       console.log("********************************");
       console.log(responseData.result);
       console.log("********************************");
@@ -44,6 +50,7 @@ const HrSearchBar = ({
     } catch (error) {
       console.error("api 요청 실패:", error);
     }
+    setCheckedRows([]);
   };
   const handleCloseAlert = () => {
     setShowAlert(false); // 알림창 표시 상태를 false로 설정

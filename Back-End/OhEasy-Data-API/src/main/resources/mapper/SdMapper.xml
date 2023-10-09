@@ -9,9 +9,9 @@
 		SELECT
 		e.CD_EMP as cdEmp,
 		e.NM_EMP as nmEmp,
-		s.NM_POSITION as nmPosition
+		IFNULL(s.NM_POSITION, '직급없음') as nmPosition
 		FROM HR_EMP_MST e
-		JOIN POSITION_SDTL s
+		LEFT JOIN POSITION_SDTL s
 		ON
 		e.NO_POSITION_UNIQUE =
 		s.NO_POSITION_UNIQUE
@@ -73,46 +73,51 @@
 		resultType="kr.or.oheasy.vo.SdEmpInfoVO">
 		SELECT
 		e.DT_HIRE AS hireDate,
-		CASE
-		WHEN
-		SUBSTRING(e.NO_RESIDENT, 8, 1) = '1' THEN '남'
-		ELSE '여'
-		END AS gender,
+		CASE WHEN SUBSTRING(e.NO_RESIDENT, 8, 1) = '1' THEN '남' ELSE '여' END AS gender,
 		e.NM_ADDRESS AS address,
 		e.DC_ADDRESS AS detailAddress,
 		e.NO_MOBILE_PHONE AS phone,
 		e.NM_EMAIL AS email,
-		e.DT_RESIGN AS
-		leavingDate,
-		e.FG_FOREIGN AS domesticForeign,
-		d.NM_DEPARTMENT AS
-		department,
-		m.FG_MILITARY_SERVICE AS military,
-		IFNULL(l.LICENSE_COUNT,
-		0) AS certificate,
+		e.DT_RESIGN AS leavingDate,
+		CASE WHEN e.FG_FOREIGN = 0 THEN '내국인' ELSE '외국인' END AS domesticForeign,
+		d.NM_DEPARTMENT AS department,
+		CASE 
+        WHEN m.FG_MILITARY_DISCHARGE = '10100' THEN '만기제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10200' THEN '의병제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10300' THEN '의가사제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10400' THEN '소집해제'
+        ELSE ''
+    	END AS milDischarge,
+		CASE 
+        WHEN m.FG_MILITARY_SERVICE = '20100' THEN '현역'
+        WHEN m.FG_MILITARY_SERVICE = '20200' THEN '공익근무'
+        WHEN m.FG_MILITARY_SERVICE = '20300' THEN '방위산업체'
+        WHEN m.FG_MILITARY_SERVICE = '20400' THEN '기간산업체'
+        WHEN m.FG_MILITARY_SERVICE = '20500' THEN '산업기능'
+        WHEN m.FG_MILITARY_SERVICE = '20600' THEN '미필'
+        WHEN m.FG_MILITARY_SERVICE = '20700' THEN '면제'
+        ELSE ''
+    	END AS milService,
+		IFNULL(l.LICENSE_COUNT, 0) AS certificate,
 		IFNULL(f.FAMILY_COUNT, 0) AS family,
-		bd.FG_OBSTACLE
-		AS obstacle
+		bd.FG_OBSTACLE AS obstacle
 		FROM HR_EMP_MST e
-		LEFT JOIN DEPARTMENT_DTL d ON
-		e.NO_DEPARTMENT = d.NO_DEPARTMENT
-		LEFT JOIN HR_MILITARY_INFO_DTL m ON
-		e.CD_EMP = m.CD_EMP
-		LEFT JOIN (
-		SELECT CD_EMP, COUNT(*) AS LICENSE_COUNT
-		FROM HR_LICENSE_DTL
-		GROUP BY CD_EMP
-		) l ON e.CD_EMP = l.CD_EMP
+		LEFT JOIN DEPARTMENT_DTL d ON e.NO_DEPARTMENT = d.NO_DEPARTMENT
+		LEFT JOIN HR_MILITARY_INFO_DTL m ON e.CD_EMP = m.CD_EMP
+		LEFT JOIN 
+			(
+			SELECT CD_EMP, COUNT(*) AS LICENSE_COUNT
+			FROM HR_LICENSE_DTL
+			GROUP BY CD_EMP
+			) l ON e.CD_EMP = l.CD_EMP
 		LEFT JOIN
-		(
-		SELECT CD_EMP, COUNT(*) AS FAMILY_COUNT
-		FROM HR_FAMILY_DTL
-		GROUP BY
-		CD_EMP
-		) f ON e.CD_EMP = f.CD_EMP
-		LEFT JOIN HR_BODY_DATA_DTL bd ON
-		e.CD_EMP
-		= bd.CD_EMP
+			(
+			SELECT CD_EMP, COUNT(*) AS FAMILY_COUNT
+			FROM HR_FAMILY_DTL
+			GROUP BY
+			CD_EMP
+			) f ON e.CD_EMP = f.CD_EMP
+		LEFT JOIN HR_BODY_DATA_DTL bd ON e.CD_EMP = bd.CD_EMP
 		WHERE e.CD_EMP = #{cd_Emp}
 	</select>
 
@@ -814,7 +819,48 @@
             #{item}
         </foreach>
     	GROUP BY
-        s.CD_EMP, h.NM_EMAIL
+        s.CD_EMP
+	</select>
+	
+	<!-- PDF를 위한 조회 -->
+	<select id="selectForPdf" parameterType="Map" resultType="kr.or.oheasy.vo.SdPdfInfoVO">
+		SELECT
+		s.CD_EMP as cdEmp,
+		h.NM_EMP as nmEmp,
+		DATE_FORMAT(STR_TO_DATE(SUBSTR(h.NO_RESIDENT, 1, 6), '%y%m%d'), '%Y-%m-%d') as dtBirth,
+		DATE_FORMAT(STR_TO_DATE(h.DT_HIRE, '%Y%m%d'), '%Y-%m-%d') as dtHire,
+		IFNULL(dep.NM_DEPARTMENT, '부서없음') as nmDept, 
+    	IFNULL(pos.NM_POSITION, '직급없음') as nmPosition,
+		s.YY_ALLOWANCE as yyAllowance,
+    	s.MM_BELONG as mmBelong,
+    	DATE_FORMAT(STR_TO_DATE(s.DT_ALLOWANCE, '%Y%m%d'), '%Y-%m-%d') as dtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) AS amtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '국민연금' THEN s.AMT_ALLOWANCE END) AS nationalPension,
+		MAX(CASE WHEN t.NM_TAX_RATE = '건강보험' THEN s.AMT_ALLOWANCE END) AS healthInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '장기요양보험료' THEN s.AMT_ALLOWANCE END) AS longtermNursingInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '고용보험' THEN s.AMT_ALLOWANCE END) AS employmentInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '소득세' THEN s.AMT_ALLOWANCE END) AS incomeTax,
+		MAX(CASE WHEN t.NM_TAX_RATE = '지방소득세' THEN s.AMT_ALLOWANCE END) AS localIncomeTax,
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS totalDeduct,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) -
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS netPay
+		FROM
+		SALARY_DEDUCTION_INFO s
+		INNER JOIN
+		TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE AND t.YY_APPLY = #{yyAllowance}
+		INNER JOIN
+		HR_EMP_MST h ON s.CD_EMP = h.CD_EMP
+		LEFT JOIN 
+		DEPARTMENT_DTL dep ON h.NO_DEPARTMENT = dep.NO_DEPARTMENT
+    	LEFT JOIN 
+    	POSITION_SDTL pos ON h.NO_POSITION_UNIQUE = pos.NO_POSITION_UNIQUE
+		WHERE
+        s.DT_ALLOWANCE=#{dtAllowance} AND 
+        s.YY_ALLOWANCE = #{yyAllowance} AND 
+        s.MM_BELONG = #{mmBelong} AND
+        s.CD_EMP = #{cdEmp}
+    	GROUP BY
+        s.CD_EMP
 	</select>
 	
 		<!-- 각 공제 항목 별 업데이트 -->

@@ -31,6 +31,19 @@ WHERE d.CD_EMP IS NULL
     WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_family_dtl)
 </insert>
 
+
+
+<!-- 
+ -->
+<insert id="insertOneHrFamilyDtl">
+    INSERT INTO hr_family_dtl (CD_EMP, FG_YEAR_END_TAX,NM_EMP_FAM,NO_RESIDENT ,FG_FAMILY) VALUE(#{CD_EMP},0)
+</insert>
+<!-- 사원 테이블 사원 한명의 정보  
+<select id="getOneHrEmpData">
+	select * from 
+</select>
+-->
+
 <insert id="insertIntoHrBodyDataDtl">
     INSERT INTO hr_body_data_dtl (CD_EMP)
     SELECT m.CD_EMP FROM hr_emp_mst m
@@ -131,11 +144,23 @@ WHERE d.CD_EMP IS NULL
 <select id="getFamilyDataList" resultType="kr.or.oheasy.vo.HrFamilyDtlVO">
 	select * from hr_family_dtl where cd_emp=#{cdEmp}
 </select>
-
-<!-- 한사원의 한명의 가족 정보 insert -->
+<!--  한사원의 한명의 가족 정보 insert 초기 처음 insert 할때-->
+<insert id="insertFirstFamilyData">
+    INSERT INTO hr_family_dtl (CD_EMP, NM_EMP_FAM, NO_RESIDENT, FG_YEAR_END_TAX, FG_FAMILY)
+    SELECT 
+        #{cdEmp},
+        NM_EMP,
+        NO_RESIDENT,
+        0 AS FG_YEAR_END_TAX,
+        0 AS FG_FAMILY
+    FROM hr_emp_mst
+    WHERE CD_EMP = #{cdEmp};
+</insert>
+<!-- 한사원의 한명의 가족 정보 insert 후기 2번째 가족부터-->
 <insert id="insertFamilyData">
 	insert into hr_family_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
 </insert>
+
 
 <!-- 한사원의 한명의 가족 정보 update -->
 <update id="updateFamilyData">
@@ -234,6 +259,23 @@ WHERE d.CD_EMP IS NULL
 	select * from hr_License_Sdtl
 </select>
 
+<!-- 삭제 가족 한명 -->
+<delete id="deleteFamilyData">
+	DELETE FROM hr_family_dtl WHERE SEQ_FAMILY = #{seqFamily}
+</delete>
+<!-- 삭제 가족 한명 -->
+<delete id="deleteEduData">
+	DELETE FROM hr_education_dtl WHERE SEQ_EDUCATION = #{seqEducation}
+</delete>
+<!-- 삭제 경력 한명 -->
+<delete id="deleteCareerData">
+	DELETE FROM hr_career_dtl WHERE SEQ_CAREER = #{seqCareer}
+</delete>
+<!-- 삭제 자격 한명 -->
+<delete id="deleteLicenseData">
+	DELETE FROM hr_license_dtl WHERE SEQ_License = #{seqLicense}
+</delete>
+
 
 <!-- 조건 검색 카테고리 0 재직자 -->
 <select id="getConditionalEmpListCategory0" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
@@ -255,27 +297,22 @@ WHERE d.CD_EMP IS NULL
                 END, 
                 m.cd_emp;
         </when>
-        <!-- 이름 순 정렬 -->
-        <when test="sort == 1">
-            ORDER BY 
-                CASE 
-                    WHEN m.nm_emp IS NULL THEN 4
-                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    WHEN m.nm_emp REGEXP '^[0-9]' THEN 3
-                    ELSE 4
-                END, 
-                m.nm_emp;
-        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp;
+		</when>
         <!-- 입사 순 정렬 -->
-        <when test="sort == 2">
-            ORDER BY 
-                CASE 
-                    WHEN m.dt_hire IS NOT NULL THEN 1
-                    ELSE 2
-                END, 
-                m.dt_hire;
-        </when>
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
     </choose>
 </select>
 <!-- 조건 검색 카테고리 1 퇴사자 -->
@@ -298,27 +335,22 @@ WHERE d.CD_EMP IS NULL
                 END, 
                 m.cd_emp
         </when>
-        <!-- 이름 순 정렬 -->
-        <when test="sort == 1">
-            ORDER BY 
-                CASE 
-                    WHEN m.nm_emp IS NULL THEN 4
-                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    WHEN m.nm_emp REGEXP '^[0-9]' THEN 3
-                    ELSE 4
-                END, 
-                m.nm_emp
-        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
         <!-- 입사 순 정렬 -->
-        <when test="sort == 2">
-            ORDER BY 
-                CASE 
-                    WHEN m.dt_hire IS NOT NULL THEN 1
-                    ELSE 2
-                END, 
-                m.dt_hire asc
-        </when>
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
     </choose>
 </select>
 
@@ -342,26 +374,23 @@ WHERE d.CD_EMP IS NULL
                 END, 
                 m.cd_emp
         </when>
-        <!-- 이름 순 정렬 -->
-        <when test="sort == 1">
-            ORDER BY 
-                CASE 
-                    WHEN m.nm_emp IS NULL THEN 4
-                    WHEN m.nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    ELSE 3
-                END,
-                m.nm_emp
-        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
         <!-- 입사 순 정렬 -->
-        <when test="sort == 2">
-            ORDER BY 
-                CASE 
-                    WHEN m.dt_hire IS NULL THEN 2
-                    ELSE 1
-                END, 
-                m.dt_hire
-        </when>
+        <!-- 입사 순 정렬 -->
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
     </choose>
 </select>
 
@@ -369,45 +398,50 @@ WHERE d.CD_EMP IS NULL
 <!-- 조건 검색 카테고리 3 작년 퇴사자 + 당해년도 퇴사자 -->
 <select id="getConditionalEmpListCategory3" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
     SELECT *
-    FROM hr_emp_mst
-    WHERE LEFT(DT_RESIGN, 4) IN (YEAR(NOW()), YEAR(NOW()) - 1)
+    FROM hr_emp_mst m
+    WHERE LEFT(m.DT_RESIGN, 4) IN (YEAR(NOW()), YEAR(NOW()) - 1)
     <choose>
         <!-- 코드 순 정렬 -->
         <when test="sort == 0">
             ORDER BY 
                 CASE 
-                    WHEN cd_emp IS NULL THEN 4
-                    WHEN cd_emp REGEXP '^[A-Za-z]' THEN 1
-                    WHEN cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
                     ELSE 3
                 END, 
-                cd_emp;
+                cd_emp
         </when>
-        <!-- 이름 순 정렬 -->
-        <when test="sort == 1">
-            ORDER BY 
-                CASE 
-                    WHEN nm_emp IS NULL THEN 4
-                    WHEN nm_emp REGEXP '^[가-힣]' THEN 1
-                    WHEN nm_emp REGEXP '^[A-Za-z]' THEN 2
-                    WHEN nm_emp REGEXP '^[0-9]' THEN 3
-                    ELSE 4
-                END,
-                nm_emp
-        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
         <!-- 입사 순 정렬 -->
-        <when test="sort == 2">
-            ORDER BY 
-                CASE 
-                    WHEN dt_hire IS NULL THEN 2
-                    ELSE 1
-                END, 
-                dt_hire
-        </when>
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
     </choose>
 </select>
 
 
+
+<!-- pdf용 데이터 -->
+<select id="getHrPdfData" resultType="kr.or.oheasy.hrm.vo.HrPdfVO">
+    SELECT *
+    FROM hr_emp_mst
+    JOIN hr_emp_dtl ON hr_emp_mst.CD_EMP = hr_emp_dtl.CD_EMP
+    JOIN hr_body_data_dtl ON hr_emp_mst.CD_EMP = hr_body_data_dtl.CD_EMP
+    JOIN hr_military_info_dtl ON hr_emp_mst.CD_EMP = hr_military_info_dtl.CD_EMP
+    where hr_emp_mst.CD_EMP=#{cdEmp};
+</select>
 
 
 

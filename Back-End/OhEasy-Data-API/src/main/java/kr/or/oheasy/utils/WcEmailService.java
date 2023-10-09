@@ -1,12 +1,15 @@
 package kr.or.oheasy.utils;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -22,12 +25,80 @@ public class WcEmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public String sendEmailToEmployees(Map<String, Object> emailData) {
-       
+    
+//    public String sendEmailToEmployees(Map<String, Object> emailData) throws Exception {
+//        WcDao wcdao = sqlSession.getMapper(WcDao.class);
+//        List<WcEmailVO> employees = wcdao.getEmployeeEmailData(emailData);
+//
+//        // 누락된 이메일 주소를 추적하는 List
+//        List<String> missingEmailEmployees = new ArrayList<>();
+//
+//        // 성공적으로 이메일을 보낸 사람들을 추적하는 List
+//        List<String> successfulEmailEmployees = new ArrayList<>();
+//
+//        for (WcEmailVO emp : employees) {
+//            if (emp.getNmEmail() == null || emp.getNmEmail().isEmpty()) {
+//                System.out.println("Email address is null or empty for employee: " + emp.getNmEmp());
+//                missingEmailEmployees.add(emp.getNmEmp());
+//                continue;  // 이메일이 없는 경우 다음 직원으로 건너뜁니다.
+//            }
+//
+//            try {
+//                MimeMessage mail = javaMailSender.createMimeMessage();
+//                MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+//                String htmlContent = buildEmailContent(emp);
+//                helper.setTo(emp.getNmEmail());
+//                helper.setSubject("근로계약서 교부 양식입니다.");
+//                helper.setText(htmlContent, true);
+//                javaMailSender.send(mail);
+//                
+//                successfulEmailEmployees.add(emp.getNmEmp());  // 메일 전송 성공한 직원 이름을 리스트에 추가합니다.
+//
+//            } catch (MailException e) {
+//                throw new Exception("Failed to send email due to messaging exception.", e);
+//            }
+//        }
+//
+//        StringBuilder resultMessage = new StringBuilder();
+//
+//        if (!successfulEmailEmployees.isEmpty()) {
+//            resultMessage.append(successfulEmailEmployees.size())
+//                         .append("명에게 메일을 성공적으로 보냈습니다: ")
+//                         .append(String.join(", ", successfulEmailEmployees))
+//                         .append(". ");
+//        }
+//
+//        if (!missingEmailEmployees.isEmpty()) {
+//            resultMessage.append(missingEmailEmployees.size())
+//                         .append("명에게 메일을 보내지 못했습니다: ")
+//                         .append(String.join(", ", missingEmailEmployees));
+//        }
+//
+//        // 모든 사원이 메일 보내기에 성공했다면 "Emails sent successfully"를 반환
+//        if (successfulEmailEmployees.size() == employees.size()) {
+//            return "Emails sent successfully";
+//        }
+//
+//        return resultMessage.toString();
+//    }
+    
+    public String sendEmailToEmployees(Map<String, Object> emailData) throws Exception {
         WcDao wcdao = sqlSession.getMapper(WcDao.class);
         List<WcEmailVO> employees = wcdao.getEmployeeEmailData(emailData);
-        System.out.println(employees);
+
+        // 누락된 이메일 주소를 추적하는 List
+        List<String> missingEmailEmployees = new ArrayList<>();
+
+        // 성공적으로 이메일을 보낸 사람들을 추적하는 List
+        List<String> successfulEmailEmployees = new ArrayList<>();
+
         for (WcEmailVO emp : employees) {
+            if (emp.getNmEmail() == null || emp.getNmEmail().isEmpty()) {
+                System.out.println("Email address is null or empty for employee: " + emp.getNmEmp());
+                missingEmailEmployees.add(emp.getNmEmp());
+                continue;  // 이메일이 없는 경우 다음 직원으로 건너뜁니다.
+            }
+
             try {
                 MimeMessage mail = javaMailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mail, true);
@@ -35,33 +106,43 @@ public class WcEmailService {
                 helper.setTo(emp.getNmEmail());
                 helper.setSubject("근로계약서 교부 양식입니다.");
                 helper.setText(htmlContent, true);
-                
                 javaMailSender.send(mail);
-            } catch (Exception e) {
-                return e.getMessage();
+                
+                successfulEmailEmployees.add(emp.getNmEmp());  // 메일 전송 성공한 직원 이름을 리스트에 추가합니다.
+
+            } catch (MailException e) {
+                throw new Exception("Failed to send email due to messaging exception.", e);
             }
         }
-        return "Emails sent successfully";
-//        for (WcEmailVO emp : employees) {
-//            try {
-//            	
-//                MimeMessage mail = javaMailSender.createMimeMessage();
-//                MimeMessageHelper helper = new MimeMessageHelper(mail, true);
-//                helper.setTo(emp.getNmEmail());
-//                helper.setSubject("근로계약서 교부 양식입니다.");
-//                helper.setText("계약기간동안 소지해주세요.");
-//                javaMailSender.send(mail);
-//            } catch (Exception e) {
-//                return e.getMessage();
-//            }
-//        }
-//        return "Emails sent successfully";
-        
-        
-    }
-    
 
- 
+        StringBuilder resultMessage = new StringBuilder();
+
+        if (!successfulEmailEmployees.isEmpty()) {
+            resultMessage.append(successfulEmailEmployees.size())
+                         .append("명에게 메일을 성공적으로 보냈습니다: ")
+                         .append(String.join(", ", successfulEmailEmployees))
+                         .append(". ");
+        }
+
+        if (!missingEmailEmployees.isEmpty()) {
+            resultMessage.append(missingEmailEmployees.size())
+                         .append("명에게 메일을 보내지 못했습니다: ")
+                         .append(String.join(", ", missingEmailEmployees));
+        }
+
+        // 모든 사원이 메일 보내기에 성공했다면 "Emails sent successfully"를 반환
+        if (successfulEmailEmployees.size() == employees.size()) {
+            return "Emails sent successfully";
+        }
+
+        // 모든 사원이 메일 보내기에 실패했다면 "Emails sent fail"를 반환
+        if (successfulEmailEmployees.isEmpty()) {
+            return "Emails sent fail";
+        }
+
+        return resultMessage.toString();
+    }
+
 
     private String buildEmailContent(WcEmailVO emp) {
         return "<!DOCTYPE html>"
@@ -76,7 +157,7 @@ public class WcEmailService {
                     + row("직원명", emp.getNmEmp())
                     + row("이메일", emp.getNmEmail())
                     + row("계약시작일", formatDate(emp.getDtStartCont()))
-                    + row("계약종료일", formatDate(emp.getDtEndCont()))
+                    + row("계약종료일",formatDate(emp.getDtEndCont()))
                     + row("근무지 우편번호", emp.getNoWorkPost())
                     + row("근무지 주소", emp.getAddrWork())
                     + row("근무지 상세주소", emp.getAddrWorkDtl())
@@ -108,34 +189,52 @@ public class WcEmailService {
             + "</body>"
             + "</html>";
     }
+    
 
+    
     private String row(String label, Object value) {
+        System.out.println(value);
         return "<tr>"
             + "<td style='padding: 8px; width: 25%; border: 1px solid black; background-color: #92c5ff;'><strong>" + label + "</strong></td>"
-            + "<td style='padding: 8px; width: 75%; border: 1px solid black;'>" + (value != null ? value : "") + "</td>"
+            + "<td style='padding: 8px; width: 75%; border: 1px solid black;'>" + (value != null ? value : "정보 없음") + "</td>"
             + "</tr>";
     }
 
     private String formatDate(String date) {
-        if (date == null || date.length() != 8) {
-            return date;
+        if (date == null) {
+        	
+            return null;
         }
         return date.substring(0, 4) + "년 " + date.substring(4, 6) + "월 " + date.substring(6, 8) + "일";
     }
     
     
     private String formatTime(String time) {
-        if (time == null || time.length() != 4) {
+    	System.out.println("*********"+"formatTime");
+ 
+        if (time == null) {
+        	
             return time;
         }
         return time.substring(0, 2) + "시 " + time.substring(2, 4) + "분";
     }
     
     private String formatWorkingDays(String days) {
-        switch (days) {
+    System.out.println("***********3"+days);
+    
+    if (days == null) { //switch는 null을 모름.
+        System.out.println("***********10"+days);
+        return null; // null을 반환하거나 다른 기본값 반환
+    }
+    	switch (days) {
+    
             case "1":
-                return "1주에 1일";
+            	System.out.println("***********4"+days);
+                
+            	return "1주에 1일";
+                
             case "2":
+            	System.out.println("***********6"+days);
                 return "1주에 2일";
             case "3":
                 return "1주에 3일";
@@ -146,14 +245,21 @@ public class WcEmailService {
             case "6":
                 return "1주에 6일";
             case "7":
+            	System.out.println("***********5"+days);
                 return "1주에 7일";
             default:
-                return days;
+            	System.out.println("***********7"+days);
+            	return null;
         }
     }
     
     private String formatDotw(String day) {
+    	  if (day == null) {
+    	        System.out.println("***********days is null");
+    	        return null; // null을 반환하거나 다른 기본값 반환
+    	    }
         switch (day) {
+       
             case "1":
                 return "매주 월요일";
             case "2":
@@ -169,12 +275,17 @@ public class WcEmailService {
             case "7":
                 return "매주 일요일";
             default:
-                return day;
+            	return null;
         }
     }
     
     private String formatTpSal(String type) {
+    	  if (type == null) {
+    	        System.out.println("***********days is null");
+    	        return null; // null을 반환하거나 다른 기본값 반환
+    	    }
         switch (type) {
+      
             case "1":
                 return "월급";
             case "2":
@@ -182,7 +293,7 @@ public class WcEmailService {
             case "3":
                 return "시급";
             default:
-                return type;
+            	return null;
         }
     }
     
@@ -198,35 +309,49 @@ public class WcEmailService {
     }
     
     private String formatMethodPay(String method) {
+    	  if (method == null) {
+    	        System.out.println("***********days is null");
+    	        return null; // null을 반환하거나 다른 기본값 반환
+    	    }
         switch (method) {
+        
             case "1":
                 return "예금통장에 지급";
             case "2":
                 return "직접지급";
             default:
-                return method;
+            	return null;
         }
     }
     
     private String formatInsurance(String value) {
+    	  if (value == null) {
+    	        System.out.println("***********days is null");
+    	        return null; // null을 반환하거나 다른 기본값 반환
+    	    }
         switch (value) {
+       
             case "1":
                 return "가입";
             case "2":
                 return "미가입";
             default:
-                return value;
+            	return null;
         }
     }
     
     private String formatStSign(String value) {
+    	  if (value == null) {
+    	        System.out.println("***********days is null");
+    	        return null; // null을 반환하거나 다른 기본값 반환
+    	    }
         switch (value) {
             case "1":
                 return "서명완료";
             case "2":
                 return "서명 미작성";
             default:
-                return value;
+            	return null;
         }
     }
     

@@ -30,11 +30,19 @@ const defaultBodyData = {
 const HrBody = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [bodyData, setBodyData] = useState({ ...defaultBodyData });
+  const [bodyDataCopy, setBodyDataCopy] = useState({ ...defaultBodyData });
 
   const handleInputBlur = async (e) => {
     console.log("블러이벤 ****************************");
     const { name, value } = e.target;
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || value === "") {
+
+    console.log(name);
+
+    if (!cdEmp || value === "") {
+      return;
+    }
+    console.log(bodyDataCopy[name]);
+    if (value === bodyDataCopy[name]) {
       return;
     }
 
@@ -48,6 +56,10 @@ const HrBody = ({ cdEmp }) => {
       console.error("Failed to fetch emp data:", error);
     }
     setBodyData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    setBodyDataCopy((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -85,7 +97,7 @@ const HrBody = ({ cdEmp }) => {
       return;
     }
 
-    const handleGetEmpBasicData = async (cdEmp) => {
+    const handleGetBodyData = async (cdEmp) => {
       try {
         const responseData = await apiRequest({
           method: "GET",
@@ -95,17 +107,19 @@ const HrBody = ({ cdEmp }) => {
           ...defaultBodyData,
           ...responseData,
         });
+        setBodyDataCopy({
+          ...defaultBodyData,
+          ...responseData,
+        });
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
       }
     };
 
-    handleGetEmpBasicData(cdEmp);
+    handleGetBodyData(cdEmp);
   }, [cdEmp]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("인풋값변경~~~~~~~~~~~~~~~~~");
-    console.log(value);
     setBodyData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -122,7 +136,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"lenBody"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.lenBody || ""}
               />
@@ -135,7 +150,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"lenBust"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.lenBust || ""}
               />
@@ -148,7 +164,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={200}
                 name={"fgEye"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.fgEye || ""}
               />
@@ -194,7 +211,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"wgtBody"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.wgtBody || ""}
               />
@@ -207,7 +225,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={200}
                 name={"dcCaseHistory"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.dcCaseHistory || ""}
               />
@@ -219,7 +238,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"leftEyesight"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.leftEyesight || ""}
               />
@@ -231,7 +251,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={200}
                 name={"fgObstacle"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.fgObstacle || ""}
               />
@@ -243,17 +264,17 @@ const HrBody = ({ cdEmp }) => {
               <CustomSelect
                 options={[
                   { value: "0", label: "미선택" },
-                  { value: "1.1", label: "1급1항" },
-                  { value: "1.2", label: "1급2항" },
-                  { value: "1.3", label: "1급3항" },
-                  { value: "2", label: "2급" },
-                  { value: "3", label: "3급" },
-                  { value: "4", label: "4급" },
-                  { value: "5", label: "5급" },
-                  { value: "6", label: "6급1항" },
-                  { value: "6.2", label: "6급2항" },
-                  { value: "6.3", label: "6급3항" },
-                  { value: "7", label: "7급" },
+                  { value: "1급1항", label: "1급1항" },
+                  { value: "1급2항", label: "1급2항" },
+                  { value: "1급3항", label: "1급3항" },
+                  { value: "2급", label: "2급" },
+                  { value: "3급", label: "3급" },
+                  { value: "4급", label: "4급" },
+                  { value: "5급", label: "5급" },
+                  { value: "6급1항", label: "6급1항" },
+                  { value: "6급2항", label: "6급2항" },
+                  { value: "6급3항", label: "6급3항" },
+                  { value: "7급", label: "7급" },
                 ]}
                 placeholder="선택"
                 value={bodyData.lvVerterans || ""}
@@ -269,7 +290,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={80}
                 name={"nclBloodMin"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.nclBloodMin || ""}
               />
@@ -277,7 +299,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={80}
                 name={"nclBloodMax"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.nclBloodMax || ""}
               />
@@ -290,10 +313,10 @@ const HrBody = ({ cdEmp }) => {
               <CustomSelect
                 options={[
                   { value: "0", label: "미선택" },
-                  { value: "1", label: "AB형" },
-                  { value: "2", label: "A형" },
-                  { value: "3", label: "B형" },
-                  { value: "4", label: "O형" },
+                  { value: "AB형", label: "AB형" },
+                  { value: "A형", label: "A형" },
+                  { value: "B형", label: "B형" },
+                  { value: "O형", label: "O형" },
                 ]}
                 placeholder="선택"
                 value={bodyData.fgBloodType || "0"}
@@ -307,7 +330,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"rightEyesight"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.rightEyesight || ""}
               />
@@ -319,7 +343,8 @@ const HrBody = ({ cdEmp }) => {
               <CustomInput
                 width={100}
                 name={"fgVerterans"}
-                onBlur={handleInputBlur}
+                //onBlur={handleInputBlur}
+                onKeyDown={handleInputBlur}
                 onChange={handleInputChange}
                 value={bodyData.fgVerterans || ""}
               />

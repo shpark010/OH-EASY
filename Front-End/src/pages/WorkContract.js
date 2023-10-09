@@ -52,6 +52,7 @@ const WorkContract = () => {
   const [highlightFirstRow, setHighlightFirstRow] = useState(true); //첫번째 행 표시를 위해
   const [clickCode,setClickCode] = useState("");
   const [showInsertRow, setShowInsertRow] = useState(false);
+  const [emailResult,setEmailResult] = useState("");
 
   const tabClick = (e,tabState) =>{
     
@@ -150,7 +151,7 @@ const handleDeleteClick = () => {
 const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 confirm alert
   const [emailSendAlert, setEmailSendAlert] = React.useState(false);  // 이메일 발송 성공 alert
   const [emailSendAlert2, setEmailSendAlert2] = React.useState(false);  // 이메일 발송 성공 alert
-
+  const [emailSendAlert3, setEmailSendAlert3] = React.useState(false);  // 이메일 발송 성공 alert
 
   // 이메일 관련 alret set 이벤트 핸들러
   const handleEmailCloseAlert = () => {
@@ -172,17 +173,48 @@ const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 c
 
   const handleEmailSendCloseAlert = () => {
     setEmailSendAlert(false); 
+    setEmailSendAlert2(false); 
+    setEmailSendAlert3(false);
+   
   };
   const handleEmailSendOpenAlert = () => {
     setEmailSendAlert(true); 
+  };
+
+  const handleEmailSendOpenAlert2 = () => {
+    setEmailSendAlert2(true); 
+  };
+  const handleEmailSendOpenAlert3 = () => {
+    setEmailSendAlert3(true); 
   };
 
   const handleEmailSendConfirm = () => {
     handleEmailSendCloseAlert();
   };
 
+  const formatResponseData = (data) => {
+    const sentences = data.split('. ').filter(Boolean);
+    const formattedSentences = sentences.map(sentence => {
+        if (sentence.includes("메일을 성공적으로 보냈습니다")) {
+            const [count, names] = sentence.split(': ');
+            return `\n🟢 성공 (${count.split("명에게")[0].trim()}명):\n`;
+        }
+        if (sentence.includes("메일을 보내지 못했습니다")) {
+            const [count, names] = sentence.split(': ');
+            return `\n🔴 실패 (${count.split("명에게")[0].trim()}명):\n${names}`;
+        }
+        return sentence;
+    });
+
+    return formattedSentences.join('\n\n'); // 두 문장 사이에는 더 큰 간격으로 줄바꿈
+}
+
+
+
+
+
 const handleSendEmail = async () => {
-  let sendResult = 0;
+  setEmailResult([]);
   try {
     // checkColumn을 기반으로 employeeData 필터링
     const selectedEmployees = employeeData.filter(emp => checkColumn.includes(emp.cdEmp));
@@ -204,11 +236,16 @@ const handleSendEmail = async () => {
       },
     });
     console.log(responseData);
-  
-    if (responseData === "Emails sent successfully") {
+    if (responseData === "Emails sent successfully") { //전원 성공시
+     
       handleEmailSendOpenAlert();
-    } else {
-      setEmailSendAlert2(false);
+    } else if(responseData === "Emails sent fail"){ //전원 실패시
+      handleEmailSendOpenAlert3();
+    }
+    
+    else  {
+      handleEmailSendOpenAlert2();
+      setEmailResult(formatResponseData(responseData));
     }
   } catch (error) {
     console.error("Failed to fetch emp data:", error);
@@ -257,7 +294,7 @@ const handleSendEmail = async () => {
                   }
                 }}               
               />
-              <PageHeaderIconButton
+              {/* <PageHeaderIconButton
                 btnName="calc wcMouseOver"
                 imageSrc={Calc}
                 altText="계산기"
@@ -266,7 +303,7 @@ const handleSendEmail = async () => {
                 btnName="setting wcMouseOver"
                 imageSrc={Setting}
                 altText="세팅"
-              />
+              /> */}
 
               
             </div>
@@ -294,7 +331,7 @@ const handleSendEmail = async () => {
 
          {showAlert && (
         <SweetAlert
-          text="정말 삭제하시겠습니까?"
+        text={`${checkColumn.length}명의 사원을 삭제하시겠습니까?`}
           showCancel={true}
           //type="success"
           type="warning"
@@ -310,7 +347,7 @@ const handleSendEmail = async () => {
 
         {showAlert2 && (
         <SweetAlert
-          text="삭제할 사원을 선택해 주세요."
+          text="선택한 사원이 없습니다."
           // showCancel={true}
           //type="success"
           type="warning"
@@ -327,8 +364,8 @@ const handleSendEmail = async () => {
         <SweetAlert
         text={
             checkColumn.length > 0
-            ? `선택한 ${checkColumn.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
-            : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
+            ? ` ${checkColumn.length}명의 사원에게 근로계약서를 발송하시겠습니까?`
+            : "선택한 사원이 없습니다."
         }
         type={checkColumn.length > 0 ? "question" : "warning"}
         showCancel={checkColumn.length > 0} // 이 부분을 수정하여 조건에 따라 취소 버튼을 표시
@@ -338,7 +375,7 @@ const handleSendEmail = async () => {
       )}
       {emailSendAlert && (
         <SweetAlert
-          text={"메일을 성공적으로 발송했습니다."}
+          text={` 메일 보내기가 성공했습니다.`}
           type="success"
           onConfirm={handleEmailSendConfirm}
           showCancel={false}
@@ -348,8 +385,18 @@ const handleSendEmail = async () => {
       
       {emailSendAlert2 && (
         <SweetAlert
-          text={"메일 발송에 실패했습니다."}
-          type="fail"
+          text={emailResult}
+          type="error"
+          onConfirm={handleEmailSendConfirm}
+          showCancel={false}
+          confirmText="확인"
+        />
+      )}
+
+{emailSendAlert3 && (
+        <SweetAlert
+        text={` 메일 보내기가 실패했습니다.`}
+          type="error"
           onConfirm={handleEmailSendConfirm}
           showCancel={false}
           confirmText="확인"

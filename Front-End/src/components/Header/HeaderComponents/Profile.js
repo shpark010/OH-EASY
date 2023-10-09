@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { setCookie, getCookie, removeCookie } from "../../../containers/Cookie";
@@ -57,6 +57,7 @@ const ProfileBox = styled.div`
 const ProfileBoxItem = styled.a`
   display: flex;
   align-items: center;
+  width: 100px;
 
   & + & {
     margin-top: 10px;
@@ -66,7 +67,7 @@ const ProfileBoxItem = styled.a`
 const IconWrapper = styled.div`
   width: 24px;
   height: 24px;
-  margin-right: 5px;
+  margin-right: 10px;
 `;
 
 const Profile = (props) => {
@@ -100,8 +101,23 @@ const Profile = (props) => {
     setIsProfileBoxVisible((prev) => !prev);
   };
 
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsProfileBoxVisible(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+
   return (
-    <ProfileWrapper onClick={toggleProfileBox}>
+    <ProfileWrapper onClick={toggleProfileBox} ref={wrapperRef}>
       <ProfileName>{props.name} 님</ProfileName>
       <ProfileImageWrapper>
         <img src={noProfile} alt="이미지 샘플" />

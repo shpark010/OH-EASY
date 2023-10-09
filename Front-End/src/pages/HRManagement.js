@@ -66,7 +66,8 @@ function HRManagement() {
       console.log("서버에서 넘어온 데이터 ");
       console.log(responseData);
       setEmpList((prevEmpList) => [...prevEmpList, responseData]);
-      setClickEmpCode(clickModalEmpCode);
+      //setClickEmpCode(clickModalEmpCode);
+      setClickEmpCode(cdEmp);
       setClickModalEmpCode();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -79,6 +80,22 @@ function HRManagement() {
   const [selectedEmpCode, setSelectedEmpCode] = useState(null); // 현재 체크된 cdEmp 저장하는 상태
   const [clickEmpCode, setClickEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
   const [clickModalEmpCode, setClickModalEmpCode] = useState(null); // 현재 클릭한 cdEmp 저장하는 상태
+
+  //const [firstCdEmp, setFirstCdEmp] = useState();
+  //const firstCdEmp = data && data[0] ? data[0].cdEmp : null;
+
+  useEffect(() => {
+    if (showInsertRow) {
+      setClickEmpCode();
+    }
+  }, [showInsertRow]);
+
+  // empList가 변경시에 무조건 첫번째행을 cdEmp를 가져와서 clickEmp에 넣기
+  useEffect(() => {
+    if (!empList) {
+      setClickEmpCode(empList[0].cdEmp);
+    }
+  }, [empList]);
 
   const [conditions, setConditions] = useState({
     category: 0,
@@ -329,11 +346,14 @@ function HRManagement() {
         setCheckedRows={setCheckedRows}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
+        clickEmpCode={clickEmpCode}
         deleteEmp={deleteEmp}
+        empList={empList}
         setEmpStats={setEmpStats}
       />
       <HrSearchBar
         conditions={conditions}
+        setCheckedRows={setCheckedRows}
         setConditions={setConditions}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
@@ -402,21 +422,36 @@ function HRManagement() {
       >
         <PageHeaderName text="추가목록" />
         <div className="test2">
-          <Table columns={columnsModal} data={dataModalEmpList} />
+          {dataModalEmpList.length === 0 ? (
+            <div>현재 모든 사원이 인사테이블에 등록되어있습니다.</div>
+          ) : (
+            <Table columns={columnsModal} data={dataModalEmpList} />
+          )}
         </div>
         <div className="test">
-          <CustomButton
-            backgroundColor={"var(--color-primary-blue)"}
-            color={"var(--color-primary-white)"}
-            onClick={closeModalAndEmpInsert}
-            text={"추가하기"}
-          />
-          <CustomButton
-            backgroundColor={"var(--color-primary-gray)"}
-            color={"var(--color-primary-white)"}
-            onClick={closeModal}
-            text={"취소"}
-          />
+          {dataModalEmpList.length === 0 ? (
+            <CustomButton
+              backgroundColor={"var(--color-primary-gray)"}
+              color={"var(--color-primary-white)"}
+              onClick={closeModal}
+              text={"취소"}
+            />
+          ) : (
+            <>
+              <CustomButton
+                backgroundColor={"var(--color-primary-blue)"}
+                color={"var(--color-primary-white)"}
+                onClick={closeModalAndEmpInsert}
+                text={"추가하기"}
+              />
+              <CustomButton
+                backgroundColor={"var(--color-primary-gray)"}
+                color={"var(--color-primary-white)"}
+                onClick={closeModal}
+                text={"취소"}
+              />
+            </>
+          )}
         </div>
       </CustomModal>
     </>

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO;
 import kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO;
+import kr.or.oheasy.hrm.vo.HrPdfVO;
 import kr.or.oheasy.vo.HrBodyDataDtlVO;
 import kr.or.oheasy.vo.HrCareerDtlVO;
 import kr.or.oheasy.vo.HrEducationDtlVO;
@@ -32,6 +33,9 @@ public interface HrDao {
 	public int insertIntoHrMilitaryInfoDtl();
 	public int insertIntoHrBodyDataDtl();
 
+	
+	// 사원 한명만 등록시 가족테이블에 본인 넣기 
+	public int insertOneHrFamilyDtl(String cdEmp);	
 	// 인사테이블 삭제
 	public void deleteHrEmpDtl(String cdEmp);
 	// 인사테이블에 사진까지 삭제
@@ -66,6 +70,8 @@ public interface HrDao {
 	
 	// 가족 테이블
 	public List<HrFamilyDtlVO> getFamilyDataList(String cdEmp);
+	
+	public int insertFirstFamilyData(@Param("cdEmp") String cdEmp);
 	
 	public int insertFamilyData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);
 	
@@ -108,5 +114,17 @@ public interface HrDao {
     public int updateLicenseData(@Param("seqLicense") String seqLicense, @Param("column") String column, @Param("value") String value);
 	
    
+    // 삭제 
+    public int deleteFamilyData(@Param("seqFamily") String seqFamily);
+    public int deleteEduData(@Param("seqEducation") String seqEducation);
+    public int deleteCareerData(@Param("seqCareer") String seqCareer);
+    public int deleteLicenseData(@Param("seqLicense") String seqLicense);
+    
+    
+    public HrEmpMstCdEmpNmNameVO insertHrDtlAndGetHrMst(@Param("cdEmp") String cdEmp);
+    
+    // pdf
+    public HrPdfVO getHrPdfData(String cdEmp);
+    
     
 }

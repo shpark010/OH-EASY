@@ -11,6 +11,7 @@ import kr.or.oheasy.vo.SdEmailInfoVO;
 import kr.or.oheasy.vo.SdEmpInfoVO;
 import kr.or.oheasy.vo.SdEmpMstVO;
 import kr.or.oheasy.vo.SdPayDayListVO;
+import kr.or.oheasy.vo.SdPdfInfoVO;
 import kr.or.oheasy.vo.SdTaxAmountVO;
 import kr.or.oheasy.vo.SdTaxRateVO;
 
@@ -53,6 +54,9 @@ public interface SdDao {
 	
 	//이매일 발송을 위한 사원 급여 정보
 	public List<SdEmailInfoVO> selectForMail(Map<String, Object> emailData);
+	
+	//PDF 출력을 위한 사원 급여 정보
+	public SdPdfInfoVO selectForPdf(Map<String, String> pdfData);
 	
 	//각 공제 항목 별 업데이트
 	public int updateEachDeduction(Map<String, Object> updateEachDeductionData);

@@ -56,7 +56,7 @@ public class EmailController {
         	for (SdEmailInfoVO emailInfo : emailInfoList) {
         		String html = FileUtil.readHtmlFile("src/main/resources/static/email.html");
         		if(emailValidator.validate(emailInfo.getNmEmail())) {
-        			
+        		System.out.println(emailInfo);
         		FormatPrice formatPrice = new FormatPrice();
         		// 여기서 파라미터 대체
         		html = html.replace("{{nmEmp}}", emailInfo.getCdEmp())

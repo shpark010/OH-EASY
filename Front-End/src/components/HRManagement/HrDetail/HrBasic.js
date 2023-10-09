@@ -28,18 +28,38 @@ const defaultEmpBasicData = {
 const HrBasic = ({ cdEmp }) => {
   const apiRequest = useApiRequest();
   const [empBasicData, setEmpBasicData] = useState({ ...defaultEmpBasicData });
+  const [empBasicDataCopy, setEmpBasicDataCopy] = useState({
+    ...defaultEmpBasicData,
+  });
 
   const [showAlert, setShowAlert] = useState(false);
+  const [showImgDeleteAlert, setShowImgDeleteAlert] = useState(false);
   const [alertText, setAlertText] = useState("");
   const openAlertWithText = (text) => {
     setAlertText(text);
     setShowAlert(true);
   };
 
+  const handleImgDeleteAlert = () => {
+    console.log("삭제버튼클릭~~");
+    setShowImgDeleteAlert(true);
+  };
+
   const handleInputBlur = async (e) => {
     console.log("블러이벤 ****************************");
+
     const { name, value } = e.target;
-    if (cdEmp == null || cdEmp === "" || cdEmp === undefined || value === "") {
+    console.log("empBasicData.nmEngEmp : " + empBasicData.nmEngEmp);
+    console.log("copy : " + empBasicDataCopy.nmEngEmp);
+    if (!cdEmp || value === "") {
+      return;
+    }
+
+    if (
+      (name === "nmEngEmp" && value === empBasicDataCopy.nmEngEmp) ||
+      (name === "nmHanjaEmp" && value === empBasicDataCopy.nmHanjaEmp)
+    ) {
+      console.log("값이 동일하니까 api 요청안가 ");
       return;
     }
 
@@ -53,6 +73,10 @@ const HrBasic = ({ cdEmp }) => {
       console.error("Failed to fetch emp data:", error);
     }
     setEmpBasicData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    setEmpBasicDataCopy((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -136,6 +160,7 @@ const HrBasic = ({ cdEmp }) => {
           ...defaultEmpBasicData,
           ...responseData,
         });
+        setEmpBasicDataCopy(responseData);
         console.log(responseData.path);
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
@@ -149,12 +174,16 @@ const HrBasic = ({ cdEmp }) => {
   const fileInputRef = useRef(null);
 
   const handleFileUploadClick = () => {
+    console.log("********************************");
+    console.log(fileInputRef);
+    console.log("********************************");
     fileInputRef.current.click();
   };
   //const [profileImage, setProfileImage] = useState(noImage);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
+    console.log(file);
     console.log("handleFileChange *****************");
     if (!file) {
       //file = null;
@@ -192,6 +221,8 @@ const HrBasic = ({ cdEmp }) => {
     } catch (error) {
       console.error("Failed to upload file:", error);
     }
+    // 파일 선택 후 <input>의 값을 초기화
+    e.target.value = null;
   };
 
   const imgDelete = async () => {
@@ -224,6 +255,18 @@ const HrBasic = ({ cdEmp }) => {
           onConfirm={() => setShowAlert(false)}
         />
       )}
+      {showImgDeleteAlert && (
+        <SweetAlert
+          text="정말 사진을 삭제하시겠습니까?"
+          type="question"
+          showCancel={true}
+          onConfirm={() => {
+            imgDelete();
+            setShowImgDeleteAlert(false);
+          }}
+          onCancel={() => setShowImgDeleteAlert(false)}
+        />
+      )}
       <ul className="pageTab">
         <li className="on">기초정보</li>
       </ul>
@@ -249,6 +292,12 @@ const HrBasic = ({ cdEmp }) => {
               style={{ display: "none" }}
               ref={fileInputRef}
               onChange={handleFileChange}
+              onClick={(e) => {
+                if (!cdEmp) {
+                  openAlertWithText("사원 선택 후 업로드가 가능합니다.");
+                  e.preventDefault(); // 파일 선택 창을 없애기
+                }
+              }}
             />
             <CustomButton
               text="삭제"
@@ -256,7 +305,14 @@ const HrBasic = ({ cdEmp }) => {
               backgroundColor="#707070"
               className="hrInfoBaseProfileImgBtn"
               //onClick={fileDelete}
-              onClick={imgDelete}
+              //onClick={imgDelete}
+              onClick={() => {
+                if (empBasicData.path) {
+                  handleImgDeleteAlert();
+                } else {
+                  return;
+                }
+              }}
             />
           </div>
         </div>
@@ -269,7 +325,8 @@ const HrBasic = ({ cdEmp }) => {
                   value={empBasicData.nmEngEmp || ""}
                   width={322}
                   name={"nmEngEmp"}
-                  onBlur={handleInputBlur}
+                  //onBlur={handleInputBlur}
+                  onKeyDown={handleInputBlur}
                   onChange={handleInputChange}
                   // backgroundColor={"gray"}
                   // readOnly={true}
@@ -291,11 +348,6 @@ const HrBasic = ({ cdEmp }) => {
             <tr>
               <th>생년월일</th>
               <td>
-                {/* <CustomInput
-                  className="hrInfoBaseInput"
-                  width={322}
-                  value={extractBirthDate(empBasicData.noResident)}
-                /> */}
                 <CustomCalender
                   className="hrInfoBaseInput"
                   value={empBasicData.dtBirth}
@@ -347,6 +399,7 @@ const HrBasic = ({ cdEmp }) => {
                   ]}
                   // dtResign 값이 있으면 "1" (퇴사), 없으면 "0" (재직)
                   value={empBasicData.dtResign ? "1" : "0"}
+                  readOnly={true}
                 />
               </td>
             </tr>
@@ -371,7 +424,8 @@ const HrBasic = ({ cdEmp }) => {
                   value={empBasicData.nmHanjaEmp || ""}
                   width={322}
                   name={"nmHanjaEmp"}
-                  onBlur={handleInputBlur}
+                  onKeyDown={handleInputBlur}
+                  //onBlur={handleInputBlur}
                   onChange={handleInputChange}
                 />
               </td>

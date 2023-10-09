@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,27 +87,8 @@ public class HrController {
 	public ResponseEntity<?> insertHrEmpData(@RequestParam("cdEmp") String cdEmp){
 		System.out.println("insertHrEmpData");
 		System.out.println("넘어온 cdEmp : " + cdEmp);
-		
-	
-		// 인사테이블에 사원정보 insert 
-		hrService.insertHrEmpData(cdEmp);
-		// 신체테이블에 신체정보 insert
-		hrService.insertBodyData(cdEmp);
-		// 병역테이블에 병역정보 insert
-		hrService.insertMilitaryData(cdEmp);
-		
-		// 한명의 사원 정보 인사테이블에서  가져오기
-		HrEmpMstCdEmpNmNameVO result  = hrService.getOneHrEmpData(cdEmp);
-		System.out.println("가져온 1명의 정보 : " + result);
-		
-		
-		//String result2 = "{cdEmp=" + result.getCdEmp();
-		
-		// 인사테이블에 등록되어있는 사원목록 리스트
-		//List<HrEmpMstVO> result = hrService.getAllEmpList();
-		//System.out.println(result);
-	
-		
+		// 사원번호 받으면 해당사원의 mst 정보 전부 끌어오고 insert문 4개 진행
+		HrEmpMstCdEmpNmNameVO result  = hrService.insertHrDtlAndGetHrMst(cdEmp);
 		
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
@@ -323,7 +305,7 @@ public class HrController {
 		return new ResponseEntity<>("",HttpStatus.OK);
 	}
 	
-	@GetMapping("/getCarrerDataList")
+	@GetMapping("/getCareerDataList")
 	public ResponseEntity<?> getCarrerDataList(@RequestParam String cdEmp){
 		System.out.println("getCarrerDataList");
 		
@@ -451,6 +433,58 @@ public class HrController {
 	    
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}
+	
+	
+	@PostMapping("deleteFamilyData")
+	public ResponseEntity<?> deleteFamilyData(@RequestBody Map<String,String> payload){
+		
+		String seqFamily = payload.get("seqFamily");
+		System.out.println("deleteFamilyData");
+		System.out.println(seqFamily);
+		int result = hrService.deleteFamilyData(seqFamily);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("deleteEduData")
+	public ResponseEntity<?> deleteEduData(@RequestBody Map<String,String> payload){
+		
+		String seqEducation = payload.get("seqEducation");
+		System.out.println("deleteEduData");
+		System.out.println(seqEducation);
+		int result = hrService.deleteEduData(seqEducation);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	@PostMapping("deleteCareerData")
+	public ResponseEntity<?> deleteCareerData(@RequestBody Map<String,String> payload){
+		
+		String seqCareer = payload.get("seqCareer");
+		System.out.println("deleteCareerData");
+		System.out.println(seqCareer);
+		int result = hrService.deleteCareerData(seqCareer);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	@PostMapping("deleteLicenseData")
+	public ResponseEntity<?> deleteLicenseData(@RequestBody Map<String,String> payload){
+		
+		String seqLicense = payload.get("seqLicense");
+		System.out.println("deleteLicenseData");
+		System.out.println(seqLicense);
+		int result = hrService.deleteLicenseData(seqLicense);
+		
+		
+		return new ResponseEntity<>(result,HttpStatus.OK);
+	}
+	
+	
+	
+	
 	
 	
 }

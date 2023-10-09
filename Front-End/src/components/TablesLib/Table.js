@@ -87,7 +87,8 @@ const TableContainer = styled.div`
 
 function Table(props) {
   const tableContainerRef = useRef(null);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  //const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(0);
 
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
@@ -96,10 +97,16 @@ function Table(props) {
     if (props.data.length > prevRowsLength) {
       const lastIndex = props.data.length - 1; // 마지막 행 인덱스
       setPrevRowsLength(props.data.length); // rows의 길이 업데이트
+      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
     } else {
-      setLastAddedRowIndex(null); // 추가된 행이 없으면 null로 설정
+      const lastIndex = props.data.length - 1; // 마지막 행 인덱스
+      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
     }
-    setSelectedRowIndex(-1);
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop =
+        tableContainerRef.current.scrollHeight -
+        tableContainerRef.current.clientHeight;
+    }
   }, [props.data.length]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -195,26 +202,20 @@ function Table(props) {
         {props.insertRow && (
           <StyledInsertFooter>
             <StyledTr>
-              <StyledInsertTh
-                colSpan={props.columns.length}
-                onClick={() => {
-                  props.setShowInsertRow((prevState) => !prevState);
-                  setSelectedRowIndex("insert"); // 'insert'로 설정
-                  setTimeout(() => {
-                    if (tableContainerRef.current) {
-                      tableContainerRef.current.scrollTop =
-                        tableContainerRef.current.scrollHeight -
-                        tableContainerRef.current.clientHeight;
-                    }
-                  }, 0);
-                  
-                  if (props.onAddButtonClick) {
-                    props.onAddButtonClick();
-                  }
-                  
-                }}
-              >
-                <StyledBtn>
+              <StyledInsertTh colSpan={props.columns.length}>
+                <StyledBtn
+                  onClick={() => {
+                    props.setShowInsertRow((prevState) => !prevState);
+                    setSelectedRowIndex("insert"); // 'insert'로 설정
+                    setTimeout(() => {
+                      if (tableContainerRef.current) {
+                        tableContainerRef.current.scrollTop =
+                          tableContainerRef.current.scrollHeight -
+                          tableContainerRef.current.clientHeight;
+                      }
+                    }, 0);
+                  }}
+                >
                   <span>추가하기</span>
                 </StyledBtn>
               </StyledInsertTh>
