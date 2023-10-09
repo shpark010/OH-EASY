@@ -93,6 +93,7 @@ function Table(props) {
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
   useEffect(() => {
+    console.log("props.data.length:", props.data.length);
     if (props.bottomFocus) {
       // rows의 길이가 이전 길이보다 크면
       if (props.data.length > prevRowsLength) {
@@ -127,20 +128,25 @@ function Table(props) {
     <TableContainer ref={tableContainerRef} height={props.height}>
       <table {...getTableProps()} className="namePickerTable hrGridTable">
         <thead>
-          {headerGroups.map((headerGroup) => (
+          {headerGroups.map((headerGroup, headerIndex) => (
             <StyledTr
               {...headerGroup.getHeaderGroupProps()}
+              key={headerIndex} // 추가
               className="hrHeaderStyle"
               data-is-header={true}
             >
               {headerGroup.headers.map((column) => (
-                <StyledTh {...column.getHeaderProps()} width={column.width}>
+                <StyledTh
+                  {...column.getHeaderProps()}
+                  key={column.id}
+                  width={column.width}
+                >
                   {column.render("Header")}
                 </StyledTh>
               ))}
             </StyledTr>
           ))}
-          <StyledTr>
+          <StyledTr key="empty-header">
             <StyledTh style={{ width: "15px", padding: "0" }} />
           </StyledTr>
         </thead>
@@ -169,6 +175,7 @@ function Table(props) {
                 {row.cells.map((cell) => (
                   <StyledTd
                     {...cell.getCellProps()}
+                    key={cell.column.id} // 추가
                     width={getWidthStyle(cell.column.width)}
                   >
                     {cell.render("Cell")}
@@ -179,17 +186,18 @@ function Table(props) {
           })}
           {props.showInsertRow && (
             <StyledTr
+              key="insert-row"
               style={
                 selectedRowIndex === "insert"
                   ? { backgroundColor: "var(--color-secondary-blue)" }
                   : {}
               }
             >
-              {props.columns.map((column) => {
+              {props.columns.map((column, index) => {
                 const CellContent = column.Cell;
                 return (
                   <StyledTd
-                    key={column.id}
+                    key={index}
                     style={{ width: getWidthStyle(column.width) }}
                   >
                     <CellContent
@@ -206,7 +214,7 @@ function Table(props) {
         {props.insertRow && (
           <StyledInsertFooter>
             <StyledTr>
-              <StyledInsertTh colSpan={props.columns.length}>
+              <StyledInsertTh key="insert-th" colSpan={props.columns.length}>
                 <StyledBtn
                   onClick={() => {
                     props.setShowInsertRow((prevState) => !prevState);
@@ -218,11 +226,10 @@ function Table(props) {
                           tableContainerRef.current.clientHeight;
                       }
                     }, 0);
-                    
+
                     if (props.onAddButtonClick) {
                       props.onAddButtonClick();
                     }
-                    
                   }}
                 >
                   <span>추가하기</span>

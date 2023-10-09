@@ -71,6 +71,15 @@ function CustomInput({
     } else if (type === "number") {
       // 숫자만 허용
       newValue = newValue.replace(/[^0-9]/g, "");
+    } else if (type === "figure") {
+      // 정수 또는 소수만 허용하는 정규 표현식
+      newValue = newValue.replace(/[^0-9.]/g, "");
+
+      // 소수점이 두 번 이상 등장하지 않도록 처리
+      const decimalPoints = newValue.split(".").length - 1;
+      if (decimalPoints > 1) {
+        newValue = newValue.substr(0, newValue.lastIndexOf("."));
+      }
     }
 
     if (onChange) {

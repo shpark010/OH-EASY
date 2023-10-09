@@ -134,6 +134,7 @@ const HrBody = ({ cdEmp }) => {
             <th>신장</th>
             <td>
               <CustomInput
+                type="figure"
                 width={100}
                 name={"lenBody"}
                 //onBlur={handleInputBlur}
@@ -149,6 +150,7 @@ const HrBody = ({ cdEmp }) => {
             <td>
               <CustomInput
                 width={100}
+                type="figure"
                 name={"lenBust"}
                 //onBlur={handleInputBlur}
                 onKeyDown={handleInputBlur}
@@ -210,6 +212,7 @@ const HrBody = ({ cdEmp }) => {
             <td>
               <CustomInput
                 width={100}
+                type="figure"
                 name={"wgtBody"}
                 //onBlur={handleInputBlur}
                 onKeyDown={handleInputBlur}
@@ -236,6 +239,7 @@ const HrBody = ({ cdEmp }) => {
             <th>시력(좌)</th>
             <td>
               <CustomInput
+                type="figure"
                 width={100}
                 name={"leftEyesight"}
                 //onBlur={handleInputBlur}
@@ -289,6 +293,7 @@ const HrBody = ({ cdEmp }) => {
             <td>
               <CustomInput
                 width={80}
+                type="figure"
                 name={"nclBloodMin"}
                 //onBlur={handleInputBlur}
                 onKeyDown={handleInputBlur}
@@ -298,6 +303,7 @@ const HrBody = ({ cdEmp }) => {
               <span> ~ </span>
               <CustomInput
                 width={80}
+                type="figure"
                 name={"nclBloodMax"}
                 //onBlur={handleInputBlur}
                 onKeyDown={handleInputBlur}

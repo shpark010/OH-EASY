@@ -41,7 +41,8 @@ const DropdownMenu = styled.div`
   width: 200px;
   right: 0px;
   top: 50px;
-  display: ${(props) => (props.show ? "block" : "none")};
+  //display: ${(props) => (props.show ? "block" : "none")};
+  display: ${(props) => (props["data-show"] ? "block" : "none")};
   border-radius: 5px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -68,10 +69,10 @@ const QuickMenu = () => {
   const menuRef = useRef(); // 레퍼런스 생성
 
   const menuItems = [
-    { label: "- 사원등록", to: "/er" },
-    { label: "- 인사등록", to: "/hrm" },
-    { label: "- 급여자료입력", to: "/sd" },
-    { label: "- 표준근로계약서", to: "/wc" },
+    { label: "· 사원등록", to: "/er" },
+    { label: "· 인사등록", to: "/hrm" },
+    { label: "· 급여등록", to: "/sd" },
+    { label: "· 근로계약서", to: "/wc" },
   ];
 
   useEffect(() => {
@@ -99,7 +100,7 @@ const QuickMenu = () => {
         onClick={() => setShowMenu(!showMenu)}
       />
 
-      <DropdownMenu show={showMenu}>
+      <DropdownMenu data-show={showMenu}>
         {menuItems.map((item, index) => (
           <Link
             key={index}
