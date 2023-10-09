@@ -269,7 +269,7 @@ const handleSendEmail = async () => {
               <div className="btnWrapper textBtnWrap">
                 {/* <PageHeaderTextButton text="PDF로 저장하기" onClick={""} />*/}
                 <PageHeaderTextButton 
-    text="전자서명 메일 보내기" 
+    text="메일 보내기" 
     onClick={() => {
         if (checkColumn.length === 0) {
             // 체크된 사원이 없으면 emailAlert를 true로 설정하여 경고 알림을 보여줍니다.
@@ -400,7 +400,7 @@ const handleSendEmail = async () => {
 
 {emailSendAlert3 && (
         <SweetAlert
-        text={` 메일 보내기가 실패했습니다.`}
+        text={` 메일 주소를 확인해주세요.`}
           type="error"
           onConfirm={handleEmailSendConfirm}
           showCancel={false}
