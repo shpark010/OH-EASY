@@ -41,8 +41,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: parksungh97@gmail.com
-    password: fgrgkenbhmjshexq
+    username: ${smtp.email.username}
+    password: ${smtp.email.password}
     properties:
       mail:
         debug: true
@@ -72,8 +72,8 @@ cloud:
     s3:
       bucket: leefinal
     credentials:
-      access-key: AKIAT3ZIG6Q7KGW66R7Y
-      secret-key: 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
+      access-key: ${aws.s3.access-key}
+      secret-key: ${aws.s3.secret-key}
     region:
       static: ap-northeast-2
       auto: false
