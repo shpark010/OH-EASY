@@ -67,28 +67,33 @@ public class AuthController {
 		if (result == 1) {
 			// 아이디 비번 맞을 경우 200
 			// 맞으면 jwt 토큰 생성 후 뷰페이지로 리턴
+			String existToken = redisService.getData(loginVO.getUserId());
+			if(existToken == null) {
+				String token = JwtUtil.generateToken(loginVO.getUserId());
+				System.out.println("생성된 jwt 토큰 : " + token);
+				
+				// Redis에 데이터(아이디, 토큰) 저장
+				redisService.setData(loginVO.getUserId(), token);
+				
+				LoginVO userData = authService.userData(loginVO.getUserId());
+				
+				
+				String idToken = loginVO.getUserId() + "." + token;
+				System.out.println(idToken);
+				
+				Map<String, Object> data = new HashMap<>();
+				
+				data.put("idToken",idToken );
+				data.put("companyName", userData.getCompanyName());
+				data.put("name", userData.getName());
+				System.out.println("최종 데이터 : ");
+				System.out.println(data);
+				return new ResponseEntity<>(data, HttpStatus.OK);				
+			} else {
+				return new ResponseEntity<>(1, HttpStatus.CONFLICT);
+			}
 
-			String token = JwtUtil.generateToken(loginVO.getUserId());
-			System.out.println("생성된 jwt 토큰 : " + token);
-
-			// Redis에 데이터(아이디, 토큰) 저장
-			redisService.setData(loginVO.getUserId(), token);
-
-			LoginVO userData = authService.userData(loginVO.getUserId());
 			
-			
-			String idToken = loginVO.getUserId() + "." + token;
-			System.out.println(idToken);
-			
-			Map<String, Object> data = new HashMap<>();
-			
-			data.put("idToken",idToken );
-			data.put("companyName", userData.getCompanyName());
-			data.put("name", userData.getName());
-			System.out.println("최종 데이터 : ");
-			System.out.println(data);
-			
-			return new ResponseEntity<>(data, HttpStatus.OK);
 		} else if (result == 0) {
 			// 아이디 혹은 비밀 번호가 틀릴 경우 401
 			return new ResponseEntity<>(1, HttpStatus.UNAUTHORIZED);
