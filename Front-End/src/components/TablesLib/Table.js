@@ -88,7 +88,8 @@ const TableContainer = styled.div`
 function Table(props) {
   const tableContainerRef = useRef(null);
   //const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(0);
+  // const [selectedRowIndex, setSelectedRowIndex] = useState(0);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(props.index || 0);
 
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
