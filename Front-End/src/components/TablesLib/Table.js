@@ -97,13 +97,18 @@ function Table(props) {
     if (props.data.length > prevRowsLength) {
       const lastIndex = props.data.length - 1; // 마지막 행 인덱스
       setPrevRowsLength(props.data.length); // rows의 길이 업데이트
+      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
     } else {
-      setLastAddedRowIndex(null); // 추가된 행이 없으면 null로 설정
+      const lastIndex = props.data.length - 1; // 마지막 행 인덱스
+      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
     }
-
-    // 첫 번째 행이 선택되도록 수정
-    setSelectedRowIndex(0);
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop =
+        tableContainerRef.current.scrollHeight -
+        tableContainerRef.current.clientHeight;
+    }
   }, [props.data.length]);
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
 

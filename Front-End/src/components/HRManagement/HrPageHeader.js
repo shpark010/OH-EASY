@@ -49,7 +49,8 @@ const HrPageHeader = ({
         console.log("************************");
         console.log("************************");
         console.log(empList[0].cdEmp);
-        setClickEmpCode(empList[0].cdEmp);
+        console.log(empList.length);
+        setClickEmpCode(empList[empList.length - 1].cdEmp);
         console.log(clickEmpCode);
       } else {
         // 삭제 실패
@@ -75,7 +76,9 @@ const HrPageHeader = ({
         working: responseData.working,
         resigned: responseData.resigned,
       });
-      setClickEmpCode(responseData.result[0].cdEmp);
+      setClickEmpCode(
+        responseData.result[responseData.result.length - 1].cdEmp,
+      );
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -89,6 +92,49 @@ const HrPageHeader = ({
   };
   const handleCloseDeleteErrorAlert = () => {
     setShowAlertDeleteError(false); // 알림창 표시 상태를 false로 설정
+  };
+
+  //PDF 출력
+  const handlePrintPdf = async () => {
+    let sendResult = 0;
+    try {
+      const responseData = await apiRequest({
+        method: "POST",
+        url: "/api2/util/hrPdf",
+        data: {
+          code: clickEmpCode,
+        },
+        responseType: "json",
+      });
+      // EmpInfo 처리
+      const cdEmp = responseData.empInfo.cdEmp;
+      const nmEmp = responseData.empInfo.nmEmp;
+
+      // Base64로 인코딩된 PDF 처리
+      const base64Pdf = responseData.pdf;
+      const pdfBlob = new Blob(
+        [Uint8Array.from(atob(base64Pdf), (c) => c.charCodeAt(0))],
+        { type: "application/pdf" },
+      );
+
+      // Create a link element
+      const link = document.createElement("a");
+
+      // Set the download attribute with a filename
+      link.download = `인사자료_${nmEmp}(${cdEmp}).pdf`;
+
+      // Create a URL to the blob and set it as the href attribute
+      link.href = window.URL.createObjectURL(pdfBlob);
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Trigger a click event on the link to download the file
+      link.click();
+    } catch (error) {
+      console.error("Failed to fetch emp data:", error);
+    }
+    return sendResult;
   };
   return (
     <div className="pageHeader">
@@ -147,6 +193,13 @@ const HrPageHeader = ({
               btnName="print"
               imageSrc={Print}
               altText="프린트"
+              onClick={(e) => {
+                if (!clickEmpCode) {
+                  setShowAlertDeleteError(true);
+                } else {
+                  handlePrintPdf();
+                }
+              }}
             />
             <PageHeaderIconButton
               btnName="delete"
@@ -165,11 +218,11 @@ const HrPageHeader = ({
               imageSrc={Calc}
               altText="계산기"
             /> */}
-            <PageHeaderIconButton
+            {/* <PageHeaderIconButton
               btnName="setting"
               imageSrc={Setting}
               altText="세팅"
-            />
+            /> */}
           </div>
         </div>
       </div>

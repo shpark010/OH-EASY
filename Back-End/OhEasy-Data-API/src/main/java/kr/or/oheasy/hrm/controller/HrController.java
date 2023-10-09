@@ -87,27 +87,8 @@ public class HrController {
 	public ResponseEntity<?> insertHrEmpData(@RequestParam("cdEmp") String cdEmp){
 		System.out.println("insertHrEmpData");
 		System.out.println("넘어온 cdEmp : " + cdEmp);
-		
-	
-		// 인사테이블에 사원정보 insert 
-		hrService.insertHrEmpData(cdEmp);
-		// 신체테이블에 신체정보 insert
-		hrService.insertBodyData(cdEmp);
-		// 병역테이블에 병역정보 insert
-		hrService.insertMilitaryData(cdEmp);
-		
-		// 한명의 사원 정보 인사테이블에서  가져오기
-		HrEmpMstCdEmpNmNameVO result  = hrService.getOneHrEmpData(cdEmp);
-		System.out.println("가져온 1명의 정보 : " + result);
-		
-		
-		//String result2 = "{cdEmp=" + result.getCdEmp();
-		
-		// 인사테이블에 등록되어있는 사원목록 리스트
-		//List<HrEmpMstVO> result = hrService.getAllEmpList();
-		//System.out.println(result);
-	
-		
+		// 사원번호 받으면 해당사원의 mst 정보 전부 끌어오고 insert문 4개 진행
+		HrEmpMstCdEmpNmNameVO result  = hrService.insertHrDtlAndGetHrMst(cdEmp);
 		
 		return new ResponseEntity<>(result,HttpStatus.OK);
 	}

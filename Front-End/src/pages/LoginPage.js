@@ -68,7 +68,8 @@ function LoginPage() {
         userId,
         userPwd,
       });
-      if (response.status === 200) {
+      console.log(response.status);
+      if (response.status === 200 || response.data === "1") {
         console.log(response.data);
         setCookie("loginInfo", response.data.idToken, {
           path: "/",
@@ -90,12 +91,21 @@ function LoginPage() {
         navigate("/main");
       } else if (response.status === 401) {
         console.log("아이디 or 비밀번호 틀림");
+        setAlertText("아이디 및 비밀번호를 다시 확인해주세요");
+        setAlertType("error");
+        setShowAlert(true);
       } else {
         console.log(response.status);
         console.log("서버오류");
       }
     } catch (error) {
       console.error("오류 : ", error);
+      console.log(error.response.status);
+      if (error.response.status === 401) {
+        setAlertText("아이디 및 비밀번호를 다시 확인해주세요");
+        setAlertType("error");
+        setShowAlert(true);
+      }
     }
     setLoading(false);
   };

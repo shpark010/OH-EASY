@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO;
 import kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO;
+import kr.or.oheasy.hrm.vo.HrPdfVO;
 import kr.or.oheasy.vo.HrBodyDataDtlVO;
 import kr.or.oheasy.vo.HrCareerDtlVO;
 import kr.or.oheasy.vo.HrEducationDtlVO;
@@ -70,6 +71,8 @@ public interface HrDao {
 	// 가족 테이블
 	public List<HrFamilyDtlVO> getFamilyDataList(String cdEmp);
 	
+	public int insertFirstFamilyData(@Param("cdEmp") String cdEmp);
+	
 	public int insertFamilyData(@Param("cdEmp") String cdEmp, @Param("column") String column, @Param("value") String value);
 	
 	public int updateFamilyData(@Param("seqFamily") String seqFamily, @Param("column") String column, @Param("value") String value);
@@ -116,6 +119,12 @@ public interface HrDao {
     public int deleteEduData(@Param("seqEducation") String seqEducation);
     public int deleteCareerData(@Param("seqCareer") String seqCareer);
     public int deleteLicenseData(@Param("seqLicense") String seqLicense);
+    
+    
+    public HrEmpMstCdEmpNmNameVO insertHrDtlAndGetHrMst(@Param("cdEmp") String cdEmp);
+    
+    // pdf
+    public HrPdfVO getHrPdfData(String cdEmp);
     
     
 }
