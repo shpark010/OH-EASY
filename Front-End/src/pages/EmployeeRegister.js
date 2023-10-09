@@ -61,6 +61,7 @@ const EmployeeRegister = () => {
   const [latestCdEmp, setLatestCdEmp] = useState(""); // insert 동작시 cdEmp값 저장
   const [inserted, setInserted] = useState(false); // insert 함수 한 번 실행하게 해주는 상태관리
   const [isEmpListUpdated, setIsEmpListUpdated] = useState(false); // 사원 목록이 업데이트되었는지 확인
+  const [isCdEmpUpdated, setCdEmpUpdated] = useState(false); // cdEmp 업데이트 상태관리
 
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
@@ -525,10 +526,6 @@ const EmployeeRegister = () => {
 
             const inputValue = e.target.value?.trim();
 
-            if (original && original.code) {
-                console.log("original.code의 값 : " + original.code);
-            }
-
             if (!inputValue || (original && inputValue === original.code) || !inputValue.trim() || !changed) {
                 console.log("*********************************** onChange 없으니 종료");
                 return;
@@ -560,7 +557,13 @@ const EmployeeRegister = () => {
 
               // 위에서 중복 체크를 통과했다면, 업데이트 처리
               if (original && original.code) {
-                handleUpdateEmp("cdEmp", original.code, inputValue);
+                console.log("original.code의 값 : " + original.code);
+                const isUpdated = await handleUpdateEmp("cdEmp", original.code, inputValue);
+                
+                if (isUpdated) {
+                    await handleGetEmpList(); // 이 부분을 await로 수정
+                    setCdEmpUpdated(inputValue);  // inputValue를 상태에 저장
+                }
               }
             } catch (error) {
             console.error("An error occurred:", error);
@@ -1518,12 +1521,33 @@ const EmployeeRegister = () => {
     }
   };
 
-  // isEmpListUpdated 상태가 변경될 때마다 동작하는 함수
+  // cdEmp가 업데이트된 후 전체 목록과 특정 항목을 다시 가져오는 useEffect
+  useEffect(() => {
+    const fetchUpdatedData = async () => {
+        if (isCdEmpUpdated) {
+            setTableKey(Date.now());
+            await handleGetSingleEmp(isCdEmpUpdated);
+
+            // 포커스 설정
+            const elementToFocus = document.getElementById(`focusOn_${isCdEmpUpdated}`);
+            if (elementToFocus) {
+                elementToFocus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                elementToFocus.focus();
+            }
+
+            setCdEmpUpdated(false);
+        }
+    };
+    fetchUpdatedData();
+  }, [isCdEmpUpdated]);
+
+
+  // erGrid2 주민번호 업데이트시 동작
   useEffect(() => {
     if (isEmpListUpdated) {
       setTableKey(Date.now());
       handleGetSingleEmp(clickCdEmp);
-      setIsEmpListUpdated(false);  // 초기화
+      setIsEmpListUpdated(false);
     }
   }, [isEmpListUpdated]);
 
