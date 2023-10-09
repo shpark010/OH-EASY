@@ -104,6 +104,7 @@ function CustomCalendar({
   disabled,
   position,
   setValue,
+  onKeyDown,
 }) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -178,6 +179,7 @@ function CustomCalendar({
         readOnly={readOnly}
         name={name}
         disabled={disabled}
+        onKeyDown={onKeyDown}
       />
       <IconWrapper onClick={() => !disabled && setIsOpen(!isOpen)}>
         <FaRegCalendarAlt size={17} />

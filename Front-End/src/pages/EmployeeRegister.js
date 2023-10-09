@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import Setting from "../images/pages/common/setting.png";
 // import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
@@ -37,20 +37,31 @@ const EmployeeRegister = () => {
 
   const [empList, setEmpList] = useState([]); // 첫번째 테이블의 사원정보들 관리
   const [clickCdEmp, setClickCdEmp] = useState(""); // table에서 행 클릭시 cdEmp 저장
-  const [showAlert, setShowAlert] = useState(false); // 삭제 버튼 sweetAlert 상태 관리
+
+  // sweetAlert 상태 관리
+  const [showAlert, setShowAlert] = useState(false); // 삭제 버튼 sweetAlert 상태관리
+  const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
+  const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태관리
+  const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태관리
 
    // 삭제시 에러에 관한 sweetAlert 상태 관리
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showMultipleRowsAlert, setShowMultipleRowsAlert] = useState(false);
 
   const [checkedRows, setCheckedRows] = useState([]); // 각 행의 체크박스 상태를 저장하는 상태
   const [showInsertRow, setShowInsertRow] = useState(false); // 테이블의 insertRow의 상태
-  const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태 관리
-  const [isValid, setIsValid] = useState(null); // 주민번호 유효성 검사 결과 저장 상태 관리
+  const [initialValues, setInitialValues] = useState({}); // 업데이트 요청을 위한 초기값 상태관리
+  const [isValid, setIsValid] = useState(null); // 주민번호 유효성 검사 결과 저장 상태관리
   
-  const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태 관리
-  const [isDataInserted, setIsDataInserted] = useState(false);
+  // 강제로 컴포넌트를 재마운트
+  const [tableKey, setTableKey] = useState(Date.now());
+  
+  const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태관리
+  const [latestCdEmp, setLatestCdEmp] = useState(""); // insert 동작시 cdEmp값 저장
+  const [inserted, setInserted] = useState(false); // insert 함수 한 번 실행하게 해주는 상태관리
+  const [isEmpListUpdated, setIsEmpListUpdated] = useState(false); // 사원 목록이 업데이트되었는지 확인
+  const [isCdEmpUpdated, setCdEmpUpdated] = useState(false); // cdEmp 업데이트 상태관리
 
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
@@ -77,12 +88,55 @@ const EmployeeRegister = () => {
     dtResign: "",
     noAccount: "",
     noPositionUnique: "",
+    nmNationality: "",
+    idMessenger: "",
+    fgSalaryGrade: "",
+    comment: "",
   });
 
   // 컴포넌트가 처음 마운트될 때 handleGetEmpList 실행
   useEffect(() => {
     handleGetEmpList();
   }, []);
+
+  // 추가하기 버튼 클릭시 데이터리셋
+  const resetEmployeeData = () => {
+    setEmployeeData({
+      cdEmp: "",
+      nmEmp: "",
+      noResident: "",
+      fgForeign: "",
+      dtHire: "",
+      noPost: "",
+      nmAddress: "",
+      dcAddress: "",
+      nmAccountHolder: "",
+      noDepartment: "",
+      cdBank: "",
+      noPhone1: "",
+      noPhone2: "",
+      noPhone3: "",
+      noMobilePhone1: "",
+      noMobilePhone2: "",
+      noMobilePhone3: "",
+      nmEmail: "",
+      username: "",
+      domain: "",
+      selectedOption: "0",
+      dtResign: "",
+      noAccount: "",
+      noPositionUnique: "",
+      nmNationality: "",
+      idMessenger: "",
+      fgSalaryGrade: "",
+      comment: "",
+    });
+    setIsReadOnly(true); // readOnly 상태를 true로 설정
+    setIsValid(null); // 주민번호 유효성 상태 초기화
+    setNmDept("");
+    setNmBank("");
+    // setFgSalaryGrade("");
+  }
 
   // Email 도메인 맵
   const domainMap = {
@@ -99,41 +153,70 @@ const EmployeeRegister = () => {
     const selectedValue = event.target.value;
     const newDomain = domainMap[selectedValue];
 
-    setEmployeeData(prevState => ({
-      ...prevState,
-      selectedOption: selectedValue,
-      domain: newDomain === "직접입력" ? "" : newDomain,
-      nmEmail: newDomain && prevState.username ? `${prevState.username}@${newDomain}` : prevState.username
-    }));
+    if (selectedValue === undefined || newDomain === undefined) {
+      return;
+    }
 
-    handleDomainUpdate(newDomain);
+    // 직접입력일 때 미리 빈 문자열로 설정
+    const finalDomain = newDomain === "직접입력" ? "" : newDomain;
+
+    setEmployeeData(prevState => {
+        const emailToUpdate = newDomain && prevState.username 
+                              ? `${prevState.username}@${finalDomain}` 
+                              : prevState.username;
+
+        handleUpdateEmp("nmEmail", clickCdEmp, emailToUpdate);
+
+        return {
+            ...prevState,
+            selectedOption: selectedValue,
+            domain: finalDomain,
+            nmEmail: emailToUpdate
+        };
+    });
   };
 
   // username만 업데이트하는 함수
   const handleUsernameUpdate = () => {
+    
+    if (employeeData.username === undefined) {
+      return;
+    }
+
     setEmployeeData(prevState => {
-      if (!prevState.username) {
-        console.log("username API 요청 중단*********************");
-        return prevState; // 상태를 그대로 반환
-      }
-      const email = prevState.domain ? `${prevState.username}@${prevState.domain}` : prevState.username;
-      handleUpdateEmp("nmEmail", clickCdEmp, email);
-      return { ...prevState, nmEmail: email };
+        let updatedDomain = prevState.domain;
+        let updatedSelectedOption = prevState.selectedOption;
+
+        // username이 null 혹은 빈 문자열일 때 domain도 비워진다
+        if (!prevState.username || prevState.username === '') {
+            updatedDomain = '';
+            updatedSelectedOption = '0'; // 직접입력으로 설정
+        }
+
+        const email = updatedDomain ? `${prevState.username || ''}@${updatedDomain}` : (prevState.username || '');
+
+        handleUpdateEmp("nmEmail", clickCdEmp, email);
+        return { ...prevState, nmEmail: email, domain: updatedDomain, selectedOption: updatedSelectedOption };
     });
   };
 
   // domain만 업데이트하는 함수
   const handleDomainUpdate = (newDomain) => {
-    if (!newDomain) {
-      console.log("domain API 요청 중단*********************");
+
+    if (newDomain === undefined) {
       return;
     }
-    const email = employeeData.username ? `${employeeData.username}@${newDomain}` : `@${newDomain}`;
+
+    const updatedDomain = newDomain || ''; // newDomain이 null이나 undefined인 경우 빈 문자열을 사용
+    const email = (employeeData.username && updatedDomain !== "직접입력")
+        ? `${employeeData.username}@${updatedDomain}` 
+        : (employeeData.username || '');
+    
     handleUpdateEmp("nmEmail", clickCdEmp, email);
     setEmployeeData(prevState => ({
-      ...prevState,
-      domain: newDomain,
-      nmEmail: email
+        ...prevState,
+        domain: updatedDomain,
+        nmEmail: email
     }));
   };
 
@@ -170,6 +253,25 @@ const EmployeeRegister = () => {
       handleUpdateEmp("noPositionUnique", clickCdEmp, selectedValue);
     }
   };
+
+  // 호봉 업데이트 함수
+  const handleFgSalaryGradeChange = (event) => {
+    let selectedValue = event.target.value;
+    console.log("Selected salary grade value:", selectedValue);
+
+    if (selectedValue === "null") {
+        selectedValue = null;
+    }
+
+    if (selectedValue !== undefined) {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            fgSalaryGrade: selectedValue
+        }));
+        handleUpdateEmp("fgSalaryGrade", clickCdEmp, selectedValue);
+    }
+  };
+
 
   // 성별 자동입력 함수
   const genderFromNoResident = (noResident) => {
@@ -216,9 +318,9 @@ const EmployeeRegister = () => {
       default:
         maxDay = 31;
     }
-  
+
     if (day < 1 || day > maxDay) return false;
-  
+
     // 성별 번호 검증
     if (!['1', '2', '3', '4', '5', '6', '7', '8'].includes(gender)) return false;
   
@@ -226,7 +328,7 @@ const EmployeeRegister = () => {
 };
 
 
-  // 버튼 클릭시 DaumPostcode 모달 열기
+  // 주소검색 모달 열기
   const handleAddressButtonClick = () => {
     setOpenPostcode(true);
   }
@@ -280,7 +382,7 @@ const EmployeeRegister = () => {
     }
   }, [checkedRows]);
 
-  // 모달 닫기
+  // 주소검색 모달 닫기
   const closeModal = () => {
     setOpenPostcode(false);
   }
@@ -302,15 +404,20 @@ const EmployeeRegister = () => {
 
   // 전화번호 하나로 합치기
   const handlePhoneUpdate = () => {
-    const fullPhone = `${employeeData.noPhone1}-${employeeData.noPhone2}-${employeeData.noPhone3}`;
+    const { noPhone1, noPhone2, noPhone3 } = employeeData;
 
-    // 전화번호의 모든 세부 요소가 비어 있으면 API 요청 중단
-    if (!employeeData.noPhone1 && !employeeData.noPhone2 && !employeeData.noPhone3) {
-      console.log("전화번호 API 요청 중단*********************");
-      return;
+    // 전화번호의 각 부분이 모두 비어있거나 초기 상태일 때 업데이트 스킵
+    if ((noPhone1 === undefined) && (noPhone2 === undefined) && (noPhone3 === undefined)) {
+    return;
+    }
+
+    let fullPhone = "";
+    if (noPhone1 || noPhone2 || noPhone3) {
+        fullPhone = `${noPhone1 || ''}-${noPhone2 || ''}-${noPhone3 || ''}`;
     }
 
     handleUpdateEmp("noPhone", clickCdEmp, fullPhone);
+    
     setEmployeeData(prevState => ({
         ...prevState,
         noPhone: fullPhone
@@ -319,30 +426,25 @@ const EmployeeRegister = () => {
 
   // 휴대폰번호 하나로 합치기
   const handleMobilePhoneUpdate = () => {
-    const fullMobilePhone = `${employeeData.noMobilePhone1}-${employeeData.noMobilePhone2}-${employeeData.noMobilePhone3}`;
+    const { noMobilePhone1, noMobilePhone2, noMobilePhone3 } = employeeData;
 
-    // 휴대폰 번호의 모든 세부 요소가 비어 있으면 API 요청 중단
-    if (!employeeData.noMobilePhone1 && !employeeData.noMobilePhone2 && !employeeData.noMobilePhone3) {
-      console.log("휴대폰번호 API 요청 중단*********************");
+    // 휴대폰 번호의 각 부분이 모두 비어있거나 초기 상태일 때 업데이트 스킵
+    if ((noMobilePhone1 === undefined) && (noMobilePhone2 === undefined) && (noMobilePhone3 === undefined)) {
       return;
     }
 
+    let fullMobilePhone = "";
+    if (noMobilePhone1 || noMobilePhone2 || noMobilePhone3) {
+      fullMobilePhone = `${noMobilePhone1 || ''}-${noMobilePhone2 || ''}-${noMobilePhone3 || ''}`;
+    }
+
     handleUpdateEmp("noMobilePhone", clickCdEmp, fullMobilePhone);
+    
     setEmployeeData(prevState => ({
-        ...prevState,
-        noMobilePhone: fullMobilePhone
+      ...prevState,
+      noMobilePhone: fullMobilePhone
     }));
   };
-
-  // insert useEffect
-  useEffect(() => {
-    if (isDataInserted) {
-        handleInsertEmp(insertData.cdEmp, insertData.nmEmp, insertData.noResident);
-        setIsDataInserted(false);
-        window.location.reload();
-    }
-  }, [isDataInserted]);
-
 
   // erGrid useMemo data
   const data = useMemo(
@@ -351,13 +453,13 @@ const EmployeeRegister = () => {
         checkbox: false,
         code: emp.cdEmp,
         employee: emp.nmEmp,
-        foreign: emp.fgForeign,
         resident: emp.noResident,
         onRowClick: () => (emp.cdEmp),
       })),
     [empList]
   );
 
+  const clickCdEmpRef = useRef(null);
   const [sortOrder, setSortOrder] = useState("code"); // default 정렬 순서
   const [sortedDataEmp, setSortedDataEmp] = useState(data); // 데이터의 현재 정렬된 버전 상태 관리
 
@@ -379,6 +481,7 @@ const EmployeeRegister = () => {
           return (
             <input
               type="checkbox"
+              value={""}
               checked={checkedRows.includes(original?.code)}
               onChange={() => handleRowCheckboxClick(original?.code)}
             />
@@ -395,47 +498,58 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeCdEmp = (e) => {
-            setInputValue(e.target.value);
-            setChanged(true);
-            setInsertData(prev => ({ ...prev, cdEmp: e.target.value }));
+            const cleanedValue = e.target.value.replace(/\s+/g, '').toUpperCase();
+
+            if (cleanedValue.length <= 8) {
+              setInputValue(cleanedValue);
+              setChanged(true);
+              setInsertData(prev => ({ ...prev, cdEmp: cleanedValue }));
+            }
           };
 
           const tableEmpCodeClick = (e) => {
             console.log("*************************** Code 클릭");
-            console.log("tableEmpCodeClick is called. original:", original);
+          
             if (original && original.code != null) {
-              console.log("*************************** original.code" + original.code);
-              handleGetSingleEmp(original.code);
-              setClickCdEmp(original.code);
+              console.log("*************************** original.code : " + original.code);
+          
+              if (original.code !== clickCdEmpRef.current) {
+                handleGetSingleEmp(original.code);
+              } else {
+                console.log("code 값이 동일하니 API 요청 안함");
+              }
             }
           };
 
           const handleInputOnBlurCdEmp = async (e) => {
             console.log("handleInputOnBlurCdEmp 함수가 호출되었습니다.");
-            console.log("inputValue의 값 : " + inputValue);
-        
-            if (original && original.code) {
-                console.log("original.code의 값 : " + original.code);
-            }
-        
+
+            const inputValue = e.target.value?.trim();
+
             if (!inputValue || (original && inputValue === original.code) || !inputValue.trim() || !changed) {
                 console.log("*********************************** onChange 없으니 종료");
                 return;
             }
-        
+
             setChanged(false);
-        
+
             try {
               const exists = await checkCdEmpExists(inputValue);
-      
+
               // Code의 중복을 체크
               if (exists) {
                 console.log("이미 존재하는 Code 입니다. focus 이동합니다~~");
-                const element = document.getElementById(`focusOn_${inputValue}`);
+                const upperCaseInputValue = inputValue.toUpperCase();
+                const element = document.getElementById(`focusOn_${upperCaseInputValue}`);
+
                 if (element) {
                   element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   element.focus();
+                  
+                  // cdEmp 값을 사용하여 사원의 정보 가져오기
+                  handleGetSingleEmp(upperCaseInputValue);
                 }
+
                 // 원래의 값을 inputValue로 되돌린다.
                 setInputValue(original.code);
                 return;
@@ -443,10 +557,42 @@ const EmployeeRegister = () => {
 
               // 위에서 중복 체크를 통과했다면, 업데이트 처리
               if (original && original.code) {
-                handleUpdateEmp("cdEmp", original.code, inputValue);
+                console.log("original.code의 값 : " + original.code);
+                const isUpdated = await handleUpdateEmp("cdEmp", original.code, inputValue);
+                
+                if (isUpdated) {
+                    await handleGetEmpList(); // 이 부분을 await로 수정
+                    setCdEmpUpdated(inputValue);  // inputValue를 상태에 저장
+                }
               }
             } catch (error) {
             console.error("An error occurred:", error);
+            }
+            
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, cdEmp: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
+
+          };
+
+          const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleInputOnBlurCdEmp(e);
+
+              // 현재 포커스 된 요소의 다음 요소로 포커스를 이동합니다.
+              const formElements = Array.from(document.querySelectorAll('input, button, select, textarea'));
+              const currentIndex = formElements.indexOf(e.target);
+              const nextElement = formElements[currentIndex + 1];
+              if (nextElement) {
+                nextElement.focus();
+              }
             }
           };
 
@@ -456,9 +602,9 @@ const EmployeeRegister = () => {
                 value={inputValue || ""}
                 onChange={handleInputChangeCdEmp}
                 onClick={tableEmpCodeClick}
-                // isDoubleClick={true}
                 className={"doubleLine"}
                 onBlur={handleInputOnBlurCdEmp}
+                onKeyDown={handleKeyDown}
               />
             </>
           );
@@ -474,23 +620,34 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeNmEmp = (e) => {
-            setInputValue(e.target.value);
-            setChanged(true);
-            setInsertData(prev => ({ ...prev, nmEmp: e.target.value }));
+            const cleanedValue = e.target.value.replace(/\s+/g, '');
+
+            if (cleanedValue.length <= 10) {
+              setInputValue(cleanedValue);
+              setChanged(true);
+              setInsertData(prev => ({ ...prev, nmEmp: cleanedValue }));
+            }
           };
 
           const tableEmpNmClick = (e) => {
             console.log("*************************** 사원명 클릭");
-            console.log("tableEmpNmClick is called. original:", original);
+          
             if (original && original.code != null) {
-              console.log("*************************** original.code " + original.code);
-              handleGetSingleEmp(original.code);
-              setClickCdEmp(original.code);
+              console.log("*************************** original.code : " + original.code);
+          
+              if (original.code !== clickCdEmpRef.current) {
+                handleGetSingleEmp(original.code);
+              } else {
+                console.log("code 값이 동일하니 API 요청 안함");
+              }
             }
           };
 
           const handleInputOnBlurNmEmp = async (e) => {
             const inputValue = e.target.value?.trim();
+
+            setInsertData((prevData) => ({ ...prevData, nmEmp: inputValue }));
+
             if (!changed) {
               console.log("*********************************** onChange 없으니 종료");
               return;
@@ -508,6 +665,31 @@ const EmployeeRegister = () => {
                 nmEmp: inputValue
               }));
             }
+
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, nmEmp: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
+          };
+
+          const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleInputOnBlurNmEmp(e);
+
+              // 현재 포커스 된 요소의 다음 요소로 포커스를 이동합니다.
+              const formElements = Array.from(document.querySelectorAll('input, button, select, textarea'));
+              const currentIndex = formElements.indexOf(e.target);
+              const nextElement = formElements[currentIndex + 1];
+              if (nextElement) {
+                nextElement.focus();
+              }
+            }
           };
 
         return (
@@ -515,51 +697,10 @@ const EmployeeRegister = () => {
               value={inputValue || ""}
               onChange={handleInputChangeNmEmp}
               onClick={tableEmpNmClick}
-              // isDoubleClick={true}
               className={"doubleLine"}
               onBlur={handleInputOnBlurNmEmp}
+              onKeyDown={handleKeyDown}
             />
-          );
-        },
-      },
-      {
-        Header: "내/외",
-        accessor: "foreign",
-        id: "foreign",
-        width: "12%",
-        Cell: ({ cell: { value }, row: { original } }) => {
-          const [inputValue, setInputValue] = useState(value === 0 ? "내" : value === 1 ? "외" : value || "");
-
-          const handleInputChange = (e) => {
-              const newValue = e.target.value;
-              // 입력값이 '내' 또는 '외'일 때 DB에 저장할 수 있는 형태 (0 또는 1)로 변환
-              if (newValue === "내") {
-                  setInputValue(0);
-              } else if (newValue === "외") {
-                  setInputValue(1);
-              } else {
-                  setInputValue(newValue);
-              }
-          };
-
-          const tableFgForeignClick = (e) => {
-              console.log("*************************** 내/외 클릭");
-              console.log("tableFgForeignClick is called. original:", original);
-              if (original && original.code != null) {
-                  console.log("*************************** original.code " + original.code);
-                  handleGetSingleEmp(original.code);
-                  setClickCdEmp(original.code);
-              }
-          };
-
-          return (
-              <Input
-                  value={inputValue === 0 ? "내" : inputValue === 1 ? "외" : inputValue || ""}
-                  onChange={handleInputChange}
-                  onClick={tableFgForeignClick}
-                  className={"doubleLine"}
-                  readOnly={true}
-              />
           );
         },
       },
@@ -571,32 +712,46 @@ const EmployeeRegister = () => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
 
-          const handleInputChange = (e) => {
-            setInputValue(e.target.value);
+          const handleInputChangeNoResident = (e) => {
+            const newInputValue = e.target.value;
+        
+            // 주민번호의 길이 검사. 14자리를 초과하면 입력을 무시합니다.
+            if (newInputValue.length > 14) {
+                console.log("주민번호는 14자리를 초과할 수 없습니다.");
+                return;
+            }
+        
+            setInputValue(newInputValue);
             setChanged(true);
-            setIsValid(null); // 변경될 때 isValid를 null로 설정
-            setInsertData(prev => ({ ...prev, noResident: e.target.value }));
+            setIsValid(null);
+            
+            setInsertData(prevState => ({ ...prevState, noResident: newInputValue }));
           };
 
           const tableNoResidentClick = (e) => {
             console.log("*************************** 주민번호 클릭");
-            console.log("tableNoResidentClick is called. original:", original);
+          
             if (original && original.code != null) {
-              console.log("*************************** original.code " + original.code);
-              handleGetSingleEmp(original.code);
-              setClickCdEmp(original.code);
+              console.log("*************************** original.code : " + original.code);
+          
+              if (original.code !== clickCdEmpRef.current) {
+                handleGetSingleEmp(original.code);
+              } else {
+                console.log("code 값이 동일하니 API 요청 안함");
+              }
             }
           };
 
           const handleInputOnBlurNoResident = async (e) => {
-            
-            // // 주민번호가 마스킹 상태인 경우 업데이트 및 삽입을 중지
-            // if (maskResident) {
-            //   console.log("주민번호가 마스킹 상태이므로 업데이트 및 삽입을 중지합니다.");
-            //   return;
-            // }
-
             const inputValue = e.target.value?.trim();
+          
+            // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
+            if (!inputValue || inputValue === "") {
+              if (original && original.code) {
+                  handleUpdateEmp("noResident", original.code, "");
+              }
+              return;
+            }
 
             // 주민번호의 길이 검사
             if (inputValue.length !== 14) {
@@ -611,46 +766,57 @@ const EmployeeRegister = () => {
 
             setChanged(false);
 
-            try {
-                if (original && original.code) {
-                    handleUpdateEmp("noResident", original.code, inputValue);
-                } else {
-                    setInsertData(prev => {
-                        if (prev.cdEmp && prev.nmEmp && inputValue) {
-                            setIsDataInserted(true);
-                        }
-                        return { ...prev, noResident: inputValue };
-                    });
+            // update가 성공하면 우측 erGrid2 부분에도 갱신
+            if (original && original.code) {
+              const isUpdateSuccess = await handleUpdateEmp("noResident", original.code, inputValue);
+              if (isUpdateSuccess) {
+                const updatedData = await handleGetSingleEmp(original.code);
+                if(updatedData) {
+                  setEmployeeData(updatedData);
                 }
-            } catch (error) {
-                console.error("An error occurred:", error);
+              }
             }
-            // setIsValid(isValidResidentNumber(inputValue));
+
+            setInsertData(prevState => {
+              const updatedState = { ...prevState, noResident: inputValue };
+
+              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              }
+
+              return updatedState;
+            });
           };
 
           const maskedValue = inputValue 
           ? inputValue.slice(0, 6) + (maskResident ? '-*******' : inputValue.slice(6))
           : '';
 
-          // // 색상 결정 로직
-          // let color;
-          // if (isValid === null || isValid) {
-          //   color = 'grey';
-          // } else {
-          //   color = 'red';
-          // }
+          const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleInsertEmp();
+
+              // 현재 포커스 된 요소의 다음 요소로 포커스를 이동합니다.
+              const formElements = Array.from(document.querySelectorAll('input, button, select, textarea'));
+              const currentIndex = formElements.indexOf(e.target);
+              const nextElement = formElements[currentIndex + 1];
+              if (nextElement) {
+                nextElement.focus();
+              }
+            }
+          };
 
           return (
             <Input
             type={"resident"}
             value={maskedValue}
-            onChange={handleInputChange}
+            onChange={handleInputChangeNoResident}
             onClick={tableNoResidentClick}
-            // isDoubleClick={true}
-            // style={{ color: color }}
             className={"doubleLine"}
             onBlur={handleInputOnBlurNoResident}
             readOnly={maskResident} // 마스킹 상태일 경우 읽기 전용으로 설정
+            onKeyDown={handleKeyDown}
             />
           );
         },
@@ -661,6 +827,13 @@ const EmployeeRegister = () => {
   // Insert
   const handleInsertEmp = async (codeValue, employeeValue, noResidentValue) => {
     console.log("handleInsertEmp 실행 *********************");
+
+    // cdEmp, nmEmp, 또는 주민번호가 null이거나 공백일 경우 함수를 종료합니다.
+    if (!codeValue || codeValue.trim() === "" || !employeeValue || employeeValue.trim() === "" || !noResidentValue || noResidentValue.trim() === "") {
+      console.log("cdEmp, nmEmp 또는 주민번호가 없어서 insert를 중단합니다.");
+      return;
+    }
+
     try {
       const responseData = await apiRequest({
         method: "POST",
@@ -674,6 +847,14 @@ const EmployeeRegister = () => {
 
       console.log("****************************** handleInsertEmp");
       console.log(responseData);
+      await handleGetEmpList();
+      setInserted(true);
+      setShowInsertSuccessAlert(true);
+      setLatestCdEmp(codeValue);
+      setInsertData({ cdEmp: "", nmEmp: "", noResident: "" });
+      setInserted(false);
+
+      setShowInsertRow(false);
     } catch (error) {
       console.log("api 요청 실패:", error);
     }
@@ -704,34 +885,36 @@ const EmployeeRegister = () => {
     console.log("columnName : " + columnName);
     console.log('initial : ' +  initial);
     console.log('inputValue : ' +  inputValue);
-    if (
-      (initial === inputValue) || // 초기값과 변경값이 동일할 때
-      ((initial === undefined || initial === null) && !inputValue) // 초기값이 undefined 또는 null이고 입력값이 없을 때
-    ) {
-      console.log("변경이 없으니 API 호출 중단");
+
+    // 만약 초기값이 undefined 이거나 inputValue가 비어 있으면 업데이트를 중단
+    if ((initial === undefined && !inputValue) || initial === inputValue) {
       return;
     }
-  
+
     console.log("********************* handleUpdateEmp 실행 *********************");
     console.log("columnName : " + columnName, "clickCdEmp : " + clickCdEmp, "inputValue : " + inputValue);
-  
+
     const requestData = {
       updateField: {
         [columnName]: inputValue
       },
       cdEmp: clickCdEmp
     };
-  
+
     try {
       const responseData = await apiRequest({
         method: "POST",
         url: "/api2/er/updateEmpData",
         data: requestData,
       });
-  
+
       // API 호출이 성공한 경우 초기값 업데이트
-      setInitialValues((prev) => ({ ...prev, [columnName]: inputValue }));
       console.log("responseData : " + responseData);
+      if (responseData === 1) {
+        setInitialValues((prev) => ({ ...prev, [columnName]: inputValue }));
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("API 요청 실패:", error);
     }
@@ -747,7 +930,9 @@ const EmployeeRegister = () => {
 
   // 전체사원 조회
   const handleGetEmpList = async () => {
+    
     console.log("************************************************* 전체사원 조회");
+
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -756,11 +941,23 @@ const EmployeeRegister = () => {
 
       setEmpList(responseData);
       console.log("api 이벤트 발생");
+      console.log("API Response:", responseData);
+      console.log("Updated empList after setEmpList:", empList);
       console.log("responseData.length : " + responseData.length);
-      return responseData;
+
+      // 데이터 로딩 후 첫 번째 항목에 포커스 주기
+      if (responseData && responseData.length > 0) {
+        setTimeout(() => {
+            const firstRowElement = document.querySelector("[id^='focusOn_']");
+            if (firstRowElement) {
+                firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstRowElement.focus();
+            }
+        }, 10);
+      }
+
     } catch (error) {
       console.error("api 요청 실패:", error);
-      return [];
     }
   }
 
@@ -771,6 +968,11 @@ const EmployeeRegister = () => {
         method: "GET",
         url: `/api2/er/getEmpData?cdEmp=${cdEmp}`,
       });
+
+      if (!responseData) {
+        console.warn("응답 데이터가 없습니다.");
+        return;
+      }
 
     const updatedData = {
       ...employeeData, // 기존 데이터 복사
@@ -800,6 +1002,10 @@ const EmployeeRegister = () => {
       dtResign: responseData.dtResign || "",
       noAccount: responseData.noAccount || "",
       noPositionUnique: responseData.noPositionUnique || "",
+      nmNationality: responseData.nmNationality || "",
+      idMessenger: responseData.idMessenger || "",
+      fgSalaryGrade: responseData.fgSalaryGrade || "",
+      comment: responseData.comment || "",
     };
 
     // 전화번호 처리
@@ -857,14 +1063,23 @@ const EmployeeRegister = () => {
     updateNmDeptByCode(responseData.noDepartment);
     updateNmBankByCode(responseData.cdBank);
 
-      } catch (error) {
+    setClickCdEmp(cdEmp);
+    clickCdEmpRef.current = cdEmp;
+    
+    } catch (error) {
         console.error("api 요청 실패:", error);
-      }
+    }
 
       setIsReadOnly(false);
   };
 
-  // Delete (체크된 모든 행을 삭제)
+  const empListRef = useRef(empList);
+
+  useEffect(() => {
+      empListRef.current = empList;
+  }, [empList]);
+
+  // Delete (체크된 행만 삭제)
   const handleDeleteEmp = async () => {
     if (checkedRows.length === 0) {
       setErrorMessage("선택된 사원이 없습니다.");
@@ -884,15 +1099,15 @@ const EmployeeRegister = () => {
         if (responseData && responseData.deleted) {
             console.log("삭제 성공임다******************************");
             // 삭제 성공한 사원 코드를 제외하고 업데이트
-            const updatedEmpList = empList.filter(emp => !checkedRows.includes(emp.cdEmp));
+            const updatedEmpList = empListRef.current.filter(emp => !checkedRows.includes(emp.cdEmp));
             console.log(empList);
             console.log(updatedEmpList);
             setEmpList(updatedEmpList);
             setCheckedRows([]);
-            window.location.reload();
-        } else {
+            setShowDeleteSuccessAlert(true);
+          } else {
             alert("삭제 실패");
-        }
+          }
     } catch (error) {
       console.error("API 요청 실패:", error);
       if (error.response && error.response.status === 409) {
@@ -969,14 +1184,22 @@ const EmployeeRegister = () => {
         id: "noDepartment",
         width: "35%",
         Cell: ({ cell: { value }, row: { original } }) => {
+          
           const handleInputClick = (e) => {
-            console.log("부서 Code 클릭 이벤트 발생*******************");
+            console.log("부서 클릭 이벤트 발생*******************");
             setClickModalDeptCode(original.noDepartment);
           };
+
+          const handleInputDoubleClick = async (e) => {
+            await handleDeptDoubleClick(original.noDepartment);
+            closeDeptModal();
+          };
+
           return (
             <Input
               value={original?.noDepartment || ""}
               onClick={handleInputClick}
+              onDoubleClick={handleInputDoubleClick}
               className={"doubleLine"}
               readOnly={true}
             />
@@ -988,14 +1211,22 @@ const EmployeeRegister = () => {
         accessor: "nmDepartment",
         id: "nmDepartment",
         Cell: ({ cell: { value }, row: { original } }) => {
+          
           const handleInputClick = (e) => {
             console.log("부서명 클릭 이벤트 발생*******************");
             setClickModalDeptCode(original.noDepartment);
           };
+
+          const handleInputDoubleClick = async (e) => {
+            await handleDeptDoubleClick(original.noDepartment);
+            closeDeptModal();
+          };
+
           return (
             <Input
               value={original?.nmDepartment || ""}
               onClick={handleInputClick}
+              onDoubleClick={handleInputDoubleClick}
               className={"doubleLine"}
               readOnly={true}
             />
@@ -1003,7 +1234,7 @@ const EmployeeRegister = () => {
         },
       },
     ],
-    []
+    [clickCdEmp]
   );
 
   // 부서전체조회
@@ -1020,25 +1251,48 @@ const EmployeeRegister = () => {
     } catch (error) {
         console.error("api 요청 실패:", error);
     }
-  }
+  };
 
-  // 부서 확인 버튼 클릭 이벤트 핸들러
+  // 부서 모달창에서 확인버튼 클릭 했을 때의 동작함수
   const handleDeptConfirmClick = async () => {
-    console.log("확인 버튼 클릭됨");
 
-    if (clickModalDeptCode && clickModalDeptCode !== clickCdEmp) {
-      try {
-        await handleUpdateEmp("noDepartment", clickCdEmp, clickModalDeptCode);
-        console.log(`cdEmp ${clickCdEmp}의 부서를 ${clickModalDeptCode}로 업데이트하였습니다.`);
-      } catch (error) {
-        console.error("cdEmp 업데이트 실패:", error);
-      }
-    } else {
-      console.log("변경 사항이 없거나, 부서 선택이 되지 않았습니다.");
+    const deptCodeToUpdate = clickModalDeptCode || "";  // 없으면 빈 문자열로 처리
+
+    // 만약 clickModalDeptCode가 빈 문자열이면 부서 정보를 비워버립니다.
+    if (!deptCodeToUpdate) {
+      setNmDept("");
+      await handleUpdateEmp("noDepartment", clickCdEmp, null);
+      closeDeptModal();
+      return;
+    } 
+
+    try {
+      await handleUpdateEmp("noDepartment", clickCdEmp, deptCodeToUpdate);
+      console.log(`cdEmp ${clickCdEmp}의 부서를 ${deptCodeToUpdate}로 업데이트하였습니다.`);
+      closeDeptModal();
+    } catch (error) {
+      console.error("cdEmp 업데이트 실패:", error);
     }
 
-    // 부서명을 갱신
-    updateNmDeptByCode(clickModalDeptCode);
+    updateNmDeptByCode(deptCodeToUpdate);
+    setClickModalDeptCode("");
+  };
+
+  // 부서 모달창에서 더블클릭 했을 때의 동작함수
+  const handleDeptDoubleClick = async (deptCode) => {
+    if (!deptCode || deptCode === clickCdEmp) {
+      console.log("변경 사항이 없거나, 부서 선택이 되지 않았습니다.");
+      return;
+    }
+  
+    try {
+      await handleUpdateEmp("noDepartment", clickCdEmp, deptCode);
+      console.log(`cdEmp ${clickCdEmp}의 부서를 ${deptCode}로 업데이트하였습니다.`);
+    } catch (error) {
+      console.error("cdEmp 업데이트 실패:", error);
+    }
+  
+    updateNmDeptByCode(deptCode);
     setClickModalDeptCode("");
   };
 
@@ -1100,14 +1354,22 @@ const EmployeeRegister = () => {
         id: "cdBank",
         width: "35%",
         Cell: ({ cell: { value }, row: { original } }) => {
+          
           const handleInputClick = (e) => {
-            console.log("code클릭이벤발생");
-            setClickModalBankCode(original.cdBank);  // 클릭한 은행의 코드 설정
+            console.log("은행 클릭 이벤트 발생*******************");
+            setClickModalBankCode(original.cdBank);
           };
+    
+          const handleInputDoubleClick = async (e) => {
+              await handleBankDoubleClick(original.cdBank);
+              closeBankModal();
+          };
+
           return (
             <Input
               value={original?.cdBank || ""}
               onClick={handleInputClick}
+              onDoubleClick={handleInputDoubleClick}
               className={"doubleLine"}
               readOnly={true}
             />
@@ -1119,22 +1381,31 @@ const EmployeeRegister = () => {
         accessor: "nmBank",
         id: "nmBank",
         Cell: ({ cell: { value }, row: { original } }) => {
+          
           const handleInputClick = (e) => {
-            console.log("code클릭이벤발생");
-            setClickModalBankCode(original.cdBank);  // 클릭한 은행의 코드 설정
+            console.log("은행명 클릭 이벤트 발생*******************");
+            setClickModalBankCode(original.cdBank);
           };
+    
+          const handleInputDoubleClick = async (e) => {
+            await handleBankDoubleClick(original.cdBank);
+            closeBankModal();
+          };
+
           return (
             <Input
               value={original?.nmBank || ""}
               onClick={handleInputClick}
+              onDoubleClick={handleInputDoubleClick}
               className={"doubleLine"}
               readOnly={true}
+              onKeyDown={""}
             />
           );
         },
       },
     ],
-    []
+    [clickCdEmp]
   );
 
   // 은행전체조회
@@ -1153,23 +1424,46 @@ const EmployeeRegister = () => {
     }
   }
 
-  // 은행 확인 버튼 클릭 이벤트 핸들러
+  // 은행 모달창에서 확인버튼 클릭 했을 때의 동작함수
   const handleBankConfirmClick = async () => {
-    console.log("은행 확인 버튼 클릭됨");
+    
+    const bankCodeToUpdate = clickModalBankCode || "";  // 없으면 빈 문자열로 처리
 
-    if (clickModalBankCode && clickModalBankCode !== clickCdEmp) {
-      try {
-        await handleUpdateEmp("cdBank", clickCdEmp, clickModalBankCode);
-        console.log(`cdEmp ${clickCdEmp}의 은행을 ${clickModalBankCode}로 업데이트하였습니다.`);
-      } catch (error) {
-        console.error("cdEmp 업데이트 실패:", error);
-      }
-    } else {
-      console.log("변경 사항이 없거나, 은행 선택이 되지 않았습니다.");
+    // 만약 clickModalDeptCode가 빈 문자열이면 은행 정보를 비워버립니다.
+    if (!bankCodeToUpdate) {
+      setNmBank("");
+      await handleUpdateEmp("cdBank", clickCdEmp, null);
+      closeBankModal();
+      return;
+    } 
+
+    try {
+        await handleUpdateEmp("cdBank", clickCdEmp, bankCodeToUpdate);
+        console.log(`cdEmp ${clickCdEmp}의 은행을 ${bankCodeToUpdate}로 업데이트하였습니다.`);
+        closeBankModal();
+    } catch (error) {
+        console.error("cdEmp 은행 업데이트 실패:", error);
     }
 
-    // 은행명을 갱신
-    updateNmBankByCode(clickModalBankCode);
+    updateNmBankByCode(bankCodeToUpdate);
+    setClickModalBankCode("");
+  };
+
+  // 은행 모달창에서 더블클릭 했을 때의 동작함수
+  const handleBankDoubleClick = async (bankCode) => {
+    if (!bankCode || bankCode === clickCdEmp) {
+        console.log("변경 사항이 없거나, 은행 선택이 되지 않았습니다.");
+        return;
+    }
+
+    try {
+        await handleUpdateEmp("cdBank", clickCdEmp, bankCode);
+        console.log(`cdEmp ${clickCdEmp}의 은행을 ${bankCode}로 업데이트하였습니다.`);
+    } catch (error) {
+        console.error("cdEmp 업데이트 실패:", error);
+    }
+
+    updateNmBankByCode(bankCode);
     setClickModalBankCode("");
   };
 
@@ -1192,15 +1486,70 @@ const EmployeeRegister = () => {
     setOpenSortSearch(!openSortSearch);
   }
 
-  // 강제로 컴포넌트를 재마운트 상태 관리
-  const [tableKey, setTableKey] = useState(Date.now());
-
   // 데이터 정렬 함수
   const handleSortDataConfirm = () => {
     setSortOrder(sortOrder);
     toggleSortSearch();
     setTableKey(Date.now());
   };
+
+  // 입사일자 리셋함수
+  const handleBackspaceDtHire = (e) => {
+    if (e.key === 'Backspace') {
+        const field = "dtHire";
+        setEmployeeData(prevState => ({
+            ...prevState,
+            [field]: ""
+        }));
+        handleUpdateEmp(field, clickCdEmp, "");
+        console.log("백스페이스 키 눌림");
+        e.preventDefault();
+    }
+  };
+
+  // 퇴사일자 리셋함수
+  const handleBackspaceDtResign = (e) => {
+    if (e.key === 'Backspace') {
+        const field = "dtResign";
+        setEmployeeData(prevState => ({
+            ...prevState,
+            [field]: ""
+        }));
+        handleUpdateEmp(field, clickCdEmp, "");
+        console.log("백스페이스 키 눌림");
+        e.preventDefault();
+    }
+  };
+
+  // cdEmp가 업데이트된 후 전체 목록과 특정 항목을 다시 가져오는 useEffect
+  useEffect(() => {
+    const fetchUpdatedData = async () => {
+        if (isCdEmpUpdated) {
+            setTableKey(Date.now());
+            await handleGetSingleEmp(isCdEmpUpdated);
+
+            // 포커스 설정
+            const elementToFocus = document.getElementById(`focusOn_${isCdEmpUpdated}`);
+            if (elementToFocus) {
+                elementToFocus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                elementToFocus.focus();
+            }
+
+            setCdEmpUpdated(false);
+        }
+    };
+    fetchUpdatedData();
+  }, [isCdEmpUpdated]);
+
+
+  // erGrid2 주민번호 업데이트시 동작
+  useEffect(() => {
+    if (isEmpListUpdated) {
+      setTableKey(Date.now());
+      handleGetSingleEmp(clickCdEmp);
+      setIsEmpListUpdated(false);
+    }
+  }, [isEmpListUpdated]);
 
   return (
     <>
@@ -1278,14 +1627,38 @@ const EmployeeRegister = () => {
                   imageSrc={Delete}
                   altText="삭제"
                   onClick={() => {
-                    // 체크박스에 체크가 된 상태인 경우에만 SweetAlert 창을 띄움
-                    if (checkedRows.length > 0) {
-                      setShowAlert(true);
+                    if (checkedRows.length === 0) {
+                        setShowAlertMessage(true);
+                        console.log("체크박스에 체크된 항목이 없습니다.");
+                    } else if (checkedRows.length === 1) {
+                        setShowAlert(true);
                     } else {
-                      console.log("체크박스에 체크된 항목이 없습니다.");
+                        setShowMultipleRowsAlert(true);
+                        console.log("여러 항목이 선택되었습니다.");
                     }
-                  }}
-                />
+                }}
+            />
+
+                {
+                  showInsertSuccessAlert && (
+                    <SweetAlert
+                      text="사원 등록이 완료되었습니다."
+                      confirmText="확인"
+                      type="success"
+                      onConfirm={async () => {
+                        setShowInsertSuccessAlert(false);
+                        setTableKey(Date.now());
+                        await handleGetSingleEmp(latestCdEmp);
+
+                        const element = document.getElementById(`focusOn_${latestCdEmp}`);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          element.focus();
+                        }
+                      }}
+                    />
+                  )
+                }
 
                 {showAlert && (
                   <SweetAlert
@@ -1305,12 +1678,51 @@ const EmployeeRegister = () => {
                   />
                 )}
 
-              {/* <PageHeaderIconButton
-                btnName="calc"
-                imageSrc={Calc}
-                altText="계산기"
-                disabled={true}
-              /> */}
+                {showDeleteSuccessAlert && (
+                    <SweetAlert
+                        text="삭제가 완료되었습니다."
+                        confirmText="확인"
+                        type="success"
+                        onConfirm={async () => {
+                            setShowDeleteSuccessAlert(false);
+                            resetEmployeeData();
+                            setTableKey(Date.now());
+                            
+                            // 여기서 맨 위 항목으로 포커스 이동
+                            if (empList && empList.length > 0) {
+                            setTimeout(() => {
+                                const firstRowElement = document.querySelector("[id^='focusOn_']");
+                                if (firstRowElement) {
+                                    firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    firstRowElement.focus();
+                                }
+                            }, 310);
+                          }
+                        }}
+                    />
+                )}
+
+                {showMultipleRowsAlert && (
+                    <SweetAlert
+                        text="여러 명을 동시에 삭제할 수 없습니다."
+                        confirmText="확인"
+                        type="error"
+                        onConfirm={async () => {
+                            setShowMultipleRowsAlert(false);
+                        }}
+                    />
+                )}
+
+                {showAlertMessage && (
+                  <SweetAlert
+                    text="체크박스를 선택해주세요."
+                    confirmText="확인"
+                    type="error"
+                    onConfirm={async () => {
+                      setShowAlertMessage(false);
+                    }}
+                  />
+                )}
 
               <PageHeaderIconButton
                 btnName="setting"
@@ -1336,6 +1748,7 @@ const EmployeeRegister = () => {
                 insertRow={!maskResident}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
+                onAddButtonClick={resetEmployeeData}
               />
             </div>
 
@@ -1354,469 +1767,570 @@ const EmployeeRegister = () => {
         {/* 두번째 그리드 */}
         <div className="erGrid2">
           {/* 제목 탭 테이블 */}
-          <ul className="pageTab">
-            <li className="on">기초자료</li>
-          </ul>
+          <div className="erBorderBottomBold">
+            <ul className="pageTab">
+                <li className="on">기초자료</li>
+            </ul>
+          </div>
 
           {/* 탭 내용 테이블 */}
-          <table>
-            <tbody className="borderTopBold">
-              <tr>
-                <th className="erHeaderStyle">입사일자</th>
-                <td className="erCellStyle">
-                  <CustomCalendar 
-                    width={180} 
-                    value={employeeData.dtHire} 
-                    onChange={(newDate) => handleDateChange("dtHire", newDate)}
-                    disabled={isReadOnly}
-                    readOnly={true}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">주민번호</th>
+          <div className="erTableContainer">
+            <table>
+              <tbody>
+                <tr>
+                  <th className="erHeaderStyle">입사일자</th>
                   <td className="erCellStyle">
-                    <CustomSelect
-                      className="erSelectBox"
-                      options={[
-                        { value: "0", label: "내국인" },
-                        { value: "1", label: "외국인" },
-                      ]}
-                      value={employeeData.fgForeign}
-                      onChange={handleFgForeignChange}
+                    <CustomCalendar 
+                      width={180}
+                      value={employeeData.dtHire}
+                      onChange={(newDate) => handleDateChange("dtHire", newDate)}
                       disabled={isReadOnly}
+                      readOnly={true}
+                      onKeyDown={handleBackspaceDtHire}
                     />
                   </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="resident"
-                    width={180} 
-                    value={maskResidentValue(employeeData.noResident)}
-                    placeholder="주민번호를 입력해주세요."
-                    onChange={(e) => {
-                      // if (maskResident) {
-                      //   console.log("주민번호가 마스킹 상태이므로 값 변경을 중지합니다.");
-                      //   return;
-                      // }
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noResident: e.target.value
-                      }));
-                    }}
-                    onBlur={() => {
-                      // if (maskResident) {
-                      //   console.log("주민번호가 마스킹 상태이므로 업데이트를 중지합니다.");
-                      //   return;
-                      // }
-                      
-                      if (employeeData.noResident.length !== 14) {
-                        console.log("주민번호는 13자리여야 합니다.");
-                        setIsValid(false);
-                        return;
-                      }
-                      const residentValid = isValidResidentNumber(employeeData.noResident);
-                      setIsValid(residentValid);
-                      handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
-                    }}
-                    readOnly={isReadOnly || maskResident}
-                    style={{
-                      borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
-                      borderWidth: isValid === false ? '3px' : '1px',
-                      color: isValid ? 'black' : 'red'
-                    }}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput
-                    className="erSelectBox"
-                    value={genderFromNoResident(employeeData.noResident)}
-                    readOnly={true}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">주소</th>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    width={180} 
-                    value={employeeData.noPost} 
-                    setZonecode={(value) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noPost: value
-                      }));
-                    }} 
-                    readOnly 
-                    />
-                </td>
-                <td className="erCellStyle" colSpan="2">
-                  <CustomInput 
-                    width={368} 
-                    value={employeeData.nmAddress} 
-                    setAddress={(value) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            nmAddress: value
-                        }));
-                    }}
-                    readOnly 
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomButton 
-                    text="검색" 
-                    color="black" 
-                    onClick={handleAddressButtonClick}
-                    disabled={isReadOnly}
-                    />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">상세주소</th>
-                <td className="erCellStyle" colSpan="5">
-                  <CustomInput 
-                    width={845} 
-                    value={employeeData.dcAddress} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          dcAddress: e.target.value
-                      }));
-                    }}
-                    onBlur={() => {
-                      handleUpdateEmp("dcAddress", clickCdEmp, employeeData.dcAddress);
-                    }}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">전화번호</th>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noPhone1} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noPhone1: e.target.value
-                      }));
-                    }}
-                    onBlur={handlePhoneUpdate}
-                    maxLength={3}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noPhone2} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noPhone2: e.target.value
-                      }));
-                    }}
-                    onBlur={handlePhoneUpdate}
-                    maxLength={4}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noPhone3} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noPhone3: e.target.value
-                      }));
-                    }}
-                    onBlur={handlePhoneUpdate}
-                    maxLength={4}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">휴대폰번호</th>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noMobilePhone1} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noMobilePhone1: e.target.value
-                      }));
-                    }}
-                    onBlur={handleMobilePhoneUpdate}
-                    maxLength={3}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noMobilePhone2} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noMobilePhone2: e.target.value
-                      }));
-                    }}
-                    onBlur={handleMobilePhoneUpdate}
-                    maxLength={4}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    type="number"
-                    width={180} 
-                    value={employeeData.noMobilePhone3} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noMobilePhone3: e.target.value
-                      }));
-                    }}
-                    onBlur={handleMobilePhoneUpdate}
-                    maxLength={4}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                {/* disabled */}
-                <td width={298}>
-                  <input type="text" disabled className="erInputDisabledStyle" />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">이메일</th>
-                <td className="erCellStyle">
-                  <div>
-                    <CustomInput 
-                      type="email"
-                      width={180} 
-                      value={employeeData.username} 
-                      onChange={(e) => {
+                </tr>
+                <tr>
+                  <th className="erHeaderStyle">주민번호</th>
+                    <td className="erCellStyle">
+                      <CustomSelect
+                        className="erSelectBox"
+                        options={[
+                          { value: "0", label: "내국인" },
+                          { value: "1", label: "외국인" },
+                        ]}
+                        value={employeeData.fgForeign}
+                        onChange={handleFgForeignChange}
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="resident"
+                        width={180}
+                        value={maskResidentValue(employeeData.noResident)}
+                        placeholder="주민번호를 입력해주세요."
+                        onChange={(e) => {
                           setEmployeeData(prevState => ({
                               ...prevState,
-                              username: e.target.value
+                              noResident: e.target.value
                           }));
-                      }} 
-                      onBlur={handleUsernameUpdate}
-                      readOnly={isReadOnly}
-                    />
-                  </div>
-                </td>
-                <td className="erCellStyle">
-                  <div className="erEmailCell">
-                    <div className="erAtSign">@</div>
+                        }}
+                        onBlur={async () => {
+                          // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
+                          if (!employeeData.noResident || employeeData.noResident === "") {
+                            await handleUpdateEmp("noResident", clickCdEmp, "");
+                            setIsValid(true);
+                            return;
+                          }
+
+                          // 주민번호의 길이가 14자리가 아닌 경우 업데이트 중지
+                          if (employeeData.noResident.length !== 14) {
+                            console.log("주민번호는 13자리여야 합니다.");
+                            setIsValid(false);
+                            return;
+                          }
+                          
+                          // 주민번호 유효성 검사 후 업데이트 진행
+                          const residentValid = isValidResidentNumber(employeeData.noResident);
+                          setIsValid(residentValid);
+
+                          const isUpdated = await handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
+
+                          if (isUpdated) {
+                            await handleGetEmpList();
+                            setIsEmpListUpdated(true);
+                          }
+                        }}
+                        readOnly={isReadOnly || maskResident}
+                        style={{
+                          borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
+                          borderWidth: isValid === false ? '3px' : '1px',
+                          color: isValid ? 'black' : 'red'
+                          }}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput
+                        value={genderFromNoResident(employeeData.noResident)}
+                        readOnly={true}
+                      />
+                    </td>
+                  </tr>
+                {/* <tr>
+                <th className="erHeaderStyle">국적</th>
+                  <td className="erCellStyle">
                     <CustomInput
-                      className="erInputCell"
-                      width={160}
-                      value={domainMap[employeeData.selectedOption] === "직접입력" ? employeeData.domain : domainMap[employeeData.selectedOption]}
-                      onChange={(e) => {
+                      value="대한민국"
+                      readOnly={true}
+                    />
+                  </td>
+                </tr> */}
+                  <tr>
+                    <th className="erHeaderStyle">주소</th>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        width={180}
+                        value={employeeData.noPost}
+                        setZonecode={(value) => {
                           setEmployeeData(prevState => ({
                               ...prevState,
-                              domain: e.target.value
+                              noPost: value
                           }));
-                      }}
-                      onBlur={() => handleDomainUpdate(employeeData.domain)}
-                      readOnly={isReadOnly}
-                    />
-                  </div>
-                </td>
-                <td className="erCellStyle">
-                  <CustomSelect
-                    className="erSelectBox"
-                    options={options}
-                    value={employeeData.selectedOption}
-                    onChange={handleSelectChange} 
-                    disabled={isReadOnly}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">부서</th>
-                <td className="erCellStyle">
-                  <CustomModalInput 
-                    width={180} 
-                    value={nmDept} 
-                    disabled={isReadOnly}
-                    readOnly={true}
-                    placeholder="부서 코드도움"
-                    onClick={() => {
-                      handleGetDeptList();
-                      openDeptModal();
-                    }}
-                    contentStyle={{height: '505px'}}
-                    isOpen={isDeptModalOpen}
-                    onRequestClose={closeDeptModal}
-                  >
-                    <PageHeaderName text="부서 코드도움" />
-                    <div className="test2">
-                      <Table 
-                        columns={columnsDept} 
-                        data={dataDept} 
-                      />
-                    </div>
-                    <div className="test">
-                      <CustomButton 
-                        backgroundColor={"var(--color-primary-blue)"}
-                        color={"var(--color-primary-white)"}
-                        onClick={() => {
-                          handleDeptConfirmClick();
-                          closeDeptModal();
+                        }} 
+                        readOnly 
+                        />
+                    </td>
+                    <td className="erCellStyle" colSpan="2">
+                      <CustomInput 
+                        width={368}
+                        value={employeeData.nmAddress}
+                        setAddress={(value) => {
+                            setEmployeeData(prevState => ({
+                                ...prevState,
+                                nmAddress: value
+                            }));
                         }}
-                        text={"확인"}
+                        readOnly 
                       />
+                    </td>
+                    <td className="erCellStyle">
                       <CustomButton 
-                        backgroundColor={"var(--color-primary-blue)"}
-                        color={"var(--color-primary-white)"}
-                        onClick={closeDeptModal}
-                        text={"취소"}
-                      />
-                    </div>
-                  </CustomModalInput>
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">직급</th>
-                <td className="erCellStyle">
-                  <CustomSelect 
-                    className="erSelectBox"
-                    options={[{value:"0", label:"기본직급"}]} 
-                    disabled={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomSelect
-                    className="erSelectBox"
-                    options={[
-                      { value: "1", label: "회장" },
-                      { value: "2", label: "사장" },
-                      { value: "3", label: "부사장" },
-                      { value: "4", label: "전무" },
-                      { value: "5", label: "상무" },
-                      { value: "6", label: "이사" },
-                      { value: "7", label: "부장" },
-                      { value: "8", label: "수석" },
-                      { value: "9", label: "차장" },
-                      { value: "10", label: "책임" },
-                      { value: "11", label: "과장" },
-                      { value: "12", label: "선임" },
-                      { value: "13", label: "대리" },
-                      { value: "14", label: "주임" },
-                      { value: "15", label: "사원" },
-                      { value: "16", label: "직급없음" },
-                    ]}
-                    value={employeeData.noPositionUnique}
-                    onChange={handleNoPositionUniqueChange}
-                    placeholder="선택"
-                    disabled={isReadOnly}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">퇴사일자</th>
-                <td className="erCellStyle">
-                  <CustomCalendar 
-                    width={180} 
-                    value={employeeData.dtResign} 
-                    onChange={(newDate) => handleDateChange("dtResign", newDate)}
-                    disabled={isReadOnly}
-                    readOnly={true}
-                    position="up"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th className="erHeaderStyle">급여이체은행</th>
-                <td className="erCellStyle">
-                  <CustomModalInput 
-                    width={180} 
-                    value={nmBank}
-                    disabled={isReadOnly}
-                    readOnly={true}
-                    placeholder="급여이체은행 코드도움"
-                    onClick={() => {
-                      handleGetBankList();
-                      openBankModal();
-                    }}
-                    contentStyle={{height: '505px'}}
-                    isOpen={isBankModalOpen}
-                    onRequestClose={closeBankModal}
-                  >
-                    <PageHeaderName text="급여이체은행 코드도움" />
-                    <div className="test2">
-                      <Table 
-                        columns={columnsBank}
-                        data={dataBank}
-                      />
-                    </div>
-                    <div className="test">
-                      <CustomButton 
-                        backgroundColor={"var(--color-primary-blue)"}
-                        color={"var(--color-primary-white)"}
-                        onClick={() => {
-                          handleBankConfirmClick();
-                          closeBankModal();
+                        text="검색" 
+                        color="black" 
+                        onClick={handleAddressButtonClick}
+                        disabled={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">상세주소</th>
+                    <td className="erCellStyle" colSpan="5">
+                      <CustomInput 
+                        width={845}
+                        maxLength={100}
+                        value={employeeData.dcAddress}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              dcAddress: e.target.value
+                          }));
                         }}
-                        text={"확인"}
+                        onBlur={() => {
+                          // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                          if (employeeData.dcAddress === undefined) {
+                            return;
+                          }
+                          handleUpdateEmp("dcAddress", clickCdEmp, employeeData.dcAddress);
+                        }}
+                        readOnly={isReadOnly}
                       />
-                      <CustomButton 
-                        backgroundColor={"var(--color-primary-blue)"}
-                        color={"var(--color-primary-white)"}
-                        onClick={closeBankModal}
-                        text={"취소"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">전화번호</th>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone1}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone1: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={3}
+                        readOnly={isReadOnly}
                       />
-                    </div>
-                  </CustomModalInput>
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    width={180} 
-                    value={employeeData.noAccount} 
-                    onChange={(e) => {
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          noAccount: e.target.value
-                      }));
-                    }}
-                    onBlur={() => {
-                      handleUpdateEmp("noAccount", clickCdEmp, employeeData.noAccount);
-                    }}
-                    placeholder="계좌번호를 입력해주세요."
-                    readOnly={isReadOnly}
-                  />
-                </td>
-                <td className="erCellStyle">
-                  <CustomInput 
-                    width={180} 
-                    value={employeeData.nmAccountHolder || employeeData.nmEmp}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setEmployeeData(prevState => ({
-                          ...prevState,
-                          nmAccountHolder: value === "" ? null : value
-                      }));
-                    }}
-                    onBlur={() => {
-                      handleUpdateEmp("nmAccountHolder", clickCdEmp, employeeData.nmAccountHolder);
-                    }}
-                    readOnly={isReadOnly}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone2}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone2: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone3}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone3: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">휴대폰번호</th>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone1}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone1: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={3}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone2}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone2: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone3}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone3: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    {/* disabled */}
+                    <td width={298}>
+                      <input type="text" disabled className="erInputDisabledStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">이메일</th>
+                    <td className="erCellStyle">
+                      <div>
+                        <CustomInput 
+                          type="email"
+                          width={180}
+                          maxLength={20}
+                          value={employeeData.username}
+                          onChange={(e) => {
+                              setEmployeeData(prevState => ({
+                                  ...prevState,
+                                  username: e.target.value
+                              }));
+                          }} 
+                          onBlur={handleUsernameUpdate}
+                          readOnly={isReadOnly}
+                        />
+                      </div>
+                    </td>
+                    <td className="erCellStyle">
+                      <div className="erEmailCell">
+                        <div className="erAtSign">@</div>
+                        <CustomInput
+                          className="erInputCell"
+                          width={160}
+                          maxLength={20}
+                          value={domainMap[employeeData.selectedOption] === "직접입력" ? employeeData.domain : domainMap[employeeData.selectedOption]}
+                          onChange={(e) => {
+                              setEmployeeData(prevState => ({
+                                  ...prevState,
+                                  domain: e.target.value
+                              }));
+                          }}
+                          onBlur={() => handleDomainUpdate(employeeData.domain)}
+                          readOnly={isReadOnly}
+                        />
+                      </div>
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomSelect
+                        className="erSelectBox"
+                        options={options}
+                        value={employeeData.selectedOption}
+                        onChange={handleSelectChange} 
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">메신저ID</th>
+                    <td className="erCellStyle">
+                        <CustomInput 
+                            type="email"
+                            width={180}
+                            maxLength={20}
+                            value={employeeData.idMessenger}
+                            onChange={(e) => {
+                                setEmployeeData(prevState => ({
+                                    ...prevState,
+                                    idMessenger: e.target.value
+                                }));
+                            }} 
+                            onBlur={() => {
+                                // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                                if (employeeData.idMessenger === undefined) {
+                                    return;
+                                }
+                                handleUpdateEmp("idMessenger", clickCdEmp, employeeData.idMessenger);
+                            }}
+                            readOnly={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">부서</th>
+                    <td className="erCellStyle">
+                      <CustomModalInput 
+                        width={180}
+                        value={nmDept}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        placeholder="부서 코드도움"
+                        onClick={() => {
+                          handleGetDeptList();
+                          openDeptModal();
+                        }}
+                        contentStyle={{height: '505px'}}
+                        isOpen={isDeptModalOpen}
+                        onRequestClose={closeDeptModal}
+                      >
+                        <PageHeaderName text="부서 코드도움" />
+                        <div className="test2">
+                          <Table 
+                            columns={columnsDept} 
+                            data={dataDept} 
+                          />
+                        </div>
+                        <div className="test">
+                          <CustomButton 
+                              backgroundColor={"var(--color-primary-blue)"}
+                              color={"var(--color-primary-white)"}
+                              onClick={() => {
+                                  handleDeptConfirmClick();
+                                  closeDeptModal();
+                              }}
+                              text={"확인"}
+                          />
+                          <CustomButton 
+                            backgroundColor={"var(--color-primary-blue)"}
+                            color={"var(--color-primary-white)"}
+                            onClick={closeDeptModal}
+                            text={"취소"}
+                          />
+                        </div>
+                      </CustomModalInput>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">직급</th>
+                    <td className="erCellStyle">
+                      <CustomSelect 
+                        className="erSelectBox"
+                        options={[{value:"0", label:"기본직급"}]} 
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomSelect
+                        className="erSelectBox"
+                        options={[
+                          { value: "1", label: "회장" },
+                          { value: "2", label: "사장" },
+                          { value: "3", label: "부사장" },
+                          { value: "4", label: "전무" },
+                          { value: "5", label: "상무" },
+                          { value: "6", label: "이사" },
+                          { value: "7", label: "부장" },
+                          { value: "8", label: "수석" },
+                          { value: "9", label: "차장" },
+                          { value: "10", label: "책임" },
+                          { value: "11", label: "과장" },
+                          { value: "12", label: "선임" },
+                          { value: "13", label: "대리" },
+                          { value: "14", label: "주임" },
+                          { value: "15", label: "사원" },
+                          { value: "16", label: "직급없음" },
+                        ]}
+                        value={employeeData.noPositionUnique}
+                        onChange={handleNoPositionUniqueChange}
+                        placeholder="선택"
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">호봉</th>
+                    <td className="erCellStyle">
+                        <CustomSelect
+                            className="erSelectBox"
+                            options={[
+                                { value: "null", label: "선택" },
+                                { value: "1", label: "1호봉" },
+                                { value: "2", label: "2호봉" },
+                                { value: "3", label: "3호봉" },
+                                { value: "4", label: "4호봉" },
+                                { value: "5", label: "5호봉" },
+                            ]}
+                            value={employeeData.fgSalaryGrade}
+                            onChange={handleFgSalaryGradeChange}
+                            disabled={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">퇴사일자</th>
+                    <td className="erCellStyle">
+                      <CustomCalendar 
+                        width={180}
+                        value={employeeData.dtResign}
+                        onChange={(newDate) => handleDateChange("dtResign", newDate)}
+                        onKeyDown={handleBackspaceDtResign}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        position="up"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">급여이체은행</th>
+                    <td className="erCellStyle">
+                      <CustomModalInput 
+                        width={180}
+                        value={nmBank}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        placeholder="급여이체은행 코드도움"
+                        onClick={() => {
+                          handleGetBankList();
+                          openBankModal();
+                        }}
+                        contentStyle={{height: '505px'}}
+                        isOpen={isBankModalOpen}
+                        onRequestClose={closeBankModal}
+                      >
+                        <PageHeaderName text="급여이체은행 코드도움" />
+                        <div className="test2">
+                          <Table 
+                            columns={columnsBank}
+                            data={dataBank}
+                          />
+                        </div>
+                        <div className="test">
+                          <CustomButton 
+                            backgroundColor={"var(--color-primary-blue)"}
+                            color={"var(--color-primary-white)"}
+                            onClick={() => {
+                              handleBankConfirmClick();
+                              closeBankModal();
+                            }}
+                            text={"확인"}
+                          />
+                          <CustomButton 
+                            backgroundColor={"var(--color-primary-blue)"}
+                            color={"var(--color-primary-white)"}
+                            onClick={closeBankModal}
+                            text={"취소"}
+                          />
+                        </div>
+                      </CustomModalInput>
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        width={180}
+                        maxLength={20}
+                        value={employeeData.noAccount}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noAccount: e.target.value
+                          }));
+                        }}
+                        onBlur={() => {
+                          if (employeeData.noAccount === undefined) {
+                            return;
+                          }
+                          handleUpdateEmp("noAccount", clickCdEmp, employeeData.noAccount);
+                        }}
+                        placeholder="계좌번호를 입력해주세요."
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        width={180}
+                        maxLength={10}
+                        value={employeeData.nmAccountHolder || employeeData.nmEmp}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              nmAccountHolder: value === "" ? null : value
+                          }));
+                        }}
+                        onBlur={() => {
+                          handleUpdateEmp("nmAccountHolder", clickCdEmp, employeeData.nmAccountHolder);
+                        }}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">비고</th>
+                    <td className="erCellStyle" colSpan="5">
+                        <CustomInput 
+                            width={845}
+                            maxLength={100}
+                            value={employeeData.comment}
+                            onChange={(e) => {
+                                setEmployeeData(prevState => ({
+                                    ...prevState,
+                                    comment: e.target.value
+                                }));
+                            }}
+                            onBlur={() => {
+                                // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                                if (employeeData.comment === undefined) {
+                                    return;
+                                }
+                                handleUpdateEmp("comment", clickCdEmp, employeeData.comment);
+                            }}
+                            readOnly={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* 주소검색 모달 */}

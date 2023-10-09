@@ -17,7 +17,7 @@
 
     <!--사원코드 존재여부검사-->
     <select id="checkCdEmpExistence" parameterType="string" resultType="int">
-        SELECT COUNT(*) FROM hr_emp_mst WHERE CD_EMP = #{cdEmp}
+        SELECT COUNT(*) FROM hr_emp_mst WHERE UPPER(CD_EMP) = UPPER(#{cdEmp})
     </select>
 
     <!--사원전체조회-->
