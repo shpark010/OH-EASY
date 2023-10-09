@@ -100,9 +100,9 @@ const useApiRequest = () => {
         throw error; // 409 에러일 때만 에러를 다시 발생
       } else {
         // "loginInfo" 쿠키 삭제
-        document.cookie =
-          "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        navigate("/login"); // 그 외의 경우에는 로그인 페이지로 리디렉션
+        // document.cookie =
+        //   "loginInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // navigate("/login"); // 그 외의 경우에는 로그인 페이지로 리디렉션
         return null;
       }
     }
