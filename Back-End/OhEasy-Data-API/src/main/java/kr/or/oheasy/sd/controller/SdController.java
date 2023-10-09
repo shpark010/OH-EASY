@@ -27,9 +27,7 @@ public class SdController {
 	@PostMapping("/getEmpList")
 	public ResponseEntity<?> getEmpList(@RequestBody Map<String, String> empSearch) {
 		System.out.println("조회 컨트롤러 진입");
-		System.out.println(empSearch);
 		Map<String, Object> result = sdService.getAllEmpList(empSearch);
-		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
@@ -37,9 +35,6 @@ public class SdController {
 	@PostMapping("/getOneEmpDetailData")
 	public ResponseEntity<?> getOneEmpDetailData(@RequestBody Map<String, String> empInfo) {
 		System.out.println("선택 컨트롤러 진입");
-		System.out.println("사원코드 : " + empInfo.get("code"));
-		System.out.println("귀속년월 : " + empInfo.get("belongingDate"));
-		System.out.println("지급일 : " + empInfo.get("payDay"));
 		Map<String, Object> result = sdService.getEmpDetailData(empInfo);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
@@ -49,7 +44,6 @@ public class SdController {
 	public ResponseEntity<?> setEmpPay(@RequestBody Map<String, String> insertPay) {
 		System.out.println("삽입 컨트롤러 진입");
 		Map<String, Object> result = sdService.setEmpPay(insertPay);
-		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
@@ -65,9 +59,7 @@ public class SdController {
 	@PostMapping("/searchTaxInfo")
 	public ResponseEntity<?> searchTaxInfo(@RequestBody Map<String, String> searchTax) {
 		System.out.println("조회 구분 컨트롤러 진입");
-		System.out.println(searchTax.get("code"));
 		Map<String, Object> result = sdService.searchTaxInfo(searchTax);
-		System.out.println(result);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
@@ -75,7 +67,6 @@ public class SdController {
 	@PostMapping("/deletePayData")
 	public ResponseEntity<?> deletePayData(@RequestBody Map<String, Object> deleteData) {
 		System.out.println("삭제 컨트롤러 진입");
-		System.out.println(deleteData.get("code"));
 		Map<String, Object> result = sdService.deletePayData(deleteData);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
@@ -108,7 +99,6 @@ public class SdController {
 	@PostMapping("/updateEachDeduction")
 	public ResponseEntity<?> updateEachDeduction(@RequestBody Map<String, String> updateEachDeductionData) {
 		System.out.println("각 항목 정보 수정 컨트롤러 진입");
-		System.out.println(updateEachDeductionData);
 		Map<String, Object> result = sdService.updateEachDeduction(updateEachDeductionData);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}

@@ -17,6 +17,7 @@ import useApiRequest from "../components/Services/ApiRequest";
 import CustomButton from "../components/Contents/CustomButton";
 import SweetAlert from "../components/Contents/SweetAlert";
 import CustomSelect from "../components/Contents/CustomSelect";
+import QuickMenu from "../components/PageHeader/QuickMenu";
 
 const SalaryData = (props) => {
   // 수정 가능 여부
@@ -119,16 +120,24 @@ const SalaryData = (props) => {
   //포멧 함수
   //금액
   const changeFormat = (changeValue) => {
+    let isNegative = false; // 음수 여부를 판단하는 변수를 추가합니다.
+    if (changeValue < 0) {
+      // changeValue가 0보다 작으면 음수로 판단합니다.
+      isNegative = true; // 음수 여부를 true로 설정합니다.
+      changeValue = -changeValue; // changeValue를 양수로 변환합니다.
+    }
+
     let newValue = String(changeValue);
-    // 쉼표(,) 제거 후 숫자만 남김
     newValue = newValue.replace(/,/g, "");
-    // 숫자만 허용
     newValue = newValue.replace(/[^0-9]/g, "");
-    // 앞에 0을 제거
     newValue = newValue.replace(/^0+/, "");
-    // 3자리마다 쉼표 추가
     newValue = newValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // newValue = Number(newValue).toLocaleString("ko-KR");
+
+    if (isNegative) {
+      // 만약 값이 음수였다면 결과 문자열 앞에 '-'를 붙입니다.
+      newValue = "-" + newValue;
+    }
+
     return newValue;
   };
 
@@ -889,7 +898,14 @@ const SalaryData = (props) => {
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={(e) => insertPayAmount(e)}
-              className={"doubleLine"}
+              className={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+                  ? ""
+                  : "doubleLine"
+              }
               type="price"
               align="right"
               readOnly={
@@ -957,7 +973,14 @@ const SalaryData = (props) => {
               id="price-input"
               value={inputValue}
               onChange={handleInputChange}
-              className={"doubleLine"}
+              className={
+                !empList ||
+                empList.length === 0 ||
+                !clickEmpCode ||
+                clickEmpCode.trim() === ""
+                  ? ""
+                  : "doubleLine"
+              }
               type="price"
               align="right"
               readOnly={
@@ -1435,7 +1458,7 @@ const SalaryData = (props) => {
       )}
       {deleteAlert && (
         <SweetAlert
-          text="선택한 사원(들)의 급여정보를 삭제하시겠습니까?"
+          text={`선택한 사원 ${checkedRows.length}명의 현재 급여정보를 전부 삭제하시겠습니까?`}
           showCancel={true}
           type="error"
           onConfirm={handleDeleteConfirm}
@@ -1462,10 +1485,9 @@ const SalaryData = (props) => {
               ? `선택한 ${checkedRows.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
               : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
           }
-          showCancel={true}
+          showCancel={false}
           type={checkedRows.length > 0 ? "question" : "warning"}
           onConfirm={handleEmailConfirm}
-          onCancel={handleEmailCloseAlert}
         />
       )}
       {noEmailAlert && (
@@ -1480,7 +1502,7 @@ const SalaryData = (props) => {
       {pdfAlert && (
         <SweetAlert
           // text={"선택한 사원의 현재 급여정보를 PDF로 다운로드 하시겠습니까?"}
-          html={`선택한 사원의 현재 급여정보를 <br> PDF로 다운로드 하시겠습니까?`}
+          html={`현재 사원의 당월 급여정보를 <br> PDF로 다운로드 하시겠습니까?`}
           showCancel={true}
           type="question"
           onConfirm={handlePdfConfirm}
@@ -1627,11 +1649,12 @@ const SalaryData = (props) => {
                 onClick={handleDeleteOpenAlert}
                 disabled={checkedRows.length > 0 ? false : true}
               />
-              <PageHeaderIconButton
+              {/* <PageHeaderIconButton
                 btnName="setting"
                 imageSrc={Setting}
                 altText="세팅"
-              />
+              /> */}
+              <QuickMenu />
             </div>
           </div>
         </div>

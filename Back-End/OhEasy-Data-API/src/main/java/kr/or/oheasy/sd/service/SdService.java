@@ -34,15 +34,12 @@ public class SdService {
 		String yyAllowance = empSearch.get("belongingDate").substring(0, 4);
 		// 귀속월
 		String mmBelong = empSearch.get("belongingDate").substring(4, 6);
-		System.out.println("검색 년도 : " + yyAllowance);
-		System.out.println("검색 월 : " + mmBelong);
 		// 지급일
 		String dtAllowance = empSearch.get("payDay");
 		// 조회 정렬
 		String searchOrder = empSearch.get("searchOrder");
 		// 조회 구분
 		String searchTaxOrder = empSearch.get("searchTaxOrder");
-		System.out.println(searchTaxOrder);
 		HashMap<String, String> empData = new HashMap<>();
 		empData.put("yyAllowance", yyAllowance);
 		empData.put("mmBelong", mmBelong);
@@ -55,7 +52,6 @@ public class SdService {
 			List<Long> deducationList = dao.getTaxInfo(empData);
 			taxInfo = new SdTaxAmountVO(deducationList.get(0), deducationList.get(1), deducationList.get(2),
 					deducationList.get(4), deducationList.get(3), deducationList.get(5), deducationList.get(6));
-			System.out.println(taxInfo);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -125,7 +121,6 @@ public class SdService {
 		String dtAllowance = searchTax.get("payDay");
 		// 조회 구분
 		String searchTaxOrder = searchTax.get("searchTaxOrder");
-		System.out.println("조회구분 : " + searchTaxOrder);
 		HashMap<String, String> empData = new HashMap<>();
 		empData.put("cdEmp", cd_Emp);
 		empData.put("yyAllowance", yyAllowance);
@@ -172,7 +167,6 @@ public class SdService {
 		List<SdTaxRateVO> taxRateList = new ArrayList<>();
 		try {
 			taxRateList = dao.getAllTaxList(empData);
-			System.out.println(taxRateList);
 		} catch (Exception e) {
 			System.out.println("과세 리스트 오류");
 			System.out.println(e.getMessage());
@@ -186,7 +180,6 @@ public class SdService {
 		searchData.put("dtAllowance", dtAllowance);
 		searchData.put("searchTaxOrder", searchTaxOrder);
 		// 삽입
-		System.out.println("서치데이터 : " + searchData);
 		int insertResult = dao.setEmpPay(searchData);
 		// 계산 결과 조회
 		SdTaxAmountVO emptaxInfo = new SdTaxAmountVO();
@@ -222,7 +215,6 @@ public class SdService {
 		String cd_Emp = updatePay.get("code");
 		// 입력 급여
 		long pay = Long.parseLong(updatePay.get("pay").replaceAll(",", ""));
-		System.out.println("입력 급여 : " + pay);
 		// 연도
 		String yyAllowance = updatePay.get("belongingDate").substring(0, 4);
 		// 귀속월
@@ -371,7 +363,6 @@ public class SdService {
 		List<SdTaxRateVO> taxList = new ArrayList<>();
 		try {
 			taxList = dao.getTaxList(taxListData);
-			System.out.println(taxList);
 		} catch (Exception e) {
 			System.out.println("과세 리스트 오류");
 			System.out.println(e.getMessage());
@@ -404,7 +395,6 @@ public class SdService {
 		yearData.put("yyAllowance", (String)updateTaxListData.get("applyYear"));
 		try {
 			taxRateList = dao.getAllTaxList(yearData);
-			System.out.println(taxRateList);
 		} catch (Exception e) {
 			System.out.println("과세 리스트 오류");
 			System.out.println(e.getMessage());
@@ -415,7 +405,6 @@ public class SdService {
 		List<SdDeducationVO> payList = new ArrayList<>();
 		try {
 			payList = dao.getAllPayListForEdit(payListData);
-			System.out.println(payList);
 		} catch (Exception e) {
 			System.out.println("전체 사원 정보 수정을 위한 급여 및 일자 조회 오류");
 			System.out.println(e.getMessage());
