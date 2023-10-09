@@ -25,16 +25,25 @@ public class WcEmailController {
     private WcEmailService wcemailService;
     
 
+//    @PostMapping("/workContractEmail")
+//    public ResponseEntity<?> sendEmail(@RequestBody Map<String, Object> emailData) {
+//        
+//        try {
+//            String responseMessage = wcemailService.sendEmailToEmployees(emailData);
+//            if ("Emails sent successfully".equals(responseMessage)) {
+//                return ResponseEntity.ok().body(responseMessage);
+//            } else {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
     @PostMapping("/workContractEmail")
     public ResponseEntity<?> sendEmail(@RequestBody Map<String, Object> emailData) {
-        
         try {
             String responseMessage = wcemailService.sendEmailToEmployees(emailData);
-            if ("Emails sent successfully".equals(responseMessage)) {
-                return ResponseEntity.ok().body(responseMessage);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
-            }
+            return ResponseEntity.ok().body(responseMessage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

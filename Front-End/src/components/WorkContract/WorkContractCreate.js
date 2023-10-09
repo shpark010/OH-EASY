@@ -366,22 +366,23 @@ const WorkContractCreate = ({
     
     const cdEmp = clickCode;
     const colum = e.target.id;
-    const data = e.target.value.trim();
+    const data = e.target.value;
   
     
 
     
     
-    if (!cdEmp || !data) return;
+    if (!cdEmp ) return; //null이 들어와도 update돼야함. 값이 있다가 다지웠을때도 update돼야 하기 때문.
 
 
     
     
-     if( validate[colum]===data){ 
-      console.log("초기값과 같으면 종료");
+     if( validate[colum]===data || !validate[colum]&&!data){ 
+      console.log("들어온값이 초기값과 같다면 종료");
       console.log(validate[colum]);
       console.log(data);
-      return};
+      return
+    };
     
        
 
@@ -1163,8 +1164,8 @@ const modalSearch = async(e) => {
     if (e.key === 'Enter' || e.key ==='Tab' ) {
       inputOnBlur(e); // 'Enter' 키가 눌렸을 때 inputOnBlur 함수를 호출합니다.
       console.log("enter가 눌려요");
-  }
-  console.log("enter가 안 눌려요");
+    }else{console.log("enter가 안 눌려요");}
+  
   }
 
 
