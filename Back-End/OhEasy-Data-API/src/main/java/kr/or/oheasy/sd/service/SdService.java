@@ -288,8 +288,11 @@ public class SdService {
 	// 급여 자료 삭제
 	public Map<String, Object> deletePayData(Map<String, Object> deleteData) {
 		SdDao dao = sqlSession.getMapper(SdDao.class);
-		// 사원코드
+		// 삭제 사원 리스트
 		List<String> cdEmpList = (List<String>) deleteData.get("code");
+		// 클릭 사원 코드
+		String cdEmp = deleteData.get("clickEmpCode").toString();
+		System.out.println("클릭된 사원 : " + cdEmp);
 		// 연도
 		String yyAllowance = deleteData.get("belongingDate").toString().substring(0, 4);
 		// 귀속월
@@ -302,6 +305,7 @@ public class SdService {
 		empData.put("yyAllowance", yyAllowance);
 		empData.put("mmBelong", mmBelong);
 		empData.put("dtAllowance", dtAllowance);
+		empData.put("cdEmp", cdEmp);
 		empData.put("searchTaxOrder", searchTaxOrder);
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("cdEmpList", cdEmpList);
@@ -494,7 +498,19 @@ public class SdService {
 		searchData.put("mmBelong", mmBelong);
 		searchData.put("dtAllowance", dtAllowance);
 		searchData.put("searchTaxOrder", searchTaxOrder);
+		// 계산 결과 조회
+		SdTaxAmountVO emptaxInfo = new SdTaxAmountVO();
 		SdTaxAmountVO searchTaxInfo = new SdTaxAmountVO();
+		try {
+			List<SdDeducationVO> empTaxInfoList = dao.getEmpTax(searchData);
+			emptaxInfo = new SdTaxAmountVO(empTaxInfoList.get(0).getAmtAllowance(),
+					empTaxInfoList.get(1).getAmtAllowance(), empTaxInfoList.get(2).getAmtAllowance(),
+					empTaxInfoList.get(3).getAmtAllowance(), empTaxInfoList.get(4).getAmtAllowance(),
+					empTaxInfoList.get(5).getAmtAllowance(), empTaxInfoList.get(6).getAmtAllowance());
+		} catch (Exception e) {
+			System.out.println("사원 급여 오류");
+			System.out.println(e.getMessage());
+		}
 		try {
 			List<Long> searchTaxInfoList = dao.getTaxInfo(searchData);
 			searchTaxInfo = new SdTaxAmountVO(searchTaxInfoList.get(0), searchTaxInfoList.get(1),
@@ -504,7 +520,7 @@ public class SdService {
 			System.out.println("조회구분 오류");
 			System.out.println(e.getMessage());
 		}
-		System.out.println(searchTaxInfo);
+		resultData.put("empTaxInfo", emptaxInfo);
 		resultData.put("searchTaxInfo", searchTaxInfo);
 		return resultData;
 	}

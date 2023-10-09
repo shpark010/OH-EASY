@@ -9,9 +9,9 @@
 		SELECT
 		e.CD_EMP as cdEmp,
 		e.NM_EMP as nmEmp,
-		s.NM_POSITION as nmPosition
+		IFNULL(s.NM_POSITION, '직급없음') as nmPosition
 		FROM HR_EMP_MST e
-		JOIN POSITION_SDTL s
+		LEFT JOIN POSITION_SDTL s
 		ON
 		e.NO_POSITION_UNIQUE =
 		s.NO_POSITION_UNIQUE

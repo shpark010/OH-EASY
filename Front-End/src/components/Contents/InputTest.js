@@ -86,6 +86,10 @@ function Input({
       newValue = newValue.replace(/,/g, "");
       // 숫자만 허용
       newValue = newValue.replace(/[^0-9]/g, "");
+      // 숫자의 자리수가 18자리를 넘지 않도록 확인
+      if (newValue.length > 14) {
+        newValue = newValue.substring(0, 14); // 처음 14자리만 남김
+      }
       // 앞에 0을 제거
       newValue = newValue.replace(/^0+/, "");
       // 3자리마다 쉼표 추가

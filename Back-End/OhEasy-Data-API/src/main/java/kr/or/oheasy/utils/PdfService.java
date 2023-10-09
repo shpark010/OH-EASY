@@ -15,6 +15,8 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 
 @Service
 public class PdfService {
@@ -28,19 +30,24 @@ public class PdfService {
         PdfDocument pdf = new PdfDocument(reader, writer);
         Document document = new Document(pdf);
 
+        // Windows 환경의 시스템 폰트 경로
+        String fontPath = "C:\\Windows\\Fonts\\malgun.ttf"; // 예: Windows에 설치된 맑은 고딕 폰트
+        PdfFont font = PdfFontFactory.createFont(fontPath, "Identity-H", true); // 한글 폰트 로드
+
         dataMap.forEach((position, data) -> {
             String[] coordinates = position.split(",");
             float x = Float.parseFloat(coordinates[0]);
             float y = Float.parseFloat(coordinates[1]);
             int page = Integer.parseInt(coordinates[2]);
             
-         // Text 객체를 생성하고 폰트 크기를 설정
-            Text text = new Text(data);
-            if (position.equals("195,748,1") || position.equals("262,748,1")) {
-                text.setFontSize(19);  // 원하는 폰트 크기로 설정
+            Text text = new Text(data).setFont(font); // 폰트 설정
+            float fontSize = 11;
+            if (position.equals("195,747,1") || position.equals("262,747,1")) {
+            	fontSize = 19;
             }
+            text.setFontSize(fontSize);
 
-            document.add(new Paragraph(text).setFixedPosition(page, x, y, 500)); // 데이터를 원하는 위치에 추가
+            document.add(new Paragraph(text).setFixedPosition(page, x, y, 500));
         });
 
         document.close();
