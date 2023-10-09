@@ -370,6 +370,7 @@ function HRManagement() {
                 insertRow={true}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
+                bottomFocus={true}
               />
             </div>
             <div className="totalBox">
