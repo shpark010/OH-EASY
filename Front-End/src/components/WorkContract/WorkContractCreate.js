@@ -128,7 +128,7 @@ const WorkContractCreate = ({
       // 만약 dtStartCont 값이 있고, dtEndCont가 dtStartCont보다 작다면 오류를 표시합니다.
       if (paramGetEmpList1.dtStartCont && data < paramGetEmpList1.dtStartCont) {
         setShowAlert2(true)
-          return; //종료 근로계약 기간은 시작 근로계약 기간보다 늦을 수 없습니다.
+          return; 
       }
   
       setParamGetEmpList1({ ...paramGetEmpList1, dtEndCont: data });
@@ -150,6 +150,9 @@ const WorkContractCreate = ({
     const cdEmp = clickCode
     const data = newDate
     const colum = "dtCreated"
+    if(!paramGetEmpList1.dtStartCont || !paramGetEmpList1.dtEndCont){
+      return;
+    }
     if (cdEmp == null || cdEmp === "" || cdEmp === undefined || data === "" ) {
       return;
     }
@@ -180,8 +183,10 @@ const WorkContractCreate = ({
       setEmployeeData(empListResponseData);
 
       
-      const lastTwoCharsNewDate = newDate.slice(-2);
+      const lastTwoCharsNewDate = newDate.slice(4, 6);
       const lastTwoCharsBelongingDate = belongingDate.slice(-2);
+      console.log(lastTwoCharsNewDate);
+      console.log(lastTwoCharsBelongingDate);
       
       if (lastTwoCharsNewDate !== lastTwoCharsBelongingDate) {
 
@@ -222,6 +227,11 @@ const WorkContractCreate = ({
     const colum = e.target.id;
 
     console.log(cdEmp);
+
+    if( !paramGetEmpList1.dtStartCont || !paramGetEmpList1.dtEndCont){
+     
+      return
+    } ;
    
     if (cdEmp === null || cdEmp === "" || cdEmp === undefined) {
       return;
@@ -290,7 +300,7 @@ const WorkContractCreate = ({
 
 
       if(colum ==="ddPaySal"&& payState === "on" ){ // 32일이 넘으면 변경x
-       if(data > 31){
+       if(data > 31 || data==0){
         return
        }
       
@@ -374,6 +384,9 @@ const WorkContractCreate = ({
     
     if (!cdEmp ) return; //null이 들어와도 update돼야함. 값이 있다가 다지웠을때도 update돼야 하기 때문.
 
+    if(!paramGetEmpList1.dtStartCont || !paramGetEmpList1.dtEndCont){
+      return
+    }
 
     
     
@@ -484,6 +497,8 @@ const WorkContractCreate = ({
       setHighlightLastRow(false)
     }
 
+    
+
     setParamGetEmpList1([]);
     setBelongingDate(newDate);
     setCheckColumn([]);
@@ -516,7 +531,24 @@ const WorkContractCreate = ({
         
       } catch (error) {
         console.error("Failed to fetch emp data:", error);
-    }
+
+//     const lastCdEmp = responseData && responseData.length > 0 ? responseData[responseData.length - 1].cdEmp : null;
+//     setClickCode(lastCdEmp);
+
+//     if (lastCdEmp) {
+//         // 두 번째 API 요청
+//         const responseData2 = await apiRequest({
+//             method: "GET",
+//             url: `/api2/wc/getCodeParamEmpList?code=${lastCdEmp}`,
+//         });
+
+//         setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+//         setValidate(responseData2); // 초기값을 담을 state validate에 사용할 data set
+//     }
+// } catch (error) {
+//     console.error("Failed to fetch emp data:", error);
+}
+    // }
   };
   
   
@@ -535,7 +567,7 @@ const WorkContractCreate = ({
     [modalEmpList],
   );
 
-  // 모달창에서 추가하기 하면 꺼지면서 사원 인서트
+  // 모달창에서 추가하기 하면 꺼지면서 사원 인서트 그냥 추가하기
   const closeModalAndEmpInsert = async () => {
     closeModal2();
     
@@ -553,18 +585,30 @@ const WorkContractCreate = ({
       
       
       
-      if (clickModalEmpCode) {
-          // 두 번째 API 요청 Table.js에 의해서 무조건 맨위의 code를 오른쪽 Table에 표시해야함.
+      // if (clickModalEmpCode) {
+      //     // 두 번째 API 요청 Table.js에 의해서 무조건 맨위의 code를 오른쪽 Table에 표시해야함.
          
-          const responseData2 = await apiRequest({
-              method: "GET",
-              url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
-          });
-          console.log(responseData2);
-          setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
-          setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
-      }
-      
+      //     const responseData2 = await apiRequest({
+      //         method: "GET",
+      //         url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
+      //     });
+      //     console.log(responseData2);
+      //     setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+      //     setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
+      // }
+      if (clickModalEmpCode) {
+        // employeeData의 마지막 항목에서 cdEmp 값을 가져옵니다.
+       
+            // 두 번째 API 요청
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${clickModalEmpCode}`, 
+            });
+            console.log(responseData2);
+            setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+            setValidate(responseData2); // 초기값을 담을 state validate에 사용할 data set
+        
+    }
 
 
     } catch (error) {
@@ -592,18 +636,30 @@ const WorkContractCreate = ({
       setHighlightLastRow(true);
       
       
-      if (cdEmp) {
-          // 두 번째 API 요청
+      // if (cdEmp) {
+      //     // 두 번째 API 요청
          
-          const responseData2 = await apiRequest({
-            method: "GET",
-            url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
-        });
-        console.log(responseData2);
-        setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
-        setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
-      }
+      //     const responseData2 = await apiRequest({
+      //       method: "GET",
+      //       url: `/api2/wc/getCodeParamEmpList?code=${employeeData[0].cdEmp}`, 
+      //   });
+      //   console.log(responseData2);
+      //   setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+      //   setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
+      // }
       
+     
+
+if (cdEmp) {
+    // 두 번째 API 요청
+    const responseData2 = await apiRequest({
+        method: "GET",
+        url: `/api2/wc/getCodeParamEmpList?code=${cdEmp}`, 
+    });
+    console.log(responseData2);
+    setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+    setValidate(responseData2); // 초기값을 담을 state validate에 사용할 data set
+}
 
 
     } catch (error) {
@@ -707,24 +763,37 @@ const WorkContractCreate = ({
                 url: `/api2/wc/getEmpList?creDate=${belongingDate}&orderValue=${e.target.value}`,
             });
 
-            const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
-            setClickCode(firstCdEmp);
-            if (firstCdEmp) {
-                // 두 번째 API 요청
-               
-                const responseData2 = await apiRequest({
-                    method: "GET",
-                    url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
-                });
-          
-                setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+            // const lastCdEmp = responseData && responseData.length > 0 ? responseData[responseData.length - 1].cdEmp : null;    // responseData의 마지막 항목에서 cdEmp 값을 가져옵니다.
+            // setClickCode(lastCdEmp);
+            // if (lastCdEmp) {
+            //     // 두 번째 API 요청
+            //     const responseData2 = await apiRequest({
+            //         method: "GET",
+            //         url: `/api2/wc/getCodeParamEmpList?code=${lastCdEmp}`, 
+            //     });
+            
+            //     setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
+            // }
              
-            }
+            const firstCdEmp = responseData && responseData[0] ? responseData[0].cdEmp : null;    // responseData의 첫 번째 항목에서 cdEmp 값을 가져옵니다.
+        setClickCode(firstCdEmp);
+        if (firstCdEmp) {
+            // 두 번째 API 요청
+           
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${firstCdEmp}`, 
+            });
+      
+            setParamGetEmpList1(responseData2); // 오른쪽 table 보여줄 data set
             setEmployeeData(responseData);
+            setValidate(responseData2); //  초기값을 담을 state validate에 사용할 data set
+        }
+
+        
+      } catch (error) {
+        console.error("Failed to fetch emp data:", error);
             
-            
-        } catch (error) {
-            console.error("Failed to fetch emp data:", error);
         }
     }
 };
@@ -849,10 +918,11 @@ const dataLength = data.length; //마지막 행의 code
           onChange={selectAllCheckBox}
           // belongingDate && clickCode && data.length===checkColumn.length
           checked={
-            clickCode ? (data.length === checkColumn.length) : 
+            clickCode ? 
+            (data.length === checkColumn.length && checkColumn.length > 0) : 
             (belongingDate && data.length === checkColumn.length && 
-             (belongingDate !== null || data.length > 0 || checkColumn.length > 0))
-          }
+             (belongingDate !== null || data.length > 0) && checkColumn.length > 0)
+        }
           />)
           }
         ,
@@ -1163,8 +1233,8 @@ const modalSearch = async(e) => {
   const enterPress = (e) =>{
     if (e.key === 'Enter' || e.key ==='Tab' ) {
       inputOnBlur(e); // 'Enter' 키가 눌렸을 때 inputOnBlur 함수를 호출합니다.
-      console.log("enter가 눌려요");
-    }else{console.log("enter가 안 눌려요");}
+      
+    }else{}
   
   }
 
@@ -1345,6 +1415,7 @@ const modalSearch = async(e) => {
                     readOnly
                     onChange={inputOnChange}
                     width={180}
+                    onBlur={inputOnBlur}
                      />
                   </td>
                   <td className="wcCellStyle">
@@ -1354,6 +1425,7 @@ const modalSearch = async(e) => {
                     onChange={inputOnChange}
                     value={paramGetEmpList1.addrWork || "" }
                     readOnly
+                    onBlur={inputOnBlur}
                     />
 
                     <CustomButton
@@ -1377,7 +1449,7 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.addrWorkDtl || ""}
                     id={"addrWorkDtl"}
                     onChange={inputOnChange}
-                    
+                    onBlur={inputOnBlur}
                     maxLength="100"
                     placeholder={"ex) 더존 APT 1동 101호 "}
                     onKeyDown={enterPress}
@@ -1395,6 +1467,7 @@ const modalSearch = async(e) => {
                     id={"cntnJob"}
                     onChange={inputOnChange}
                     onKeyDown={enterPress}
+                    onBlur={inputOnBlur}
                     maxLength="100"
                     placeholder={"ex) Platform 부서 refactoring 업무 "}
 
@@ -1413,7 +1486,7 @@ const modalSearch = async(e) => {
                     maxLength="4"
                     placeholder={"ex) 0900 "}
                     width={180}
-                    
+                    onBlur={inputOnBlur}
                     
                     >
                       
@@ -1427,7 +1500,7 @@ const modalSearch = async(e) => {
                     onKeyDown={enterPress}
                     maxLength="4"
                     placeholder={"ex) 1800 "}
-                   
+                    onBlur={inputOnBlur}
                     >
                     </CustomInput>
 
@@ -1441,10 +1514,11 @@ const modalSearch = async(e) => {
                      id={"tmStartBreak"}
                     onChange={inputOnChange}
                     onKeyDown={enterPress}
+                    onBlur={inputOnBlur}
                     maxLength="4"
                     placeholder={"ex) 1200 "}
                     width={180}
-
+                    
 
 
                     >
@@ -1460,6 +1534,7 @@ const modalSearch = async(e) => {
 
                      onChange={inputOnChange}
                      onKeyDown={enterPress}
+                     onBlur={inputOnBlur}
                      maxLength="4"
 
 
@@ -1542,10 +1617,12 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.amtSal || "" }
                     id ={"amtSal"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
+                     onBlur={inputOnBlur}
                     maxLength="11"
                     placeholder={"ex) 10000000"}
                     type={"number"}
+                    
                      /> 
                     <b> 원 </b>
                   </td>
@@ -1572,7 +1649,8 @@ const modalSearch = async(e) => {
                     value={paramGetEmpList1.ddPaySal || "" }
                     id ={"ddPaySal"}
                     onChange={inputOnChange}
-                    onBlur={inputOnBlur}
+                    onKeyDown={enterPress}
+                     onBlur={inputOnBlur}
                     maxLength="2"
                     className={`wcSelect2 ${payState === "off" ? "wcPayDayOff" : ""} `}
                     placeholder={"ex) 17"}
@@ -1799,7 +1877,7 @@ const modalSearch = async(e) => {
         {/* 공통 sweetalert  */}
       {showAlert && (
         <SweetAlert
-          text=" 기간을 정확하게  입력해주세요. "
+          text=" 계약기간을 정확하게  입력해주세요. "
           
           //type="success"
           type="warning"
@@ -1815,7 +1893,7 @@ const modalSearch = async(e) => {
 
         {showAlert2 && (
         <SweetAlert
-          text=" 기간을 정확하게  입력해주세요. "
+          text=" 계약기간을 정확하게  입력해주세요. "
           // showCancel={true}
           //type="success"
           type="warning"

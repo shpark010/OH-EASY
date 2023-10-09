@@ -2,9 +2,9 @@
   display: flex;
   gap: 2rem;
   width: 100%;
-  max-width: 1640px;
+  max-width: 1800px;
   height: 72vh;
-  margin: 0 auto;
+  margin-top: 5px;
   padding: 0 15px;
   overflow: hidden;
   flex-grow: 1;
@@ -16,6 +16,7 @@
   box-sizing: border-box;
   background-color: #ffffff;
   position: relative;
+  
   
 }
 

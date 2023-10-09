@@ -13,6 +13,7 @@ import WorkContractCreate from '../components/WorkContract/WorkContractCreate';
 import WorkContractSelect from '../components/WorkContract/WorkContractSelect';
 import PageHeaderName from '../components/PageHeader/PageHeaderName';
 import SweetAlert from "../components/Contents/SweetAlert";
+import QuickMenu from '../components/PageHeader/QuickMenu';
 
 
 
@@ -107,34 +108,37 @@ const WorkContract = () => {
 
 
   const deleteEmp = async () => {
-
-    
     console.log("삭제할 항목들:", checkColumn);
 
     try {
         const responseData = await apiRequest({
             method: "DELETE",
             url: `/api2/wc/deleteEmpList`,
-            data: checkColumn,  // checkColumn 배열을 직접 전송a
+            data: checkColumn,  // checkColumn 배열을 직접 전송
         });
 
-        
         //삭제 후 empList 초기화 하는데 2가지 방법 1. 전체API 불러오기, 2. Frontend에서 해결하기.
         const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
         setEmployeeData(updatedEmpList);
-        const responseData2 = await apiRequest({
-          method: "GET",
-          url: `/api2/wc/getCodeParamEmpList?code=${updatedEmpList[0].cdEmp}`, 
-      });
+        const lastCdEmpFromUpdatedList = updatedEmpList && updatedEmpList.length > 0 ? updatedEmpList[updatedEmpList.length - 1].cdEmp : null;
+
+        if (lastCdEmpFromUpdatedList) {
+            const responseData2 = await apiRequest({
+                method: "GET",
+                url: `/api2/wc/getCodeParamEmpList?code=${lastCdEmpFromUpdatedList}`, 
+            });
+            setParamGetEmpList1(responseData2); // delete후 맨위의 사원 data 가져오기 위해
+        } else {
+            setParamGetEmpList1([]);
+        }
+
         // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
         setCheckColumn([]);
-        setParamGetEmpList1(responseData2); // delete후 맨위의 사원 data 가져오기 위해
         setHighlightFirstRow(true);
         setClickCode();
         setShowInsertRow(false);
 
-    } 
-    catch (error) {
+    } catch (error) {
         console.error("Failed to delete emp data:", error);
     }
 };
@@ -294,6 +298,7 @@ const handleSendEmail = async () => {
                   }
                 }}               
               />
+              <QuickMenu/>
               {/* <PageHeaderIconButton
                 btnName="calc wcMouseOver"
                 imageSrc={Calc}
