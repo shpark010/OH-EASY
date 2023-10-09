@@ -45,7 +45,7 @@ const WorkContractSelect = () => {
     if (belongingDate2) {
         if (formattedDate <= belongingDate2) {
             setEmployeeData([]);
-            setHighlightFirstRow1(true);
+            // setHighlightFirstRow1(false);
             try {
                 const responseData = await apiRequest({
                     method: "GET",
@@ -88,7 +88,7 @@ const handleBelongingDateChange2 = async(newDate) => {
     if (belongingDate) {
         if (belongingDate <= formattedDate) {
             setEmployeeData([]);
-            setHighlightFirstRow1(true);
+            // setHighlightFirstRow1(false);
             try {
                 const responseData = await apiRequest({
                     method: "GET",
@@ -152,7 +152,7 @@ const handleBelongingDateChange2 = async(newDate) => {
     setEmployeeData([]); //backgroundcolor 지우기 위한
     // 두 달력의 상태값이 모두 있을 경우 API 요청을 보냅니다.
     if (belongingDate && belongingDate2) {
-      setHighlightFirstRow1(true);
+      // setHighlightFirstRow1(false);
         try {
             const responseData = await apiRequest({
                 method: "GET",
@@ -200,9 +200,8 @@ const handleBelongingDateChange2 = async(newDate) => {
   const handleInputClick = async (e) => {
     setParamGetEmpList([]);
 
-    // 상태 변경을 Promise로 감싸서 상태가 완전히 업데이트된 후 다음 동작을 진행합니다.
 
-        setHighlightFirstRow1(false);
+        // setHighlightFirstRow1(false);
        
     
         const code = e.target.parentElement.parentElement.querySelector('td:nth-child(2) input');
@@ -247,7 +246,7 @@ const handleBelongingDateChange2 = async(newDate) => {
 
 <Input
     style={{
-      background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+      // background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
     }}
     value={original?.dtCreated||""}
     onClick={handleInputClick}
@@ -267,7 +266,7 @@ const handleBelongingDateChange2 = async(newDate) => {
         return (
           <Input
     style={{
-      background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+      // background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
     }}
     value={original?.cdEmp || ""}
     onClick={handleInputClick}
@@ -288,7 +287,7 @@ const handleBelongingDateChange2 = async(newDate) => {
         return (
           <Input
           style={{
-            background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+            // background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
           }}
           value={original?.nmEmp||""}
           onClick={handleInputClick}
@@ -309,7 +308,7 @@ const handleBelongingDateChange2 = async(newDate) => {
         return (
           <Input
           style={{
-            background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
+            // background: index === 0 && highlightFirstRow1 ? '#92c5ff' : 'transparent'
           }}
           value={original?.noResident||""}
           onClick={handleInputClick}
@@ -317,7 +316,7 @@ const handleBelongingDateChange2 = async(newDate) => {
         );
       },
     },
-  ],[highlightFirstRow1] //이 상태가 바뀌기 전까지는 전의 data 유지.
+  ],[] //이 상태가 바뀌기 전까지는 전의 data 유지.
   );
   
   
@@ -387,8 +386,8 @@ const handleBelongingDateChange2 = async(newDate) => {
               <Table
                 columns={columns}
                 data={data}   
-                checkboxWidth={"10%"}
-         
+                
+                // bottomFocus={true}
                 />
               </div>
               <table className="wcGridBottomTable">
