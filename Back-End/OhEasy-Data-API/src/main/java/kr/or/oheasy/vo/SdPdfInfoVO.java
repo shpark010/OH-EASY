@@ -1,8 +1,10 @@
 package kr.or.oheasy.vo;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SdPdfInfoVO {
 	private String cdEmp;						//사원코드
 	private String nmEmp;						//사원명

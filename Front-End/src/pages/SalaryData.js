@@ -185,7 +185,7 @@ const SalaryData = (props) => {
     handleChangeSearch(e);
   };
 
-  //
+  // 조회구분 세액
   const [searchTax, setSearchTax] = useState({
     amtAllowance: "", //기본급 총액
     nationalPension: "", //국민연금 총액
@@ -400,6 +400,7 @@ const SalaryData = (props) => {
       setEmpList(responseData.empSearch);
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -537,6 +538,7 @@ const SalaryData = (props) => {
         method: "POST",
         url: "/api2/sd/deletePayData",
         data: {
+          clickEmpCode: clickEmpCode,
           code: checkedRows,
           belongingDate: belongingDate,
           payDay: payDay,
@@ -598,6 +600,7 @@ const SalaryData = (props) => {
           editTaxList: editTaxList,
         },
       });
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -620,6 +623,7 @@ const SalaryData = (props) => {
       if (sendResult > 0) {
         handleEmailSendOpenAlert();
       }
+      setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -638,26 +642,35 @@ const SalaryData = (props) => {
           belongingDate: belongingDate,
           dtAllowance: payDay,
         },
-        responseType: "blob",
+        responseType: "json",
       });
-      // Create a new Blob from the response data
-      const blob = new Blob([responseData], { type: "application/pdf" });
+      // EmpInfo 처리
+      const cdEmp = responseData.empInfo.cdEmp;
+      const nmEmp = responseData.empInfo.nmEmp;
+      const yyAllowance = responseData.empInfo.yyAllowance;
+      const mmBelong = responseData.empInfo.mmBelong;
+
+      // Base64로 인코딩된 PDF 처리
+      const base64Pdf = responseData.pdf;
+      const pdfBlob = new Blob(
+        [Uint8Array.from(atob(base64Pdf), (c) => c.charCodeAt(0))],
+        { type: "application/pdf" },
+      );
 
       // Create a link element
       const link = document.createElement("a");
 
       // Set the download attribute with a filename
-      link.download = "salary.pdf";
+      link.download = `급여자료(${yyAllowance}년${mmBelong}월)_${nmEmp}(${cdEmp}).pdf`;
 
       // Create a URL to the blob and set it as the href attribute
-      link.href = window.URL.createObjectURL(blob);
+      link.href = window.URL.createObjectURL(pdfBlob);
 
       // Append the link to the body
       document.body.appendChild(link);
 
       // Trigger a click event on the link to download the file
       link.click();
-      console.log(blob);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -680,7 +693,9 @@ const SalaryData = (props) => {
           searchTaxOrder: searchTaxOrder,
         },
       });
+      const empTaxInfo = responseData.empTaxInfo;
       const searchTaxInfo = responseData.searchTaxInfo;
+      handlePersonalTax(empTaxInfo);
       handleSearchTax(searchTaxInfo);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
@@ -1334,10 +1349,15 @@ const SalaryData = (props) => {
 
   const handleEmailConfirm = () => {
     if (checkedRows.length > 0) {
-      const sendResult = handleSendEmail();
-      console.log(sendResult);
-      setCheckedRows([]);
+      if (!empDetailInfo.email) {
+        handleNoEmailOpenAlert();
+      } else {
+        const sendResult = handleSendEmail();
+        console.log(sendResult);
+        setCheckedRows([]);
+      }
     }
+
     handleEmailCloseAlert();
     setCheckedRows([]);
   };
@@ -1356,6 +1376,20 @@ const SalaryData = (props) => {
     handleEmailSendCloseAlert();
   };
 
+  // 이메일 없음 alert
+  const [noEmailAlert, setNoEmailAlert] = React.useState(false);
+
+  const handleNoEmailCloseAlert = () => {
+    setNoEmailAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleNoEmailOpenAlert = () => {
+    setNoEmailAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleNoEmailConfirm = () => {
+    handleNoEmailCloseAlert();
+  };
+
   // 조회 조건 alert
   const [searchAlert, setSearchAlert] = React.useState(false);
 
@@ -1368,6 +1402,21 @@ const SalaryData = (props) => {
 
   const handleSearchConfirm = () => {
     handleSearchCloseAlert();
+  };
+
+  //pdf 출력 alert
+  const [pdfAlert, setPdfAlert] = React.useState(false);
+
+  const handlePdfCloseAlert = () => {
+    setPdfAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handlePdfOpenAlert = () => {
+    setPdfAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handlePdfConfirm = () => {
+    handlePrintPdf();
+    handlePdfCloseAlert();
   };
 
   return (
@@ -1417,6 +1466,25 @@ const SalaryData = (props) => {
           type={checkedRows.length > 0 ? "question" : "warning"}
           onConfirm={handleEmailConfirm}
           onCancel={handleEmailCloseAlert}
+        />
+      )}
+      {noEmailAlert && (
+        <SweetAlert
+          text={"사원정보에 등록된 메일이 없습니다."}
+          showCancel={true}
+          type="error"
+          onConfirm={handleNoEmailConfirm}
+          onCancel={handleNoEmailCloseAlert}
+        />
+      )}
+      {pdfAlert && (
+        <SweetAlert
+          // text={"선택한 사원의 현재 급여정보를 PDF로 다운로드 하시겠습니까?"}
+          html={`선택한 사원의 현재 급여정보를 <br> PDF로 다운로드 하시겠습니까?`}
+          showCancel={true}
+          type="question"
+          onConfirm={handlePdfConfirm}
+          onCancel={handlePdfCloseAlert}
         />
       )}
       {searchAlert && (
@@ -1549,8 +1617,8 @@ const SalaryData = (props) => {
                 btnName="print"
                 imageSrc={Print}
                 altText="프린트"
-                onClick={handlePrintPdf}
-                disabled={!clickEmpCode ? true : false}
+                onClick={handlePdfOpenAlert}
+                disabled={!clickEmpCode || !pay ? true : false}
               />
               <PageHeaderIconButton
                 btnName="delete"
