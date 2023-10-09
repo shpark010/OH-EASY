@@ -60,6 +60,7 @@ const EmployeeRegister = () => {
   const [insertData, setInsertData] = useState({ cdEmp: "", nmEmp: "", noResident: "" }); // 현재 편집 중인 insert 데이터 상태관리
   const [latestCdEmp, setLatestCdEmp] = useState(""); // insert 동작시 cdEmp값 저장
   const [inserted, setInserted] = useState(false); // insert 함수 한 번 실행하게 해주는 상태관리
+  const [isEmpListUpdated, setIsEmpListUpdated] = useState(false); // 사원 목록이 업데이트되었는지 확인
 
   const [employeeData, setEmployeeData] = useState({
     cdEmp: "",
@@ -762,8 +763,15 @@ const EmployeeRegister = () => {
 
             setChanged(false);
 
+            // update가 성공하면 우측 erGrid2 부분에도 갱신
             if (original && original.code) {
-              handleUpdateEmp("noResident", original.code, inputValue);
+              const isUpdateSuccess = await handleUpdateEmp("noResident", original.code, inputValue);
+              if (isUpdateSuccess) {
+                const updatedData = await handleGetSingleEmp(original.code);
+                if(updatedData) {
+                  setEmployeeData(updatedData);
+                }
+              }
             }
 
             setInsertData(prevState => {
@@ -784,7 +792,7 @@ const EmployeeRegister = () => {
           const handleKeyDown = (e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              handleInputOnBlurNoResident(e);
+              handleInsertEmp();
 
               // 현재 포커스 된 요소의 다음 요소로 포커스를 이동합니다.
               const formElements = Array.from(document.querySelectorAll('input, button, select, textarea'));
@@ -898,8 +906,12 @@ const EmployeeRegister = () => {
       });
 
       // API 호출이 성공한 경우 초기값 업데이트
-      setInitialValues((prev) => ({ ...prev, [columnName]: inputValue }));
       console.log("responseData : " + responseData);
+      if (responseData === 1) {
+        setInitialValues((prev) => ({ ...prev, [columnName]: inputValue }));
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("API 요청 실패:", error);
     }
@@ -1506,6 +1518,15 @@ const EmployeeRegister = () => {
     }
   };
 
+  // isEmpListUpdated 상태가 변경될 때마다 동작하는 함수
+  useEffect(() => {
+    if (isEmpListUpdated) {
+      setTableKey(Date.now());
+      handleGetSingleEmp(clickCdEmp);
+      setIsEmpListUpdated(false);  // 초기화
+    }
+  }, [isEmpListUpdated]);
+
   return (
     <>
       <div className="pageHeader">
@@ -1736,8 +1757,8 @@ const EmployeeRegister = () => {
                   <th className="erHeaderStyle">입사일자</th>
                   <td className="erCellStyle">
                     <CustomCalendar 
-                      width={180} 
-                      value={employeeData.dtHire} 
+                      width={180}
+                      value={employeeData.dtHire}
                       onChange={(newDate) => handleDateChange("dtHire", newDate)}
                       disabled={isReadOnly}
                       readOnly={true}
@@ -1759,53 +1780,59 @@ const EmployeeRegister = () => {
                         disabled={isReadOnly}
                       />
                     </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="resident"
-                      width={180} 
-                      value={maskResidentValue(employeeData.noResident)}
-                      placeholder="주민번호를 입력해주세요."
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noResident: e.target.value
-                        }));
-                      }}
-                      onBlur={() => {
-                        // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
-                        if (!employeeData.noResident || employeeData.noResident === "") {
-                          handleUpdateEmp("noResident", clickCdEmp, "");
-                          setIsValid(true);
-                          return;
-                        }
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="resident"
+                        width={180}
+                        value={maskResidentValue(employeeData.noResident)}
+                        placeholder="주민번호를 입력해주세요."
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noResident: e.target.value
+                          }));
+                        }}
+                        onBlur={async () => {
+                          // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
+                          if (!employeeData.noResident || employeeData.noResident === "") {
+                            await handleUpdateEmp("noResident", clickCdEmp, "");
+                            setIsValid(true);
+                            return;
+                          }
 
-                        // 주민번호의 길이가 14자리가 아닌 경우 업데이트 중지
-                        if (employeeData.noResident.length !== 14) {
-                          console.log("주민번호는 13자리여야 합니다.");
-                          setIsValid(false);
-                          return;
-                        }
-                        
-                        // 주민번호 유효성 검사 후 업데이트 진행
-                        const residentValid = isValidResidentNumber(employeeData.noResident);
-                        setIsValid(residentValid);
-                        handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
+                          // 주민번호의 길이가 14자리가 아닌 경우 업데이트 중지
+                          if (employeeData.noResident.length !== 14) {
+                            console.log("주민번호는 13자리여야 합니다.");
+                            setIsValid(false);
+                            return;
+                          }
+                          
+                          // 주민번호 유효성 검사 후 업데이트 진행
+                          const residentValid = isValidResidentNumber(employeeData.noResident);
+                          setIsValid(residentValid);
+
+                          const isUpdated = await handleUpdateEmp("noResident", clickCdEmp, employeeData.noResident);
+
+                          if (isUpdated) {
+                            await handleGetEmpList();
+                            setIsEmpListUpdated(true);
+                          }
                         }}
-                      readOnly={isReadOnly || maskResident}
-                      style={{
-                        borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
-                        borderWidth: isValid === false ? '3px' : '1px',
-                        color: isValid ? 'black' : 'red'
-                        }}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput
-                      value={genderFromNoResident(employeeData.noResident)}
-                      readOnly={true}
-                    />
-                  </td>
-                </tr>
+                        readOnly={isReadOnly || maskResident}
+                        style={{
+                          borderColor: isValid === false ? 'red' : 'var(--color-primary-gray)',
+                          borderWidth: isValid === false ? '3px' : '1px',
+                          color: isValid ? 'black' : 'red'
+                          }}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput
+                        value={genderFromNoResident(employeeData.noResident)}
+                        readOnly={true}
+                      />
+                    </td>
+                  </tr>
                 {/* <tr>
                 <th className="erHeaderStyle">국적</th>
                   <td className="erCellStyle">
@@ -1815,461 +1842,468 @@ const EmployeeRegister = () => {
                     />
                   </td>
                 </tr> */}
-                <tr>
-                  <th className="erHeaderStyle">주소</th>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      width={180} 
-                      value={employeeData.noPost} 
-                      setZonecode={(value) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noPost: value
-                        }));
-                      }} 
-                      readOnly 
-                      />
-                  </td>
-                  <td className="erCellStyle" colSpan="2">
-                    <CustomInput 
-                      width={368} 
-                      value={employeeData.nmAddress} 
-                      setAddress={(value) => {
+                  <tr>
+                    <th className="erHeaderStyle">주소</th>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        width={180}
+                        value={employeeData.noPost}
+                        setZonecode={(value) => {
                           setEmployeeData(prevState => ({
                               ...prevState,
-                              nmAddress: value
+                              noPost: value
                           }));
-                      }}
-                      readOnly 
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomButton 
-                      text="검색" 
-                      color="black" 
-                      onClick={handleAddressButtonClick}
-                      disabled={isReadOnly}
-                      />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">상세주소</th>
-                  <td className="erCellStyle" colSpan="5">
-                    <CustomInput 
-                      width={845} 
-                      value={employeeData.dcAddress} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            dcAddress: e.target.value
-                        }));
-                      }}
-                      onBlur={() => {
-                        // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
-                        if (employeeData.dcAddress === undefined) {
-                          return;
-                        }
-                        handleUpdateEmp("dcAddress", clickCdEmp, employeeData.dcAddress);
-                      }}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">전화번호</th>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noPhone1} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noPhone1: e.target.value
-                        }));
-                      }}
-                      onBlur={handlePhoneUpdate}
-                      maxLength={3}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noPhone2} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noPhone2: e.target.value
-                        }));
-                      }}
-                      onBlur={handlePhoneUpdate}
-                      maxLength={4}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noPhone3} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noPhone3: e.target.value
-                        }));
-                      }}
-                      onBlur={handlePhoneUpdate}
-                      maxLength={4}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">휴대폰번호</th>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noMobilePhone1} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noMobilePhone1: e.target.value
-                        }));
-                      }}
-                      onBlur={handleMobilePhoneUpdate}
-                      maxLength={3}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noMobilePhone2} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noMobilePhone2: e.target.value
-                        }));
-                      }}
-                      onBlur={handleMobilePhoneUpdate}
-                      maxLength={4}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      type="number"
-                      width={180} 
-                      value={employeeData.noMobilePhone3} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noMobilePhone3: e.target.value
-                        }));
-                      }}
-                      onBlur={handleMobilePhoneUpdate}
-                      maxLength={4}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  {/* disabled */}
-                  <td width={298}>
-                    <input type="text" disabled className="erInputDisabledStyle" />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">이메일</th>
-                  <td className="erCellStyle">
-                    <div>
-                      <CustomInput 
-                        type="email"
-                        width={180} 
-                        value={employeeData.username} 
-                        onChange={(e) => {
-                            setEmployeeData(prevState => ({
-                                ...prevState,
-                                username: e.target.value
-                            }));
                         }} 
-                        onBlur={handleUsernameUpdate}
-                        readOnly={isReadOnly}
-                      />
-                    </div>
-                  </td>
-                  <td className="erCellStyle">
-                    <div className="erEmailCell">
-                      <div className="erAtSign">@</div>
-                      <CustomInput
-                        className="erInputCell"
-                        width={160}
-                        value={domainMap[employeeData.selectedOption] === "직접입력" ? employeeData.domain : domainMap[employeeData.selectedOption]}
-                        onChange={(e) => {
+                        readOnly 
+                        />
+                    </td>
+                    <td className="erCellStyle" colSpan="2">
+                      <CustomInput 
+                        width={368}
+                        value={employeeData.nmAddress}
+                        setAddress={(value) => {
                             setEmployeeData(prevState => ({
                                 ...prevState,
-                                domain: e.target.value
+                                nmAddress: value
                             }));
                         }}
-                        onBlur={() => handleDomainUpdate(employeeData.domain)}
+                        readOnly 
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomButton 
+                        text="검색" 
+                        color="black" 
+                        onClick={handleAddressButtonClick}
+                        disabled={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">상세주소</th>
+                    <td className="erCellStyle" colSpan="5">
+                      <CustomInput 
+                        width={845}
+                        maxLength={100}
+                        value={employeeData.dcAddress}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              dcAddress: e.target.value
+                          }));
+                        }}
+                        onBlur={() => {
+                          // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                          if (employeeData.dcAddress === undefined) {
+                            return;
+                          }
+                          handleUpdateEmp("dcAddress", clickCdEmp, employeeData.dcAddress);
+                        }}
                         readOnly={isReadOnly}
                       />
-                    </div>
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomSelect
-                      className="erSelectBox"
-                      options={options}
-                      value={employeeData.selectedOption}
-                      onChange={handleSelectChange} 
-                      disabled={isReadOnly}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">메신저ID</th>
-                  <td className="erCellStyle">
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">전화번호</th>
+                    <td className="erCellStyle">
                       <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone1}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone1: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={3}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone2}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone2: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noPhone3}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noPhone3: e.target.value
+                          }));
+                        }}
+                        onBlur={handlePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">휴대폰번호</th>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone1}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone1: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={3}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone2}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone2: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        type="number"
+                        width={180}
+                        value={employeeData.noMobilePhone3}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noMobilePhone3: e.target.value
+                          }));
+                        }}
+                        onBlur={handleMobilePhoneUpdate}
+                        maxLength={4}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                    {/* disabled */}
+                    <td width={298}>
+                      <input type="text" disabled className="erInputDisabledStyle" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">이메일</th>
+                    <td className="erCellStyle">
+                      <div>
+                        <CustomInput 
                           type="email"
-                          width={180} 
-                          value={employeeData.idMessenger} 
+                          width={180}
+                          maxLength={20}
+                          value={employeeData.username}
                           onChange={(e) => {
                               setEmployeeData(prevState => ({
                                   ...prevState,
-                                  idMessenger: e.target.value
+                                  username: e.target.value
                               }));
                           }} 
-                          onBlur={() => {
-                              // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
-                              if (employeeData.idMessenger === undefined) {
-                                  return;
-                              }
-                              handleUpdateEmp("idMessenger", clickCdEmp, employeeData.idMessenger);
-                          }}
+                          onBlur={handleUsernameUpdate}
                           readOnly={isReadOnly}
-                      />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">부서</th>
-                  <td className="erCellStyle">
-                    <CustomModalInput 
-                      width={180} 
-                      value={nmDept} 
-                      disabled={isReadOnly}
-                      readOnly={true}
-                      placeholder="부서 코드도움"
-                      onClick={() => {
-                        handleGetDeptList();
-                        openDeptModal();
-                      }}
-                      contentStyle={{height: '505px'}}
-                      isOpen={isDeptModalOpen}
-                      onRequestClose={closeDeptModal}
-                    >
-                      <PageHeaderName text="부서 코드도움" />
-                      <div className="test2">
-                        <Table 
-                          columns={columnsDept} 
-                          data={dataDept} 
                         />
                       </div>
-                      <div className="test">
-                        <CustomButton 
+                    </td>
+                    <td className="erCellStyle">
+                      <div className="erEmailCell">
+                        <div className="erAtSign">@</div>
+                        <CustomInput
+                          className="erInputCell"
+                          width={160}
+                          maxLength={20}
+                          value={domainMap[employeeData.selectedOption] === "직접입력" ? employeeData.domain : domainMap[employeeData.selectedOption]}
+                          onChange={(e) => {
+                              setEmployeeData(prevState => ({
+                                  ...prevState,
+                                  domain: e.target.value
+                              }));
+                          }}
+                          onBlur={() => handleDomainUpdate(employeeData.domain)}
+                          readOnly={isReadOnly}
+                        />
+                      </div>
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomSelect
+                        className="erSelectBox"
+                        options={options}
+                        value={employeeData.selectedOption}
+                        onChange={handleSelectChange} 
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">메신저ID</th>
+                    <td className="erCellStyle">
+                        <CustomInput 
+                            type="email"
+                            width={180}
+                            maxLength={20}
+                            value={employeeData.idMessenger}
+                            onChange={(e) => {
+                                setEmployeeData(prevState => ({
+                                    ...prevState,
+                                    idMessenger: e.target.value
+                                }));
+                            }} 
+                            onBlur={() => {
+                                // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                                if (employeeData.idMessenger === undefined) {
+                                    return;
+                                }
+                                handleUpdateEmp("idMessenger", clickCdEmp, employeeData.idMessenger);
+                            }}
+                            readOnly={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">부서</th>
+                    <td className="erCellStyle">
+                      <CustomModalInput 
+                        width={180}
+                        value={nmDept}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        placeholder="부서 코드도움"
+                        onClick={() => {
+                          handleGetDeptList();
+                          openDeptModal();
+                        }}
+                        contentStyle={{height: '505px'}}
+                        isOpen={isDeptModalOpen}
+                        onRequestClose={closeDeptModal}
+                      >
+                        <PageHeaderName text="부서 코드도움" />
+                        <div className="test2">
+                          <Table 
+                            columns={columnsDept} 
+                            data={dataDept} 
+                          />
+                        </div>
+                        <div className="test">
+                          <CustomButton 
+                              backgroundColor={"var(--color-primary-blue)"}
+                              color={"var(--color-primary-white)"}
+                              onClick={() => {
+                                  handleDeptConfirmClick();
+                                  closeDeptModal();
+                              }}
+                              text={"확인"}
+                          />
+                          <CustomButton 
+                            backgroundColor={"var(--color-primary-blue)"}
+                            color={"var(--color-primary-white)"}
+                            onClick={closeDeptModal}
+                            text={"취소"}
+                          />
+                        </div>
+                      </CustomModalInput>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">직급</th>
+                    <td className="erCellStyle">
+                      <CustomSelect 
+                        className="erSelectBox"
+                        options={[{value:"0", label:"기본직급"}]} 
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomSelect
+                        className="erSelectBox"
+                        options={[
+                          { value: "1", label: "회장" },
+                          { value: "2", label: "사장" },
+                          { value: "3", label: "부사장" },
+                          { value: "4", label: "전무" },
+                          { value: "5", label: "상무" },
+                          { value: "6", label: "이사" },
+                          { value: "7", label: "부장" },
+                          { value: "8", label: "수석" },
+                          { value: "9", label: "차장" },
+                          { value: "10", label: "책임" },
+                          { value: "11", label: "과장" },
+                          { value: "12", label: "선임" },
+                          { value: "13", label: "대리" },
+                          { value: "14", label: "주임" },
+                          { value: "15", label: "사원" },
+                          { value: "16", label: "직급없음" },
+                        ]}
+                        value={employeeData.noPositionUnique}
+                        onChange={handleNoPositionUniqueChange}
+                        placeholder="선택"
+                        disabled={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">호봉</th>
+                    <td className="erCellStyle">
+                        <CustomSelect
+                            className="erSelectBox"
+                            options={[
+                                { value: "null", label: "선택" },
+                                { value: "1", label: "1호봉" },
+                                { value: "2", label: "2호봉" },
+                                { value: "3", label: "3호봉" },
+                                { value: "4", label: "4호봉" },
+                                { value: "5", label: "5호봉" },
+                            ]}
+                            value={employeeData.fgSalaryGrade}
+                            onChange={handleFgSalaryGradeChange}
+                            disabled={isReadOnly}
+                        />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">퇴사일자</th>
+                    <td className="erCellStyle">
+                      <CustomCalendar 
+                        width={180}
+                        value={employeeData.dtResign}
+                        onChange={(newDate) => handleDateChange("dtResign", newDate)}
+                        onKeyDown={handleBackspaceDtResign}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        position="up"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">급여이체은행</th>
+                    <td className="erCellStyle">
+                      <CustomModalInput 
+                        width={180}
+                        value={nmBank}
+                        disabled={isReadOnly}
+                        readOnly={true}
+                        placeholder="급여이체은행 코드도움"
+                        onClick={() => {
+                          handleGetBankList();
+                          openBankModal();
+                        }}
+                        contentStyle={{height: '505px'}}
+                        isOpen={isBankModalOpen}
+                        onRequestClose={closeBankModal}
+                      >
+                        <PageHeaderName text="급여이체은행 코드도움" />
+                        <div className="test2">
+                          <Table 
+                            columns={columnsBank}
+                            data={dataBank}
+                          />
+                        </div>
+                        <div className="test">
+                          <CustomButton 
                             backgroundColor={"var(--color-primary-blue)"}
                             color={"var(--color-primary-white)"}
                             onClick={() => {
-                                handleDeptConfirmClick();
-                                closeDeptModal();
+                              handleBankConfirmClick();
+                              closeBankModal();
                             }}
                             text={"확인"}
-                        />
-                        <CustomButton 
-                          backgroundColor={"var(--color-primary-blue)"}
-                          color={"var(--color-primary-white)"}
-                          onClick={closeDeptModal}
-                          text={"취소"}
-                        />
-                      </div>
-                    </CustomModalInput>
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">직급</th>
-                  <td className="erCellStyle">
-                    <CustomSelect 
-                      className="erSelectBox"
-                      options={[{value:"0", label:"기본직급"}]} 
-                      disabled={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomSelect
-                      className="erSelectBox"
-                      options={[
-                        { value: "1", label: "회장" },
-                        { value: "2", label: "사장" },
-                        { value: "3", label: "부사장" },
-                        { value: "4", label: "전무" },
-                        { value: "5", label: "상무" },
-                        { value: "6", label: "이사" },
-                        { value: "7", label: "부장" },
-                        { value: "8", label: "수석" },
-                        { value: "9", label: "차장" },
-                        { value: "10", label: "책임" },
-                        { value: "11", label: "과장" },
-                        { value: "12", label: "선임" },
-                        { value: "13", label: "대리" },
-                        { value: "14", label: "주임" },
-                        { value: "15", label: "사원" },
-                        { value: "16", label: "직급없음" },
-                      ]}
-                      value={employeeData.noPositionUnique}
-                      onChange={handleNoPositionUniqueChange}
-                      placeholder="선택"
-                      disabled={isReadOnly}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">호봉</th>
-                  <td className="erCellStyle">
-                      <CustomSelect
-                          className="erSelectBox"
-                          options={[
-                              { value: "null", label: "선택" },
-                              { value: "1", label: "1호봉" },
-                              { value: "2", label: "2호봉" },
-                              { value: "3", label: "3호봉" },
-                              { value: "4", label: "4호봉" },
-                              { value: "5", label: "5호봉" },
-                          ]}
-                          value={employeeData.fgSalaryGrade}
-                          onChange={handleFgSalaryGradeChange}
-                          disabled={isReadOnly}
-                      />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">퇴사일자</th>
-                  <td className="erCellStyle">
-                    <CustomCalendar 
-                      width={180} 
-                      value={employeeData.dtResign} 
-                      onChange={(newDate) => handleDateChange("dtResign", newDate)}
-                      onKeyDown={handleBackspaceDtResign}
-                      disabled={isReadOnly}
-                      readOnly={true}
-                      position="up"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">급여이체은행</th>
-                  <td className="erCellStyle">
-                    <CustomModalInput 
-                      width={180} 
-                      value={nmBank}
-                      disabled={isReadOnly}
-                      readOnly={true}
-                      placeholder="급여이체은행 코드도움"
-                      onClick={() => {
-                        handleGetBankList();
-                        openBankModal();
-                      }}
-                      contentStyle={{height: '505px'}}
-                      isOpen={isBankModalOpen}
-                      onRequestClose={closeBankModal}
-                    >
-                      <PageHeaderName text="급여이체은행 코드도움" />
-                      <div className="test2">
-                        <Table 
-                          columns={columnsBank}
-                          data={dataBank}
-                        />
-                      </div>
-                      <div className="test">
-                        <CustomButton 
-                          backgroundColor={"var(--color-primary-blue)"}
-                          color={"var(--color-primary-white)"}
-                          onClick={() => {
-                            handleBankConfirmClick();
-                            closeBankModal();
-                          }}
-                          text={"확인"}
-                        />
-                        <CustomButton 
-                          backgroundColor={"var(--color-primary-blue)"}
-                          color={"var(--color-primary-white)"}
-                          onClick={closeBankModal}
-                          text={"취소"}
-                        />
-                      </div>
-                    </CustomModalInput>
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      width={180} 
-                      value={employeeData.noAccount} 
-                      onChange={(e) => {
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            noAccount: e.target.value
-                        }));
-                      }}
-                      onBlur={() => {
-                        if (employeeData.noAccount === undefined) {
-                          return;
-                        }
-                        handleUpdateEmp("noAccount", clickCdEmp, employeeData.noAccount);
-                      }}
-                      placeholder="계좌번호를 입력해주세요."
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                  <td className="erCellStyle">
-                    <CustomInput 
-                      width={180} 
-                      value={employeeData.nmAccountHolder || employeeData.nmEmp}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setEmployeeData(prevState => ({
-                            ...prevState,
-                            nmAccountHolder: value === "" ? null : value
-                        }));
-                      }}
-                      onBlur={() => {
-                        handleUpdateEmp("nmAccountHolder", clickCdEmp, employeeData.nmAccountHolder);
-                      }}
-                      readOnly={isReadOnly}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th className="erHeaderStyle">비고</th>
-                  <td className="erCellStyle" colSpan="5">
+                          />
+                          <CustomButton 
+                            backgroundColor={"var(--color-primary-blue)"}
+                            color={"var(--color-primary-white)"}
+                            onClick={closeBankModal}
+                            text={"취소"}
+                          />
+                        </div>
+                      </CustomModalInput>
+                    </td>
+                    <td className="erCellStyle">
                       <CustomInput 
-                          width={845} 
-                          value={employeeData.comment} 
-                          onChange={(e) => {
-                              setEmployeeData(prevState => ({
-                                  ...prevState,
-                                  comment: e.target.value
-                              }));
-                          }}
-                          onBlur={() => {
-                              // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
-                              if (employeeData.comment === undefined) {
-                                  return;
-                              }
-                              handleUpdateEmp("comment", clickCdEmp, employeeData.comment);
-                          }}
-                          readOnly={isReadOnly}
+                        width={180}
+                        maxLength={20}
+                        value={employeeData.noAccount}
+                        onChange={(e) => {
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              noAccount: e.target.value
+                          }));
+                        }}
+                        onBlur={() => {
+                          if (employeeData.noAccount === undefined) {
+                            return;
+                          }
+                          handleUpdateEmp("noAccount", clickCdEmp, employeeData.noAccount);
+                        }}
+                        placeholder="계좌번호를 입력해주세요."
+                        readOnly={isReadOnly}
                       />
-                  </td>
-                </tr>
+                    </td>
+                    <td className="erCellStyle">
+                      <CustomInput 
+                        width={180}
+                        maxLength={10}
+                        value={employeeData.nmAccountHolder || employeeData.nmEmp}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEmployeeData(prevState => ({
+                              ...prevState,
+                              nmAccountHolder: value === "" ? null : value
+                          }));
+                        }}
+                        onBlur={() => {
+                          handleUpdateEmp("nmAccountHolder", clickCdEmp, employeeData.nmAccountHolder);
+                        }}
+                        readOnly={isReadOnly}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="erHeaderStyle">비고</th>
+                    <td className="erCellStyle" colSpan="5">
+                        <CustomInput 
+                            width={845}
+                            maxLength={100}
+                            value={employeeData.comment}
+                            onChange={(e) => {
+                                setEmployeeData(prevState => ({
+                                    ...prevState,
+                                    comment: e.target.value
+                                }));
+                            }}
+                            onBlur={() => {
+                                // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                                if (employeeData.comment === undefined) {
+                                    return;
+                                }
+                                handleUpdateEmp("comment", clickCdEmp, employeeData.comment);
+                            }}
+                            readOnly={isReadOnly}
+                        />
+                    </td>
+                  </tr>
               </tbody>
             </table>
           </div>
