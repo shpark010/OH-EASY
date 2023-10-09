@@ -9,6 +9,7 @@ import Print from "../../images/pages/common/print.png";
 import Delete from "../../images/pages/common/delete.png";
 import useApiRequest from "../Services/ApiRequest";
 import SweetAlert from "../Contents/SweetAlert";
+import QuickMenu from "../PageHeader/QuickMenu";
 
 const HrPageHeader = ({
   checkedRows,
@@ -220,6 +221,8 @@ const HrPageHeader = ({
                 }
               }}
             />
+            <QuickMenu />
+
             {/* <PageHeaderIconButton
               btnName="calc"
               imageSrc={Calc}
