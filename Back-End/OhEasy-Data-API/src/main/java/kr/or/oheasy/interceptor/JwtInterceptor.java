@@ -13,8 +13,8 @@ import kr.or.oheasy.utils.JwtUtil;
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 	
-	 @Autowired
-	    private RedisTemplate<String, String> redisTemplate;
+//	@Autowired
+//	private RedisTemplate<String, String> redisTemplate;
 	
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -39,15 +39,15 @@ public class JwtInterceptor implements HandlerInterceptor {
         String userId = parts[0];
         String jwtToken = parts[1];
         
-        //redis 검증
-//        String redisToken = redisTemplate.opsForValue().get(userId);
-//        System.out.println(jwtToken);
-//        System.out.println(redisToken);
-//        if (redisToken == null || !jwtToken.equals(redisToken)) {
-//            System.out.println("Redis에 저장된 token과 값이 다르거나 없습니다.");
+//        //Redis 토큰 검증
+//        String exsitToken = redisTemplate.opsForValue().get(userId);
+//        if(!jwtToken.equals(exsitToken)) {
+//            System.out.println("쿠키토큰 : " + jwtToken);
+//            System.out.println("레디스토큰 : " + exsitToken);
+//            System.out.println("달라");
 //            return false;
-//        } else {
-//            System.out.println("동일합니다.");
+//        }else {
+//        	System.out.println("토큰 비교 결과 일치함");
 //        }
 
         // JWT 검증
