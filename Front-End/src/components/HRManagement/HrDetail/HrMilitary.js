@@ -11,9 +11,9 @@ const defaultMilitaryData = {
   dcExemption: "", // 면제사유
   dtMilitaryStart: "", // 복무시작일
   dtMilitaryEnd: "", // 복무종료일
-  yyMilitary: "", //  병역기간 (년)
+  //yyMilitary: "", //  병역기간 (년)
   mmMilitary: "", //   병역기간 (월)
-  ddMilitary: "", // 병역기간 (일)
+  //ddMilitary: "", // 병역기간 (일)
   fgMilitaryType: "", // 군별 육군/해군
   dcClassMilitary: "", // 병과
   fgMilitaryRank: "", // 계급

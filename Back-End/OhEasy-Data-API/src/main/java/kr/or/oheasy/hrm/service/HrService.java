@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.or.oheasy.hrm.dao.HrDao;
 import kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO;
 import kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO;
+import kr.or.oheasy.hrm.vo.HrPdfVO;
 import kr.or.oheasy.utils.Camel;
 import kr.or.oheasy.vo.HrBodyDataDtlVO;
 import kr.or.oheasy.vo.HrCareerDtlVO;
@@ -301,5 +302,32 @@ public class HrService {
 		
 		return dao.deleteLicenseData(seqLicense);
 	}	
+	
+	@Transactional(rollbackFor = Exception.class)
+	public HrEmpMstCdEmpNmNameVO insertHrDtlAndGetHrMst(@Param("cdEmp") String cdEmp) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		// 인사테이블에 사원정보 insert 
+		dao.insertHrEmpData(cdEmp);
+		// 신체테이블에 신체정보 insert
+		dao.insertBodyData(cdEmp);
+		// 병역테이블에 병역정보 insert
+		dao.insertMilitaryData(cdEmp);
+		// 가족테이블에 가족정보 insert
+		dao.insertFirstFamilyData(cdEmp);
+	
+		
+		return dao.getOneHrEmpData(cdEmp);
+	}
+	
 
+	public HrPdfVO getHrPdfData(String cdEmp) {
+		HrDao dao = sqlSession.getMapper(HrDao.class);
+		
+		
+		return dao.getHrPdfData(cdEmp);
+	}
+	
+	
+	
 }

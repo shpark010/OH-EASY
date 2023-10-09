@@ -23,6 +23,7 @@ const HrSearchBar = ({
 
   const handleSearchBtnClick = async () => {
     console.log("클릭 시점");
+    setEmpList([]);
     try {
       const responseData = await apiRequest({
         method: "GET",
@@ -35,7 +36,10 @@ const HrSearchBar = ({
         working: responseData.working,
         resigned: responseData.resigned,
       });
-      setClickEmpCode(responseData.result[0].cdEmp);
+      console.log(responseData.result[responseData.result.length - 1].cdEmp);
+      setClickEmpCode(
+        responseData.result[responseData.result.length - 1].cdEmp,
+      );
       console.log("********************************");
       console.log(responseData.result);
       console.log("********************************");

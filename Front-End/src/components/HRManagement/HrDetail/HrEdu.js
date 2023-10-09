@@ -313,11 +313,12 @@ const HrEdu = ({ cdEmp }) => {
             <CustomSelect
               className={"hrDetailSelect"}
               options={[
+                { value: "-1", label: "미선택" },
                 { value: "0", label: "졸업" },
                 { value: "1", label: "중퇴" },
               ]}
-              placeholder="선택"
-              value={inputValue}
+              //placeholder="선택"
+              value={inputValue || "-1"}
               onChange={handleInputChange}
             />
           );

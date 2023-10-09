@@ -6,8 +6,8 @@ import SweetAlert from "../components/Contents/SweetAlert";
 import axios from "axios";
 import { useLoading } from "../containers/LoadingContext";
 
-const validateId = (id) => /^[a-z0-9]{4,}$/.test(id);
-const validatePassword = (password) => /^[a-z0-9]{4,}$/.test(password);
+const validateId = (id) => /^[a-z0-9]{4,10}$/.test(id);
+const validatePassword = (password) => /^[a-z0-9]{4,10}$/.test(password);
 const validateEmail = (email) => /^\S+@\S+\.\S+$/.test(email);
 
 const SignupPage = () => {
@@ -100,7 +100,9 @@ const SignupPage = () => {
     }
 
     if (!validatePassword(memberData.password)) {
-      setAlertMessage("암호는 4자리 이상의 영소문자, 숫자만 입력가능합니다.");
+      setAlertMessage(
+        "암호는 4자리 이상 10자리 이하의 영소문자, 숫자만 입력가능합니다.",
+      );
       setAlertType("warning");
       setShowAlert(true);
       return;
@@ -148,7 +150,9 @@ const SignupPage = () => {
     // 1. 아이디 유효성 검사
     if (!validateId(memberData.id)) {
       event.target.focus(); // 포커스를 다시 아이디 입력창에 주기
-      setAlertMessage("아이디는 4자리이상 영소문자, 숫자만 입력가능합니다.");
+      setAlertMessage(
+        "아이디는 4자리이상 10자리이하의 영소문자, 숫자만 입력가능합니다.",
+      );
       setAlertType("error");
       setShowAlert(true);
       return;

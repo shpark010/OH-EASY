@@ -174,12 +174,16 @@ const HrBasic = ({ cdEmp }) => {
   const fileInputRef = useRef(null);
 
   const handleFileUploadClick = () => {
+    console.log("********************************");
+    console.log(fileInputRef);
+    console.log("********************************");
     fileInputRef.current.click();
   };
   //const [profileImage, setProfileImage] = useState(noImage);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
+    console.log(file);
     console.log("handleFileChange *****************");
     if (!file) {
       //file = null;
@@ -217,6 +221,8 @@ const HrBasic = ({ cdEmp }) => {
     } catch (error) {
       console.error("Failed to upload file:", error);
     }
+    // 파일 선택 후 <input>의 값을 초기화
+    e.target.value = null;
   };
 
   const imgDelete = async () => {
