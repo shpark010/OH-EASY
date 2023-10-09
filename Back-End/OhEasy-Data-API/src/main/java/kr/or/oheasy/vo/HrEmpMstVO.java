@@ -23,6 +23,13 @@ public class HrEmpMstVO {
     private String dtResign;        // 퇴사일
     private String noAccount;       // 계좌번호
     private String nmAccountHolder; // 예금주명
+    private String idMessenger;     // 메신저ID
+    private String comment;         // 비고
+    private String fgSalaryGrade;   // 호봉
+
+//    // 국적정보
+//    private String cdNationality;   // 국적코드 fk
+//    private String nmNationality;   // 국적명
 
     // 은행정보
     private String cdBank;  // 은행코드 fk
@@ -40,6 +47,4 @@ public class HrEmpMstVO {
     private String nmPosition;          // 직급명
     private String sqPosition;          // 직급순서
 
-    // 년도
-    private String year;		// 년도
 }

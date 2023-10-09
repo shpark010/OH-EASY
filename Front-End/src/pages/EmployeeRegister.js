@@ -86,6 +86,10 @@ const EmployeeRegister = () => {
     dtResign: "",
     noAccount: "",
     noPositionUnique: "",
+    nmNationality: "",
+    idMessenger: "",
+    fgSalaryGrade: "",
+    comment: "",
   });
 
   // 컴포넌트가 처음 마운트될 때 handleGetEmpList 실행
@@ -119,12 +123,17 @@ const EmployeeRegister = () => {
       selectedOption: "0",
       dtResign: "",
       noAccount: "",
-      noPositionUnique: ""
+      noPositionUnique: "",
+      nmNationality: "",
+      idMessenger: "",
+      fgSalaryGrade: "",
+      comment: "",
     });
     setIsReadOnly(true); // readOnly 상태를 true로 설정
     setIsValid(null); // 주민번호 유효성 상태 초기화
     setNmDept("");
     setNmBank("");
+    // setFgSalaryGrade("");
   }
 
   // Email 도메인 맵
@@ -243,6 +252,25 @@ const EmployeeRegister = () => {
     }
   };
 
+  // 호봉 업데이트 함수
+  const handleFgSalaryGradeChange = (event) => {
+    let selectedValue = event.target.value;
+    console.log("Selected salary grade value:", selectedValue);
+
+    if (selectedValue === "null") {
+        selectedValue = null;
+    }
+
+    if (selectedValue !== undefined) {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            fgSalaryGrade: selectedValue
+        }));
+        handleUpdateEmp("fgSalaryGrade", clickCdEmp, selectedValue);
+    }
+  };
+
+
   // 성별 자동입력 함수
   const genderFromNoResident = (noResident) => {
 
@@ -298,7 +326,7 @@ const EmployeeRegister = () => {
 };
 
 
-  // 버튼 클릭시 DaumPostcode 모달 열기
+  // 주소검색 모달 열기
   const handleAddressButtonClick = () => {
     setOpenPostcode(true);
   }
@@ -352,7 +380,7 @@ const EmployeeRegister = () => {
     }
   }, [checkedRows]);
 
-  // 모달 닫기
+  // 주소검색 모달 닫기
   const closeModal = () => {
     setOpenPostcode(false);
   }
@@ -785,14 +813,6 @@ const EmployeeRegister = () => {
     ], [checkedRows, maskResident]
   );
 
-  // // useEffect를 사용하여 insertData가 변경되었을 때만 handleInsertEmp를 호출
-  // useEffect(() => {
-  //   const { cdEmp, nmEmp, noResident } = insertData;
-  //   if (!inserted && cdEmp && nmEmp && noResident.length === 14) {
-  //       handleInsertEmp(cdEmp, nmEmp, noResident);
-  //   }
-  // }, [insertData]);
-  
   // Insert
   const handleInsertEmp = async (codeValue, employeeValue, noResidentValue) => {
     console.log("handleInsertEmp 실행 *********************");
@@ -854,12 +874,6 @@ const EmployeeRegister = () => {
     console.log("columnName : " + columnName);
     console.log('initial : ' +  initial);
     console.log('inputValue : ' +  inputValue);
-
-    // // 초기값과 변경값이 동일할 때만 API 호출 중단
-    // if (initial === inputValue) {
-    //   console.log("변경이 없으니 API 호출 중단");
-    //   return;
-    // }
 
     // 만약 초기값이 undefined 이거나 inputValue가 비어 있으면 업데이트를 중단
     if ((initial === undefined && !inputValue) || initial === inputValue) {
@@ -973,6 +987,10 @@ const EmployeeRegister = () => {
       dtResign: responseData.dtResign || "",
       noAccount: responseData.noAccount || "",
       noPositionUnique: responseData.noPositionUnique || "",
+      nmNationality: responseData.nmNationality || "",
+      idMessenger: responseData.idMessenger || "",
+      fgSalaryGrade: responseData.fgSalaryGrade || "",
+      comment: responseData.comment || "",
     };
 
     // 전화번호 처리
@@ -1488,7 +1506,6 @@ const EmployeeRegister = () => {
     }
   };
 
-
   return (
     <>
       <div className="pageHeader">
@@ -1781,12 +1798,20 @@ const EmployeeRegister = () => {
                 </td>
                 <td className="erCellStyle">
                   <CustomInput
-                    className="erSelectBox"
                     value={genderFromNoResident(employeeData.noResident)}
                     readOnly={true}
                   />
                 </td>
               </tr>
+              {/* <tr>
+              <th className="erHeaderStyle">국적</th>
+                <td className="erCellStyle">
+                  <CustomInput
+                    value="대한민국"
+                    readOnly={true}
+                  />
+                </td>
+              </tr> */}
               <tr>
                 <th className="erHeaderStyle">주소</th>
                 <td className="erCellStyle">
@@ -2001,6 +2026,30 @@ const EmployeeRegister = () => {
                 </td>
               </tr>
               <tr>
+                <th className="erHeaderStyle">메신저ID</th>
+                <td className="erCellStyle">
+                    <CustomInput 
+                        type="email"
+                        width={180} 
+                        value={employeeData.idMessenger} 
+                        onChange={(e) => {
+                            setEmployeeData(prevState => ({
+                                ...prevState,
+                                idMessenger: e.target.value
+                            }));
+                        }} 
+                        onBlur={() => {
+                            // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                            if (employeeData.idMessenger === undefined) {
+                                return;
+                            }
+                            handleUpdateEmp("idMessenger", clickCdEmp, employeeData.idMessenger);
+                        }}
+                        readOnly={isReadOnly}
+                    />
+                </td>
+              </tr>
+              <tr>
                 <th className="erHeaderStyle">부서</th>
                 <td className="erCellStyle">
                   <CustomModalInput 
@@ -2079,6 +2128,25 @@ const EmployeeRegister = () => {
                     placeholder="선택"
                     disabled={isReadOnly}
                   />
+                </td>
+              </tr>
+              <tr>
+                <th className="erHeaderStyle">호봉</th>
+                <td className="erCellStyle">
+                    <CustomSelect
+                        className="erSelectBox"
+                        options={[
+                            { value: "null", label: "선택" },
+                            { value: "1", label: "1호봉" },
+                            { value: "2", label: "2호봉" },
+                            { value: "3", label: "3호봉" },
+                            { value: "4", label: "4호봉" },
+                            { value: "5", label: "5호봉" },
+                        ]}
+                        value={employeeData.fgSalaryGrade}
+                        onChange={handleFgSalaryGradeChange}
+                        disabled={isReadOnly}
+                    />
                 </td>
               </tr>
               <tr>
@@ -2174,6 +2242,29 @@ const EmployeeRegister = () => {
                     }}
                     readOnly={isReadOnly}
                   />
+                </td>
+              </tr>
+              <tr>
+                <th className="erHeaderStyle">비고</th>
+                <td className="erCellStyle" colSpan="5">
+                    <CustomInput 
+                        width={845} 
+                        value={employeeData.comment} 
+                        onChange={(e) => {
+                            setEmployeeData(prevState => ({
+                                ...prevState,
+                                comment: e.target.value
+                            }));
+                        }}
+                        onBlur={() => {
+                            // 초기 값과 현재 값이 모두 비어 있으면 업데이트를 스킵
+                            if (employeeData.comment === undefined) {
+                                return;
+                            }
+                            handleUpdateEmp("comment", clickCdEmp, employeeData.comment);
+                        }}
+                        readOnly={isReadOnly}
+                    />
                 </td>
               </tr>
             </tbody>
