@@ -22,17 +22,36 @@ const HrPageHeader = ({
 }) => {
   const apiRequest = useApiRequest();
 
-  // 알림창 표시 상태 관리
-  const [showAlert, setShowAlert] = useState(false);
-  const [showAlertDelete, setShowAlertDelete] = useState(false);
-  const [showAlertDeleteError, setShowAlertDeleteError] = useState(false);
+  // New Alert state
+  const [alertState, setAlertState] = useState({
+    show: false,
+    text: "",
+    type: "question",
+    onConfirm: null,
+    showCancel: false,
+  });
 
-  // 체크된 사원들을 가져와서 db에서 삭제
+  const showAlertWithSettings = (settings) => {
+    setAlertState({
+      ...alertState,
+      ...settings,
+      show: true,
+    });
+  };
+
+  const closeAlert = () => {
+    setAlertState({ ...alertState, show: false });
+  };
+
   const handleSendCheckedCdEmpListDelete = async () => {
     if (checkedRows.length === 0) {
-      setShowAlertDeleteError(true);
+      showAlertWithSettings({
+        text: "선택한 사원이 없습니다.",
+        type: "error",
+      });
       return;
     }
+
     try {
       const responseData = await apiRequest({
         method: "POST",
@@ -41,34 +60,30 @@ const HrPageHeader = ({
           selectedEmpCodes: checkedRows,
         },
       });
+
       if (responseData === 1) {
         checkedRows.forEach((empCode) => {
-          deleteEmp(empCode); // 여기에서 부모의 함수를 호출
+          deleteEmp(empCode);
         });
-        console.log("************************");
-        console.log("************************");
-        console.log("************************");
-        console.log(empList[0].cdEmp);
-        console.log(empList.length);
+
         setClickEmpCode(empList[empList.length - 1].cdEmp);
-        console.log(clickEmpCode);
       } else {
-        // 삭제 실패
-        alert("삭제실패");
+        showAlertWithSettings({
+          text: "삭제 실패",
+          type: "error",
+        });
       }
     } catch (error) {
-      console.error("api 요청 실패:", error);
+      console.error("API 요청 실패:", error);
     }
   };
 
-  // 사원정보 API 요청 후 사원정보 setEmpList
   const handleGetEmpList = async () => {
     try {
       const responseData = await apiRequest({
         method: "GET",
         url: "/api2/hr/insertAllHrEmpData",
       });
-      console.log(responseData);
       setEmpList(responseData.result);
 
       setEmpStats({
@@ -76,107 +91,76 @@ const HrPageHeader = ({
         working: responseData.working,
         resigned: responseData.resigned,
       });
+
       setClickEmpCode(
         responseData.result[responseData.result.length - 1].cdEmp,
       );
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
+
     setCheckedRows([]);
   };
-  const handleCloseAlert = () => {
-    setShowAlert(false); // 알림창 표시 상태를 false로 설정
-  };
-  const handleCloseDeleteAlert = () => {
-    setShowAlertDelete(false); // 알림창 표시 상태를 false로 설정
-  };
-  const handleCloseDeleteErrorAlert = () => {
-    setShowAlertDeleteError(false); // 알림창 표시 상태를 false로 설정
-  };
 
-  //PDF 출력
   const handlePrintPdf = async () => {
+    if (checkedRows.length === 0) {
+      showAlertWithSettings({
+        text: "선택한 사원이 없습니다.",
+        type: "error",
+      });
+      return;
+    }
+
     let sendResult = 0;
     try {
-      const responseData = await apiRequest({
+      const responseDataList = await apiRequest({
         method: "POST",
         url: "/api2/util/hrPdf",
         data: {
-          code: clickEmpCode,
+          codes: checkedRows,
         },
         responseType: "json",
       });
-      // EmpInfo 처리
-      const cdEmp = responseData.empInfo.cdEmp;
-      const nmEmp = responseData.empInfo.nmEmp;
 
-      // Base64로 인코딩된 PDF 처리
-      const base64Pdf = responseData.pdf;
-      const pdfBlob = new Blob(
-        [Uint8Array.from(atob(base64Pdf), (c) => c.charCodeAt(0))],
-        { type: "application/pdf" },
-      );
+      for (let responseData of responseDataList) {
+        console.log("responseData");
+        console.log(responseData);
+        const cdEmp = responseData.empInfo.cdEmp;
+        const nmEmp = responseData.empInfo.nmEmp;
 
-      // Create a link element
-      const link = document.createElement("a");
+        const base64Pdf = responseData.pdf;
+        const pdfBlob = new Blob(
+          [Uint8Array.from(atob(base64Pdf), (c) => c.charCodeAt(0))],
+          { type: "application/pdf" },
+        );
 
-      // Set the download attribute with a filename
-      link.download = `인사자료_${nmEmp}(${cdEmp}).pdf`;
-
-      // Create a URL to the blob and set it as the href attribute
-      link.href = window.URL.createObjectURL(pdfBlob);
-
-      // Append the link to the body
-      document.body.appendChild(link);
-
-      // Trigger a click event on the link to download the file
-      link.click();
+        const link = document.createElement("a");
+        link.download = `인사자료_${nmEmp}(${cdEmp}).pdf`;
+        link.href = window.URL.createObjectURL(pdfBlob);
+        document.body.appendChild(link);
+        link.click();
+      }
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
     return sendResult;
   };
+
   return (
     <div className="pageHeader">
-      {showAlert && (
+      {alertState.show && (
         <SweetAlert
-          text="인사관리에 등록하지않은 사원을 전부 등록 후 모든 사원을 불러옵니다. 실행하시겠습니까?"
-          showCancel={true}
-          type="question"
+          text={alertState.text}
+          showCancel={alertState.showCancel}
+          type={alertState.type}
           onConfirm={() => {
-            handleGetEmpList();
-            handleCloseAlert();
+            if (alertState.onConfirm) alertState.onConfirm();
+            closeAlert();
           }}
-          onCancel={handleCloseAlert}
+          onCancel={closeAlert}
         />
       )}
-      {showAlertDelete && (
-        <SweetAlert
-          text="선택한 사원을 전부 삭제합니까?"
-          showCancel={true}
-          //type="success"
-          type="warning"
-          //type="error"
-          //type="question"
-          onConfirm={() => {
-            handleSendCheckedCdEmpListDelete();
-            handleCloseDeleteAlert();
-          }}
-          onCancel={handleCloseDeleteAlert}
-        />
-      )}
-      {showAlertDeleteError && (
-        <SweetAlert
-          text="선택한 사원이 없습니다."
-          //type="success"
-          //type="warning"
-          type="error"
-          //type="question"
-          onConfirm={() => {
-            handleCloseDeleteErrorAlert();
-          }}
-        />
-      )}
+
       <div className="innerBox fxSpace">
         <PageHeaderName text="인사관리등록" />
         <div className="fxAlignCenter">
@@ -184,7 +168,11 @@ const HrPageHeader = ({
             <PageHeaderTextButton
               text="사원불러오기"
               onClick={(e) => {
-                setShowAlert(true);
+                showAlertWithSettings({
+                  text: "인사관리에 등록하지않은 사원을 전부 등록 후 모든 사원을 불러옵니다. 실행하시겠습니까?",
+                  onConfirm: handleGetEmpList,
+                  showCancel: true,
+                });
               }}
             />
           </div>
@@ -193,23 +181,41 @@ const HrPageHeader = ({
               btnName="print"
               imageSrc={Print}
               altText="프린트"
-              onClick={(e) => {
-                if (!clickEmpCode) {
-                  setShowAlertDeleteError(true);
-                } else {
-                  handlePrintPdf();
+              onClick={
+                (e) => {
+                  if (checkedRows.length !== 0) {
+                    showAlertWithSettings({
+                      text: `선택한 사원 ${checkedRows.length}명의 PDF를 다운로드 하시겠습니까?`,
+                      onConfirm: handlePrintPdf,
+                      showCancel: true,
+                    });
+                  } else {
+                    showAlertWithSettings({
+                      text: `선택한 사원이 없습니다.`,
+                      //showCancel: true,
+                      type: "error",
+                    });
+                  }
                 }
-              }}
+                //handlePrintPdf
+              }
             />
             <PageHeaderIconButton
               btnName="delete"
               imageSrc={Delete}
               altText="삭제"
-              onClick={(e) => {
+              onClick={() => {
                 if (checkedRows.length === 0) {
-                  setShowAlertDeleteError(true);
+                  showAlertWithSettings({
+                    text: "선택한 사원이 없습니다.",
+                    type: "error",
+                  });
                 } else {
-                  setShowAlertDelete(true);
+                  showAlertWithSettings({
+                    text: `선택한 사원 ${checkedRows.length}명을 전부 삭제합니까?`,
+                    type: "warning",
+                    onConfirm: handleSendCheckedCdEmpListDelete,
+                  });
                 }
               }}
             />

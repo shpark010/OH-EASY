@@ -93,19 +93,23 @@ function Table(props) {
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
   useEffect(() => {
-    // rows의 길이가 이전 길이보다 크면
-    if (props.data.length > prevRowsLength) {
-      const lastIndex = props.data.length - 1; // 마지막 행 인덱스
-      setPrevRowsLength(props.data.length); // rows의 길이 업데이트
-      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
+    if (props.bottomFocus) {
+      // rows의 길이가 이전 길이보다 크면
+      if (props.data.length > prevRowsLength) {
+        const lastIndex = props.data.length - 1; // 마지막 행 인덱스
+        setPrevRowsLength(props.data.length); // rows의 길이 업데이트
+        setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
+      } else {
+        const lastIndex = props.data.length - 1; // 마지막 행 인덱스
+        setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
+        //setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
+      }
+      if (tableContainerRef.current) {
+        tableContainerRef.current.scrollTop =
+          tableContainerRef.current.scrollHeight -
+          tableContainerRef.current.clientHeight;
+      }
     } else {
-      const lastIndex = props.data.length - 1; // 마지막 행 인덱스
-      setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
-    }
-    if (tableContainerRef.current) {
-      tableContainerRef.current.scrollTop =
-        tableContainerRef.current.scrollHeight -
-        tableContainerRef.current.clientHeight;
     }
   }, [props.data.length]);
 
