@@ -16,6 +16,7 @@
   box-sizing: border-box;
   background-color: #ffffff;
   position: relative;
+  max-height: 90vh;
   
   
 }
@@ -59,7 +60,7 @@
 
 .wcScroll{
   overflow: auto; 
-  height: 800px;
+  height: 80vh;
   
 }
 
