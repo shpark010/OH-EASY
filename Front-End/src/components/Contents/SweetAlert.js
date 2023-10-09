@@ -51,6 +51,7 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel {
 
 const SweetAlert = ({
   text,
+  html,
   type = "info",
   showCancel = false,
   confirmText = "확인",
@@ -61,6 +62,7 @@ const SweetAlert = ({
   React.useEffect(() => {
     Swal.fire({
       text,
+      html,
       icon: type,
       showCancelButton: showCancel,
       confirmButtonText: confirmText,
@@ -76,7 +78,16 @@ const SweetAlert = ({
         onCancel();
       }
     });
-  }, [text, type, showCancel, confirmText, cancelText, onConfirm, onCancel]);
+  }, [
+    text,
+    html,
+    type,
+    showCancel,
+    confirmText,
+    cancelText,
+    onConfirm,
+    onCancel,
+  ]);
   return <GlobalStyle />;
 };
 export default SweetAlert;
