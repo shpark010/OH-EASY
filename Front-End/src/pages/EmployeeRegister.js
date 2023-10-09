@@ -498,8 +498,12 @@ const EmployeeRegister = () => {
           const [changed, setChanged] = useState(false);
 
           const handleInputChangeCdEmp = (e) => {
-            const cleanedValue = e.target.value.replace(/\s+/g, '').toUpperCase();
-
+            // 먼저, 공백을 제거하고 모든 문자를 대문자로 변경합니다.
+            let cleanedValue = e.target.value.replace(/\s+/g, '').toUpperCase();
+          
+            // 영어와 숫자를 제외한 모든 문자를 제거합니다.
+            cleanedValue = cleanedValue.replace(/[^A-Z0-9]/g, '');
+          
             if (cleanedValue.length <= 8) {
               setInputValue(cleanedValue);
               setChanged(true);
@@ -2266,6 +2270,7 @@ const EmployeeRegister = () => {
                     </td>
                     <td className="erCellStyle">
                       <CustomInput 
+                        type={"number"}
                         width={180}
                         maxLength={20}
                         value={employeeData.noAccount}
