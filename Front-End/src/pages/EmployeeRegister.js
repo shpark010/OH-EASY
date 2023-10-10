@@ -133,6 +133,7 @@ const EmployeeRegister = () => {
     setIsValid(null); // 주민번호 유효성 상태 초기화
     setNmDept("");
     setNmBank("");
+    setCheckedRows([]);
   }
 
   // Email 도메인 맵
@@ -1115,16 +1116,20 @@ const EmployeeRegister = () => {
   };
 
   // 주민번호 마스킹처리
-  // const maskResidentValue = (value, originalCode) => 
-  // value
-  //     ? value.slice(0, 6) + (maskResident && originalCode ? '-*******' : value.slice(6))
-  //     : '';
-
-  // 주민번호 마스킹처리
-  const maskResidentValue = (value) => 
-  value
-      ? value.slice(0, 6) + (maskResident ? '-*******' : value.slice(6))
+  const maskResidentValue = (value, originalCode) => {
+    const maskedValue = value
+      ? value.slice(0, 6) + (maskResident && originalCode ? '-*******' : value.slice(6))
       : '';
+    return maskedValue;
+  }
+
+  // 커스텀인풋 주민번호 마스킹처리
+  const maskResidentValueInput = (value, originalCode) => {
+    const maskedValue = value
+      ? value.slice(0, 6) + (maskResident || originalCode ? '-*******' : value.slice(6))
+      : '';
+    return maskedValue;
+  }
 
   // 모달창 부서 정보
   const [deptList, setDeptList] = useState([]); 
@@ -1803,7 +1808,7 @@ const EmployeeRegister = () => {
                       <CustomInput 
                         type="resident"
                         width={180}
-                        value={maskResidentValue(employeeData.noResident)}
+                        value={maskResidentValueInput(employeeData.noResident)}
                         placeholder="주민번호를 입력해주세요."
                         onChange={(e) => {
                           setEmployeeData(prevState => ({
