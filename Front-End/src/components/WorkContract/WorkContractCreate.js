@@ -159,6 +159,7 @@ const WorkContractCreate = ({
     if(belongingDate===null || belongingDate ===""){
 
       setEmployeeData([])
+      setParamGetEmpList1([])
       return
     }
     console.log(cdEmp);

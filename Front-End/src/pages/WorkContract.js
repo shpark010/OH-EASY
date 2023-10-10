@@ -54,6 +54,7 @@ const WorkContract = () => {
   const [clickCode,setClickCode] = useState("");
   const [showInsertRow, setShowInsertRow] = useState(false);
   const [emailResult,setEmailResult] = useState("");
+  const [deleteAlert,setDeleteAlert] = useState("");
 
   const tabClick = (e,tabState) =>{
     
@@ -107,40 +108,80 @@ const WorkContract = () => {
   };
 
 
-  const deleteEmp = async () => {
-    console.log("삭제할 항목들:", checkColumn);
+//   const deleteEmp = async () => {
+//     console.log("삭제할 항목들:", checkColumn);
 
-    try {
-        const responseData = await apiRequest({
-            method: "DELETE",
-            url: `/api2/wc/deleteEmpList`,
-            data: checkColumn,  // checkColumn 배열을 직접 전송
-        });
+//     try {
+//         const responseData = await apiRequest({
+//             method: "DELETE",
+//             url: `/api2/wc/deleteEmpList`,
+//             data: checkColumn,  // checkColumn 배열을 직접 전송
+//         });
 
-        //삭제 후 empList 초기화 하는데 2가지 방법 1. 전체API 불러오기, 2. Frontend에서 해결하기.
-        const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
-        setEmployeeData(updatedEmpList);
-        const lastCdEmpFromUpdatedList = updatedEmpList && updatedEmpList.length > 0 ? updatedEmpList[updatedEmpList.length - 1].cdEmp : null;
+//         //삭제 후 empList 초기화 하는데 2가지 방법 1. 전체API 불러오기, 2. Frontend에서 해결하기.
+//         const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
+//         setEmployeeData(updatedEmpList);
+//         const lastCdEmpFromUpdatedList = updatedEmpList && updatedEmpList.length > 0 ? updatedEmpList[updatedEmpList.length - 1].cdEmp : null;
 
-        if (lastCdEmpFromUpdatedList) {
-            const responseData2 = await apiRequest({
-                method: "GET",
-                url: `/api2/wc/getCodeParamEmpList?code=${lastCdEmpFromUpdatedList}`, 
-            });
-            setParamGetEmpList1(responseData2); // delete후 맨위의 사원 data 가져오기 위해
-        } else {
-            setParamGetEmpList1([]);
-        }
+//         if (lastCdEmpFromUpdatedList) {
+//             const responseData2 = await apiRequest({
+//                 method: "GET",
+//                 url: `/api2/wc/getCodeParamEmpList?code=${lastCdEmpFromUpdatedList}`, 
+//             });
+//             setParamGetEmpList1(responseData2); // delete후 맨위의 사원 data 가져오기 위해
+//         } else {
+//             setParamGetEmpList1([]);
+//         }
 
-        // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
-        setCheckColumn([]);
-        setHighlightFirstRow(true);
-        setClickCode();
-        setShowInsertRow(false);
+//         // 요청이 성공적으로 수행되었다면 checkColumn 상태를 초기화
+//         setCheckColumn([]);
+//         setHighlightFirstRow(true);
+//         setClickCode();
+//         setShowInsertRow(false);
+//         setDeleteAlert(true);
 
-    } catch (error) {
-        console.error("Failed to delete emp data:", error);
-    }
+//     } catch (error) {
+//         console.error("Failed to delete emp data:", error);
+//     }
+// };
+
+const deleteEmp = async () => {
+  console.log("삭제할 항목들:", checkColumn);
+
+  try {
+      const responseData = await apiRequest({
+          method: "DELETE",
+          url: `/api2/wc/deleteEmpList`,
+          data: checkColumn,  // checkColumn 배열을 직접 전송
+      });
+
+      const updatedEmpList = employeeData.filter(emp => !checkColumn.includes(emp.cdEmp));
+      setEmployeeData(updatedEmpList);
+
+      // Check if the updatedEmpList has any data
+      if (updatedEmpList && updatedEmpList.length > 0) {
+          const topCdEmpFromUpdatedList = updatedEmpList[0].cdEmp;
+          
+          const responseData2 = await apiRequest({
+              method: "GET",
+              url: `/api2/wc/getCodeParamEmpList?code=${topCdEmpFromUpdatedList}`, 
+          });
+          
+          setParamGetEmpList1(responseData2); // Set with the data for the top employee
+          setClickCode(topCdEmpFromUpdatedList);
+      } else {
+          setParamGetEmpList1([]); // Clear the data if there's no employee left
+          setClickCode(null); // Clear the click code if there's no employee left
+      }
+
+      setCheckColumn([]);
+      setHighlightFirstRow(true);
+      setShowInsertRow(false);
+      setDeleteAlert(true);
+
+  } catch (error) {
+      console.error("Failed to delete emp data:", error);
+  }
 };
 
   
@@ -195,6 +236,10 @@ const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 c
   const handleEmailSendConfirm = () => {
     handleEmailSendCloseAlert();
   };
+
+  const handleDeleteConfirm = () =>{
+    setDeleteAlert(false);
+  }
 
   const formatResponseData = (data) => {
     const sentences = data.split('. ').filter(Boolean);
@@ -403,6 +448,16 @@ const handleSendEmail = async () => {
         text={` 메일 주소를 확인해주세요.`}
           type="error"
           onConfirm={handleEmailSendConfirm}
+          showCancel={false}
+          confirmText="확인"
+        />
+      )}
+
+{deleteAlert && (
+        <SweetAlert
+        text={` 삭제에 성공했습니다. `}
+          type="success"
+          onConfirm={handleDeleteConfirm}
           showCancel={false}
           confirmText="확인"
         />
