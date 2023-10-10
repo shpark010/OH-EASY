@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -27,24 +28,52 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
+
+import kr.or.oheasy.vo.SdPdfInfoVO;
 
 @Service
 public class PdfService {
 
-    public ByteArrayInputStream generatePdf(Map<String, String> dataMap) throws IOException {
+    public ByteArrayInputStream generatePdf(SdPdfInfoVO pdfInfo) throws IOException {
         File file = new ClassPathResource("static/SWSA0101_12_62.pdf").getFile(); // 기본 양식 파일
         PdfReader reader = new PdfReader(file);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(reader, writer);
-        Document document = new Document(pdf);
+		PdfWriter writer = new PdfWriter(out);
+		PdfDocument pdf = new PdfDocument(reader, writer);
+		Document document = new Document(pdf);
 
-        // Windows 환경의 시스템 폰트 경로
-        String fontPath = "C:\\Windows\\Fonts\\malgun.ttf"; // 예: Windows에 설치된 맑은 고딕 폰트
-        PdfFont font = PdfFontFactory.createFont(fontPath, "Identity-H", true); // 한글 폰트 로드
+		// Windows 환경의 시스템 폰트 경로
+		String fontPath = "C:\\Windows\\Fonts\\malgun.ttf"; // 예: Windows에 설치된 맑은 고딕 폰트
+		PdfFont font = PdfFontFactory.createFont(fontPath, "Identity-H", true); // 한글 폰트 로드
+
+		FormatPrice formatPrice = new FormatPrice();
+
+		Map<String, String> dataMap = new HashMap<>();
+
+		dataMap.put("195,747,1", pdfInfo.getYyAllowance()); // 년도
+		dataMap.put("262,747,1", pdfInfo.getMmBelong()); // 지급월
+		dataMap.put("467,692,1", pdfInfo.getDtAllowance()); // 지급일
+
+		dataMap.put("94,669,1", pdfInfo.getCdEmp()); // 사원코드
+		dataMap.put("237,669,1", pdfInfo.getNmEmp()); // 사원명
+		dataMap.put("400,669,1", pdfInfo.getDtBirth()); // 생년월일
+		dataMap.put("87,653,1", pdfInfo.getNmDept()); // 부서명
+		dataMap.put("235,653,1", pdfInfo.getNmPosition()); // 직급명
+		dataMap.put("395,653,1", pdfInfo.getDtHire()); // 입사일
+
+		dataMap.put("210,560,1", formatPrice.formatMoney(pdfInfo.getAmtAllowance())); // 기본급
+		dataMap.put("210,235,1", formatPrice.formatMoney(pdfInfo.getAmtAllowance())); // 지급액 계
+
+		dataMap.put("463,560,1", formatPrice.formatMoney(pdfInfo.getNationalPension())); // 국민연금
+		dataMap.put("463,535,1", formatPrice.formatMoney(pdfInfo.getHealthInsurance())); // 건강보험
+		dataMap.put("466,511,1", formatPrice.formatMoney(pdfInfo.getLongtermNursingInsurance())); // 장기요양보험
+		dataMap.put("466,484,1", formatPrice.formatMoney(pdfInfo.getEmploymentInsurance())); // 고용보험
+		dataMap.put("463,459,1", formatPrice.formatMoney(pdfInfo.getIncomeTax())); // 소득세
+		dataMap.put("466,432,1", formatPrice.formatMoney(pdfInfo.getLocalIncomeTax())); // 지방소득세
+		dataMap.put("463,253,1", formatPrice.formatMoney(pdfInfo.getTotalDeduct())); // 공제액 계
+		dataMap.put("460,235,1", formatPrice.formatMoney(pdfInfo.getNetPay())); // 차인지급액(실수령액)
+		dataMap.put("460,144,1", formatPrice.formatMoney(pdfInfo.getNetPay())); // 지급액
 
         dataMap.forEach((position, data) -> {
             String[] coordinates = position.split(",");
@@ -66,6 +95,7 @@ public class PdfService {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
+    
     public ByteArrayInputStream generatePdfHr(Map<String, String> dataMap) throws IOException {
         File file = new ClassPathResource("static/SWPM0102_01_10.pdf").getFile(); // 기본 양식 파일
         PdfReader reader = new PdfReader(file);

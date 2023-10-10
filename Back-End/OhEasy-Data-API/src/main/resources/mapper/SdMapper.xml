@@ -790,7 +790,7 @@
 	<!-- 이메일 발송을 위한 조회 -->
 	<select id="selectForMail" parameterType="Map" resultType="kr.or.oheasy.vo.SdEmailInfoVO">
 		SELECT
-		s.CD_EMP as cdEmp,
+		h.NM_EMP as nmEmp,
 		h.NM_EMAIL as nmEmail,
 		s.YY_ALLOWANCE as yyAllowance,
     	s.MM_BELONG as mmBelong,

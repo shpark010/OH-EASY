@@ -634,6 +634,8 @@ const SalaryData = (props) => {
       setResultRow(sendResult);
       if (sendResult > 0) {
         handleEmailSendOpenAlert();
+      } else {
+        handleNoEmailOpenAlert();
       }
       setCheckedRows([]);
     } catch (error) {
@@ -656,10 +658,10 @@ const SalaryData = (props) => {
         responseType: "json",
       });
       // EmpInfo 처리
-      const cdEmp = responseData.empInfo.cdEmp;
-      const nmEmp = responseData.empInfo.nmEmp;
-      const yyAllowance = responseData.empInfo.yyAllowance;
-      const mmBelong = responseData.empInfo.mmBelong;
+      const cdEmp = responseData.pdfInfo.cdEmp;
+      const nmEmp = responseData.pdfInfo.nmEmp;
+      const yyAllowance = responseData.pdfInfo.yyAllowance;
+      const mmBelong = responseData.pdfInfo.mmBelong;
 
       // Base64로 인코딩된 PDF 처리
       const base64Pdf = responseData.pdf;

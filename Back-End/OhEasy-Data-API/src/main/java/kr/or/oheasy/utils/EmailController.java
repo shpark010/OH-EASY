@@ -61,7 +61,7 @@ public class EmailController {
         		System.out.println(emailInfo);
         		FormatPrice formatPrice = new FormatPrice();
         		// 여기서 파라미터 대체
-        		html = html.replace("{{nmEmp}}", emailInfo.getCdEmp())
+        		html = html.replace("{{nmEmp}}", emailInfo.getNmEmp())
         				.replace("{{yyAllowance}}", emailInfo.getYyAllowance())
         				.replace("{{mmBelong}}", emailInfo.getMmBelong())
         				.replace("{{amtAllowance}}", formatPrice.formatMoney(emailInfo.getAmtAllowance()))
