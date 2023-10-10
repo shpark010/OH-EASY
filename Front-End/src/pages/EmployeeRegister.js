@@ -1,6 +1,4 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import Setting from "../images/pages/common/setting.png";
-// import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
 import Delete from "../images/pages/common/delete.png";
 
@@ -31,7 +29,6 @@ const EmployeeRegister = () => {
   // 모달창 관련 상태관리
   const [openPostcode, setOpenPostcode] = useState(false); // 카카오 API 모달창 상태관리
   const [openSortSearch, setOpenSortSearch] = useState(false); // 데이터정렬 모달창 상태관리
-  // const [openSettingModal, setOpenSettingModal] = useState(false); // 세팅 모달창 상태관리
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false); // 부서 모달창 상태관리
   const [isBankModalOpen, setIsBankModalOpen] = useState(false); // 은행 모달창 상태관리
   const [maskResident, setMaskResident] = useState(false); // 주민번호 마스킹 상태관리
@@ -136,7 +133,7 @@ const EmployeeRegister = () => {
     setIsValid(null); // 주민번호 유효성 상태 초기화
     setNmDept("");
     setNmBank("");
-    // setFgSalaryGrade("");
+    setCheckedRows([]);
   }
 
   // Email 도메인 맵
@@ -575,13 +572,13 @@ const EmployeeRegister = () => {
             }
             
             setInsertData(prevState => {
-              const updatedState = { ...prevState, cdEmp: inputValue };
+              const updatedStateCd = { ...prevState, cdEmp: inputValue };
 
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
-                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              if (updatedStateCd.cdEmp && updatedStateCd.nmEmp && updatedStateCd.noResident.length === 14) {
+                  handleInsertEmp(updatedStateCd.cdEmp, updatedStateCd.nmEmp, updatedStateCd.noResident);
               }
 
-              return updatedState;
+              return updatedStateCd;
             });
 
           };
@@ -626,8 +623,11 @@ const EmployeeRegister = () => {
 
           const handleInputChangeNmEmp = (e) => {
             const cleanedValue = e.target.value.replace(/\s+/g, '');
-
-            if (cleanedValue.length <= 10) {
+          
+            // 정규식으로 한글, 영문, 숫자만 확인
+            const regex = /^[ㄱ-힣a-zA-Z0-9]*$/;
+          
+            if (cleanedValue.length <= 10 && regex.test(cleanedValue)) {
               setInputValue(cleanedValue);
               setChanged(true);
               setInsertData(prev => ({ ...prev, nmEmp: cleanedValue }));
@@ -668,13 +668,13 @@ const EmployeeRegister = () => {
             }
 
             setInsertData(prevState => {
-              const updatedState = { ...prevState, nmEmp: inputValue };
+              const updatedStateNm = { ...prevState, nmEmp: inputValue };
 
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
-                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              if (updatedStateNm.cdEmp && updatedStateNm.nmEmp && updatedStateNm.noResident.length === 14) {
+                  handleInsertEmp(updatedStateNm.cdEmp, updatedStateNm.nmEmp, updatedStateNm.noResident);
               }
 
-              return updatedState;
+              return updatedStateNm;
             });
           };
 
@@ -716,12 +716,6 @@ const EmployeeRegister = () => {
           const handleInputChangeNoResident = (e) => {
             const newInputValue = e.target.value;
         
-            // 주민번호의 길이 검사. 14자리를 초과하면 입력을 무시합니다.
-            if (newInputValue.length > 14) {
-                console.log("주민번호는 14자리를 초과할 수 없습니다.");
-                return;
-            }
-        
             setInputValue(newInputValue);
             setChanged(true);
             setIsValid(null);
@@ -748,50 +742,48 @@ const EmployeeRegister = () => {
           
             // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
             if (!inputValue || inputValue === "") {
-              if (original && original.code) {
+              if (original && original.code && !maskResident) {  // 마스킹 설정 체크 추가
                   handleUpdateEmp("noResident", original.code, "");
               }
               return;
             }
-
+          
             // 주민번호의 길이 검사
             if (inputValue.length !== 14) {
               console.log("주민번호는 13자리여야 합니다.");
               return;
             }
-
+          
             if (!changed) {
                 console.log("*********************************** onChange 없으니 종료");
                 return;
             }
-
+          
             setChanged(false);
 
-            // update가 성공하면 우측 erGrid2 부분에도 갱신
-            if (original && original.code) {
+            // 마스킹 설정이 활성화되어 있지 않을 때만 업데이트 로직을 실행(우측 erGrid2 부분에도 갱신)
+            if (!maskResident && original && original.code) {
               const isUpdateSuccess = await handleUpdateEmp("noResident", original.code, inputValue);
               if (isUpdateSuccess) {
                 const updatedData = await handleGetSingleEmp(original.code);
                 if(updatedData) {
                   setEmployeeData(updatedData);
                 }
+              } else {
+                console.log('Update logic skipped.');
               }
             }
-
+          
             setInsertData(prevState => {
               const updatedState = { ...prevState, noResident: inputValue };
-
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+          
+              if (!original || !original.code && updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
                   handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
               }
-
+          
               return updatedState;
             });
           };
-
-          const maskedValue = inputValue 
-          ? inputValue.slice(0, 6) + (maskResident ? '-*******' : inputValue.slice(6))
-          : '';
 
           const handleKeyDown = (e) => {
             if (e.key === 'Enter') {
@@ -810,14 +802,14 @@ const EmployeeRegister = () => {
 
           return (
             <Input
-            type={"resident"}
-            value={maskedValue}
-            onChange={handleInputChangeNoResident}
-            onClick={tableNoResidentClick}
-            className={"doubleLine"}
-            onBlur={handleInputOnBlurNoResident}
-            readOnly={maskResident} // 마스킹 상태일 경우 읽기 전용으로 설정
-            onKeyDown={handleKeyDown}
+                type={"resident"}
+                value={maskResidentValue(inputValue, original?.code)}
+                onChange={handleInputChangeNoResident}
+                onClick={tableNoResidentClick}
+                className={"doubleLine"}
+                onBlur={handleInputOnBlurNoResident}
+                readOnly={maskResident && original && original.code}
+                onKeyDown={handleKeyDown}
             />
           );
         },
@@ -1118,16 +1110,26 @@ const EmployeeRegister = () => {
     }
   };
 
-  // 주민번호 별표 사용 설정
+  // 주민번호 마스킹 설정
   const toggleMaskResident = () => {
     setMaskResident(prev => !prev);
-    console.log("toggleMaskResident 함수 실행 ********************************")
+  };
+
+  // 주민번호 마스킹처리
+  const maskResidentValue = (value, originalCode) => {
+    const maskedValue = value
+      ? value.slice(0, 6) + (maskResident && originalCode ? '-*******' : value.slice(6))
+      : '';
+    return maskedValue;
   }
 
-  const maskResidentValue = (value) => 
-    value
-        ? value.slice(0, 6) + (maskResident ? '-*******' : value.slice(6))
-        : '';
+  // 커스텀인풋 주민번호 마스킹처리
+  const maskResidentValueInput = (value, originalCode) => {
+    const maskedValue = value
+      ? value.slice(0, 6) + (maskResident || originalCode ? '-*******' : value.slice(6))
+      : '';
+    return maskedValue;
+  }
 
   // 모달창 부서 정보
   const [deptList, setDeptList] = useState([]); 
@@ -1611,8 +1613,8 @@ const EmployeeRegister = () => {
               </div>
               <div>
                 <PageHeaderTextButton 
-                  text="별표 사용설정"
-                  onClick={toggleMaskResident}
+                    text={maskResident ? "마스킹 해제" : "마스킹 설정"}
+                    onClick={toggleMaskResident}
                 />
               </div>
             </div>
@@ -1689,16 +1691,16 @@ const EmployeeRegister = () => {
                             resetEmployeeData();
                             setTableKey(Date.now());
                             
-                            // 여기서 맨 위 항목으로 포커스 이동
-                            if (empList && empList.length > 0) {
-                            setTimeout(() => {
-                                const firstRowElement = document.querySelector("[id^='focusOn_']");
-                                if (firstRowElement) {
-                                    firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    firstRowElement.focus();
-                                }
-                            }, 310);
-                          }
+                          //   // 여기서 맨 위 항목으로 포커스 이동
+                          //   if (empList && empList.length > 0) {
+                          //   setTimeout(() => {
+                          //       const firstRowElement = document.querySelector("[id^='focusOn_']");
+                          //       if (firstRowElement) {
+                          //           firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          //           firstRowElement.focus();
+                          //       }
+                          //   }, 310);
+                          // }
                         }}
                     />
                 )}
@@ -1742,7 +1744,7 @@ const EmployeeRegister = () => {
                 key={tableKey}
                 columns={columns}
                 data={sortedDataEmp}
-                insertRow={!maskResident}
+                insertRow={true}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
                 onAddButtonClick={resetEmployeeData}
@@ -1806,7 +1808,7 @@ const EmployeeRegister = () => {
                       <CustomInput 
                         type="resident"
                         width={180}
-                        value={maskResidentValue(employeeData.noResident)}
+                        value={maskResidentValueInput(employeeData.noResident)}
                         placeholder="주민번호를 입력해주세요."
                         onChange={(e) => {
                           setEmployeeData(prevState => ({
