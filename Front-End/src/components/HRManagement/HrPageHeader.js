@@ -60,13 +60,19 @@ const HrPageHeader = ({
           selectedEmpCodes: checkedRows,
         },
       });
+      console.log("1111111111111111111111111111111111111111111111");
 
       if (responseData === 1) {
         checkedRows.forEach((empCode) => {
           deleteEmp(empCode);
         });
+        console.log("2222222222222222222222222222222222222222222222");
 
-        setClickEmpCode(empList[empList.length - 1].cdEmp);
+        if (empList.length > 1 && empList[empList.length - 2].cdEmp) {
+          setClickEmpCode(empList[empList.length - 2].cdEmp);
+        } else {
+          setClickEmpCode();
+        }
       } else {
         showAlertWithSettings({
           text: "삭제 실패",
