@@ -44,6 +44,7 @@ const EmployeeRegister = () => {
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태관리
   const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태관리
+  const [showMaskAlert, setShowMaskAlert] = useState(false); // 별표 사용설정 클릭시 알림 상태 관리
 
    // 삭제시 에러에 관한 sweetAlert 상태 관리
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -626,8 +627,11 @@ const EmployeeRegister = () => {
 
           const handleInputChangeNmEmp = (e) => {
             const cleanedValue = e.target.value.replace(/\s+/g, '');
-
-            if (cleanedValue.length <= 10) {
+          
+            // 정규식으로 한글, 영문, 숫자만 확인
+            const regex = /^[ㄱ-힣a-zA-Z0-9]*$/;
+          
+            if (cleanedValue.length <= 10 && regex.test(cleanedValue)) {
               setInputValue(cleanedValue);
               setChanged(true);
               setInsertData(prev => ({ ...prev, nmEmp: cleanedValue }));
@@ -713,14 +717,10 @@ const EmployeeRegister = () => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
 
+          const maskedValue = maskResidentValue(inputValue);
+
           const handleInputChangeNoResident = (e) => {
             const newInputValue = e.target.value;
-        
-            // 주민번호의 길이 검사. 14자리를 초과하면 입력을 무시합니다.
-            if (newInputValue.length > 14) {
-                console.log("주민번호는 14자리를 초과할 수 없습니다.");
-                return;
-            }
         
             setInputValue(newInputValue);
             setChanged(true);
@@ -788,10 +788,6 @@ const EmployeeRegister = () => {
               return updatedState;
             });
           };
-
-          const maskedValue = inputValue 
-          ? inputValue.slice(0, 6) + (maskResident ? '-*******' : inputValue.slice(6))
-          : '';
 
           const handleKeyDown = (e) => {
             if (e.key === 'Enter') {
@@ -1118,12 +1114,14 @@ const EmployeeRegister = () => {
     }
   };
 
-  // 주민번호 별표 사용 설정
+  // 주민번호 별표 사용설정
   const toggleMaskResident = () => {
     setMaskResident(prev => !prev);
+    setShowMaskAlert(true);
     console.log("toggleMaskResident 함수 실행 ********************************")
   }
 
+  // 주민번호 마스킹처리
   const maskResidentValue = (value) => 
     value
         ? value.slice(0, 6) + (maskResident ? '-*******' : value.slice(6))
@@ -1611,8 +1609,8 @@ const EmployeeRegister = () => {
               </div>
               <div>
                 <PageHeaderTextButton 
-                  text="별표 사용설정"
-                  onClick={toggleMaskResident}
+                    text={maskResident ? "별표 사용해제" : "별표 사용설정"}
+                    onClick={toggleMaskResident}
                 />
               </div>
             </div>
@@ -1639,6 +1637,18 @@ const EmployeeRegister = () => {
                     }
                 }}
             />
+                {
+                  showMaskAlert && (
+                    <SweetAlert
+                      text={maskResident ? "마스킹 설정이 활성화되어 사원 등록이 제한됩니다." : "이제 사원 등록을 진행하실 수 있습니다."}
+                      confirmText="확인"
+                      type="info"
+                      onConfirm={() => {
+                        setShowMaskAlert(false);
+                      }}
+                    />
+                  )
+                }
 
                 {
                   showInsertSuccessAlert && (
