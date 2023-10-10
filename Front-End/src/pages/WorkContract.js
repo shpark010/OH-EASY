@@ -428,6 +428,7 @@ const handleSendEmail = async () => {
           text={` 메일 보내기가 성공했습니다.`}
           type="success"
           onConfirm={handleEmailSendConfirm}
+          onCancel={handleEmailSendConfirm}
           showCancel={false}
           confirmText="확인"
         />
@@ -438,8 +439,10 @@ const handleSendEmail = async () => {
           text={emailResult}
           type="error"
           onConfirm={handleEmailSendConfirm}
+          onCancel={handleEmailSendConfirm}
           showCancel={false}
           confirmText="확인"
+          
         />
       )}
 
@@ -448,6 +451,7 @@ const handleSendEmail = async () => {
         text={` 메일 주소를 확인해주세요.`}
           type="error"
           onConfirm={handleEmailSendConfirm}
+          onCancel={handleEmailSendConfirm}
           showCancel={false}
           confirmText="확인"
         />
@@ -458,6 +462,7 @@ const handleSendEmail = async () => {
         text={` 삭제에 성공했습니다. `}
           type="success"
           onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteConfirm}
           showCancel={false}
           confirmText="확인"
         />
