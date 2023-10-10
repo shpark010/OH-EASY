@@ -1,6 +1,4 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import Setting from "../images/pages/common/setting.png";
-// import Calc from "../images/pages/common/calc.png";
 import Print from "../images/pages/common/print.png";
 import Delete from "../images/pages/common/delete.png";
 
@@ -31,7 +29,6 @@ const EmployeeRegister = () => {
   // 모달창 관련 상태관리
   const [openPostcode, setOpenPostcode] = useState(false); // 카카오 API 모달창 상태관리
   const [openSortSearch, setOpenSortSearch] = useState(false); // 데이터정렬 모달창 상태관리
-  // const [openSettingModal, setOpenSettingModal] = useState(false); // 세팅 모달창 상태관리
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false); // 부서 모달창 상태관리
   const [isBankModalOpen, setIsBankModalOpen] = useState(false); // 은행 모달창 상태관리
   const [maskResident, setMaskResident] = useState(false); // 주민번호 마스킹 상태관리
@@ -44,7 +41,6 @@ const EmployeeRegister = () => {
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태관리
   const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태관리
-  const [showMaskAlert, setShowMaskAlert] = useState(false); // 마스킹 설정 클릭시 알림 상태 관리
 
    // 삭제시 에러에 관한 sweetAlert 상태 관리
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -137,7 +133,6 @@ const EmployeeRegister = () => {
     setIsValid(null); // 주민번호 유효성 상태 초기화
     setNmDept("");
     setNmBank("");
-    // setFgSalaryGrade("");
   }
 
   // Email 도메인 맵
@@ -576,13 +571,13 @@ const EmployeeRegister = () => {
             }
             
             setInsertData(prevState => {
-              const updatedState = { ...prevState, cdEmp: inputValue };
+              const updatedStateCd = { ...prevState, cdEmp: inputValue };
 
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
-                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              if (updatedStateCd.cdEmp && updatedStateCd.nmEmp && updatedStateCd.noResident.length === 14) {
+                  handleInsertEmp(updatedStateCd.cdEmp, updatedStateCd.nmEmp, updatedStateCd.noResident);
               }
 
-              return updatedState;
+              return updatedStateCd;
             });
 
           };
@@ -672,13 +667,13 @@ const EmployeeRegister = () => {
             }
 
             setInsertData(prevState => {
-              const updatedState = { ...prevState, nmEmp: inputValue };
+              const updatedStateNm = { ...prevState, nmEmp: inputValue };
 
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
-                  handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
+              if (updatedStateNm.cdEmp && updatedStateNm.nmEmp && updatedStateNm.noResident.length === 14) {
+                  handleInsertEmp(updatedStateNm.cdEmp, updatedStateNm.nmEmp, updatedStateNm.noResident);
               }
 
-              return updatedState;
+              return updatedStateNm;
             });
           };
 
@@ -717,8 +712,6 @@ const EmployeeRegister = () => {
           const [inputValue, setInputValue] = useState(value || "");
           const [changed, setChanged] = useState(false);
 
-          const maskedValue = maskResidentValue(inputValue);
-
           const handleInputChangeNoResident = (e) => {
             const newInputValue = e.target.value;
         
@@ -748,43 +741,45 @@ const EmployeeRegister = () => {
           
             // 아무 값도 입력되지 않았거나 빈 문자열일 경우는 바로 업데이트 진행
             if (!inputValue || inputValue === "") {
-              if (original && original.code) {
+              if (original && original.code && !maskResident) {  // 마스킹 설정 체크 추가
                   handleUpdateEmp("noResident", original.code, "");
               }
               return;
             }
-
+          
             // 주민번호의 길이 검사
             if (inputValue.length !== 14) {
               console.log("주민번호는 13자리여야 합니다.");
               return;
             }
-
+          
             if (!changed) {
                 console.log("*********************************** onChange 없으니 종료");
                 return;
             }
-
+          
             setChanged(false);
 
-            // update가 성공하면 우측 erGrid2 부분에도 갱신
-            if (original && original.code) {
+            // 마스킹 설정이 활성화되어 있지 않을 때만 업데이트 로직을 실행(우측 erGrid2 부분에도 갱신)
+            if (!maskResident && original && original.code) {
               const isUpdateSuccess = await handleUpdateEmp("noResident", original.code, inputValue);
               if (isUpdateSuccess) {
                 const updatedData = await handleGetSingleEmp(original.code);
                 if(updatedData) {
                   setEmployeeData(updatedData);
                 }
+              } else {
+                console.log('Update logic skipped.');
               }
             }
-
+          
             setInsertData(prevState => {
               const updatedState = { ...prevState, noResident: inputValue };
-
+          
               if (!original || !original.code && updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
                   handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
               }
-
+          
               return updatedState;
             });
           };
@@ -806,14 +801,14 @@ const EmployeeRegister = () => {
 
           return (
             <Input
-            type={"resident"}
-            value={maskedValue}
-            onChange={handleInputChangeNoResident}
-            onClick={tableNoResidentClick}
-            className={"doubleLine"}
-            onBlur={handleInputOnBlurNoResident}
-            readOnly={maskResident} // 마스킹 상태일 경우 읽기 전용으로 설정
-            onKeyDown={handleKeyDown}
+                type={"resident"}
+                value={maskResidentValue(inputValue, original?.code)}
+                onChange={handleInputChangeNoResident}
+                onClick={tableNoResidentClick}
+                className={"doubleLine"}
+                onBlur={handleInputOnBlurNoResident}
+                readOnly={maskResident && original && original.code}
+                onKeyDown={handleKeyDown}
             />
           );
         },
@@ -1116,20 +1111,20 @@ const EmployeeRegister = () => {
 
   // 주민번호 마스킹 설정
   const toggleMaskResident = () => {
-    setMaskResident(prev => {
-      // maskResident 상태가 true에서 false로 변경될 때만 얼럿을 보여줍니다.
-      if (!prev) {
-        setShowMaskAlert(true);
-      }
-      return !prev;
-    });
-  }
+    setMaskResident(prev => !prev);
+  };
+
+  // 주민번호 마스킹처리
+  // const maskResidentValue = (value, originalCode) => 
+  // value
+  //     ? value.slice(0, 6) + (maskResident && originalCode ? '-*******' : value.slice(6))
+  //     : '';
 
   // 주민번호 마스킹처리
   const maskResidentValue = (value) => 
-    value
-        ? value.slice(0, 6) + (maskResident ? '-*******' : value.slice(6))
-        : '';
+  value
+      ? value.slice(0, 6) + (maskResident ? '-*******' : value.slice(6))
+      : '';
 
   // 모달창 부서 정보
   const [deptList, setDeptList] = useState([]); 
@@ -1641,18 +1636,6 @@ const EmployeeRegister = () => {
                     }
                 }}
             />
-                {
-                  showMaskAlert && (
-                    <SweetAlert
-                      text={maskResident ? "마스킹 설정이 활성화되어 사원 등록이 제한됩니다." : "사원 등록을 진행하실 수 있습니다."}
-                      confirmText="확인"
-                      type="info"
-                      onConfirm={() => {
-                        setShowMaskAlert(false);
-                      }}
-                    />
-                  )
-                }
 
                 {
                   showInsertSuccessAlert && (
@@ -1703,16 +1686,16 @@ const EmployeeRegister = () => {
                             resetEmployeeData();
                             setTableKey(Date.now());
                             
-                            // 여기서 맨 위 항목으로 포커스 이동
-                            if (empList && empList.length > 0) {
-                            setTimeout(() => {
-                                const firstRowElement = document.querySelector("[id^='focusOn_']");
-                                if (firstRowElement) {
-                                    firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    firstRowElement.focus();
-                                }
-                            }, 310);
-                          }
+                          //   // 여기서 맨 위 항목으로 포커스 이동
+                          //   if (empList && empList.length > 0) {
+                          //   setTimeout(() => {
+                          //       const firstRowElement = document.querySelector("[id^='focusOn_']");
+                          //       if (firstRowElement) {
+                          //           firstRowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          //           firstRowElement.focus();
+                          //       }
+                          //   }, 310);
+                          // }
                         }}
                     />
                 )}
@@ -1756,7 +1739,7 @@ const EmployeeRegister = () => {
                 key={tableKey}
                 columns={columns}
                 data={sortedDataEmp}
-                insertRow={!maskResident}
+                insertRow={true}
                 showInsertRow={showInsertRow}
                 setShowInsertRow={setShowInsertRow}
                 onAddButtonClick={resetEmployeeData}
