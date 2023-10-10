@@ -44,7 +44,7 @@ const EmployeeRegister = () => {
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [showAlertMessage, setShowAlertMessage] = useState(false); // 체크 안하고 삭제 버튼 클릭시 sweetAlert 상태관리
   const [showInsertSuccessAlert, setShowInsertSuccessAlert] = useState(false); // 사원등록 성공 sweetAlert 상태관리
-  const [showMaskAlert, setShowMaskAlert] = useState(false); // 별표 사용설정 클릭시 알림 상태 관리
+  const [showMaskAlert, setShowMaskAlert] = useState(false); // 마스킹 설정 클릭시 알림 상태 관리
 
    // 삭제시 에러에 관한 sweetAlert 상태 관리
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -1114,7 +1114,7 @@ const EmployeeRegister = () => {
     }
   };
 
-  // 주민번호 별표 사용설정
+  // 주민번호 마스킹 설정
   const toggleMaskResident = () => {
     setMaskResident(prev => {
       // maskResident 상태가 true에서 false로 변경될 때만 얼럿을 보여줍니다.
@@ -1613,7 +1613,7 @@ const EmployeeRegister = () => {
               </div>
               <div>
                 <PageHeaderTextButton 
-                    text={maskResident ? "별표 사용해제" : "별표 사용설정"}
+                    text={maskResident ? "마스킹 해제" : "마스킹 설정"}
                     onClick={toggleMaskResident}
                 />
               </div>
