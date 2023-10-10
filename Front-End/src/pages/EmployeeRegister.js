@@ -781,7 +781,7 @@ const EmployeeRegister = () => {
             setInsertData(prevState => {
               const updatedState = { ...prevState, noResident: inputValue };
 
-              if (updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
+              if (!original || !original.code && updatedState.cdEmp && updatedState.nmEmp && updatedState.noResident.length === 14) {
                   handleInsertEmp(updatedState.cdEmp, updatedState.nmEmp, updatedState.noResident);
               }
 
