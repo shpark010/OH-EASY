@@ -217,7 +217,10 @@ const HrBasic = ({ cdEmp }) => {
       });
       console.log("File Upload Response:", response);
       //setProfileImage(response); // 이미지 URL로 변경
-      setEmpBasicData({ path: response });
+      setEmpBasicData((prevState) => ({
+        ...prevState,
+        path: response,
+      }));
     } catch (error) {
       console.error("Failed to upload file:", error);
     }
@@ -241,7 +244,11 @@ const HrBasic = ({ cdEmp }) => {
         url: "/api2/hr/deleteImg",
         data: data,
       });
-      setEmpBasicData({ path: null });
+      //setEmpBasicData({ path: null });
+      setEmpBasicData((prevState) => ({
+        ...prevState,
+        path: null,
+      }));
     } catch (error) {
       console.error("Failed to upload file:", error);
     }
