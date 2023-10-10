@@ -1,10 +1,17 @@
 import React from "react";
+import styled from 'styled-components';
 
-const PageHeaderButton = ({ btnName, imageSrc, altText }) => {
+const StyledButton = styled.button`
+  &:disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const PageHeaderButton = ({ btnName, imageSrc, altText, onClick, disabled }) => {
   return (
-    <button className={btnName}>
+    <StyledButton className={btnName} onClick={onClick} disabled={disabled}>
       <img src={imageSrc} alt={altText} />
-    </button>
+    </StyledButton>
   );
 };
 

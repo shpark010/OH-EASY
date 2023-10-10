@@ -1,0 +1,199 @@
+.wcSection {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1800px;
+  height: 72vh;
+  margin-top: 5px;
+  padding: 0 15px;
+  overflow: hidden;
+  flex-grow: 1;
+  
+}
+
+.wcGrid {
+  display: flex;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  position: relative;
+  max-height: 90vh;
+  
+  
+}
+
+.wcGridBottomTable {
+  border-collapse: collapse;
+  background-color: #a9d0f5;
+  font-weight: bold;
+  width: 100%;
+}
+
+.wcGridBottomTable th,
+.wcGridBottomTable td {
+  border: 1px solid #e6e6e6;
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+  width: 50%;
+}
+
+.wclistArea {
+  display: flex;
+  flex-direction: column;
+  width: 530px;
+  max-height: 810px;  /* 예: 푸터 높이와 몇 픽셀의 간격을 고려해서 높이를 조정하세요 */
+  overflow-y: auto;
+}
+
+.wcGrid2 {
+  background-color: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+ 
+}
+
+
+.wcRightHead{
+/* position: fixed; */
+}
+/*오른쪽 근로계약서 h1 tag에 적용*/
+
+.wcScroll{
+  overflow: auto; 
+  height: 80vh;
+  
+}
+
+
+.wcHeaderStyle {
+  background-color: #e6e6e6;
+  padding: 10px;
+  font-weight: 900;
+  text-align: right;
+  vertical-align: middle;
+  font-size: 16px;
+  width: 200px;
+}
+
+.wcCellStyle {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 7px;
+  font-size: 13px;
+}
+
+ .wcTab1{
+    padding: 8px 14px;
+  border-top: 1px solid var(--color-border-gray);
+  border-right: 1px solid var(--color-border-gray);
+  border-bottom: none;
+  color: var(--color-primary-gray);
+  font-size: 14px;
+  } 
+
+  
+
+  .wcTab2{
+    padding: 8px 14px;
+  border-top: 1px solid var(--color-border-gray);
+  border-right: 1px solid var(--color-border-gray);
+  border-bottom: none;
+  color: var(--color-primary-gray);
+  font-size: 14px;
+  }
+  
+  
+/* 작성,조회 Tab이 클릭 됐을때 Click했을때만 class에 add 될 것.*/
+  .wcOn {
+    background-color: var(--color-primary-blue);
+  color: var(--color-primary-white);
+  /* border: none; */
+
+  }
+
+  .wcModal1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .wcModal2 {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    width: 30%;
+    height: 55%;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+  /*Modal style*/
+
+
+  .wcMouseOver:hover{
+    cursor: not-allowed;
+  }
+  /*오른쪽 상단 Icon hovering시 css*/
+
+  .wcSelect1,.wcSelect3 {
+    width: 180px;
+
+  }
+
+  .wcSelect2{
+    width: 180px;
+    text-align: right;
+
+  }
+
+  
+
+  .wcPayDayOff{
+    visibility: hidden;
+    }  
+
+  
+    .wcFirstRowHighlight, .wchighlightLastRow, .wcMordalBackGround {
+      
+      background-color:#92c5ff ;
+      
+    }
+
+   
+
+    .wcMordalContainer {
+      display: flex;
+      justify-content: center;   /* 가로 중앙 정렬 */
+      align-items: center;       /* 세로 중앙 정렬 */
+  }
+    .wcModalInput{
+      margin: 7px 7px 7px 7px;
+      
+    }
+
+    .wcModalButton{
+      position: absolute;
+      right: 0;
+    }
+
+    .wcRightCellSearchButton{
+      margin-left: 20px;
+    }
+    /*주소검색 버튼*/
+    
+    .wcRightCellSearchButton:hover {
+      border-color: rgb(51, 118, 233);
+      border-width: 1px;
+      cursor: pointer;
+      
+    }  
+    /*주소검색 버튼 호버링 */
+
+    

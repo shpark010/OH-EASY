@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.dao.AuthDao">
+
+<!-- 아이디 중복체크 -->
+<select id="idCheck" resultType="int">
+	select count(*) from users where id=#{id}
+</select>
+
+<!-- 회원가입 -->
+<insert id="signup" parameterType="kr.or.oheasy.vo.UsersVO">
+	insert into users values(#{id},#{name},#{password},#{companyName},#{email})
+</insert>
+
+
+<!-- 로그인 -->
+<select id="login" resultType="int">
+	select count(*) from users where id=#{userId} and password=#{userPwd}
+</select>
+
+<!-- 로그인시 유저정보 리턴 -->
+<select id="userData" resultType="kr.or.oheasy.vo.LoginVO">
+	select * from users where id=#{userId}
+</select>
+
+<!-- 유저정보 업데이트 페이지에서 유저정보 리턴 -->
+<select id="getOneMemberData" resultType="kr.or.oheasy.vo.UsersVO">
+	select * from users where id=#{userId}
+</select>
+
+<!-- 유저정보 업데이트 -->
+<update id="updateMemberData">
+    UPDATE users
+    SET 
+        name = #{name},
+        password = #{password},
+        companyName = #{companyName},
+        email = #{email}
+    WHERE id = #{id};
+</update>
+
+
+
+</mapper>
+
+
+
+

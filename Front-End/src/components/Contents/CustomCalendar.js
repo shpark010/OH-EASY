@@ -8,6 +8,10 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 const InputWrapper = styled.div`
   position: relative;
   width: ${(props) => props.width || "100px"};
+
+  input[disabled] + div {
+    cursor: not-allowed;
+  }
 `;
 
 const Input = styled.input`
@@ -24,6 +28,14 @@ const Input = styled.input`
   &:focus {
     outline: 1px solid var(--color-primary-black);
   }
+
+  /* 조건부 스타일링 readOnly가 true 일경우 */
+  ${(props) =>
+    props.disabled &&
+    `
+    background-color: var(--color-opacity-gray);
+    cursor: not-allowed;
+  `}
 `;
 
 const StyledCalendar = styled(Calendar)`
@@ -38,11 +50,15 @@ const StyledCalendar = styled(Calendar)`
   z-index: 100;
   font-size: 16px;
   font-family: "NanumSquare", sans-serif;
-
+  .react-calendar__navigation__label {
+    padding: 0;
+  }
   .react-calendar__navigation__label > span {
     color: var(--color-primary-black);
     font-size: 15px;
     font-weight: 600;
+    text-align: center;
+    margin: 0;
   }
 
   .react-calendar__month-view__days__day--weekend:nth-child(7n-1) {
@@ -67,12 +83,40 @@ const StyledCalendar = styled(Calendar)`
     background: var(--color-primary-blue);
     color: white;
   }
+  ${(props) =>
+    props.position === "up" &&
+    `
+      bottom: 100%;
+      top: auto;
+    `}
 `;
 
-function CustomCalendar({ width, id, className, onChange }) {
+function CustomCalendar({
+  width,
+  id,
+  className,
+  onChange,
+  type,
+  name,
+  value,
+  readOnly,
+  onClick,
+  disabled,
+  position,
+  setValue,
+  onKeyDown,
+}) {
   const [date, setDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
+
+  // if (
+  //   value &&
+  //   typeof value === "string" &&
+  //   !moment(value, "YYYYMMDD").isValid()
+  // ) {
+  //   console.error("Invalid value prop passed to CustomCalendar:", value);
+  // }
 
   useEffect(() => {
     function handleOutsideClick(event) {
@@ -87,34 +131,68 @@ function CustomCalendar({ width, id, className, onChange }) {
     };
   }, []);
 
+  function convertDBDateToMoment(dateStr) {
+    if (!dateStr || !moment(dateStr, "YYYYMMDD").isValid()) {
+      //console.error("Invalid date conversion:", dateStr);
+      return "";
+    }
+    return moment(dateStr, "YYYYMMDD").format("YYYY-MM-DD");
+  }
+
   const handleDateChange = (newDate) => {
+    setDate(formatDate(newDate));
+    setIsOpen(false);
+    onChange(formatDate(newDate));
+
+    console.log("새로 선택한 날짜 : " + formatDate(newDate));
+  };
+
+  const handleMonthChange = (newDate) => {
+    const selectedMonth = moment(newDate).format("YYYY-MM");
+    console.log("선택한 월 : " + newDate);
+    console.log("저장될 월 : " + selectedMonth);
+
     setDate(newDate);
+    onChange(selectedMonth);
     setIsOpen(false);
   };
 
   const formatDate = (date) => {
-    return date ? moment(date).format("YYYY-MM-DD") : "";
+    const formattedDate =
+      typeof date === "string" ? convertDBDateToMoment(date) : date;
+    return formattedDate
+      ? type === "month"
+        ? moment(formattedDate).format("YYYY-MM")
+        : moment(formattedDate).format("YYYY-MM-DD")
+      : "";
   };
 
   return (
-    <InputWrapper ref={ref} width={`${width}px`}>
+    <InputWrapper ref={ref} width={`${width}px`} onClick={onClick}>
       <Input
         id={id}
         className={className}
-        readOnly
-        value={formatDate(date)}
-        onClick={() => setIsOpen(!isOpen)}
+        value={formatDate(value)}
+        //onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         onChange={onChange}
+        readOnly={readOnly}
+        name={name}
+        disabled={disabled}
+        onKeyDown={onKeyDown}
       />
-      <IconWrapper onClick={() => setIsOpen(!isOpen)}>
+      <IconWrapper onClick={() => !disabled && setIsOpen(!isOpen)}>
         <FaRegCalendarAlt size={17} />
       </IconWrapper>
       {isOpen && (
         <StyledCalendar
           locale="ko"
           formatDay={(locale, date) => moment(date).format("DD")}
-          onChange={handleDateChange}
-          value={date || new Date()}
+          onChange={type === "month" ? handleMonthChange : handleDateChange}
+          value={formatDate(value) || new Date()}
+          onClickMonth={type === "month" ? handleMonthChange : undefined}
+          defaultView={type === "month" ? "year" : "month"}
+          position={position}
         />
       )}
     </InputWrapper>

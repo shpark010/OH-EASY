@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.sd.dao.SdDao">
+
+	<!-- 조건 조회(사원 리스트) -->
+	<select id="getEmpList" parameterType="Map"
+		resultType="kr.or.oheasy.vo.SdEmpMstVO">
+		SELECT
+		e.CD_EMP as cdEmp,
+		e.NM_EMP as nmEmp,
+		IFNULL(s.NM_POSITION, '직급없음') as nmPosition
+		FROM HR_EMP_MST e
+		LEFT JOIN POSITION_SDTL s
+		ON
+		e.NO_POSITION_UNIQUE =
+		s.NO_POSITION_UNIQUE
+		WHERE SUBSTRING(DT_HIRE, 1,
+		6) &lt;=
+		#{belongingDate}
+		AND (e.DT_RESIGN IS NULL OR SUBSTRING(e.DT_RESIGN, 1,
+		6) &gt;= #{belongingDate})
+		<choose>
+			<!-- 코드 순 정렬 -->
+			<when test="searchOrder == 0">
+				ORDER BY
+				CASE
+				WHEN e.CD_EMP IS NULL THEN 4
+				WHEN e.CD_EMP
+				REGEXP '^[A-Za-z]' THEN 1
+				WHEN e.CD_EMP REGEXP '^[0-9]' THEN 2
+				ELSE 3
+				END,
+				e.CD_EMP;
+			</when>
+			<!-- 이름 순 정렬 -->
+			<when test="searchOrder == 1">
+				ORDER BY
+				CASE
+				WHEN e.NM_EMP IS NULL THEN 4
+				WHEN e.NM_EMP
+				REGEXP '^[가-힣]' THEN 1
+				WHEN e.NM_EMP REGEXP '^[A-Za-z]' THEN 2
+				WHEN
+				e.NM_EMP REGEXP '^[0-9]' THEN 3
+				ELSE 4
+				END,
+				e.NM_EMP;
+			</when>
+			<!-- 입사 순 정렬 -->
+			<when test="searchOrder == 2">
+				ORDER BY
+				CASE
+				WHEN e.DT_HIRE IS NOT NULL THEN 1
+				ELSE 2
+				END,
+				e.DT_HIRE;
+			</when>
+			<!-- 직급 순 정렬 -->
+			<when test="searchOrder == 3">
+				ORDER BY
+				CASE
+				WHEN s.SQ_POSITION IS NOT NULL THEN 1
+				ELSE 2
+				END,
+				s.SQ_POSITION;
+			</when>
+		</choose>
+	</select>
+
+	<!-- 사원 상세 정보 -->
+	<select id="getEmpDetailData" parameterType="String"
+		resultType="kr.or.oheasy.vo.SdEmpInfoVO">
+		SELECT
+		e.DT_HIRE AS hireDate,
+		CASE WHEN SUBSTRING(e.NO_RESIDENT, 8, 1) = '1' THEN '남' ELSE '여' END AS gender,
+		e.NM_ADDRESS AS address,
+		e.DC_ADDRESS AS detailAddress,
+		e.NO_MOBILE_PHONE AS phone,
+		e.NM_EMAIL AS email,
+		e.DT_RESIGN AS leavingDate,
+		CASE WHEN e.FG_FOREIGN = 0 THEN '내국인' ELSE '외국인' END AS domesticForeign,
+		d.NM_DEPARTMENT AS department,
+		CASE 
+        WHEN m.FG_MILITARY_DISCHARGE = '10100' THEN '만기제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10200' THEN '의병제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10300' THEN '의가사제대'
+        WHEN m.FG_MILITARY_DISCHARGE = '10400' THEN '소집해제'
+        ELSE ''
+    	END AS milDischarge,
+		CASE 
+        WHEN m.FG_MILITARY_SERVICE = '20100' THEN '현역'
+        WHEN m.FG_MILITARY_SERVICE = '20200' THEN '공익근무'
+        WHEN m.FG_MILITARY_SERVICE = '20300' THEN '방위산업체'
+        WHEN m.FG_MILITARY_SERVICE = '20400' THEN '기간산업체'
+        WHEN m.FG_MILITARY_SERVICE = '20500' THEN '산업기능'
+        WHEN m.FG_MILITARY_SERVICE = '20600' THEN '미필'
+        WHEN m.FG_MILITARY_SERVICE = '20700' THEN '면제'
+        ELSE ''
+    	END AS milService,
+		IFNULL(l.LICENSE_COUNT, 0) AS certificate,
+		IFNULL(f.FAMILY_COUNT, 0) AS family,
+		bd.FG_OBSTACLE AS obstacle
+		FROM HR_EMP_MST e
+		LEFT JOIN DEPARTMENT_DTL d ON e.NO_DEPARTMENT = d.NO_DEPARTMENT
+		LEFT JOIN HR_MILITARY_INFO_DTL m ON e.CD_EMP = m.CD_EMP
+		LEFT JOIN 
+			(
+			SELECT CD_EMP, COUNT(*) AS LICENSE_COUNT
+			FROM HR_LICENSE_DTL
+			GROUP BY CD_EMP
+			) l ON e.CD_EMP = l.CD_EMP
+		LEFT JOIN
+			(
+			SELECT CD_EMP, COUNT(*) AS FAMILY_COUNT
+			FROM HR_FAMILY_DTL
+			GROUP BY
+			CD_EMP
+			) f ON e.CD_EMP = f.CD_EMP
+		LEFT JOIN HR_BODY_DATA_DTL bd ON e.CD_EMP = bd.CD_EMP
+		WHERE e.CD_EMP = #{cd_Emp}
+	</select>
+
+	<!-- 급여 자료 조회 -->
+	<select id="getEmpTax" parameterType="Map"
+		resultType="kr.or.oheasy.vo.SdDeducationVO">
+		SELECT
+		s.CD_EMP AS cdEmp,
+		t.NM_TAX_RATE as cdTaxRate,
+		s.AMT_ALLOWANCE as amtAllowance,
+		s.YY_ALLOWANCE as yyAllowance,
+		s.MM_BELONG as mmBelong,
+		s.DT_ALLOWANCE as dtAllowance
+		FROM
+		salary_deduction_info s
+		INNER JOIN
+		tax_rate t
+		ON s.SEQ_TAX_RATE =
+		t.SEQ_TAX_RATE
+		WHERE CD_EMP=#{cdEmp}
+		AND YY_ALLOWANCE=#{yyAllowance}
+		AND
+		MM_BELONG=#{mmBelong}
+		AND DT_ALLOWANCE=#{dtAllowance}
+	</select>
+
+	<!-- 과세 전체 리스트 조회 -->
+	<select id="getAllTaxList"
+		resultType="kr.or.oheasy.vo.SdTaxRateVO">
+		SELECT
+		SEQ_TAX_RATE as seqTaxRate,
+		CD_TAX_RATE as cdTaxRate,
+		NM_TAX_RATE as nmTaxRate,
+		RATE_TAX as rateTax
+		FROM tax_rate
+		WHERE
+		YY_APPLY = #{yyAllowance}
+		ORDER BY
+		CD_TAX_RATE
+	</select>
+
+	<!-- 신규 급여 입력 -->
+	<insert id="setEmpPay" parameterType="Map">
+		INSERT INTO SALARY_DEDUCTION_INFO (CD_EMP, SEQ_TAX_RATE,
+		AMT_ALLOWANCE, YY_ALLOWANCE, MM_BELONG, DT_ALLOWANCE)
+		VALUES
+		<foreach collection="taxRateList" item="item" index="index"
+			separator=",">
+			(#{cdEmp},
+			#{item.seqTaxRate},
+			<choose>
+				<when test="item.cdTaxRate == 501">
+					GREATEST(16650, LEAST(265500, #{amtAllowance} * (
+					SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND
+					CD_TAX_RATE = #{item.cdTaxRate}
+					)))
+				</when>
+				<when test="item.cdTaxRate == 502">
+					LEAST(3911270, #{amtAllowance} * (
+					SELECT RATE_TAX
+					FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+					#{item.cdTaxRate}
+					))
+				</when>
+				<when test="item.cdTaxRate == 503">
+					LEAST(501010, #{amtAllowance} * (
+					SELECT RATE_TAX
+					FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+					#{item.cdTaxRate}
+					))
+				</when>
+				<when test="item.cdTaxRate == 505">
+					<choose>
+						<when test="amtAllowance &lt; 1060000">
+							0
+						</when>
+						<when test="amtAllowance == 10000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							)
+						</when>
+						<when
+							test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+						</when>
+						<when
+							test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+						</when>
+						<when
+							test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+						</when>
+						<when test="amtAllowance &gt; 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+						</when>
+						<otherwise>
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+							)
+						</otherwise>
+					</choose>
+				</when>
+				<when test="item.cdTaxRate == 506">
+					(
+					<choose>
+						<when test="amtAllowance &lt; 1060000">
+							0
+						</when>
+						<when test="amtAllowance == 10000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							)
+						</when>
+						<when
+							test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+						</when>
+						<when
+							test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+						</when>
+						<when
+							test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+						</when>
+						<when test="amtAllowance &gt; 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+						</when>
+						<otherwise>
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+							)
+						</otherwise>
+					</choose>
+					) * (
+					SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance}
+					AND CD_TAX_RATE = #{item.cdTaxRate}
+					)
+				</when>
+				<otherwise>
+					#{amtAllowance}* (
+					SELECT RATE_TAX FROM TAX_RATE WHERE
+					YY_APPLY = #{yyAllowance} AND CD_TAX_RATE = #{item.cdTaxRate}
+					)
+				</otherwise>
+			</choose>
+			,
+			#{yyAllowance},
+			#{mmBelong},
+			#{dtAllowance})
+		</foreach>
+	</insert>
+
+
+	<!-- 급여 정보 수정 -->
+	<update id="updateEmpPay" parameterType="Map">
+			UPDATE SALARY_DEDUCTION_INFO
+			SET AMT_ALLOWANCE =
+			<choose>
+				<when test="taxRateList.cdTaxRate == 501">
+					GREATEST(16650, LEAST(265500, #{amtAllowance} * (
+					SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND
+					CD_TAX_RATE = #{taxRateList.cdTaxRate}
+					)))
+				</when>
+				<when test="taxRateList.cdTaxRate == 502">
+					LEAST(3911270, #{amtAllowance} * (
+					SELECT RATE_TAX
+					FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+					#{taxRateList.cdTaxRate}
+					))
+				</when>
+				<when test="taxRateList.cdTaxRate == 503">
+					LEAST(501010, #{amtAllowance} * (
+					SELECT RATE_TAX
+					FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+					#{taxRateList.cdTaxRate}
+					))
+				</when>
+				<when test="taxRateList.cdTaxRate == 505">
+					<choose>
+						<when test="amtAllowance &lt; 1060000">
+							0
+						</when>
+						<when test="amtAllowance == 10000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							)
+						</when>
+						<when
+							test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+						</when>
+						<when
+							test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+						</when>
+						<when
+							test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+						</when>
+						<when test="amtAllowance &gt; 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+						</when>
+						<otherwise>
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+							)
+						</otherwise>
+					</choose>
+				</when>
+				<when test="taxRateList.cdTaxRate == 506">
+					(
+					<choose>
+						<when test="amtAllowance &lt; 1060000">
+							0
+						</when>
+						<when test="amtAllowance == 10000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							)
+						</when>
+						<when
+							test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+						</when>
+						<when
+							test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+						</when>
+						<when
+							test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+						</when>
+						<when
+							test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+						</when>
+						<when test="amtAllowance &gt; 87000000">
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+							) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+						</when>
+						<otherwise>
+							(
+							SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+							#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+							)
+						</otherwise>
+					</choose>
+					) * (
+					SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance}
+					AND CD_TAX_RATE = #{taxRateList.cdTaxRate}
+					)
+				</when>
+				<otherwise>
+					#{amtAllowance}* (
+					SELECT RATE_TAX FROM TAX_RATE WHERE
+					YY_APPLY = #{yyAllowance} AND CD_TAX_RATE = #{taxRateList.cdTaxRate}
+					)
+				</otherwise>
+			</choose>
+			WHERE CD_EMP = #{cdEmp} AND SEQ_TAX_RATE = #{taxRateList.seqTaxRate}
+			AND
+			YY_ALLOWANCE = #{yyAllowance} AND MM_BELONG = #{mmBelong}
+			AND
+			DT_ALLOWANCE = #{dtAllowance}
+	</update>
+
+	<!-- 과세 리스트 조회 -->
+	<select id="getTaxList" parameterType="Map" resultType="kr.or.oheasy.vo.SdTaxRateVO">
+		SELECT
+		SEQ_TAX_RATE as seqTaxRate,
+		CD_TAX_RATE as cdTaxRate,
+		NM_TAX_RATE as nmTaxRate,
+		ROUND(RATE_TAX * 100, 4) as rateTax
+		FROM tax_rate
+		WHERE CD_TAX_RATE NOT IN(101,505) AND YY_APPLY = #{applyYear}
+		ORDER BY
+		CD_TAX_RATE
+	</select>
+	
+	<!-- 과세 비율 수정 -->
+	<update id="updateTaxList" parameterType="kr.or.oheasy.vo.SdTaxRateVO">
+		UPDATE TAX_RATE 
+		SET RATE_TAX = (#{rateTax} / 100) 
+		WHERE SEQ_TAX_RATE = #{seqTaxRate}
+	</update>
+
+	<!-- 세액 조건 조회 -->
+	<select id="getTaxInfo" parameterType="Map">
+		SELECT
+		IFNULL(SUM(s.AMT_ALLOWANCE), 0) AS totalAmount
+		FROM
+		TAX_RATE t
+		LEFT JOIN
+		SALARY_DEDUCTION_INFO s ON t.SEQ_TAX_RATE =
+		s.SEQ_TAX_RATE
+		<choose>
+			<!-- 전체사원 당월 -->
+			<when test="searchTaxOrder == 0">
+				WHERE
+				s.YY_ALLOWANCE = #{yyAllowance}
+				AND
+				s.MM_BELONG =
+				#{mmBelong}
+			</when>
+			<!-- 현제사원 당월 -->
+			<when test="searchTaxOrder == 1">
+				WHERE
+				s.YY_ALLOWANCE = #{yyAllowance}
+				AND
+				s.MM_BELONG =
+				#{mmBelong}
+				AND
+				s.CD_EMP = #{cdEmp}
+			</when>
+			<!-- 전체사원 연간 -->
+			<when test="searchTaxOrder == 2">
+				WHERE
+				s.YY_ALLOWANCE = #{yyAllowance}
+			</when>
+			<!-- 현제사원 연간 -->
+			<when test="searchTaxOrder == 3">
+				WHERE
+				s.YY_ALLOWANCE = #{yyAllowance}
+				AND
+				s.CD_EMP =
+				#{cdEmp}
+			</when>
+		</choose>
+		GROUP BY
+		t.CD_TAX_RATE
+	</select>
+
+	<!-- 급여 자료 삭제 -->
+	<delete id="deletePayData">
+		DELETE FROM SALARY_DEDUCTION_INFO
+		WHERE YY_ALLOWANCE = #{yyAllowance}
+		AND MM_BELONG = #{mmBelong}
+		AND DT_ALLOWANCE = #{dtAllowance}
+		AND CD_EMP IN
+		<foreach item="item" index="index" collection="cdEmpList"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 모달 급여 내역 조회 -->
+	<select id="getPayDayList"
+		resultType="kr.or.oheasy.vo.SdPayDayListVO">
+		SELECT
+		s.MM_BELONG as mmBelong,
+		s.DT_ALLOWANCE as
+		dtAllowance,
+		COUNT(*) AS cntPeople,
+		SUM(s.AMT_ALLOWANCE) AS amtTotalPay
+		FROM
+		SALARY_DEDUCTION_INFO s
+		JOIN
+		TAX_RATE t ON s.SEQ_TAX_RATE =
+		t.SEQ_TAX_RATE
+		WHERE
+		s.YY_ALLOWANCE = '2023'
+		AND t.CD_TAX_RATE = 101
+		GROUP BY
+		s.MM_BELONG, s.DT_ALLOWANCE
+		ORDER BY
+		s.MM_BELONG, s.DT_ALLOWANCE
+	</select>
+
+	<!-- 전체 사원 정보 수정을 위한 급여 및 일자 조회 -->
+	<select id="getAllPayListForEdit" parameterType="Map"
+		resultType="kr.or.oheasy.vo.SdDeducationVO">
+		SELECT
+		s.CD_EMP AS cdEmp,
+		s.AMT_ALLOWANCE AS amtAllowance,
+		s.MM_BELONG as
+		mmBelong,
+		s.DT_ALLOWANCE as dtAllowance
+		FROM
+		SALARY_DEDUCTION_INFO s
+		JOIN
+		TAX_RATE t ON s.SEQ_TAX_RATE =
+		t.SEQ_TAX_RATE
+		WHERE
+		s.YY_ALLOWANCE = #{yyAllowance}
+		AND t.CD_TAX_RATE = 101
+		<if test="checkList != null and checkList.size() > 0">
+			AND s.CD_EMP IN
+			<foreach item="item" index="index" collection="checkList"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		ORDER BY
+		s.MM_BELONG, s.DT_ALLOWANCE
+	</select>
+
+	<!-- 전체 급여 정보 수정 -->
+	<update id="updateAllEmpPay" parameterType="Map">
+		UPDATE SALARY_DEDUCTION_INFO
+		SET AMT_ALLOWANCE =
+		<choose>
+			<when test="taxRateList.cdTaxRate == 501">
+				GREATEST(16650, LEAST(265500, #{amtAllowance} * (
+				SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND
+				CD_TAX_RATE = #{taxRateList.cdTaxRate}
+				)))
+			</when>
+			<when test="taxRateList.cdTaxRate == 502">
+				LEAST(3911270, #{amtAllowance} * (
+				SELECT RATE_TAX
+				FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+				#{taxRateList.cdTaxRate}
+				))
+			</when>
+			<when test="taxRateList.cdTaxRate == 503">
+				LEAST(501010, #{amtAllowance} * (
+				SELECT RATE_TAX
+				FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance} AND CD_TAX_RATE =
+				#{taxRateList.cdTaxRate}
+				))
+			</when>
+			<when test="taxRateList.cdTaxRate == 505">
+				<choose>
+					<when test="amtAllowance &lt; 1060000">
+						0
+					</when>
+					<when test="amtAllowance == 10000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						)
+					</when>
+					<when
+						test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+					</when>
+					<when
+						test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+					</when>
+					<when
+						test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+					</when>
+					<when
+						test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+					</when>
+					<when
+						test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+					</when>
+					<when test="amtAllowance &gt; 87000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+					</when>
+					<otherwise>
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+						)
+					</otherwise>
+				</choose>
+			</when>
+			<when test="taxRateList.cdTaxRate == 506">
+				(
+				<choose>
+					<when test="amtAllowance &lt; 1060000">
+						0
+					</when>
+					<when test="amtAllowance == 10000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						)
+					</when>
+					<when
+						test="amtAllowance &gt; 10000000 and amtAllowance &lt;= 14000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + ((#{amtAllowance} - 10000000) * 0.98 * 0.35) + 25000
+					</when>
+					<when
+						test="amtAllowance &gt; 14000000 and amtAllowance &lt;= 28000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 1397000 + ((#{amtAllowance} - 14000000) * 0.98 * 0.38)
+					</when>
+					<when
+						test="amtAllowance &gt; 28000000 and amtAllowance &lt;= 30000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 6610600 + ((#{amtAllowance} - 28000000) * 0.98 * 0.4)
+					</when>
+					<when
+						test="amtAllowance &gt; 30000000 and amtAllowance &lt;= 45000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 7394600 + ((#{amtAllowance} - 30000000) * 0.4)
+					</when>
+					<when
+						test="amtAllowance &gt; 45000000 and amtAllowance &lt;= 87000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 13394600 + ((#{amtAllowance} - 45000000) * 0.42)
+					</when>
+					<when test="amtAllowance &gt; 87000000">
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						AMT_START_RANGE = 10000000 AND AMT_END_RANGE = 10000000
+						) + 31034600 + ((#{amtAllowance} - 87000000) * 0.45)
+					</when>
+					<otherwise>
+						(
+						SELECT AMT_ICTAX FROM INCOME_TAX_RATE WHERE
+						#{amtAllowance} &gt;= AMT_START_RANGE AND #{amtAllowance} &lt; AMT_END_RANGE
+						)
+					</otherwise>
+				</choose>
+				) * (
+				SELECT RATE_TAX FROM TAX_RATE WHERE YY_APPLY = #{yyAllowance}
+				AND CD_TAX_RATE = #{taxRateList.cdTaxRate}
+				)
+			</when>
+			<otherwise>
+				#{amtAllowance}* (
+				SELECT RATE_TAX FROM TAX_RATE WHERE
+				YY_APPLY = #{yyAllowance} AND CD_TAX_RATE = #{taxRateList.cdTaxRate}
+				)
+			</otherwise>
+		</choose>
+		WHERE CD_EMP = #{cdEmp} AND SEQ_TAX_RATE = #{taxRateList.seqTaxRate}
+		AND
+		YY_ALLOWANCE = #{yyAllowance} AND MM_BELONG = #{mmBelong}
+		AND
+		DT_ALLOWANCE = #{dtAllowance}
+	</update>
+
+	<!-- 이메일 발송을 위한 조회 -->
+	<select id="selectForMail" parameterType="Map" resultType="kr.or.oheasy.vo.SdEmailInfoVO">
+		SELECT
+		s.CD_EMP as cdEmp,
+		h.NM_EMAIL as nmEmail,
+		s.YY_ALLOWANCE as yyAllowance,
+    	s.MM_BELONG as mmBelong,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) AS amtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '국민연금' THEN s.AMT_ALLOWANCE END) AS nationalPension,
+		MAX(CASE WHEN t.NM_TAX_RATE = '건강보험' THEN s.AMT_ALLOWANCE END) AS healthInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '장기요양보험료' THEN s.AMT_ALLOWANCE END) AS longtermNursingInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '고용보험' THEN s.AMT_ALLOWANCE END) AS employmentInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '소득세' THEN s.AMT_ALLOWANCE END) AS incomeTax,
+		MAX(CASE WHEN t.NM_TAX_RATE = '지방소득세' THEN s.AMT_ALLOWANCE END) AS localIncomeTax,
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS totalDeduct,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) -
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS netPay
+		FROM
+		SALARY_DEDUCTION_INFO s
+		INNER JOIN
+		TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE AND t.YY_APPLY = #{yyAllowance}
+		INNER JOIN
+		HR_EMP_MST h ON s.CD_EMP = h.CD_EMP
+		WHERE
+        s.DT_ALLOWANCE=#{dtAllowance} AND 
+        s.YY_ALLOWANCE = #{yyAllowance} AND 
+        s.MM_BELONG = #{mmBelong} AND
+        s.CD_EMP IN 
+        <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    	GROUP BY
+        s.CD_EMP
+	</select>
+	
+	<!-- PDF를 위한 조회 -->
+	<select id="selectForPdf" parameterType="Map" resultType="kr.or.oheasy.vo.SdPdfInfoVO">
+		SELECT
+		s.CD_EMP as cdEmp,
+		h.NM_EMP as nmEmp,
+		DATE_FORMAT(STR_TO_DATE(SUBSTR(h.NO_RESIDENT, 1, 6), '%y%m%d'), '%Y-%m-%d') as dtBirth,
+		DATE_FORMAT(STR_TO_DATE(h.DT_HIRE, '%Y%m%d'), '%Y-%m-%d') as dtHire,
+		IFNULL(dep.NM_DEPARTMENT, '부서없음') as nmDept, 
+    	IFNULL(pos.NM_POSITION, '직급없음') as nmPosition,
+		s.YY_ALLOWANCE as yyAllowance,
+    	s.MM_BELONG as mmBelong,
+    	DATE_FORMAT(STR_TO_DATE(s.DT_ALLOWANCE, '%Y%m%d'), '%Y-%m-%d') as dtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) AS amtAllowance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '국민연금' THEN s.AMT_ALLOWANCE END) AS nationalPension,
+		MAX(CASE WHEN t.NM_TAX_RATE = '건강보험' THEN s.AMT_ALLOWANCE END) AS healthInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '장기요양보험료' THEN s.AMT_ALLOWANCE END) AS longtermNursingInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '고용보험' THEN s.AMT_ALLOWANCE END) AS employmentInsurance,
+		MAX(CASE WHEN t.NM_TAX_RATE = '소득세' THEN s.AMT_ALLOWANCE END) AS incomeTax,
+		MAX(CASE WHEN t.NM_TAX_RATE = '지방소득세' THEN s.AMT_ALLOWANCE END) AS localIncomeTax,
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS totalDeduct,
+		MAX(CASE WHEN t.NM_TAX_RATE = '기본급' THEN s.AMT_ALLOWANCE END) -
+		SUM(CASE WHEN t.NM_TAX_RATE != '기본급' THEN s.AMT_ALLOWANCE ELSE 0 END) AS netPay
+		FROM
+		SALARY_DEDUCTION_INFO s
+		INNER JOIN
+		TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE AND t.YY_APPLY = #{yyAllowance}
+		INNER JOIN
+		HR_EMP_MST h ON s.CD_EMP = h.CD_EMP
+		LEFT JOIN 
+		DEPARTMENT_DTL dep ON h.NO_DEPARTMENT = dep.NO_DEPARTMENT
+    	LEFT JOIN 
+    	POSITION_SDTL pos ON h.NO_POSITION_UNIQUE = pos.NO_POSITION_UNIQUE
+		WHERE
+        s.DT_ALLOWANCE=#{dtAllowance} AND 
+        s.YY_ALLOWANCE = #{yyAllowance} AND 
+        s.MM_BELONG = #{mmBelong} AND
+        s.CD_EMP = #{cdEmp}
+    	GROUP BY
+        s.CD_EMP
+	</select>
+	
+		<!-- 각 공제 항목 별 업데이트 -->
+	<update id="updateEachDeduction" parameterType="Map">
+		UPDATE
+		SALARY_DEDUCTION_INFO s
+		JOIN TAX_RATE t ON s.SEQ_TAX_RATE = t.SEQ_TAX_RATE
+		SET s.AMT_ALLOWANCE = #{amtTax}
+		WHERE s.CD_EMP = #{cdEmp}
+		and t.NM_TAX_RATE = #{nmTax}
+		AND s.YY_ALLOWANCE = #{yyAllowance}
+		AND s.MM_BELONG = #{mmBelong}
+		AND s.DT_ALLOWANCE = #{dtAllowance}
+	</update>
+</mapper>
+
+
+
+

@@ -10,14 +10,17 @@ function Layout({ children }) {
     "/login",
     "/register",
     "/signup",
+    "/mypage",
   ].includes(location.pathname);
 
   return (
-    <div id="wrap">
-      {shouldDisplayHeaderFooter && <Header />}
-      <div className="contents">{children}</div>
-      {shouldDisplayHeaderFooter && <Footer />}
-    </div>
+    <>
+      <div id="wrap">
+        {shouldDisplayHeaderFooter && <Header />}
+        <div className="contents">{children}</div>
+        {shouldDisplayHeaderFooter && <Footer />}
+      </div>
+    </>
   );
 }
 

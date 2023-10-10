@@ -125,6 +125,7 @@ img {
   border: none;
   vertical-align: bottom;
   max-width: 100%;
+  max-height: 100%;
 }
 
 i,
@@ -244,10 +245,13 @@ input[type="password"]::-ms-clear {
 }
 
 .borderTopBold {
-  border-top: 3px solid var(--color-primary-black);
+  border-top: 2.5px solid var(--color-primary-black);
 }
 .borderbuttonBold {
   border-bottom: 1px solid var(--color-border-gray);
+}
+.borderbuttonBoldBlack {
+  border-bottom: 2.5px solid var(--color-primary-black);
 }
 
 html,
@@ -261,10 +265,11 @@ body {
 
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
 }
 
 #wrap {
+  /* position: relative; */
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -277,8 +282,8 @@ body {
   width: 100%;
   max-width: 1640px;
   min-width: 1640px;
-  height: 100%;
   max-height: calc(100vh - 115px);
+  /* max-height: calc(100vh - 300px); */
   flex-grow: 1;
   margin: 0 auto;
 }
@@ -325,10 +330,19 @@ body {
   background-color: var(--color-primary-blue);
   color: #fff;
 }
+.selectBox.blue:disabled {
+  background-color: var(--color-primary-gray);
+  cursor: not-allowed;
+}
 .contents .selectBox {
   border: 1px solid var(--color-primary-gray);
 }
 
+table .selectBox {
+  padding-right: 28px;
+  background: url("../../images/icon/arw-bottom.png") no-repeat calc(100% - 8px)
+    center/8px;
+}
 /* 버튼 */
 button {
   border: 1px solid var(--color-primary-gray);
@@ -718,7 +732,7 @@ input[type="checkbox"] {
 
 /* 서브페이지 테이블 설정 (subpage setting) */
 .listArea {
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 table {
@@ -729,36 +743,49 @@ table {
 .namePickerBox {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   background-color: #f9f9f9;
   border: 1px solid var(--color-border-gray);
   border-top: none;
+
+  /* max-height: calc(100vh - 300px);
+  overflow-y: auto; */
 }
 
 table {
   /* 사원선택 테이블 설정 */
 }
-table.namePickerTable th,
+.table thead,
+table.namePickerTable thead,
+table.hrTotalTable thead {
+  border-bottom: 1px solid var(--color-border-gray);
+}
+.table td,
 table.namePickerTable td,
-table.hrTotalTable th,
 table.hrTotalTable td {
   border-bottom: 1px solid var(--color-border-gray);
 }
+.table th,
 table.namePickerTable th,
 table.hrTotalTable th {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
   background-color: #ededed;
   padding: 10px;
 }
+.table th + th,
 table.namePickerTable th + th,
 table.hrTotalTable th + th {
   border-left: 1px solid var(--color-border-gray);
 }
+.table td,
 table.namePickerTable td,
 table.hrTotalTable td {
-  padding: 5px 10px;
-  background-color: #fff;
+  /* padding: 5px 10px; */
+  /* background-color: #fff; */
+  height: 40px;
 }
+.table td + td,
 table.namePickerTable td + td,
 table.hrTotalTable td + td {
   border-left: 1px solid var(--color-border-gray);
@@ -769,13 +796,32 @@ table.hrTotalTable td + td {
 }
 .pageTab li {
   padding: 8px 14px;
-  border: 1px solid var(--color-border-gray);
+  border-top: 1px solid var(--color-border-gray);
+  border-right: 1px solid var(--color-border-gray);
   border-bottom: none;
   color: var(--color-primary-gray);
   font-size: 14px;
+}
+.pageTab li:first-child {
+  border-left: 1px solid var(--color-border-gray);
+  border-top-left-radius: 2px;
+}
+.pageTab li:last-child {
+  border-top-right-radius: 2px;
 }
 .pageTab li.on {
   background-color: var(--color-primary-blue);
   color: var(--color-primary-white);
   border: none;
-} /*# sourceMappingURL=index.css.map */
+}
+
+.test {
+  text-align: center;
+}
+
+.test2 {
+  overflow: auto;
+  /* height: 50%; */
+  flex-grow: 0;
+  padding-bottom: 20px;
+}

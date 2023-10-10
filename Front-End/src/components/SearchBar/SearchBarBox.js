@@ -7,25 +7,20 @@ function SearchBarBox({
   options,
   defaultValue,
   onChange,
+  value,
+  onClick,
+  fixed,
 }) {
-  const [selectedValue, setSelectedValue] = useState(defaultValue);
-
-  const handleValueChange = (event) => {
-    const newValue = event.target.value;
-    setSelectedValue(newValue);
-    if (onChange) {
-      onChange(newValue);
-    }
-  };
-
   return (
-    <div className={`searchBarBox ${className}`}>
+    <div className={`searchBarBox ${className}`} onClick={onClick}>
       {label && <span className="searchBarName">{label}</span>}
       <select
         id={id}
         className="selectBox"
-        onChange={handleValueChange}
-        value={selectedValue}
+        onChange={onChange}
+        value={value}
+        disabled={fixed}
+        style={{ cursor: fixed ? "default" : "pointer" }}
       >
         {options.map((option, index) => (
           <option key={index} value={option.value}>

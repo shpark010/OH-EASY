@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.oheasy.hrm.dao.HrDao">
+
+<!-- 사원테이블에 존재하면서 인사테이블에도 존재하는 사원 리스트 -->
+<select id="getAllEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+SELECT m.*
+FROM hr_emp_mst m
+INNER JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
+</select>
+
+
+<!-- 사원테이블엔 존재하지만 인사테이블엔 존재하지 않는 사원 리스트 -->
+<select id="getAllModalEmpList" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+SELECT m.*
+FROM hr_emp_mst m
+LEFT JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
+WHERE d.CD_EMP IS NULL
+</select>
+
+<insert id="insertIntoHrEmpDtl">
+    INSERT INTO hr_emp_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_emp_dtl)
+</insert>
+
+<insert id="insertIntoHrFamilyDtl">
+    INSERT INTO hr_family_dtl (CD_EMP, FG_YEAR_END_TAX,NM_EMP_FAM,NO_RESIDENT ,FG_FAMILY)
+    SELECT m.CD_EMP, 0 AS FG_YEAR_END_TAX,m.NM_EMP,m.NO_RESIDENT, 0 AS FG_FAMILY FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_family_dtl)
+</insert>
+
+
+
+<!-- 
+ -->
+<insert id="insertOneHrFamilyDtl">
+    INSERT INTO hr_family_dtl (CD_EMP, FG_YEAR_END_TAX,NM_EMP_FAM,NO_RESIDENT ,FG_FAMILY) VALUE(#{CD_EMP},0)
+</insert>
+<!-- 사원 테이블 사원 한명의 정보  
+<select id="getOneHrEmpData">
+	select * from 
+</select>
+-->
+
+<insert id="insertIntoHrBodyDataDtl">
+    INSERT INTO hr_body_data_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_body_data_dtl)
+</insert>
+
+<insert id="insertIntoHrMilitaryInfoDtl">
+    INSERT INTO hr_military_info_dtl (CD_EMP)
+    SELECT m.CD_EMP FROM hr_emp_mst m
+    WHERE m.CD_EMP NOT IN (SELECT CD_EMP FROM hr_military_info_dtl)
+</insert>
+
+<!-- 인사테이블 insert -->
+<insert id="insertHrEmpData">
+	insert into hr_emp_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+
+<delete id="deleteHrEmpDtl">
+    DELETE FROM hr_emp_dtl
+    WHERE CD_EMP = #{cdEmp}
+</delete>
+
+<!-- 인사테이블의 사진경로 리스트로 반환 (삭제할때 사용) -->
+<select id="getEmpImagePaths" resultType="string">
+    SELECT PATH FROM hr_emp_dtl WHERE CD_EMP IN
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+
+<!-- 인사테이블 한명 정보 가져오기 -->
+<select id="getOneHrEmpData" parameterType="string" resultType="kr.or.oheasy.hrm.vo.HrEmpMstCdEmpNmNameVO">
+    SELECT 
+        m.CD_EMP as cd_Emp,
+        m.NM_EMP as nm_Emp
+    FROM hr_emp_mst m
+    JOIN hr_emp_dtl d ON m.CD_EMP = d.CD_EMP
+    WHERE m.CD_EMP = #{cdEmp}
+</select>
+
+
+<!-- 한 사원의 기초정보	 -->
+<select id="getOneEmpBasicData" resultType="kr.or.oheasy.hrm.vo.HrEmpMstJoinDtlVO">
+    select
+    	m.CD_EMP as cd_emp,
+    	m.NO_RESIDENT as no_resident,
+    	m.NO_DEPARTMENT as no_department,
+    	m.NO_POSITION_UNIQUE as no_positionUnique,
+    	m.DT_HIRE as dt_hire,
+    	m.DT_RESIGN as dt_resign,
+        d.NM_ENG_EMP as nm_eng_emp, 
+        d.NM_HANJA_EMP as nm_hanja_emp, 
+        d.FG_WORKCONTRACT as fg_workcontract, 
+        d.FG_MARRIAGE as fg_marriage, 
+        d.DT_BIRTH as dt_birth,
+        d.PATH 
+    from 
+        hr_emp_mst m
+    left join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    where 
+        m.CD_EMP=#{cdEmp}
+</select>
+
+<!-- 한 사원의 사원테이블 update-->
+<update id="updateHrEmpMst">
+    update hr_emp_mst
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+<!-- 한 사원의 인사테이블 update
+<update id="updateHrEmpDtl">
+    update hr_emp_dtl
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+-->
+<update id="updateHrEmpDtl">
+    update hr_emp_dtl
+    <set>
+        <choose>
+            <!-- value 값이 null이면 해당 컬럼을 NULL로 설정 -->
+            <when test="value == 'null'">
+                ${column} = NULL
+            </when>
+            <!-- 그렇지 않으면 일반적으로 값을 설정 -->
+            <otherwise>
+                ${column} = #{value}
+            </otherwise>
+        </choose>
+    </set>
+    where cd_emp = #{cdEmp}
+</update>
+
+
+<!-- 한 사원의 가족정보 -->
+<select id="getFamilyDataList" resultType="kr.or.oheasy.vo.HrFamilyDtlVO">
+	select * from hr_family_dtl where cd_emp=#{cdEmp}
+</select>
+<!--  한사원의 한명의 가족 정보 insert 초기 처음 insert 할때-->
+<insert id="insertFirstFamilyData">
+    INSERT INTO hr_family_dtl (CD_EMP, NM_EMP_FAM, NO_RESIDENT, FG_YEAR_END_TAX, FG_FAMILY)
+    SELECT 
+        #{cdEmp},
+        NM_EMP,
+        NO_RESIDENT,
+        0 AS FG_YEAR_END_TAX,
+        0 AS FG_FAMILY
+    FROM hr_emp_mst
+    WHERE CD_EMP = #{cdEmp};
+</insert>
+<!-- 한사원의 한명의 가족 정보 insert 후기 2번째 가족부터-->
+<insert id="insertFamilyData">
+	insert into hr_family_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+
+<!-- 한사원의 한명의 가족 정보 update -->
+<update id="updateFamilyData">
+    update hr_family_dtl 
+    set ${column} = #{value} 
+    where SEQ_FAMILY = #{seqFamily}
+</update>
+
+<!-- 한사원의 학력 정보 -->
+<select id="getEduDataList" resultType="kr.or.oheasy.vo.HrEducationDtlVO">
+	select * from hr_education_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 한명의 학력 정보 insert -->
+<insert id="insertEduData">
+	insert into hr_education_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+<!-- 한사원의 한명의 학력 정보 update -->
+<update id="updateEduData">
+    update hr_education_dtl
+    set ${column} = #{value} 
+    where SEQ_EDUCATION = #{seqEducation}
+</update>
+
+<!-- 한 사원의 경력정보 -->
+<select id="getCareerDataList" resultType="kr.or.oheasy.vo.HrCareerDtlVO">
+	select * from hr_career_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 경력 정보 insert -->
+<insert id="insertCareerData">
+	insert into hr_career_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+<!-- 한사원의 경력 정보 update -->
+<update id="updateCareerData">
+    update hr_career_dtl
+    set ${column} = #{value} 
+    where SEQ_CAREER = #{seqCareer}
+</update>
+
+<!-- 한사원의 신체 정보 -->
+<select id="getBodyData" resultType="kr.or.oheasy.vo.HrBodyDataDtlVO">
+	select * from hr_body_data_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 신체 정보 insert-->
+<insert id="insertBodyData">
+	insert into hr_body_data_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+<!-- 한 사원의 신체 정보 update-->
+<update id="updateBodyData">
+    update hr_Body_data_dtl
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+
+<!-- 한사원의 병역 정보 -->
+<select id="getMilitaryData" resultType="kr.or.oheasy.vo.HrMilitaryInfoDtlVO">
+	select * from hr_Military_info_dtl where cd_emp=#{cdEmp}
+</select>
+
+<!-- 한사원의 병역 정보 insert-->
+<insert id="insertMilitaryData">
+	insert into hr_military_info_dtl(cd_emp) values(#{cdEmp}) 
+</insert>
+
+<!-- 한 사원의 신체 정보 update-->
+<update id="updateMilitaryData">
+    update hr_military_info_dtl
+    set ${column} = #{value} 
+    where cd_emp = #{cdEmp}
+</update>
+
+<!-- 한 사원의 자격정보 -->
+<select id="getLicenseDataList" resultType="kr.or.oheasy.vo.HrLicenseDtlVO">
+	select * from hr_License_dtl where cd_emp=#{cdEmp}
+</select>
+
+
+<!-- 한사원의 자격정보 update -->
+<update id="updateLicenseData">
+    update hr_License_dtl
+    set ${column} = #{value} 
+    where SEQ_LICENSE = #{seqLicense}
+</update>
+
+<!-- 한사원의 한명의 가족 정보 insert -->
+<insert id="insertLicenseData">
+	insert into hr_License_dtl(cd_emp , ${column}) values(#{cdEmp} , #{value})
+</insert>
+
+<!-- 자격증 리스트 가져오기 -->
+<select id="getLicenseList" resultType="kr.or.oheasy.vo.HrLicenseSdtlVO">
+	select * from hr_License_Sdtl
+</select>
+
+<!-- 삭제 가족 한명 -->
+<delete id="deleteFamilyData">
+	DELETE FROM hr_family_dtl WHERE SEQ_FAMILY = #{seqFamily}
+</delete>
+<!-- 삭제 가족 한명 -->
+<delete id="deleteEduData">
+	DELETE FROM hr_education_dtl WHERE SEQ_EDUCATION = #{seqEducation}
+</delete>
+<!-- 삭제 경력 한명 -->
+<delete id="deleteCareerData">
+	DELETE FROM hr_career_dtl WHERE SEQ_CAREER = #{seqCareer}
+</delete>
+<!-- 삭제 자격 한명 -->
+<delete id="deleteLicenseData">
+	DELETE FROM hr_license_dtl WHERE SEQ_License = #{seqLicense}
+</delete>
+
+
+<!-- 조건 검색 카테고리 0 재직자 -->
+<select id="getConditionalEmpListCategory0" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT m.*
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NULL 
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                m.cd_emp;
+        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp;
+		</when>
+        <!-- 입사 순 정렬 -->
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
+    </choose>
+</select>
+<!-- 조건 검색 카테고리 1 퇴사자 -->
+<select id="getConditionalEmpListCategory1" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT m.*
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NOT NULL 
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+                ORDER BY 
+                CASE 
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                m.cd_emp
+        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
+        <!-- 입사 순 정렬 -->
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
+    </choose>
+</select>
+
+<!-- 조건 검색 카테고리 2 재직자 + 당해년도 퇴사자 -->
+<select id="getConditionalEmpListCategory2" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT m.*
+    from 
+        hr_emp_mst m
+    right join 
+        hr_emp_dtl d on m.CD_EMP = d.CD_EMP
+    WHERE m.DT_RESIGN IS NULL OR LEFT(m.DT_RESIGN, 4) = YEAR(NOW())
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    ELSE 3
+                END, 
+                m.cd_emp
+        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
+        <!-- 입사 순 정렬 -->
+        <!-- 입사 순 정렬 -->
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
+    </choose>
+</select>
+
+
+<!-- 조건 검색 카테고리 3 작년 퇴사자 + 당해년도 퇴사자 -->
+<select id="getConditionalEmpListCategory3" parameterType="map" resultType="kr.or.oheasy.vo.HrEmpMstVO">
+    SELECT *
+    FROM hr_emp_mst m
+    WHERE LEFT(m.DT_RESIGN, 4) IN (YEAR(NOW()), YEAR(NOW()) - 1)
+    <choose>
+        <!-- 코드 순 정렬 -->
+        <when test="sort == 0">
+            ORDER BY 
+                CASE 
+                    WHEN m.cd_emp IS NULL THEN 4
+                    WHEN m.cd_emp REGEXP '^[A-Za-z]' THEN 1
+                    WHEN m.cd_emp REGEXP '^[0-9]' THEN 2
+                    ELSE 3
+                END, 
+                cd_emp
+        </when>
+		<!-- 이름 순 정렬 -->
+		<when test="sort == 1">
+		    ORDER BY 
+		        CASE 
+		            WHEN m.nm_emp IS NULL THEN 1
+		            WHEN m.nm_emp REGEXP '^[가-힣]' THEN 2
+		            WHEN m.nm_emp REGEXP '^[A-Za-z]' THEN 3
+		            WHEN m.nm_emp REGEXP '^[0-9]' THEN 4
+		            ELSE 5
+		        END, 
+		        m.nm_emp
+		</when>
+        <!-- 입사 순 정렬 -->
+		<when test="sort == 2">
+		    ORDER BY m.dt_hire ASC
+		</when>
+    </choose>
+</select>
+
+
+
+<!-- pdf용 데이터 -->
+<select id="getHrPdfData" resultType="kr.or.oheasy.hrm.vo.HrPdfVO">
+    SELECT *
+    FROM hr_emp_mst
+    JOIN hr_emp_dtl ON hr_emp_mst.CD_EMP = hr_emp_dtl.CD_EMP
+    JOIN hr_body_data_dtl ON hr_emp_mst.CD_EMP = hr_body_data_dtl.CD_EMP
+    JOIN hr_military_info_dtl ON hr_emp_mst.CD_EMP = hr_military_info_dtl.CD_EMP
+    where hr_emp_mst.CD_EMP=#{cdEmp};
+</select>
+
+
+
+
+
+
+</mapper>
+
+
+
+

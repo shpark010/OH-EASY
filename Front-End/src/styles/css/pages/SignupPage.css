@@ -1,7 +1,18 @@
+.signupMainDiv {
+  /* 설정 */
+  position: relative;
+  margin-top: 500px;
+}
+
 .signupBox {
-  margin: 40px 660px 61px 660px;
+  /* margin: 40px 660px 61px 660px; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 600px;
-  height: 979px;
+  /* height: 979px; */
+  height: 800px;
   border-radius: 10px;
   background: #fff;
   border: 1px solid #ccc;
@@ -10,7 +21,7 @@
 }
 
 .signupTxt {
-  margin-top: 45px;
+  margin-top: 80px;
   font-family: NanumSquare;
   font-weight: bold;
   font-size: 24px;
@@ -78,12 +89,15 @@
   background: #fff;
   border: 1px solid #ccc;
   font-size: 16px;
+  color: black;
   margin: 13.5px 100px 13.5px 100px;
   background-color: #bfbaba;
+  font-family: NanumSquare;
 }
 
 .signupOkBtn {
-  margin: 100px 100px 5px 100px;
+  /* margin: 100px 100px 5px 100px; */
+  margin: 50px 100px 5px 100px;
   width: 400px;
   height: 60px;
   background: #2e6ec8;
@@ -110,4 +124,8 @@
   font-size: 20px;
   text-align: center;
   color: #707070;
+}
+
+#updateMemberId {
+  background-color: #ccc;
 }

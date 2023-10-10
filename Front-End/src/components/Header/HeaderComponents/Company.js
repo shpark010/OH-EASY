@@ -1,5 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
+import { useYear } from "../../../containers/YearContext";
 
 const CompanyDiv = styled.div`
   display: flex;
@@ -15,25 +17,33 @@ const CompanyNameSpan = styled.span`
   font-weight: 600;
 `;
 
-class Company extends Component {
-  render() {
-    return (
-      <CompanyDiv>
-        <CompanyNameSpan>(주)로그인시회원데이터로가져옴</CompanyNameSpan>
-        <select
-          name="targetYear"
-          id="targetYear"
-          className="targetYear companyYear selectBox blue"
-          defaultValue="2022"
-        >
-          <option value="2022">2022</option>
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
-          <option value="2019">2019</option>
-        </select>
-      </CompanyDiv>
-    );
-  }
-}
+const Company = (props) => {
+  const { selectedYear, setSelectedYear } = useYear();
+  const location = useLocation();
+
+  const handleChange = (event) => {
+    setSelectedYear(event.target.value);
+  };
+
+  // 경로가 '/main'이 아니면 셀렉트 박스를 비활성화
+  const isDisabled = location.pathname !== "/main";
+  return (
+    <CompanyDiv>
+      <CompanyNameSpan>{props.companyName}</CompanyNameSpan>
+      {/* <select
+        name="targetYear"
+        id="targetYear"
+        className="targetYear companyYear selectBox blue"
+        value={selectedYear}
+        onChange={handleChange}
+        disabled={isDisabled} // 셀렉트 박스의 disabled 속성 설정
+      >
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+      </select> */}
+    </CompanyDiv>
+  );
+};
 
 export default Company;

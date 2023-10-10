@@ -1,13 +1,12 @@
 import React, { Component } from "react";
-import { styled } from "styled-components";
+import styled from "styled-components";
 
 const PriceInput = styled.input`
   width: ${(props) => props.width || "100px"};
   border-radius: 2px;
   border: 1px solid var(--color-primary-gray);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-  height: 32px;
-  padding: 0 5px;
+  height: 38px;
   text-align: center;
   font-size: 16px;
 
@@ -36,8 +35,8 @@ class CustomPriceInput extends Component {
   };
 
   render() {
-    const { width, id, className, value, onBlur } = this.props;
-    const formattedValue = this.formatPrice(value);
+    const { width, id, className, value = "", onBlur } = this.props; // value의 기본값을 ""로 설정
+    const formattedValue = this.formatPrice(value.toString()); // toString()으로 value가 숫자인 경우 문자열로 변환
 
     return (
       <PriceInput

@@ -1,9 +1,34 @@
+/* 작은 해상도에서의 스타일링 */
+/* @media (max-width: 1920px) { */
+/* 작은 해상도에서의 스타일 설정 */
 .sd-section {
-  height: 800px;
+  height: calc(100% - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.sd-container {
+  height: calc(100% - 68px);
+  /* height: 100%; */
+  padding-top: 1%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 17.8%;
+  grid-gap: 1rem;
+  grid-template-areas:
+    "a b d f"
+    "a b d f"
+    "a c e f"
+    "a c e f"
+    "a c e f";
+}
+/* } */
+
+/* .sd-section {
+  height: 900px;
 }
 
 .sd-container {
-  /* height: 100%; */
+  height: 100%;
   padding-top: 1%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -12,11 +37,13 @@
   grid-template-areas:
     "a b d f"
     "a c e f";
-}
+} */
 
 .searchBarNameCalender {
   display: flex;
   align-items: center;
+  padding-right: 25px;
+  padding-top: 2px;
 }
 
 .searchBarNameCalender span {
@@ -31,7 +58,7 @@
 
 .sd-item1 {
   grid-area: a;
-  border-top: 2px solid black;
+  /* border-top: 2px solid black; */
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -40,7 +67,7 @@
 
 .sd-item2 {
   grid-area: b;
-  border-top: 2px solid black;
+  /* border-top: 2px solid black; */
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -49,7 +76,7 @@
 
 .sd-item3 {
   grid-area: c;
-  border-top: 2px solid black;
+  /* border-top: 2px solid black; */
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -62,8 +89,8 @@
 }
 
 .sd-tableArea {
-  height: 80%;
-  border-top: 2px solid black;
+  height: 75%;
+  /* border-top: 2px solid black; */
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -71,7 +98,7 @@
 
 .sd-item5 {
   grid-area: e;
-  border-top: 2px solid black;
+  /* border-top: 2px solid black; */
   border-left: 1px solid #d8d8d8;
   border-right: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
@@ -82,6 +109,16 @@
   grid-area: f;
   background-color: #f2f2f2;
   height: 100%;
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-gray);
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-opacity-gray);
+  }
 }
 
 .sd-item1 .sd-empList,
@@ -89,8 +126,8 @@
 .sd-item3 .sd-allowance-bottom,
 .sd-item4 .sd-search-allowance-top,
 .sd-item5 .sd-search-allowance-bottom {
-  width: 100%;
-  text-align: center;
+  /* width: 100%;
+  text-align: center; */
 }
 
 .sd-item1 .sd-empList th,
@@ -138,7 +175,7 @@
   min-width: 18px;
 }
 
-.sd-item2 tr th:first-child,
+/* .sd-item2 tr th:first-child,
 .sd-item2 tr td:first-child {
   width: 40%;
 }
@@ -146,7 +183,7 @@
 .sd-item3 tr th:first-child,
 .sd-item3 tr td:first-child {
   width: 50%;
-}
+} */
 
 .sd-item4 .sd-searchCondition {
   border: 3px solid #d8d8d8;
@@ -168,7 +205,7 @@
 }
 
 .sd-empInfo-top {
-  margin: 5px;
+  margin: 0 5px;
   padding: 10px;
   background-color: #fff;
   font-size: 1.5rem;
@@ -200,4 +237,10 @@
   background-color: #fafafa;
   border: 2px solid #dfdfdf;
   font-weight: 600;
+  height: 42px;
+}
+
+.sd-price {
+  text-align: right;
+  padding-right: 15px;
 }

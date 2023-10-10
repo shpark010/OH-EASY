@@ -3,6 +3,10 @@ import styled from "styled-components";
 
 const PageHeaderNameStyle = styled.h2`
   font-size: 20px;
+  .ReactModalPortal & {
+    padding-bottom: 20px;
+    font-size: 18px;
+  }
 `;
 
 const PageHeaderName = ({ text }) => {
