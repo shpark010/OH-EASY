@@ -440,12 +440,25 @@ public class SdService {
 	// PDF 출력을 위한 조회
 	public SdPdfInfoVO seletForPdf(Map<String, String> pdfData) {
 		SdDao dao = sqlSession.getMapper(SdDao.class);
+		// 사원코드
+		String code = pdfData.get("code");
+		// 연도
+		String yyAllowance = pdfData.get("belongingDate").toString().substring(0, 4);
+		// 귀속월
+		String mmBelong = pdfData.get("belongingDate").toString().substring(4, 6);
+		// 지급일
+		String dtAllowance = pdfData.get("dtAllowance").toString();
+		Map<String, String> searchData = new HashMap<>();
+		searchData.put("yyAllowance", yyAllowance);
+		searchData.put("mmBelong", mmBelong);
+		searchData.put("dtAllowance", dtAllowance);
+		searchData.put("cdEmp", code);
 		SdPdfInfoVO pdfInfo = new SdPdfInfoVO();
 		try {
-			pdfInfo = dao.selectForPdf(pdfData);
+			pdfInfo = dao.selectForPdf(searchData);
 		} catch (Exception e) {
 			e.getMessage();
-			
+
 		}
 		return pdfInfo;
 	}
