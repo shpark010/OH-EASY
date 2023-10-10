@@ -1429,12 +1429,13 @@ const modalSearch = async(e) => {
                     onBlur={inputOnBlur}
                     />
 
-                    <CustomButton
-                      className="wcRightCellSearchButton"
-                      text="주소검색"
-                      color="black"
-                      onClick={addrButtonClick}
-                    />
+<CustomButton
+    className="wcRightCellSearchButton"
+    text="주소검색"
+    color="black"
+    onClick={addrButtonClick}
+    disabled={!clickCode}  // clickCode가 없을 경우 버튼을 비활성화
+/>
 
                   </td>
 
