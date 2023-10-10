@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import kr.or.oheasy.vo.SdEmailInfoVO;
 
 @RestController
 @RequestMapping("/api2/util")
+@EnableAsync
 public class EmailController {
 
     @Autowired
@@ -79,6 +81,7 @@ public class EmailController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(sendResult);
         resultData.put("sendResult", sendResult);
 		return new ResponseEntity<>(resultData, HttpStatus.OK);
     }
