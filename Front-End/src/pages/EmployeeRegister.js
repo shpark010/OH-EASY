@@ -1116,9 +1116,13 @@ const EmployeeRegister = () => {
 
   // 주민번호 별표 사용설정
   const toggleMaskResident = () => {
-    setMaskResident(prev => !prev);
-    setShowMaskAlert(true);
-    console.log("toggleMaskResident 함수 실행 ********************************")
+    setMaskResident(prev => {
+      // maskResident 상태가 true에서 false로 변경될 때만 얼럿을 보여줍니다.
+      if (!prev) {
+        setShowMaskAlert(true);
+      }
+      return !prev;
+    });
   }
 
   // 주민번호 마스킹처리
@@ -1640,7 +1644,7 @@ const EmployeeRegister = () => {
                 {
                   showMaskAlert && (
                     <SweetAlert
-                      text={maskResident ? "마스킹 설정이 활성화되어 사원 등록이 제한됩니다." : "이제 사원 등록을 진행하실 수 있습니다."}
+                      text={maskResident ? "마스킹 설정이 활성화되어 사원 등록이 제한됩니다." : "사원 등록을 진행하실 수 있습니다."}
                       confirmText="확인"
                       type="info"
                       onConfirm={() => {
