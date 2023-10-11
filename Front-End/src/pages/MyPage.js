@@ -86,7 +86,7 @@ const MyPage = () => {
         setAlertMessage("수정성공");
         setAlertType("success");
         setShowAlert(true);
-        removeCookie("loginInfo");
+        //removeCookie("loginInfo");
       } else {
         setAlertMessage("알수없는 오류(담당자에게 문의해주세요.)");
         setAlertType("warning");

@@ -69,6 +69,8 @@ function HRManagement() {
       //setClickEmpCode(clickModalEmpCode);
       setClickEmpCode(cdEmp);
       setClickModalEmpCode();
+      //setEmpStats
+      setEmpStats({ total: empList.length + 1 });
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -97,10 +99,10 @@ function HRManagement() {
     }
   }, [empList]);
 
-  const [conditions, setConditions] = useState({
-    category: 0,
-    sort: 3,
-  }); // 검색 조건을 저장하는 상태
+  // const [conditions, setConditions] = useState({
+  //   category: 0,
+  //   sort: 0,
+  // }); // 검색 조건을 저장하는 상태
 
   const [empStats, setEmpStats] = useState({
     total: 0,
@@ -352,9 +354,7 @@ function HRManagement() {
         setEmpStats={setEmpStats}
       />
       <HrSearchBar
-        conditions={conditions}
         setCheckedRows={setCheckedRows}
-        setConditions={setConditions}
         setEmpList={setEmpList}
         setClickEmpCode={setClickEmpCode}
         setEmpStats={setEmpStats}
