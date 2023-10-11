@@ -358,9 +358,11 @@ const WorkContractSelect = () => {
         </div>
 
         <div className="wcGrid2">
-          <h1 className="wcRightHead">근로계약서</h1>
+          <div className="borderbuttonBoldBlack">
+            <h1 className="wcRightHead">근로계약서</h1>
+          </div>
           <div className="wcScroll">
-            <table className="borderTopBold">
+            <table className="">
               <tbody>
                 <tr>
                   <th className="wcHeaderStyle"> 근로계약기간 </th>

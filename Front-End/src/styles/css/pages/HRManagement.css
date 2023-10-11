@@ -36,7 +36,7 @@
   text-align: center;
 }
 
-.hrTotalTable tr {
+.hrTotalTable tr th {
   width: 50%;
 }
 .hrInfoBase {

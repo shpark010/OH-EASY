@@ -378,15 +378,15 @@ function HRManagement() {
               <table className="hrTotalTable borderTopBold">
                 <tbody>
                   <tr>
-                    <th rowSpan="2">총인원</th>
-                    <td rowSpan="2">{empStats.total}</td>
-                    <th>재직</th>
-                    <td>{empStats.working}</td>
+                    <th rowSpan="1">총인원</th>
+                    <td rowSpan="1">{empStats.total}</td>
+                    {/* <th>재직</th>
+                    <td>{empStats.working}</td> */}
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <th>퇴사</th>
                     <td>{empStats.resigned}</td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
             </div>
