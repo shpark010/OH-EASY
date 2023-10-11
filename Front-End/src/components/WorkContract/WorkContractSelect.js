@@ -400,7 +400,7 @@ const WorkContractSelect = () => {
                       className="wcRightCellSearchButton"
                       text="주소검색"
                       color="black"
-                      readOnly
+                      disabled={true}
                     />
                   </td>
 

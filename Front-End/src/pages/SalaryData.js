@@ -227,6 +227,8 @@ const SalaryData = (props) => {
     certificate: "", //자격증
   }); //사원 상세 정보
 
+  const [resultRow, setResultRow] = useState(0);
+
   //api 요청 함수
   const apiRequest = useApiRequest();
 
@@ -629,14 +631,16 @@ const SalaryData = (props) => {
         },
       });
       sendResult = responseData.sendResult;
+      setResultRow(sendResult);
       if (sendResult > 0) {
         handleEmailSendOpenAlert();
+      } else {
+        handleNoEmailOpenAlert();
       }
       setCheckedRows([]);
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
-    return sendResult;
   };
 
   //PDF 출력
@@ -654,10 +658,10 @@ const SalaryData = (props) => {
         responseType: "json",
       });
       // EmpInfo 처리
-      const cdEmp = responseData.empInfo.cdEmp;
-      const nmEmp = responseData.empInfo.nmEmp;
-      const yyAllowance = responseData.empInfo.yyAllowance;
-      const mmBelong = responseData.empInfo.mmBelong;
+      const cdEmp = responseData.pdfInfo.cdEmp;
+      const nmEmp = responseData.pdfInfo.nmEmp;
+      const yyAllowance = responseData.pdfInfo.yyAllowance;
+      const mmBelong = responseData.pdfInfo.mmBelong;
 
       // Base64로 인코딩된 PDF 처리
       const base64Pdf = responseData.pdf;
@@ -1372,13 +1376,8 @@ const SalaryData = (props) => {
 
   const handleEmailConfirm = () => {
     if (checkedRows.length > 0) {
-      if (!empDetailInfo.email) {
-        handleNoEmailOpenAlert();
-      } else {
-        const sendResult = handleSendEmail();
-        console.log(sendResult);
-        setCheckedRows([]);
-      }
+      handleSendEmail();
+      setCheckedRows([]);
     }
 
     handleEmailCloseAlert();
@@ -1467,9 +1466,9 @@ const SalaryData = (props) => {
       )}
       {taxAlert && (
         <SweetAlert
-          text={
+          html={
             checkedRows.length > 0
-              ? `선택한 ${checkedRows.length}명의 사원만 변경한 세율을 반영하시겠습니까?`
+              ? `선택한 ${checkedRows.length}명의 사원만 <br>변경한 세율을 반영하시겠습니까?`
               : "전체 사원에 변경한 세율을 반영하시겠습니까?"
           }
           showCancel={true}
@@ -1480,14 +1479,15 @@ const SalaryData = (props) => {
       )}
       {emailAlert && (
         <SweetAlert
-          text={
+          html={
             checkedRows.length > 0
-              ? `선택한 ${checkedRows.length}명의 사원에게 변경한 급여메일을 발송하시겠습니까?`
+              ? `선택한 ${checkedRows.length}명의 사원에게 <br> 급여메일을 발송하시겠습니까?`
               : "체크된 사원이 없습니다. 사원을 체크하시고 다시 시도해 주세요"
           }
-          showCancel={false}
+          showCancel={checkedRows.length > 0 ? true : false}
           type={checkedRows.length > 0 ? "question" : "warning"}
           onConfirm={handleEmailConfirm}
+          onCancel={handleEmailCloseAlert}
         />
       )}
       {noEmailAlert && (
@@ -1501,7 +1501,6 @@ const SalaryData = (props) => {
       )}
       {pdfAlert && (
         <SweetAlert
-          // text={"선택한 사원의 현재 급여정보를 PDF로 다운로드 하시겠습니까?"}
           html={`현재 사원의 당월 급여정보를 <br> PDF로 다운로드 하시겠습니까?`}
           showCancel={true}
           type="question"
@@ -1521,7 +1520,7 @@ const SalaryData = (props) => {
 
       {emailSendAlert && (
         <SweetAlert
-          text={"메일을 성공적으로 발송했습니다."}
+          html={`${resultRow}건의 메일을 성공적으로 발송했습니다.`}
           type="success"
           onConfirm={handleEmailSendConfirm}
           showCancel={false}

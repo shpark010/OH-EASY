@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class SdEmailInfoVO {
-	private String cdEmp;
+	private String nmEmp;
 	private String nmEmail;
 	private String yyAllowance;
 	private String mmBelong;
