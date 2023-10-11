@@ -83,7 +83,7 @@ const MyPage = () => {
       setLoading(false);
 
       if (response.data === 1) {
-        setAlertMessage("수정성공 다시 로그인 해주세요");
+        setAlertMessage("수정성공");
         setAlertType("success");
         setShowAlert(true);
         removeCookie("loginInfo");
@@ -135,11 +135,8 @@ const MyPage = () => {
             setShowAlert(false);
             setAlertMessage();
             setAlertType();
-            if (
-              alertType === "success" &&
-              alertMessage === "수정성공 다시 로그인 해주세요"
-            ) {
-              navigate("/login");
+            if (alertType === "success" && alertMessage === "수정성공") {
+              navigate("/main");
             }
           }}
         />
