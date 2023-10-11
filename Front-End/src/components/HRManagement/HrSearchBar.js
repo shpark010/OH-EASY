@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchBarBox from "../SearchBar/SearchBarBox";
 import SearchSubmitButton from "../SearchBar/SearchSubmitButton";
 import useApiRequest from "../Services/ApiRequest";
 import SweetAlert from "../Contents/SweetAlert";
 const HrSearchBar = ({
-  conditions,
-  setConditions,
+  //conditions,
+  //setConditions,
   empList,
   setEmpList,
   setClickEmpCode,
@@ -14,15 +14,28 @@ const HrSearchBar = ({
 }) => {
   const apiRequest = useApiRequest();
 
+  const [conditions, setConditions] = useState({
+    category: 0,
+    sort: 0,
+  }); // 검색 조건을 저장하는 상태
+
   // 알림창 표시 상태 관리
   const [showAlert, setShowAlert] = useState(false);
-  const handleSelectChange = (e, name) => {
-    setConditions((prevState) => ({ ...prevState, [name]: e.target.value }));
+  useEffect(() => {
+    console.log("상태가 업데이트된 후~~~~~~");
+    console.log(conditions);
     handleSearchBtnClick();
-  };
+  }, [conditions]);
 
+  const handleSelectChange = (e, name) => {
+    console.log("변경전~~~~~~");
+    console.log(conditions);
+    setConditions((prevState) => ({ ...prevState, [name]: e.target.value }));
+  };
   const handleSearchBtnClick = async () => {
     console.log("클릭 시점");
+    console.log(conditions);
+
     setEmpList([]);
     try {
       const responseData = await apiRequest({
