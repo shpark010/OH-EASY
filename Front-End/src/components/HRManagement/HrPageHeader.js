@@ -73,6 +73,7 @@ const HrPageHeader = ({
         } else {
           setClickEmpCode();
         }
+        setEmpStats({ total: empList.length - checkedRows.length });
       } else {
         showAlertWithSettings({
           text: "삭제 실패",
