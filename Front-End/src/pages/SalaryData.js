@@ -424,7 +424,7 @@ const SalaryData = (props) => {
         method: "POST",
         url: "/api2/sd/getEmpList",
         data: {
-          belongingDate: "2023" + original.mmBelong,
+          belongingDate: original.yyAllowance + original.mmBelong,
           payDay: original.dtAllowance,
           searchOrder: "0",
           searchTaxOrder: "0",
@@ -433,7 +433,7 @@ const SalaryData = (props) => {
       setEmpList(responseData.empSearch);
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
-      setBelongingDate("2023" + original.mmBelong);
+      setBelongingDate(original.yyAllowance + original.mmBelong);
       setPayDay(original.dtAllowance);
       setSearchOrder("0");
       setSearchTaxOrder("0");
@@ -612,6 +612,11 @@ const SalaryData = (props) => {
         },
       });
       setCheckedRows([]);
+      const element = document.querySelector(`.${clickEmpCode}`); // className으로 요소를 찾음
+
+      if (element) {
+        element.click(); // 요소를 클릭
+      }
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
@@ -670,24 +675,23 @@ const SalaryData = (props) => {
         { type: "application/pdf" },
       );
 
-      // Create a link element
+      // 링크 요소 생성
       const link = document.createElement("a");
 
-      // Set the download attribute with a filename
+      // 파일 이름을 가진 다운로드 속성 설정
       link.download = `급여자료(${yyAllowance}년${mmBelong}월)_${nmEmp}(${cdEmp}).pdf`;
 
-      // Create a URL to the blob and set it as the href attribute
+      // blob에 대한 URL을 생성하고 href 속성으로 설정
       link.href = window.URL.createObjectURL(pdfBlob);
 
-      // Append the link to the body
+      // 링크를 바디에 추가
       document.body.appendChild(link);
 
-      // Trigger a click event on the link to download the file
+      // 파일을 다운로드하기 위해 링크에서 클릭 이벤트를 트리거
       link.click();
     } catch (error) {
       console.error("Failed to fetch emp data:", error);
     }
-    return sendResult;
   };
 
   //각 공제 항목 별 수정
@@ -1109,6 +1113,7 @@ const SalaryData = (props) => {
   const dataModalPayDayList = useMemo(
     () =>
       payDayList.map((list) => ({
+        yyAllowance: list.yyAllowance,
         mmBelong: list.mmBelong,
         dtAllowance: list.dtAllowance,
         cntPeople: list.cntPeople,
@@ -1118,6 +1123,28 @@ const SalaryData = (props) => {
   );
   const columnsModal = useMemo(
     () => [
+      {
+        Header: "귀속년",
+        accessor: "yyAllowance",
+        width: "15%",
+        id: "yyAllowance",
+        Cell: ({ cell: { value }, row: { original } }) => {
+          const handleSearchPayDay = () => {
+            handleFetchEmpData2(original);
+          };
+          const handleSetClickPayDay = () => {
+            handleSetSearchList(original);
+          };
+          return (
+            <Input
+              value={original?.yyAllowance}
+              onDoubleClick={handleSearchPayDay}
+              onClick={handleSetClickPayDay}
+              readOnly={true}
+            />
+          );
+        },
+      },
       {
         Header: "귀속월",
         accessor: "mmBelong",
@@ -1143,7 +1170,7 @@ const SalaryData = (props) => {
       {
         Header: "지급일자",
         accessor: "dtAllowance",
-        width: "30%",
+        width: "25%",
         id: "dtAllowance",
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleSearchPayDay = () => {
@@ -1166,9 +1193,9 @@ const SalaryData = (props) => {
         },
       },
       {
-        Header: "순인원",
+        Header: "인원",
         accessor: "cntPeople",
-        width: "15%",
+        width: "10%",
         id: "cntPeople",
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleSearchPayDay = () => {
@@ -1190,7 +1217,7 @@ const SalaryData = (props) => {
       {
         Header: "총지급액",
         accessor: "amtTotalPay",
-        width: "40%",
+        width: "30%",
         id: "amtTotalPay",
         Cell: ({ cell: { value }, row: { original } }) => {
           const handleSearchPayDay = () => {
@@ -1412,6 +1439,20 @@ const SalaryData = (props) => {
     handleNoEmailCloseAlert();
   };
 
+  // 급여자료 없음 alert
+  const [noSdAlert, setNoSdAlert] = React.useState(false);
+
+  const handleNoSdCloseAlert = () => {
+    setNoSdAlert(false); // 알림창 표시 상태를 false로 설정
+  };
+  const handleNoSdOpenAlert = () => {
+    setNoSdAlert(true); // 알림창 표시 상태를 false로 설정
+  };
+
+  const handleNoSdConfirm = () => {
+    handleNoSdCloseAlert();
+  };
+
   // 조회 조건 alert
   const [searchAlert, setSearchAlert] = React.useState(false);
 
@@ -1492,7 +1533,7 @@ const SalaryData = (props) => {
       )}
       {noEmailAlert && (
         <SweetAlert
-          text={"사원정보에 등록된 메일이 없습니다."}
+          text={"사원정보에 등록된 급여정보나 메일이 없습니다."}
           showCancel={true}
           type="error"
           onConfirm={handleNoEmailConfirm}
@@ -1548,7 +1589,7 @@ const SalaryData = (props) => {
                 <PageHeaderName text="지급일자" />
                 <div className="test2" style={{ height: "380px" }}>
                   <Table
-                    height="500px"
+                    height="360px"
                     columns={columnsModal}
                     data={dataModalPayDayList}
                   />
