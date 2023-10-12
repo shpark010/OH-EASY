@@ -15,11 +15,8 @@
 		ON
 		e.NO_POSITION_UNIQUE =
 		s.NO_POSITION_UNIQUE
-		WHERE SUBSTRING(DT_HIRE, 1,
-		6) &lt;=
-		#{belongingDate}
-		AND (e.DT_RESIGN IS NULL OR SUBSTRING(e.DT_RESIGN, 1,
-		6) &gt;= #{belongingDate})
+		WHERE SUBSTRING(DT_HIRE, 1, 6) &lt;= #{belongingDate}
+		AND (e.DT_RESIGN IS NULL OR SUBSTRING(e.DT_RESIGN, 1, 6) &gt;= #{belongingDate} OR e.DT_RESIGN = '')
 		<choose>
 			<!-- 코드 순 정렬 -->
 			<when test="searchOrder == 0">
@@ -576,6 +573,7 @@
 	<select id="getPayDayList"
 		resultType="kr.or.oheasy.vo.SdPayDayListVO">
 		SELECT
+		s.YY_ALLOWANCE as yyAllowance,
 		s.MM_BELONG as mmBelong,
 		s.DT_ALLOWANCE as
 		dtAllowance,
@@ -586,13 +584,11 @@
 		JOIN
 		TAX_RATE t ON s.SEQ_TAX_RATE =
 		t.SEQ_TAX_RATE
-		WHERE
-		s.YY_ALLOWANCE = '2023'
-		AND t.CD_TAX_RATE = 101
+		WHERE t.CD_TAX_RATE = 101
 		GROUP BY
-		s.MM_BELONG, s.DT_ALLOWANCE
+		s.YY_ALLOWANCE, s.MM_BELONG, s.DT_ALLOWANCE
 		ORDER BY
-		s.MM_BELONG, s.DT_ALLOWANCE
+		s.YY_ALLOWANCE, s.MM_BELONG, s.DT_ALLOWANCE
 	</select>
 
 	<!-- 전체 사원 정보 수정을 위한 급여 및 일자 조회 -->

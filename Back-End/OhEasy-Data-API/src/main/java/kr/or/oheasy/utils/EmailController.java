@@ -48,7 +48,6 @@ public class EmailController {
 			searchData.put("codeList", codeList);
 			// 사원정보 가져오기
 			emailInfoList = sdService.seletForMail(searchData);
-			System.out.println(emailInfoList);
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -58,24 +57,24 @@ public class EmailController {
         	for (SdEmailInfoVO emailInfo : emailInfoList) {
         		String html = FileUtil.readHtmlFile("src/main/resources/static/email.html");
         		if(emailValidator.validate(emailInfo.getNmEmail())) {
-        		System.out.println(emailInfo);
-        		FormatPrice formatPrice = new FormatPrice();
-        		// 여기서 파라미터 대체
-        		html = html.replace("{{nmEmp}}", emailInfo.getNmEmp())
-        				.replace("{{yyAllowance}}", emailInfo.getYyAllowance())
-        				.replace("{{mmBelong}}", emailInfo.getMmBelong())
-        				.replace("{{amtAllowance}}", formatPrice.formatMoney(emailInfo.getAmtAllowance()))
-        				.replace("{{nationalPension}}", formatPrice.formatMoney(emailInfo.getNationalPension()))
-        				.replace("{{healthInsurance}}", formatPrice.formatMoney(emailInfo.getHealthInsurance()))
-        				.replace("{{longtermNursingInsurance}}", formatPrice.formatMoney(emailInfo.getLongtermNursingInsurance()))
-        				.replace("{{employmentInsurance}}", formatPrice.formatMoney(emailInfo.getEmploymentInsurance()))
-        				.replace("{{incomeTax}}", formatPrice.formatMoney(emailInfo.getIncomeTax()))
-        				.replace("{{localIncomeTax}}", formatPrice.formatMoney(emailInfo.getLocalIncomeTax()))
-        				.replace("{{totalTax}}", formatPrice.formatMoney(emailInfo.getTotalDeduct()))
-        				.replace("{{netPay}}", formatPrice.formatMoney(emailInfo.getNetPay()));
-        		
-        		emailService.sendMail(emailInfo.getNmEmail(), "급여명세서", html);				
-        		sendResult++;
+	        		System.out.println(emailInfo);
+	        		FormatPrice formatPrice = new FormatPrice();
+	        		// 여기서 파라미터 대체
+	        		html = html.replace("{{nmEmp}}", emailInfo.getNmEmp())
+	        				.replace("{{yyAllowance}}", emailInfo.getYyAllowance())
+	        				.replace("{{mmBelong}}", emailInfo.getMmBelong())
+	        				.replace("{{amtAllowance}}", formatPrice.formatMoney(emailInfo.getAmtAllowance()))
+	        				.replace("{{nationalPension}}", formatPrice.formatMoney(emailInfo.getNationalPension()))
+	        				.replace("{{healthInsurance}}", formatPrice.formatMoney(emailInfo.getHealthInsurance()))
+	        				.replace("{{longtermNursingInsurance}}", formatPrice.formatMoney(emailInfo.getLongtermNursingInsurance()))
+	        				.replace("{{employmentInsurance}}", formatPrice.formatMoney(emailInfo.getEmploymentInsurance()))
+	        				.replace("{{incomeTax}}", formatPrice.formatMoney(emailInfo.getIncomeTax()))
+	        				.replace("{{localIncomeTax}}", formatPrice.formatMoney(emailInfo.getLocalIncomeTax()))
+	        				.replace("{{totalTax}}", formatPrice.formatMoney(emailInfo.getTotalDeduct()))
+	        				.replace("{{netPay}}", formatPrice.formatMoney(emailInfo.getNetPay()));
+	        		
+	        		emailService.sendMail(emailInfo.getNmEmail(), "급여명세서", html);				
+	        		sendResult++;
         		}
 			}
         } catch (Exception e) {
