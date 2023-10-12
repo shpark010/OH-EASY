@@ -60,6 +60,7 @@ const WorkContract = () => {
     
     setTab(e.target.value)
     setEmployeeData([]);  //tab전환시 table 초기화
+    setParamGetEmpList1([]);
   };
 
   const tabComponent = () =>{
@@ -244,39 +245,88 @@ const [emailAlert, setEmailAlert] = React.useState(false); // 이메일 발송 c
   const formatResponseData = (data) => {
     const sentences = data.split('. ').filter(Boolean);
     const formattedSentences = sentences.map(sentence => {
-        if (sentence.includes("메일을 성공적으로 보냈습니다")) {
-            const [count, names] = sentence.split(': ');
-            return `\n🟢 성공 (${count.split("명에게")[0].trim()}명):\n`;
-        }
-        if (sentence.includes("메일을 보내지 못했습니다")) {
-            const [count, names] = sentence.split(': ');
-            return `\n🔴 실패 (${count.split("명에게")[0].trim()}명):\n${names}`;
-        }
-        return sentence;
+      if (sentence.includes("메일을 성공적으로 보냈습니다")) {
+        const [count, names] = sentence.split(': ');
+        return `\n🟢 성공 (${count.split("명에게")[0].trim()}명):\n`;
+      }
+      if (sentence.includes("메일을 보내지 못했습니다")) {
+        const [count, names] = sentence.split(': ');
+        return `\n🔴 실패 (${count.split("명에게")[0].trim()}명):\n${names}`;
+      }
+      return sentence;
     });
+  
+    return formattedSentences.join('\n\n');
+  }
 
-    return formattedSentences.join('\n\n'); // 두 문장 사이에는 더 큰 간격으로 줄바꿈
-}
+//   const formatResponseData = (data) => {
+//     const splitData = data.split('. ').filter(Boolean);
+
+//     return splitData.map(sentence => {
+//         if (sentence.includes("메일을 성공적으로 보냈습니다")) {
+//             const count = sentence.split("명에게")[0].trim();
+//             return `\n🟢 성공 (${count}명):\n`;
+//         }
+//         if (sentence.includes("메일을 보내지 못했습니다")) {
+//             const [countInfo, names] = sentence.split(': ');
+//             const count = countInfo.split("명에게")[0].trim();
+//             return `\n🔴 실패 (${count}명):\n${names}`;
+//         }
+//         return sentence;
+//     }).join('\n\n');
+// };
 
 
 
+// const handleSendEmail = async () => {
+//   setEmailResult([]);
+//   try {
+//     // checkColumn을 기반으로 employeeData 필터링
+//     const selectedEmployees = employeeData.filter(emp => checkColumn.includes(emp.cdEmp));
 
+//     // 각 직원 데이터와 paramGetEmpList1을 조합
+//     const emailData = selectedEmployees.map(emp => ({
+//       cdEmp: emp.cdEmp,
+//       nmEmp: emp.nmEmp,
+//       // noResident: emp.noResident,
+      
+//     }));
+
+//     // API 요청
+//     const responseData = await apiRequest({
+//       method: "POST",
+//       url: "/api2/util/workContractEmail",
+//       data: {
+//         emailDataList: emailData,
+//       },
+//     });
+//     console.log(responseData);
+//     if (responseData === "Emails sent successfully") { //전원 성공시
+     
+//       handleEmailSendOpenAlert();
+//     } else if(responseData === "Emails sent fail"){ //전원 실패시
+//       handleEmailSendOpenAlert3();
+//     }
+    
+//     else  {
+//       handleEmailSendOpenAlert2();
+//       setEmailResult(formatResponseData(responseData));
+//     }
+//   } catch (error) {
+//     console.error("Failed to fetch emp data:", error);
+//   }
+//   return;
+// };
 
 const handleSendEmail = async () => {
   setEmailResult([]);
   try {
-    // checkColumn을 기반으로 employeeData 필터링
     const selectedEmployees = employeeData.filter(emp => checkColumn.includes(emp.cdEmp));
-
-    // 각 직원 데이터와 paramGetEmpList1을 조합
     const emailData = selectedEmployees.map(emp => ({
       cdEmp: emp.cdEmp,
       nmEmp: emp.nmEmp,
-      // noResident: emp.noResident,
-      
     }));
 
-    // API 요청
     const responseData = await apiRequest({
       method: "POST",
       url: "/api2/util/workContractEmail",
@@ -285,17 +335,19 @@ const handleSendEmail = async () => {
       },
     });
     console.log(responseData);
-    if (responseData === "Emails sent successfully") { //전원 성공시
-     
-      handleEmailSendOpenAlert();
-    } else if(responseData === "Emails sent fail"){ //전원 실패시
-      handleEmailSendOpenAlert3();
-    }
     
-    else  {
+    const cleanedData = responseData.replace("data:", "").trim();
+  const parsedData = JSON.parse(cleanedData);
+
+    if (parsedData.status === "success") { //전원 성공시
+      handleEmailSendOpenAlert();
+    } else if (parsedData.status === "fail") { //전원 실패시
+      handleEmailSendOpenAlert3();
+    } else if (parsedData.status === "partial") {
       handleEmailSendOpenAlert2();
-      setEmailResult(formatResponseData(responseData));
+      setEmailResult(formatResponseData(parsedData.message));
     }
+
   } catch (error) {
     console.error("Failed to fetch emp data:", error);
   }
@@ -448,7 +500,7 @@ const handleSendEmail = async () => {
 
 {emailSendAlert3 && (
         <SweetAlert
-        text={` 메일 주소를 확인해주세요.`}
+        text={` 사원정보에 등록된 메일이 없습니다.`}
           type="error"
           onConfirm={handleEmailSendConfirm}
           onCancel={handleEmailSendConfirm}
