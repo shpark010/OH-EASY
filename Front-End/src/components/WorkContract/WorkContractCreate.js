@@ -509,6 +509,10 @@ const WorkContractCreate = ({
 
   // 모달창에서 추가하기 하면 꺼지면서 사원 인서트 그냥 추가하기
   const closeModalAndEmpInsert = async () => {
+
+    if(!clickModalEmpCode){
+      return
+    }
     closeModal2();
 
     setParamGetEmpList1([]);
