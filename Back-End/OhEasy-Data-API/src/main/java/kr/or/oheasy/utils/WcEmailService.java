@@ -1,8 +1,10 @@
 package kr.or.oheasy.utils;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import kr.or.oheasy.vo.WcEmailVO;
@@ -82,21 +85,80 @@ public class WcEmailService {
 //        return resultMessage.toString();
 //    }
     
-    public String sendEmailToEmployees(Map<String, Object> emailData) throws Exception {
+//    @Async
+//    public String sendEmailToEmployees(Map<String, Object> emailData) throws Exception {
+//        WcDao wcdao = sqlSession.getMapper(WcDao.class);
+//        List<WcEmailVO> employees = wcdao.getEmployeeEmailData(emailData);
+//
+//        // 누락된 이메일 주소를 추적하는 List
+//        List<String> missingEmailEmployees = new ArrayList<>();
+//
+//        // 성공적으로 이메일을 보낸 사람들을 추적하는 List
+//        List<String> successfulEmailEmployees = new ArrayList<>();
+//
+//        for (WcEmailVO emp : employees) {
+//            if (emp.getNmEmail() == null || emp.getNmEmail().isEmpty()) {
+//                System.out.println("Email address is null or empty for employee: " + emp.getNmEmp());
+//                missingEmailEmployees.add(emp.getNmEmp());
+//                continue;  // 이메일이 없는 경우 다음 직원으로 건너뜁니다.
+//            }
+//
+//            try {
+//                MimeMessage mail = javaMailSender.createMimeMessage();
+//                MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+//                String htmlContent = buildEmailContent(emp);
+//                helper.setTo(emp.getNmEmail());
+//                helper.setSubject("근로계약서 교부 양식입니다.");
+//                helper.setText(htmlContent, true);
+//                javaMailSender.send(mail);
+//                
+//                successfulEmailEmployees.add(emp.getNmEmp());  // 메일 전송 성공한 직원 이름을 리스트에 추가합니다.
+//
+//            } catch (MailException e) {
+//                throw new Exception("Failed to send email due to messaging exception.", e);
+//            }
+//        }
+//
+//        StringBuilder resultMessage = new StringBuilder();
+//
+//        if (!successfulEmailEmployees.isEmpty()) {
+//            resultMessage.append(successfulEmailEmployees.size())
+//                         .append("명에게 메일을 성공적으로 보냈습니다: ")
+//                         .append(String.join(", ", successfulEmailEmployees))
+//                         .append(". ");
+//        }
+//
+//        if (!missingEmailEmployees.isEmpty()) {
+//            resultMessage.append(missingEmailEmployees.size())
+//                         .append("명에게 메일을 보내지 못했습니다: ")
+//                         .append(String.join(", ", missingEmailEmployees));
+//        }
+//
+//        // 모든 사원이 메일 보내기에 성공했다면 "Emails sent successfully"를 반환
+//        if (successfulEmailEmployees.size() == employees.size()) {
+//            return "Emails sent successfully";
+//        }
+//
+//        // 모든 사원이 메일 보내기에 실패했다면 "Emails sent fail"를 반환
+//        if (successfulEmailEmployees.isEmpty()) {
+//            return "Emails sent fail";
+//        }
+
+//        return resultMessage.toString();
+    
+    @Async
+    public CompletableFuture<Map<String, Object>> sendEmailToEmployees(Map<String, Object> emailData) throws Exception {
         WcDao wcdao = sqlSession.getMapper(WcDao.class);
         List<WcEmailVO> employees = wcdao.getEmployeeEmailData(emailData);
 
-        // 누락된 이메일 주소를 추적하는 List
         List<String> missingEmailEmployees = new ArrayList<>();
-
-        // 성공적으로 이메일을 보낸 사람들을 추적하는 List
         List<String> successfulEmailEmployees = new ArrayList<>();
 
         for (WcEmailVO emp : employees) {
             if (emp.getNmEmail() == null || emp.getNmEmail().isEmpty()) {
                 System.out.println("Email address is null or empty for employee: " + emp.getNmEmp());
                 missingEmailEmployees.add(emp.getNmEmp());
-                continue;  // 이메일이 없는 경우 다음 직원으로 건너뜁니다.
+                continue;
             }
 
             try {
@@ -108,7 +170,7 @@ public class WcEmailService {
                 helper.setText(htmlContent, true);
                 javaMailSender.send(mail);
                 
-                successfulEmailEmployees.add(emp.getNmEmp());  // 메일 전송 성공한 직원 이름을 리스트에 추가합니다.
+                successfulEmailEmployees.add(emp.getNmEmp());
 
             } catch (MailException e) {
                 throw new Exception("Failed to send email due to messaging exception.", e);
@@ -130,18 +192,23 @@ public class WcEmailService {
                          .append(String.join(", ", missingEmailEmployees));
         }
 
-        // 모든 사원이 메일 보내기에 성공했다면 "Emails sent successfully"를 반환
+        Map<String, Object> response = new HashMap<>();
+
         if (successfulEmailEmployees.size() == employees.size()) {
-            return "Emails sent successfully";
+            response.put("status", "success");
+            response.put("message", "Emails sent successfully");
+        } else if (successfulEmailEmployees.isEmpty()) {
+            response.put("status", "fail");
+            response.put("message", "Emails sent fail");
+        } else {
+            response.put("status", "partial");
+            response.put("message", resultMessage.toString());
         }
-
-        // 모든 사원이 메일 보내기에 실패했다면 "Emails sent fail"를 반환
-        if (successfulEmailEmployees.isEmpty()) {
-            return "Emails sent fail";
-        }
-
-        return resultMessage.toString();
+        
+        return CompletableFuture.completedFuture(response);
     }
+
+    
 
 
     private String buildEmailContent(WcEmailVO emp) {
