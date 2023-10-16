@@ -86,13 +86,13 @@ const TableContainer = styled.div`
 `;
 
 function Table(props) {
-  const tableContainerRef = useRef(null);
-  //const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
-  // const [selectedRowIndex, setSelectedRowIndex] = useState(0);
+  const tableContainerRef = useRef(null); //테이블 구조 ref
   const [selectedRowIndex, setSelectedRowIndex] = useState(props.index || 0);
 
   const [prevRowsLength, setPrevRowsLength] = useState(props.data.length); // 초기 rows의 길이 저장
   const [lastAddedRowIndex, setLastAddedRowIndex] = useState(null); // 마지막으로 추가된 행의 인덱스 저장
+
+  //태이블에 들어갈 데이터의 갯수가 변경될 때 적용될 useEffect
   useEffect(() => {
     console.log("props.data.length:", props.data.length);
     if (props.bottomFocus) {
@@ -104,9 +104,9 @@ function Table(props) {
       } else {
         const lastIndex = props.data.length - 1; // 마지막 행 인덱스
         setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
-        //setSelectedRowIndex(lastIndex); // 선택된 행을 마지막 행으로 설정
       }
       if (tableContainerRef.current) {
+        //테이블의 스크롤 설정
         tableContainerRef.current.scrollTop =
           tableContainerRef.current.scrollHeight -
           tableContainerRef.current.clientHeight;
@@ -115,6 +115,7 @@ function Table(props) {
     }
   }, [props.data.length]);
 
+  //각 컬럼의 너비 설정 함수
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns: props.columns, data: props.data });
 
