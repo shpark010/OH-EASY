@@ -104,6 +104,7 @@ const SalaryData = (props) => {
   }, [clickEmpCode]);
   //클릭한 지급일자 상태
   const [clickPayDay, setClickPayDay] = useState({
+    yyAllowance: "",
     mmBelong: "",
     dtAllowance: "",
   });
@@ -433,7 +434,7 @@ const SalaryData = (props) => {
       setEmpList(responseData.empSearch);
       const searchTaxInfo = responseData.searchTaxInfo;
       handleSearchTax(searchTaxInfo);
-      setBelongingDate(original.yyAllowance + original.mmBelong);
+      setBelongingDate(original.yyAllowance + "-" + original.mmBelong);
       setPayDay(original.dtAllowance);
       setSearchOrder("0");
       setSearchTaxOrder("0");
@@ -1245,6 +1246,7 @@ const SalaryData = (props) => {
   const handleSetSearchList = (original) => {
     console.log("payDay : " + original.dtAllowance);
     setClickPayDay({
+      yyAllowance: original.yyAllowance,
       mmBelong: original.mmBelong,
       dtAllowance: original.dtAllowance,
     });
